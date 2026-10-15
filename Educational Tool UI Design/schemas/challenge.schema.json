@@ -1,0 +1,756 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "allowedModes": {
+      "items": {
+        "enum": [
+          "guided",
+          "parametric",
+          "freeform"
+        ],
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "allowedSections": {
+      "items": {
+        "enum": [
+          "circle",
+          "tube",
+          "rectangle",
+          "iSection"
+        ],
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "constraints": {
+      "additionalProperties": false,
+      "properties": {
+        "maxDeflectionM": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "maxHeightM": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "maxMassKg": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "maxStressPa": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "maxWidthM": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "maxMassKg",
+        "maxDeflectionM",
+        "maxStressPa",
+        "maxWidthM",
+        "maxHeightM"
+      ],
+      "type": "object"
+    },
+    "content": {
+      "additionalProperties": false,
+      "properties": {
+        "collegeDetails": {
+          "type": "boolean"
+        },
+        "conceptNotes": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "conceptNotes",
+        "collegeDetails"
+      ],
+      "type": "object"
+    },
+    "difficulty": {
+      "enum": [
+        "introductory",
+        "intermediate",
+        "advanced"
+      ],
+      "type": "string"
+    },
+    "id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "initialDesign": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "lengthM": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "materialId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "orientationDeg": {
+          "enum": [
+            0,
+            90
+          ],
+          "type": "number"
+        },
+        "section": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "diameterM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "kind": {
+                  "const": "circle",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind",
+                "diameterM"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "innerDiameterM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "kind": {
+                  "const": "tube",
+                  "type": "string"
+                },
+                "outerDiameterM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "kind",
+                "outerDiameterM",
+                "innerDiameterM"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "heightM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "kind": {
+                  "const": "rectangle",
+                  "type": "string"
+                },
+                "widthM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "kind",
+                "widthM",
+                "heightM"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "flangeThicknessM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "heightM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "kind": {
+                  "const": "iSection",
+                  "type": "string"
+                },
+                "webThicknessM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "widthM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "kind",
+                "widthM",
+                "heightM",
+                "flangeThicknessM",
+                "webThicknessM"
+              ],
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "section",
+        "orientationDeg",
+        "lengthM",
+        "materialId"
+      ],
+      "type": "object"
+    },
+    "load": {
+      "additionalProperties": false,
+      "properties": {
+        "direction": {
+          "const": "down",
+          "type": "string"
+        },
+        "forceN": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "location": {
+          "const": "freeEnd",
+          "type": "string"
+        }
+      },
+      "required": [
+        "forceN",
+        "location",
+        "direction"
+      ],
+      "type": "object"
+    },
+    "lockedFields": {
+      "items": {
+        "enum": [
+          "lengthM",
+          "materialId",
+          "forceN",
+          "support"
+        ],
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "material": {
+      "additionalProperties": false,
+      "properties": {
+        "allowableStressPa": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "densityKgM3": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "elasticModulusPa": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "yieldStressPa": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "elasticModulusPa",
+        "densityKgM3",
+        "allowableStressPa",
+        "yieldStressPa"
+      ],
+      "type": "object"
+    },
+    "predictionPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "requiredOnIterations": {
+          "items": {
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "requiredOnIterations"
+      ],
+      "type": "object"
+    },
+    "referenceDesign": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "lengthM": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "materialId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "orientationDeg": {
+          "enum": [
+            0,
+            90
+          ],
+          "type": "number"
+        },
+        "section": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "diameterM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "kind": {
+                  "const": "circle",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind",
+                "diameterM"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "innerDiameterM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "kind": {
+                  "const": "tube",
+                  "type": "string"
+                },
+                "outerDiameterM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "kind",
+                "outerDiameterM",
+                "innerDiameterM"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "heightM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "kind": {
+                  "const": "rectangle",
+                  "type": "string"
+                },
+                "widthM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "kind",
+                "widthM",
+                "heightM"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "flangeThicknessM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "heightM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "kind": {
+                  "const": "iSection",
+                  "type": "string"
+                },
+                "webThicknessM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "widthM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "kind",
+                "widthM",
+                "heightM",
+                "flangeThicknessM",
+                "webThicknessM"
+              ],
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "section",
+        "orientationDeg",
+        "lengthM",
+        "materialId"
+      ],
+      "type": "object"
+    },
+    "reflectionPrompt": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "text": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "text"
+      ],
+      "type": "object"
+    },
+    "sectionDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "iSectionFlangeThicknessM": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "iSectionWebThicknessM": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "tubeWallM": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "tubeWallM",
+        "iSectionFlangeThicknessM",
+        "iSectionWebThicknessM"
+      ],
+      "type": "object"
+    },
+    "sectionLimits": {
+      "additionalProperties": false,
+      "properties": {
+        "circle": {
+          "additionalProperties": false,
+          "properties": {
+            "diameterM": {
+              "additionalProperties": false,
+              "properties": {
+                "maxM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "minM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "stepM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "minM",
+                "maxM",
+                "stepM"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "diameterM"
+          ],
+          "type": "object"
+        },
+        "iSection": {
+          "additionalProperties": false,
+          "properties": {
+            "heightM": {
+              "additionalProperties": false,
+              "properties": {
+                "maxM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "minM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "stepM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "minM",
+                "maxM",
+                "stepM"
+              ],
+              "type": "object"
+            },
+            "minClearWebHeightM": {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            "minFlangeThicknessM": {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            "minWebThicknessM": {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            "widthM": {
+              "additionalProperties": false,
+              "properties": {
+                "maxM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "minM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "stepM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "minM",
+                "maxM",
+                "stepM"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "widthM",
+            "heightM",
+            "minFlangeThicknessM",
+            "minWebThicknessM",
+            "minClearWebHeightM"
+          ],
+          "type": "object"
+        },
+        "rectangle": {
+          "additionalProperties": false,
+          "properties": {
+            "heightM": {
+              "additionalProperties": false,
+              "properties": {
+                "maxM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "minM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "stepM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "minM",
+                "maxM",
+                "stepM"
+              ],
+              "type": "object"
+            },
+            "widthM": {
+              "additionalProperties": false,
+              "properties": {
+                "maxM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "minM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "stepM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "minM",
+                "maxM",
+                "stepM"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "widthM",
+            "heightM"
+          ],
+          "type": "object"
+        },
+        "tube": {
+          "additionalProperties": false,
+          "properties": {
+            "minWallM": {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            "outerDiameterM": {
+              "additionalProperties": false,
+              "properties": {
+                "maxM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "minM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "stepM": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "minM",
+                "maxM",
+                "stepM"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "outerDiameterM",
+            "minWallM"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "circle",
+        "tube",
+        "rectangle",
+        "iSection"
+      ],
+      "type": "object"
+    },
+    "statement": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "support": {
+      "const": "fixedRoot",
+      "type": "string"
+    },
+    "title": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "version": {
+      "exclusiveMinimum": 0,
+      "type": "integer"
+    },
+    "visualization": {
+      "additionalProperties": false,
+      "properties": {
+        "exaggerationFactor": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "maxVisualDeflectionFractionOfL": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "exaggerationFactor",
+        "maxVisualDeflectionFractionOfL"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "id",
+    "version",
+    "title",
+    "difficulty",
+    "allowedModes",
+    "statement",
+    "material",
+    "initialDesign",
+    "lockedFields",
+    "support",
+    "load",
+    "constraints",
+    "sectionLimits",
+    "sectionDefaults",
+    "allowedSections",
+    "predictionPolicy",
+    "reflectionPrompt",
+    "visualization",
+    "content"
+  ],
+  "title": "Challenge",
+  "type": "object"
+}

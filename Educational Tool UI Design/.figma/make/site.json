@@ -1,0 +1,11 @@
+{
+  "title": "Statica",
+  "description": "This educational tool enhances engineering intuition for high school and college students through interactive training modules and practical problem-solving exercises.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

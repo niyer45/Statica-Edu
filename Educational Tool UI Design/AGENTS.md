@@ -1,0 +1,119 @@
+# Statica (Engineering Intuition MVP)
+
+Browser-based structures learning tool. A student designs the cross-section of a cantilever beam
+("Cantilever Beam I"), predicts how it will behave, runs an idealized Euler–Bernoulli test, and
+compares iterations. It is built inside a Figma Make template ("figma-make-app"), and the
+template's visual design and platform shell are kept.
+
+Read `HANDOFF.md` first for the current status and the next task.
+
+## Specifications (source of truth)
+
+The spec lives outside this folder, one level up:
+
+- `../.kiro/specs/engineering-intuition-mvp/requirements.md`: Requirements 1–35 with numbered acceptance criteria.
+- `../.kiro/specs/engineering-intuition-mvp/design.md`: architecture, decisions D-01…D-25, correctness Properties 1–37, fixtures, thresholds.
+- `../.kiro/specs/engineering-intuition-mvp/tasks.md`: the implementation plan (Milestones 0–3, tasks 1–28) with a JSON wave dependency graph at the end.
+
+Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuition-mvp/`.
+`DECISIONS.md` in this folder records D-01…D-24 and the 14 applicability thresholds. D-25 (required `sectionDefaults` on Challenge) is in `design.md`.
+
+## Rules for following the spec
+
+- Implement tasks in `tasks.md` order, respecting the wave graph. Each task lists the requirement IDs it must satisfy.
+- Do not rewrite requirements, design, or tasks. If the code must deviate, record it under "Deviations" in `HANDOFF.md` (and in `DECISIONS.md` if it is a design decision).
+- Property tests must carry the tag comment `// Feature: engineering-intuition-mvp, Property N: <title>` and use the `test/pbt.ts` helper (`PBT_RUNS` env var, default 200, fixed seed).
+- Never show fabricated numbers in the UI. Every displayed result comes from a stored Test_Result produced by `physics/analyze` and `evaluation/evaluate`.
+- Later tasks fill existing stub files in place (each stub header names its task). Don't create parallel components.
+
+## Tech stack
+
+- React 19, TypeScript (strict), Vite 8, Tailwind CSS v4 (`@tailwindcss/vite`), and the four Figma Make Vite plugins in `vite.config.ts` (leave them unchanged).
+- 3D: three 0.186.1, @react-three/fiber 9.8.2, @react-three/drei 10.7.9. The R3F viewport isn't built yet.
+- zod 3.25.76 (challenge and import schemas), zod-to-json-schema.
+- Testing: Vitest 5 (jsdom for `src/ui/**`), fast-check 4, Testing Library, Playwright 1.64 with axe-core.
+- ESLint 10 with typescript-eslint, oxfmt.
+- Node 22, pnpm 10.34.3 (`.mise.toml`, `packageManager`). Use pnpm only. Pin new dependencies to exact versions (`pnpm add -E`).
+
+## Architecture and structure
+
+- `src/units`: mm/m/MPa conversion, `parseMmInput`, `formatMm`.
+- `src/challenge`: types, zod schema, loader, bundled `challenges/cantilever-beam-1.json`, `catalog.ts` (shell cards; only cantilever-beam-1 is available), `content.ts`.
+- `src/geometry`: sections, validation, clamp/strict set, conversion, envelope, outline, handle descriptors.
+- `src/physics`: section properties, beam formulas, applicability checks, `analyze`.
+- `src/evaluation`: constraints, acceptance, efficiency, explanations (`explain.ts`), prediction scoring. Also holds the TestResult/Prediction types.
+- `src/state`: `session.ts` (types, `initSession`), `reducer.ts` (pure `sessionReducer`), `selectors.ts`, `importExport.ts`.
+- `src/ui`: app, store, shell, workbench, palette, controls, mesh, viewport, dialogs, panels, history, a11y, icons.
+  - `ui/App.tsx`: bootstrap.
+  - `ui/state`: StoreProvider, hooks, dev snapshot.
+  - `ui/shell`: platform shell.
+  - `ui/workbench`: layout.
+  - `ui/mesh`: three.js geometry.
+- `src/BeamScene.tsx`: the template SVG scene. It's still in use and will be replaced by `ui/viewport/Fallback2D` in task 14.4.
+- `test/`: shared arbitraries, pbt helper, fixtures (`test/fixtures/designs.ts`), architecture and config guard tests.
+- `e2e/`: Playwright (empty so far).
+- `schemas/`: generated JSON Schema. `scripts/`: schema generator.
+- Unit tests are colocated as `*.test.ts(x)`. Property tests are named `*.pN.test.ts`.
+
+### Import boundary (enforced by ESLint and `test/architecture.test.ts`)
+
+- `units`, `challenge`, `geometry`, `physics`, and `evaluation` are pure. They must not import `react`, `three`, `@react-three/*`, `ui/`, or `state/`.
+- `physics` must not import `evaluation`, and `evaluation` must not import `units` or `state`.
+- No section, mass, deflection, or stress formulas anywhere in `src/ui` or `src/state`. Call the domain functions instead. `ui/mesh` and the 2D fallback may call `physics.deflectionShape` and `geometry.sectionOutline` for display only.
+- Don't recreate `src/physics.ts`.
+- The reducer is pure: no `Date`, randomness, DOM, or storage. Clock and id are injected via StoreProvider.
+
+### Runtime constraints
+
+- No network requests at runtime. Fonts are self-hosted through `@fontsource`.
+- The production build injects the CSP `default-src 'self'`, so avoid inline styles/scripts, `data:` URLs, and remote assets. Keep `.figma/make/site.json` free of analytics and custom scripts, and leave `addBypassLinks` false.
+- Keep the template class names, `index.css`, and `platform*.css`. Only make contrast fixes there.
+
+## Code conventions
+
+- TypeScript strict. Components use default exports.
+- Single quotes in TS. Use double quotes for strings containing apostrophes.
+- Keep CSS `@import` statements first in `src/index.css`.
+- Accessibility: every control has an accessible name, and state is never conveyed by color alone. Announcements go through the single `ui/a11y/LiveRegion`.
+
+## Commands (run from this folder; quote the path, it contains spaces)
+
+```bash
+pnpm install
+pnpm run dev          # http://localhost:8443
+pnpm run lint
+pnpm run typecheck
+pnpm run test         # all Vitest tests
+PBT_RUNS=2000 pnpm run test   # deeper property-test run
+pnpm exec vitest run --coverage
+pnpm run build && pnpm run preview
+pnpm exec playwright install chromium   # once, before e2e
+pnpm run e2e
+pnpm run gen:schema   # then check schemas/ for drift
+pnpm run format
+```
+
+Before finishing any task, all of these must pass: lint (0 errors), typecheck, test, build.
+
+## Maintaining task progress
+
+`tasks.md` checkbox markers:
+- `- [x]` done and verified
+- `- [ ]` not started
+- `- [-]` in progress
+- `- [~]` queued
+- `*` after the box means optional (the user chose to include optional tests)
+
+When you finish a task:
+1. Run the full verification above.
+2. Change only that task's box to `[x]`. Mark a parent `[x]` once all its children are `[x]`.
+3. Don't mark a task done without verifying it.
+
+## Updating handoff docs
+
+At the end of each work session, update `HANDOFF.md`:
+- the last completed task and the next task
+- test counts
+- new deviations and known issues
+
+Update this file only if commands, structure, or rules change.

@@ -1,0 +1,40 @@
+# Statica (Engineering Intuition MVP)
+
+Browser-only training app. The MVP ships one challenge, "Cantilever Beam I: Reduce Deflection". Students diagnose a flawed cantilever, swap and resize its cross-section in a 3D viewport, run a deterministic Euler-Bernoulli analysis, compare iterations, reflect, and submit. There is no backend and no runtime network access. Design decisions live in [DECISIONS.md](DECISIONS.md).
+
+## Install
+
+Requires Node 22 and pnpm 10.34.3 (pinned in `.mise.toml` and `package.json#packageManager`).
+
+```sh
+mise install            # or: corepack enable && corepack prepare pnpm@10.34.3 --activate
+pnpm install --frozen-lockfile
+pnpm exec playwright install chromium   # needed once before `pnpm run e2e`
+```
+
+`.figma/make/install` is for the Figma Make preview environment only. Do not use it for local development or CI.
+
+## Scripts
+
+| Command | Purpose |
+|---------|---------|
+| `pnpm run dev` | Vite dev server |
+| `pnpm run lint` | ESLint, including the domain import-boundary rule |
+| `pnpm run typecheck` | `tsc --noEmit` (strict) |
+| `pnpm run test` | Vitest unit, property-based (fast-check), and architecture tests |
+| `pnpm run build` | Production build to `dist/` (CSP injected) |
+| `pnpm run e2e` | Playwright end-to-end and axe accessibility tests (Chromium) |
+| `pnpm run gen:schema` | Regenerate `schemas/challenge.schema.json` from the zod schemas |
+| `pnpm run format` | Format with oxfmt |
+
+## Layout
+
+- `src/units`, `src/challenge`, `src/geometry`, `src/physics`, `src/evaluation`: pure, deterministic domain code
+- `src/state`: session reducer, persistence (`localStorage`), import/export
+- `src/ui`: React, React Three Fiber, and the platform shell (template CSS in `src/*.css`)
+- `test/`: shared arbitraries, fixtures, architecture tests; `e2e/`: Playwright specs
+- `schemas/`: generated JSON Schema (committed; CI checks for drift); `scripts/`: build helpers
+
+## Architecture boundary
+
+`units`, `challenge`, `geometry`, `physics`, and `evaluation` must not import `react`, `three`, `@react-three/*`, `ui/`, or `state/`, and `physics` must not import `evaluation`. ESLint (`no-restricted-imports`) and an architecture test enforce this. Every numeric result comes from typed section parameters through pure functions, never from meshes or rendering state.
