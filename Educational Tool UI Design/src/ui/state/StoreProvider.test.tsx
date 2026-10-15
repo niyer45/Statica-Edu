@@ -114,3 +114,26 @@ describe('StoreProvider', () => {
     expect(window.__EI_STATE__).toBeUndefined()
   })
 })
+
+
+it('uses injected clock/id for prediction confirmation and recording through the existing store (19.1)', () => {
+  const { store } = setup()
+  const baseline = store().state.history[0]
+  act(() => store().runTest())
+  expect(store().state.ui.predictionDialogOpen).toBe(true)
+  expect(store().state.history).toHaveLength(1)
+  const expectedId = `id-${n + 1}`
+  act(() => {
+    store().dispatch({ type: 'setPrediction', direction: 'same', explanation: '', now: store().clock() })
+    store().runTest()
+  })
+  const result = store().state.history[1]!
+  expect(result.id).toBe(expectedId)
+  expect(result.iteration).toBe(1)
+  expect(result.timestamp).toBe(clock())
+  expect(result.prediction?.createdAt).toBe(clock())
+  expect(result.predictionOutcome).toMatchObject({ actual: 'same', matched: true })
+  expect(store().state.history[0]).toBe(baseline)
+  expect(store().state.ui.predictionDialogOpen).toBe(false)
+  expect(Object.isFrozen(result.designSnapshot.section)).toBe(true)
+})

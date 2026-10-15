@@ -60,7 +60,8 @@ export type Action =
   | { type: 'applySection'; kind: SectionKind }
   | { type: 'setParam'; param: string; valueM: number; mode: 'clamp' | 'strict' }
   | { type: 'setOrientation'; orientationDeg: Orientation }
-  | { type: 'setPrediction'; direction: PredictionDirection; explanation?: string }
+  /** Prediction time is injected just like runTest time (D-27). */
+  | { type: 'setPrediction'; direction: PredictionDirection; explanation?: string; now: string }
   /** Closes the dialog and stores nothing (Req 14.5). */
   | { type: 'cancelPrediction' }
   /** Time and id are injected for determinism. */

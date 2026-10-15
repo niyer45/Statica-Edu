@@ -425,20 +425,20 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
 ### Milestone 3: Learning loop
 
 - [ ] 19. Complete the session reducer
-  - [ ] 19.1 Add `runTest`, `setPrediction`, and `cancelPrediction` to `state/reducer.ts`
+  - [x] 19.1 Add `runTest`, `setPrediction`, and `cancelPrediction` to `state/reducer.ts`
     - Prediction gating via `requiredOnIterations`; invalid draft sets `draftErrors` without opening dialog; frozen snapshot, analyze, evaluate, scorePrediction, append frozen TestResult with payload id/timestamp; catch `PhysicsInvariantError` (no iteration, error notice); compare selection keeps the last three non-baseline iterations
     - `cancelPrediction` is added to the design's Action union to satisfy 14.5
     - _Requirements: 9.4, 14.1, 14.3, 14.5, 14.6, 14.9, 14.10, 15.8, 16.8, 17.1, 17.2, 17.3, 17.7_
 
-  - [ ] 19.2 Add `restore`, `toggleCompare`, `setReflection`, `submit`, `importDesign`, and `reset`
+  - [x] 19.2 Add `restore`, `toggleCompare`, `setReflection`, `submit`, `importDesign`, and `reset`
     - Restore deep copy with fresh id, history untouched, status recomputed, unknown id no-op; compare selection max three with notice; reflection ≤ 2000 chars; submit gating (iteration ≥ 1, non-whitespace reflection) with untrimmed text and efficiency; import uses `importDesign`, all-or-nothing; reset keeps baseline and locked fields
     - _Requirements: 4.4, 15.4, 18.5, 18.6, 19.1, 19.2, 19.3, 19.4, 19.6, 19.7, 20.2, 20.4, 20.8, 22.5, 22.6, 22.7, 23.5, 23.6_
 
-  - [ ]* 19.3 Build the model-based test harness
+  - [x]* 19.3 Build the model-based test harness
     - `test/state/model.ts` with `fc.commands` for every action (valid and hostile payloads), a reachable-state arbitrary, and an invariant hook run after every action
     - _Requirements: 33.3_
 
-  - [ ]* 19.4 Write property test for append-only history
+  - [x]* 19.4 Write property test for append-only history
     - **Property 28: Append-only**
     - **Validates: Requirements 15.4, 17.1, 18.1**
 

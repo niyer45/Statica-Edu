@@ -1,6 +1,6 @@
 # Milestone 2 verification
 
-Completed on 2026-10-15 against the component-test gate in task 18 / Requirement 33.8, with the user's D-26 presentation override. Milestone 3 starts at task 19.1.
+Completed on 2026-10-15 against the component-test gate in task 18 / Requirement 33.8, with the user's D-26 presentation override. Milestone 3 starts at task 19.1. This is the historical M2 checkpoint report; subsequent work and current test counts are tracked in HANDOFF.md.
 
 ## Results
 

@@ -2,7 +2,9 @@
 
 Browser-only structures learning app built around "Cantilever Beam I: Reduce Deflection". Milestone 2 provides typed cross-section editing, a 3D viewport with dimension handles, a usable SVG fallback, and the platform shell. The domain solver is implemented; the student-facing prediction, test/results, comparison, persistence, and submission workflow is Milestone 3 work. Run Test is currently disabled.
 
-**Milestone 2 is complete against its component-test gate**: 782 tests pass, along with lint, type checking, and build. [MILESTONE2.md](MILESTONE2.md) records the evidence and remaining browser-verification limits. [HANDOFF.md](HANDOFF.md) gives the current status and next task (19.1).
+**Milestone 2 is complete against its component-test gate** (782 tests at closeout). Tasks 19.1–19.2 are implemented in the reducer: prediction gating, immutable test results, scoring, restore, comparison selection, reflection/submission, import and reset. Task 19.3 adds the reusable model-based command harness and reachable-session generator. Task 19.4 verifies append-only history (Property 28) after every generated action. The current full suite has **823 passing tests**, with lint, type checking and build passing too. [MILESTONE2.md](MILESTONE2.md) records the evidence and remaining browser-verification limits. [HANDOFF.md](HANDOFF.md) gives the current status and next task (19.5).
+
+The dotted deformation outline shows the latest **tested** design (initially the Baseline), so selecting or resizing a cross-section does not change it until a successful Run Test. This follows Requirements 25.2–25.5. The pending Run Test/results panel (21.1) and prediction confirmation (22.2) complete that UI flow; no separate deformation fix is needed.
 
 The 3D model view deliberately omits its envelope and static text overlays; drag feedback appears below the Canvas. Numerical controls and the accessible summary retain the dimension/load information, and envelope constraints remain active. See decision D-26 in [DECISIONS.md](DECISIONS.md).
 

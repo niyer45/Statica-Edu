@@ -15,6 +15,7 @@ import type { Clock, IdFactory } from './bootstrap'
 //     runTest()       dispatches runTest with the injected clock and id factory
 //     submit(id)      dispatches submit with the injected clock
 //
+// Prediction confirmation (task 22.2): dispatch setPrediction with now: clock(), then runTest().
 // Components never call Date or crypto directly; the clock and id factory are injected into
 // the provider so the reducer stays pure.
 

@@ -243,8 +243,8 @@ describe('reducer purity', () => {
     expect(s.history).toBe(s0.history)
   })
 
-  it('leaves the state unchanged for actions implemented in task 19', () => {
+  it('reset preserves the baseline history reference', () => {
     const s0 = fresh()
-    expect(sessionReducer(s0, { type: 'reset' }, ch)).toBe(s0)
+    expect(sessionReducer(s0, { type: 'reset' }, ch).history).toBe(s0.history)
   })
 })

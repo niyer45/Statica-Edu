@@ -1,6 +1,6 @@
 # Handoff: Statica MVP
 
-Last updated: 2026-10-15, Milestone 2 closeout and user-directed 3D scene simplification. See `MILESTONE2.md` for the checkpoint evidence. This handoff accompanies the authorized GitHub update. Spec: `../.kiro/specs/engineering-intuition-mvp/` (requirements.md, design.md, tasks.md). Rules and commands: `AGENTS.md`.
+Last updated: 2026-10-15, task 19.4 and deformation-behavior review for GitHub delivery. Milestone 2 checkpoint evidence remains in `MILESTONE2.md`. This delivery includes tasks 19.1–19.4 and the deformation-behavior documentation; the next development task remains 19.5. Spec: `../.kiro/specs/engineering-intuition-mvp/` (requirements.md, design.md, tasks.md). Rules and commands: `AGENTS.md`.
 
 ## A. Current state
 
@@ -29,6 +29,8 @@ Implemented and verified:
   - 18: four-profile Workbench gate; all component tests and required checks pass.
   - User override D-26: uncluttered 3D scene, with envelope/static annotations removed and handle feedback below Canvas.
 
+- **Milestone 3, partial:** tasks 19.1–19.2 are implemented and verified. Task 19.3 adds the reusable model-based test harness; task 19.4 verifies Property 28 (append-only history). Reducer `runTest`, `setPrediction` and `cancelPrediction` now work; student-facing panel/dialog wiring remains later tasks.
+
 What works in the running app (`pnpm run dev`):
 - Platform shell:
   - Library with filters and search.
@@ -42,15 +44,15 @@ What works in the running app (`pnpm run dev`):
 - Draft badge ("Draft" / "Tested #n"), workflow stepper, footer model-limits notice, and the live region.
 
 Incomplete:
-- **Run test is disabled.** The reducer's `runTest` and every other non-edit action are no-op stubs until task 19, so no results, pass/fail, or comparisons are shown.
+- **Run Test remains disabled in the UI.** Task 19.1 reducer behavior is implemented and tested through the existing store. Prediction confirmation/results panels are still unwired; restore, compare toggling, reflection, submission, import and reset are also implemented at reducer level; their UI wiring remains in later tasks.
 - **Viewport code and automated tests are implemented.** Real browser rendering, CSP, label layout, touch ergonomics, and performance still need manual/browser verification; do not confuse the passing no-op-renderer integration tests with a real GPU/browser pass.
 - These panels and dialogs are non-interactive stubs from 13.3: RequirementsPanel, HistoryCompare, ReflectionPrompt, PredictionDialog, SubmitDialog, HelpDialog, ImportExportBar.
 - No persistence yet (task 20) and no E2E tests yet (`e2e/` is empty).
 
 ## B. Task progress
 
-- **Completed:** all Milestone 2 tasks 13–18, including optional suites. This batch completes 13.6, 17.2 and checkpoint 18 and implements the user's D-26 presentation change.
-- **Next implementation:** **19.1**, `runTest`, `setPrediction`, and `cancelPrediction` in the existing reducer. Then 19.2 and the remaining Milestone 3 wave graph. Keep the current domain/edit architecture and existing stubs.
+- **Last completed:** task 19.4. All Milestone 2 tasks 13–18 remain complete, including optional suites and the D-26 uncluttered presentation.
+- **Next implementation:** **19.5**, add Property 29 (snapshot isolation) using the completed model-based harness, then the remaining Milestone 3 wave graph. Keep the current domain/edit architecture and existing stubs.
 - **Gate evidence:** `src/ui/workbench/milestone2.test.tsx` drives the real Workbench/palette/controls/lazy fallback for all four profiles, checking each numeric value, oriented SVG outline/envelope summary and actual Three.js mesh bounds against typed state. Edits leave stored history/deformation unchanged. `BeamView.test.tsx` renders the real R3F scene with a no-op GPU renderer for all four profiles and checks the D-26 uncluttered presentation. Neither suite is a real-browser/GPU pass.
 - **Viewport files:**
 
@@ -67,12 +69,26 @@ Incomplete:
 - Deformation remains static for all users, including reduced-motion users. Draft edits change solid geometry and dimensions; dashed deformation always comes from the latest frozen Test_Result or baseline. No formulas were moved out of the physics domain.
 - Handle cleanup covers release, pointer cancel/lost capture, window blur, Escape, unmount, and section-kind/orientation changes. Pending unrendered motion is discarded on release/cancel, preserving the last clamped edit. Diameters/width/height/web map half-dimension handle motion to full parameter changes; flange thickness has reversed inward-face motion. At 90°, local-v motion maps onto negative global Z.
 - **Tests:** viewport summary/control/raycast/layout tests; fallback hole/dimension/deformation/orbit tests; lazy-load/context-creation/context-loss recovery tests; palette Space/same-kind equivalence tests; handle projection/throttle/limit unit tests; real R3F reconciler + store integration with a no-op GPU renderer (capture, coalesced dispatch, clamping, labels, orbit, cancellation, and handle replacement).
-- **Still open:** Milestone 3 (19–28), plus the separately listed real-browser/CI integration follow-ups. All M2 checkboxes, including checkpoint 18, are complete. The original requirements/design and dependency graph were not rewritten; D-26 records the explicit user override.
+- **Still open:** task 19.5 onward, including the dedicated property sequence suites and later Milestone 3 gates, plus the separately listed real-browser/CI integration follow-ups. All M2 checkboxes, including checkpoint 18, are complete. The original requirements/design and dependency graph were not rewritten; D-26 records the explicit user override.
 - The optional and checkpoint tasks may need to be started by hand, because the task scheduler doesn't list them as ready.
 
 ## C. Technical context
 
 ### Decisions and why
+
+- **Task 19.4 / Property 28:** `test/state/history.p28.test.ts` registers an append-only hook with the existing command harness. It captures all recorded entry references independently of the history array, checks their original indexes after every action, verifies baseline value/iteration preservation, and checks exact growth against the independent model. A successful Run Test adds one fresh result with injected id/time and the next iteration; all other/rejected actions add zero. Each generated sequence first records three iterations and exercises gated rejection, cancel, restore, valid import and reset, then runs a random command tail with valid/hostile payloads. The tagged property uses `assertProperty` (200 runs by default, fixed seed, `PBT_RUNS` override). A regression test proves the hook catches replacement of a non-baseline entry even when ids, values and length match. No reducer changes or new deviations were needed.
+
+- **Task 19.3 test infrastructure:** `test/state/model.ts` exports `createHarness`, `sessionCommands` (`fc.commands`, default max 50), `SessionCommand`, `commandInputs`, `reachableSession` (default max 30 actions) and `assertSessionInvariants`. The independent model tracks result ids/count, pending prediction, reflection and step count; it does not call the reducer to predict its own output. History targets resolve at command execution so valid/baseline/previous/missing targets remain meaningful after shrinking. Run Test ids and timestamps are deterministic and unique per step, following the injected factory contract. Trusted action discriminants/mode tags/clock/id factories stay typed; hostile input includes geometry numbers, unknown section kinds/fields/targets, bad prediction directions/orientations, oversized/non-string text and arbitrary/locked-field/malformed imports.
+- **Harness reuse:** run `assertProperty(fc.property(sessionCommands(ch), commands => fc.modelRun(() => createHarness(ch, { hooks: [yourInvariant] }), commands)))`. The baseline invariant check and every registered hook execute after each command, including rejected actions; hooks receive action, before/after state, a detached model snapshot, challenge and step. Use `reachableSession(ch)` for persistence/state properties; it returns `{ state, actions }` produced only by real reducer transitions, with a concrete replayable trace. All randomized harness tests use the existing fixed-seed `assertProperty`/`PBT_RUNS` helper. Later property suites must add their own numbered feature tags; this infrastructure does not mark Properties 28–37 or later task checkboxes complete.
+
+- **Task 19.2:** all six remaining reducer actions are implemented. Restore deep-copies the selected snapshot, clears stale pending prediction/dialog/errors and recomputes status against the latest result. Fresh draft ids are deterministic `snapshotId:restored:n`, choosing the first suffix absent from the current draft/result/snapshot ids; no randomness or Action extension. Unknown restore/compare ids and baseline comparison toggles are exact no-ops. Comparisons stay in history order, with a visible notice on a fourth selection.
+- **Reflection/submission:** reflection is stored verbatim up to 2,000 characters; oversized/non-string payloads are rejected unchanged. Submit rejects unknown/baseline/blank-reflection targets unchanged and copies stored status/efficiency plus injected time, replacing the previous submission without grading text.
+- **Import/reset semantics:** import delegates to the existing pure helper. Rejection returns the exact state (including UI), per Req 23.6; later import UI must call that helper to display every reason. Valid import clears errors/pending/dialog and recomputes status. Reset restores an isolated baseline draft, clears compare/reflection/submission/transient state, preserves mode and **all history entries by reference**, and recomputes status against the latest snapshot. It never regenerates the baseline or deletes tests (Req 15.4/18.1). No requirements/design were rewritten.
+
+- **Task 19.1 reducer flow:** validate the draft before prediction gating (Requirement 17.2 takes precedence over the pseudocode's reversed order). Valid drafts require a pending prediction at configured iterations (1 and 3); stale iteration predictions cannot bypass gating. `setPrediction` validates the direction and optional 0–500-character explanation, stores a frozen pending prediction, and does not itself run analysis. `cancelPrediction` clears pending prediction and closes the dialog without changing draft/history.
+- **D-27 action extension:** `setPrediction` now requires `now: string`, used for `Prediction.createdAt`; the original design Action omitted this despite requiring that field. Future task 22.2 must dispatch `setPrediction` with `now: store.clock()`, then call `store.runTest()`. Both actions can be dispatched in one event; the existing store integration test proves the sequence works. No new store API or clock access inside the reducer was added.
+- **Recorded tests:** `runTest` clones/deep-freezes the draft, calls the existing analyze/evaluate/score functions, records injected id/time and optional prediction/outcome, and appends a deep-frozen result in a frozen history array. Prior entries retain identity; the draft/pending inputs are never frozen or mutated. Success clears errors/pending/dialog/old notice and marks the draft tested. Compare selection retains the highest-numbered three selected non-baseline results in history order, automatically including the new result; baseline remains implicitly comparable.
+- **Failure paths:** invalid draft returns all geometry errors, closes the prediction dialog, and retains draft/status/history/pending prediction. `PhysicsInvariantError` creates an error notice, appends no result and retains the pending prediction for retry. Unexpected programming errors are rethrown. Out-of-assumption valid geometry still records a result with `modelNotApplicable` from the domain evaluator.
 
 - **Built inside the Figma template, keeping its stack and look** (user choice). Region and class names from the template's `index.css` and `platform*.css` drive the responsive layout. The product is named "Statica".
 - **3D view:** R3F main scene, with a typed adaptation of the template SVG projection for fallback. Recovery is available from the main application bundle even when the separate 3D chunk fails.
@@ -91,6 +107,8 @@ Incomplete:
 
 ### Deviations from the spec, not yet written into the spec
 
+- **D-27:** required injected `now` was added to `setPrediction` to populate the already-required `Prediction.createdAt`. See the decision and confirmation sequence above; original requirement/design documents were not regenerated.
+
 - **D-26, explicit user direction:** remove the visible envelope, static annotations/guides and fixed-support text overlay from the 3D model; place active handle feedback below Canvas. The original visible-presentation requirements are superseded as listed in `DECISIONS.md`. Constraints, physical results and stored snapshots are unchanged; the separate 2D section diagram retains its labels/envelope. Future agents must preserve this preference.
 
 - **Req 2.7:** the round-trip tolerance can't be met for |x| above roughly 16.8 km, because of double precision. The test uses a relative floor there.
@@ -101,22 +119,28 @@ Incomplete:
 
 ### Known limitations
 
+- **Dotted deformation outline review (user report, 2026-10-15):** selecting a new section changes the solid draft beam but deliberately keeps the deformation from the latest stored result (initially Baseline), per Requirements 25.2–25.5. `BeamView` reads `selectLatestResult(session)` and uses that result's snapshot/inertia/deflection; draft changes must not recalculate this display. Pending tasks 21.1 (Run Test/results panel) and 22.2 (prediction confirmation) make recording a new result available in the UI. After a successful test, the outline reads that new stored result. No duplicate task or live-draft deformation change was added. The uniform 0.3·L visual cap may also make highly flexible tested designs appear similarly deflected; numerical results remain authoritative.
+
 - **CSP and R3F:** the scene uses a procedural `DataTexture` and DOM Html labels, with no remote assets or blob/data URLs added. The production build retains `default-src 'self'`. Actual browser CSP validation remains pending; do not add exceptions without observed evidence.
 - **Browser verification blocked in this environment.** Preview failed with `listen EPERM 127.0.0.1:4173`; launching cached Chromium aborted. The installed Playwright expects Chromium revision 1248, while the available cache contains 1208. In a normal development environment, run `pnpm exec playwright install chromium`, then verify the production preview. No browser/CSP/performance/visual pass is claimed.
-- **Repository/upload:** private `niyer45/Statica-Edu`, branch `main`. Milestone 2 closeout is delivered in the commit titled `Finish Milestone 2 and simplify the 3D scene`; the preceding viewport/handle commit is `cfa40ccfbf31f0933afeed27ebb2c19b184f3e24`. The local Kiro directory still has no `.git`; the authorized update uses GitHub's tree/commit API and a branch-head lease. Preserve the sibling application and `.kiro` directories and existing repository-root README. The CI workflow remains nested in the application directory; see audit below.
+- **Repository/upload:** private `niyer45/Statica-Edu`, branch `main`. Milestone 2 closeout is delivered in the commit titled `Finish Milestone 2 and simplify the 3D scene`; the preceding viewport/handle commit is `cfa40ccfbf31f0933afeed27ebb2c19b184f3e24`. The local Kiro directory still has no `.git`; previous authorized updates used GitHub's tree/commit API with a branch-head lease. The base for this delivery is M2 closeout commit `af02592edadc4a128958d66cc21ee2519927d019`. The follow-up delivery is titled `Complete reducer tasks 19.1–19.4 and document tested deformation`; verify the branch head when resuming. Preserve the sibling application and `.kiro` directories and existing repository-root README. The CI workflow remains nested in the application directory; see audit below.
 - **No horizontal scroll at 320–2560 px** isn't verified in a browser. It relies on the template CSS.
 
 ## D. Testing
 
-Verified at Milestone 2 closeout, including D-26 (2026-10-15; Node 24.15.0, pnpm 10.34.3 in this environment; Node 22 remains the project/CI target):
+Verified after task 19.4 (2026-10-15; Node 24.15.0, pnpm 10.34.3 in this environment; Node 22 remains the project/CI target):
 
 | Check | Result |
 |---|---|
-| `pnpm exec vitest run` | 79 files, 782 tests, all pass (baseline at takeover: 72 files, 728 tests) |
+| `pnpm exec vitest run` | 83 files, 823 tests, all pass (M2 closeout: 79 files, 782 tests) |
 | `pnpm run typecheck` | clean |
 | `pnpm run lint` | 0 errors, 10 `no-explicit-any` warnings (in `src/challenge/*.test.ts` and `vite.config.ts`, left as is) |
 | `pnpm run build` | passed; R3F remains in the lazy viewport chunk (~963 kB minified / 258 kB gzip), which triggers Vite's non-failing size warning |
 
+- Task 19.4 adds the tagged model-based Property 28 and one regression-detection test in `test/state/history.p28.test.ts`. All required checks pass; Properties 29–37 remain open.
+- Task 19.3 adds six tests in `test/state/model.test.ts`: randomized command execution, reachable-state replay in both modes, every action/hook ordering, detection of a broken runTest reducer, seed/path propagation on hook failure, and empty reachable-state generation. No application source or specification content was changed during 19.3.
+- Task 19.2 adds 14 focused cases in `src/state/learningLoop.test.ts`, covering all six actions, frozen-input purity, restore/retest, comparison limits, exact rejection identity and submission replacement. Remaining property tasks remain open.
+- Task 19.1 adds 18 focused reducer cases in `src/state/runTest.test.ts` plus one injected-time/id confirmation test in `src/ui/state/StoreProvider.test.tsx`. Dedicated reducer property/example suites (19.5–19.15) remain open; they were not marked complete.
 - No known failing automated tests. Drei's dependency path emits `THREE_CJS_DEPRECATED` during Vitest; application code uses ES module imports.
 - The pinned oxfmt 0.2.0 changed string quotes and removed a required separator from an inline TypeScript object type during formatting. The affected type was repaired and all checks rerun; inspect formatting diffs before accepting them. No formatter dependency/config changes were made.
 - Property tests also passed at `PBT_RUNS=2000` at the Milestone 1 gate.
@@ -126,7 +150,7 @@ Verified at Milestone 2 closeout, including D-26 (2026-10-15; Node 24.15.0, pnpm
   - E2E flows
   - Accessibility audit (axe)
   - Persistence
-  - Reducer Properties 28–37
+  - Reducer Properties 29–37
 
 Commands, run from this folder:
 
@@ -160,10 +184,10 @@ pnpm run typecheck && pnpm run lint && pnpm run build
 
 ### Immediate next steps
 
-1. **Implement 19.1 in `state/reducer.ts`.** Validate before prediction gating; iterations 1 and 3 require a prediction. Analyze/evaluate a frozen snapshot, score the prediction, append a frozen Test_Result using injected id/time, and preserve history on validation/physics errors. Follow the exact task acceptance criteria.
-2. **Then 19.2 and the remaining wave graph.** Complete restore/compare/reflection/submit/import/reset and their tests, followed by persistence and the existing panel/dialog/history stubs. Do not add parallel replacements or fabricate live numeric results. The current UI's Run Test remains disabled until the corresponding workflow is wired.
+1. **Implement 19.5 (Property 29: Snapshot isolation).** Reuse `test/state/model.ts` and capture stored result values at record time, then verify later edits/actions cannot alter snapshots, Analysis, Evaluation or stored predictions. Use the required feature/property tag and `assertProperty` helper. Preserve the completed Property 28 suite; task 19.14 remains a separate example-flow suite.
+2. **Continue the wave graph and tests.** Complete 19.5–19.15 as scheduled, then persistence and the existing panel/dialog/history stubs. For task 22.2, use D-27's injected prediction `now` and dispatch confirmation then Run Test. Do not enable the current disabled UI button until the corresponding learning-loop UI is wired; do not fabricate numeric results.
 3. **Preserve D-26.** No 3D envelope/static text or dimension/span/axis guide overlays. Keep transient handle values/limits below Canvas. Numeric controls, accessible summary, solver envelope checks, and dedicated 2D section diagram continue to provide the information.
 4. **Real-browser follow-up:** install matching Playwright Chromium in an environment that permits the preview server/browser. Verify desktop/mobile layout, no horizontal scroll, pointer targets, handle cancellation, camera controls, SVG/context recovery, keyboard focus, reduced motion, CSP, network origins and idle rendering. Do not interpret the no-op GPU renderer as this validation.
 5. **Repository/CI follow-up:** the workflow is still nested inside the application directory. Adapt it to repository-root `.github/workflows/` with the application working directory and lockfile path, preserving sibling `.kiro` paths. E2E specs remain a Milestone 3 deliverable. Node 22 CI and live browser checks are not claimed by the local M2 checkpoint.
 
-Read `MILESTONE2.md`, this handoff, `AGENTS.md`, D-26, then task 19.1 and its linked requirements. Keep supporting documentation, checkboxes, counts, deviations and next steps synchronized after each completed task.
+Read `MILESTONE2.md`, this handoff, `AGENTS.md`, D-26, then D-27 and task 19.5 with its linked requirements. Keep supporting documentation, checkboxes, counts, deviations and next steps synchronized after each completed task.
