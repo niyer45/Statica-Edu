@@ -11,16 +11,17 @@ import FallbackViewport, { FALLBACK_NOTICE } from './FallbackViewport'
 import { DEFAULT_ORBIT, project, SCENE_UNITS_PER_M } from './projection'
 import Viewport3D from './Viewport3D'
 import ViewportBoundary from './ViewportBoundary'
+import type { HandleFeedback } from './DimensionHandles'
 
-const glMock = vi.hoisted(() => ({ canvas: null as HTMLCanvasElement | null, throws: false }))
+const glMock = vi.hoisted(() => ({ canvas: null as HTMLCanvasElement | null, throws: false, feedback: undefined as ((value: HandleFeedback | null) => void) | undefined }))
 vi.mock('@react-three/fiber', () => ({
-  Canvas: ({ onCreated }: { onCreated: (s: { gl: { domElement: HTMLCanvasElement } }) => void }) => {
+  Canvas: ({ onCreated, children }: { children?: ReactNode; onCreated: (s: { gl: { domElement: HTMLCanvasElement } }) => void }) => {
     useEffect(() => { const canvas = document.createElement('canvas'); glMock.canvas = canvas; onCreated({ gl: { domElement: canvas } }) }, [onCreated])
     if (glMock.throws) throw new Error('Context creation failed')
-    return <div data-testid="mock-3d" />
+    return <div data-testid="mock-3d">{children}</div>
   }
 }))
-vi.mock('./BeamView', () => ({ default: () => null }))
+vi.mock('./BeamView', () => ({ default: ({ onHandleFeedback }: { onHandleFeedback?: (value: HandleFeedback | null) => void }) => { glMock.feedback = onHandleFeedback; return null } }))
 if (!bundledChallengeResult.ok) throw new Error('Invalid challenge')
 const ch = bundledChallengeResult.value
 let latest: SessionState
@@ -134,4 +135,21 @@ describe('viewport recovery', () => {
     expect(latest).toBe(before)
     expect(notify.mock.calls).toEqual([[FALLBACK_NOTICE]])
   })
+})
+
+
+it('keeps live handle feedback outside the model and hides the fixed-support overlay in 3D (D-26)', () => {
+  vi.stubGlobal('WebGL2RenderingContext', class { })
+  setup(<Viewport3D />)
+  const before = latest
+  expect(screen.queryByText('Fixed support')).toBeNull()
+  act(() => glMock.feedback!({ label: 'Width', valueM: 0.04, limited: true }))
+  const feedback = screen.getByTestId('dimension-feedback')
+  expect(feedback.textContent).toContain('Width: 40.00 mm')
+  expect(screen.getByRole('tooltip').textContent).toContain('Limit reached')
+  expect(screen.getByTestId('mock-3d').contains(feedback)).toBe(false)
+  expect(latest).toBe(before)
+  act(() => glMock.feedback!(null))
+  expect(feedback.textContent).toBe('')
+  expect(screen.queryByRole('tooltip')).toBeNull()
 })

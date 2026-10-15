@@ -37,8 +37,9 @@ async function setup() {
   const boot = bootstrap(bundledChallengeResult, () => '2026-10-15T00:00:00.000Z', () => 'baseline')
   if (!boot.ok) throw new Error('Invalid session')
   const dragActive = vi.fn()
+  const feedback = vi.fn()
   let store: RootStore
-  await act(async () => { store = root!.render(<StoreProvider challenge={boot.value.challenge} initialSession={boot.value.session}><DimensionHandles onDragActive={dragActive} /><Probe /></StoreProvider>) })
+  await act(async () => { store = root!.render(<StoreProvider challenge={boot.value.challenge} initialSession={boot.value.session}><DimensionHandles onDragActive={dragActive} onFeedback={feedback} /><Probe /></StoreProvider>) })
   const controls = { enabled: true }
   await act(async () => { store!.setState({ controls: controls as unknown as ReturnType<RootStore['getState']>['controls'] }) })
   const handle = (param: string) => store!.getState().scene.getObjectByName(`handle-${param}`) as Mesh
@@ -49,7 +50,7 @@ async function setup() {
     const instance = mesh as Mesh & { __r3f: { handlers: Record<string, (e: ThreeEvent<PointerEvent>) => void> } }
     await act(async () => { instance.__r3f.handlers[name](e) })
   }
-  return { handle, event, invoke, controls, dragActive, target, frames, flush, store: store! }
+  return { handle, event, invoke, controls, dragActive, feedback, target, frames, flush, store: store! }
 }
 
 describe('dimension handle/store integration (16.1/16.2)', () => {
@@ -70,16 +71,16 @@ describe('dimension handle/store integration (16.1/16.2)', () => {
     await t.invoke(mesh, 'onPointerMove', t.event(0.2))
     await t.flush()
     expect(session.draft.section).toEqual({ kind: 'circle', diameterM: 0.1 })
-    expect(document.body.textContent).toContain('Limit reached')
+    expect(t.feedback).toHaveBeenLastCalledWith({ label: 'Diameter', valueM: 0.1, limited: true })
     await t.invoke(mesh, 'onPointerMove', t.event(0.025))
     await t.flush()
     expect((session.draft.section as { diameterM: number }).diameterM).toBeCloseTo(0.05, 12)
-    expect(document.body.textContent).not.toContain('Limit reached')
+    expect(t.feedback.mock.calls.at(-1)![0].limited).toBe(false)
     await t.invoke(mesh, 'onPointerUp', t.event(0.025))
     expect(t.controls.enabled).toBe(true)
     expect(t.target.releasePointerCapture).toHaveBeenCalledWith(1)
     expect(t.dragActive.mock.calls).toEqual([[true], [false]])
-    expect(document.body.textContent).not.toContain('Diameter:')
+    expect(t.feedback).toHaveBeenLastCalledWith(null)
   })
   it('skips unprojectable events, cancels pending motion, and replaces handle sets on section/orientation change', async () => {
     const t = await setup()

@@ -7,6 +7,8 @@ import { useChallenge, useDispatch } from '../state/store'
 import BeamView from './BeamView'
 import FallbackViewport, { type ViewportProps } from './FallbackViewport'
 import SceneControls from './SceneControls'
+import type { HandleFeedback } from './DimensionHandles'
+import { formatMm } from '../../units/units'
 import SceneSummary, { SCENE_SUMMARY_ID } from './SceneSummary'
 
 export interface SceneHitTarget {
@@ -40,6 +42,7 @@ export default function Viewport3D({ onUnavailable }: ViewportProps = {}) {
   const onContextLost = useCallback((event: Event) => { event.preventDefault(); setContextLost(true) }, [])
   useEffect(() => () => canvas.current?.removeEventListener('webglcontextlost', onContextLost), [onContextLost])
   const [deformed, setDeformed] = useState(true)
+  const [handleFeedback, setHandleFeedback] = useState<HandleFeedback | null>(null)
   const [zoom, setZoom] = useState(1)
   const [reset, setReset] = useState(0)
   const [fit, setFit] = useState(0)
@@ -97,12 +100,17 @@ export default function Viewport3D({ onUnavailable }: ViewportProps = {}) {
             reset={reset}
             fit={fit}
             hitTarget={hitTarget}
+            onHandleFeedback={setHandleFeedback}
           />
         </Canvas>
 
       </div>
+      <div data-testid="dimension-feedback" className="h-5 px-3 text-[10px] text-[#345640]">
+        {handleFeedback && <>{handleFeedback.label}: {formatMm(handleFeedback.valueM)} mm{handleFeedback.limited && <span role="tooltip"> · Limit reached</span>}</>}
+      </div>
       <SceneSummary />
       <SceneControls
+        showFixedSupportLabel={false}
         deformed={deformed}
         onToggleDeformed={() => setDeformed((v) => !v)}
         onZoomIn={() => setZoom((v) => Math.min(1.5, v + 0.1))}

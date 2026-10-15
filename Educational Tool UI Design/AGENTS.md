@@ -16,11 +16,13 @@ The spec lives outside this folder, one level up:
 - `../.kiro/specs/engineering-intuition-mvp/tasks.md`: the implementation plan (Milestones 0–3, tasks 1–28) with a JSON wave dependency graph at the end.
 
 Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuition-mvp/`.
-`DECISIONS.md` in this folder records D-01…D-24 and the 14 applicability thresholds. D-25 (required `sectionDefaults` on Challenge) is in `design.md`.
+`DECISIONS.md` records D-01…D-26 and the 14 applicability thresholds. D-25 defines required `sectionDefaults`; D-26 records the user-directed uncluttered 3D presentation and overrides the original visible-overlay requirements.
 
 ## Rules for following the spec
 
 - Implement tasks in `tasks.md` order, respecting the wave graph. Each task lists the requirement IDs it must satisfy.
+- Milestone 2 and its component gate are complete; see `MILESTONE2.md` for evidence and limitations. Start Milestone 3 at task 19.1.
+- Follow D-26: no visible envelope or static annotations on the 3D model. Keep active drag feedback below Canvas, numerical controls and the accessible summary. Do not restore the original spec overlays; the user explicitly requested their removal.
 - Do not rewrite requirements, design, or tasks. If the code must deviate, record it under "Deviations" in `HANDOFF.md` (and in `DECISIONS.md` if it is a design decision).
 - Property tests must carry the tag comment `// Feature: engineering-intuition-mvp, Property N: <title>` and use the `test/pbt.ts` helper (`PBT_RUNS` env var, default 200, fixed seed).
 - Never show fabricated numbers in the UI. Every displayed result comes from a stored Test_Result produced by `physics/analyze` and `evaluation/evaluate`.
@@ -29,7 +31,7 @@ Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuiti
 ## Tech stack
 
 - React 19, TypeScript (strict), Vite 8, Tailwind CSS v4 (`@tailwindcss/vite`), and the four Figma Make Vite plugins in `vite.config.ts` (leave them unchanged).
-- 3D: three 0.186.1, @react-three/fiber 9.8.2, @react-three/drei 10.7.9. The R3F viewport, typed SVG fallback/error recovery, and dimension handles are implemented (tasks 14 and 16). Real-browser rendering/CSP verification remains pending; see HANDOFF.md.
+- 3D: three 0.186.1, @react-three/fiber 9.8.2, @react-three/drei 10.7.9. Milestone 2 is complete: viewport, typed SVG fallback/recovery, handles, shell/numeric test suites and four-profile component gate. Real-browser rendering/CSP verification remains pending; see MILESTONE2.md and HANDOFF.md.
 - zod 3.25.76 (challenge and import schemas), zod-to-json-schema.
 - Testing: Vitest 5 (jsdom for `src/ui/**`), fast-check 4, Testing Library, Playwright 1.64 with axe-core.
 - ESLint 10 with typescript-eslint, oxfmt.

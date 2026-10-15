@@ -1,5 +1,4 @@
 import { useThree } from '@react-three/fiber'
-import { Html } from '@react-three/drei/web/Html'
 import { Line } from '@react-three/drei/core/Line'
 import { OrbitControls } from '@react-three/drei/core/OrbitControls'
 import {
@@ -8,7 +7,6 @@ import {
   useRef,
   useState,
   type ComponentRef,
-  type ReactNode,
   type RefObject,
 } from 'react'
 import {
@@ -19,32 +17,16 @@ import {
   type Mesh,
 } from 'three'
 import { selectDraftEnvelope, selectLatestResult } from '../../state/selectors'
-import { formatMm } from '../../units/units'
 import { buildBeamGeometry } from '../mesh'
 import { useChallenge, useSession } from '../state/store'
 import {
   deformedOutline,
-  dimensionGuides,
   sceneFrame,
-  type Vec3,
 } from './sceneLayout'
 import type { SceneHitTarget } from './Viewport3D'
-import DimensionHandles from './DimensionHandles'
+import DimensionHandles, { type HandleFeedback } from './DimensionHandles'
 
 const ORANGE = '#cf744b'
-function Label({ at, children }: { at: Vec3; children: ReactNode }) {
-  return (
-    <Html
-      position={at}
-      center
-      zIndexRange={[1, 0]}
-      className="pointer-events-none whitespace-nowrap text-[9px] font-medium text-[#345640]"
-    >
-      {children}
-    </Html>
-  )
-}
-
 /** Procedural RGBA hatch; no fetches, canvas serialization, or data URLs. */
 export function wallHatchTexture() {
   const side = 16
@@ -80,7 +62,7 @@ function CameraRig({
   const { camera, size, invalidate } = useThree()
   const controls = useRef<ComponentRef<typeof OrbitControls>>(null)
   const baseZoom = useRef(500)
-  // Overview sphere includes wall, arrow, dimension guides and maximum visual deformation.
+  // Overview sphere includes wall, arrow and maximum visual deformation.
   useEffect(() => {
     if (!(camera instanceof OrthographicCamera)) return
     const radius = Math.hypot(lengthM / 2 + 0.09, 0.29, 0.15)
@@ -118,6 +100,7 @@ export interface BeamViewProps {
   reset: number
   fit: number
   hitTarget: RefObject<SceneHitTarget | null>
+  onHandleFeedback?: (feedback: HandleFeedback | null) => void
 }
 
 // Only stored TestResults drive deformation. A static reveal respects reduced motion too.
@@ -128,6 +111,7 @@ export default function BeamView({
   reset,
   fit,
   hitTarget,
+  onHandleFeedback,
 }: BeamViewProps) {
   const [dragging, setDragging] = useState(false)
   const session = useSession()
@@ -165,25 +149,17 @@ export default function BeamView({
       }),
     [latest, ch],
   )
-  const guides = dimensionGuides(draft.section, draft.orientationDeg, L, env)
+  // D-26: the user removed visible envelope/annotation overlays. Constraints still use the
+  // typed draft; these dimensions size only the fixed support plate.
   const halfZ = frame.envelopeLimit.widthZM / 2
   const halfY = frame.envelopeLimit.heightYM / 2
-  const envelopeRing = (x: number): Vec3[] => [
-    [x, -halfY, -halfZ],
-    [x, halfY, -halfZ],
-    [x, halfY, halfZ],
-    [x, -halfY, halfZ],
-    [x, -halfY, -halfZ],
-  ]
-  const spanY = frame.floorY + 0.01
-  const axisOrigin: Vec3 = [L * 0.12, frame.floorY + 0.025, 0.15]
   return (
     <>
       <CameraRig lengthM={L} zoom={zoom} reset={reset} fit={fit} dragging={dragging} />
-      <DimensionHandles onDragActive={setDragging} />
+      <DimensionHandles onDragActive={setDragging} onFeedback={onHandleFeedback} />
       <ambientLight intensity={1.6} />
       <directionalLight position={[1, 2, 3]} intensity={2.2} />
-      <mesh ref={beam} geometry={geometry}>
+      <mesh name="draft-beam" ref={beam} geometry={geometry}>
         <meshStandardMaterial
           color={highlight ? '#91a99b' : '#345640'}
           roughness={0.65}
@@ -229,9 +205,6 @@ export default function BeamView({
         <coneGeometry args={[0.009, 0.018, 12]} />
         <meshBasicMaterial color={ORANGE} />
       </mesh>
-      <Label at={[L, frame.arrowTopY + 0.02, 0]}>
-        {ch.load.forceN} N · TIP LOAD
-      </Label>
       {deformed &&
         [...outline.lines, outline.tip].map((points, i) => (
           <Line
@@ -244,94 +217,6 @@ export default function BeamView({
             lineWidth={1}
           />
         ))}
-      {[0, L].map((x) => (
-        <Line
-          key={x}
-          points={envelopeRing(x)}
-          color="#7c896e"
-          dashed
-          dashSize={0.008}
-          gapSize={0.006}
-        />
-      ))}
-      {envelopeRing(0)
-        .slice(0, 4)
-        .map((p, i) => (
-          <Line
-            key={i}
-            points={[p, [L, p[1], p[2]]]}
-            color="#7c896e"
-            dashed
-            dashSize={0.008}
-            gapSize={0.006}
-          />
-        ))}
-      <Label at={[L / 2, halfY + 0.02, -halfZ - 0.025]}>
-        Envelope {formatMm(env.widthZM)} × {formatMm(env.heightYM)} mm · limit{' '}
-        {formatMm(ch.constraints.maxWidthM, 0)} ×{' '}
-        {formatMm(ch.constraints.maxHeightM, 0)} mm
-      </Label>
-      {guides.map((g) => (
-        <group key={g.param}>
-          <Line points={[g.from, g.to]} color="#617453" lineWidth={1} />
-          <Label
-            at={[
-              g.from[0] + 0.045,
-              (g.from[1] + g.to[1]) / 2,
-              (g.from[2] + g.to[2]) / 2,
-            ]}
-          >
-            {g.label} {formatMm(g.valueM)} mm
-          </Label>
-        </group>
-      ))}
-      <Line
-        points={[
-          [0, spanY, 0.075],
-          [L, spanY, 0.075],
-        ]}
-        color="#7c896e"
-      />
-      {[0, L].map((x) => (
-        <Line
-          key={x}
-          points={[
-            [x, spanY - 0.006, 0.075],
-            [x, spanY + 0.006, 0.075],
-          ]}
-          color="#7c896e"
-        />
-      ))}
-      <Label at={[L / 2, spanY - 0.02, 0.075]}>
-        {formatMm(L, 0)} mm · fixed span
-      </Label>
-      <Line
-        points={[
-          [L, 0, -0.065],
-          [L, 0, 0.065],
-        ]}
-        color="#345640"
-      />
-      <Label at={[L / 2, -0.085, -0.09]}>
-        Bending axis (resists vertical load)
-      </Label>
-      {([
-        ['X', [0.055, 0, 0], '#a34f32'],
-        ['Y', [0, 0.055, 0], '#345640'],
-        ['Z', [0, 0, 0.055], '#486b85'],
-      ] as const).map(([name, delta, color]) => {
-        const end: Vec3 = [
-          axisOrigin[0] + delta[0],
-          axisOrigin[1] + delta[1],
-          axisOrigin[2] + delta[2],
-        ]
-        return (
-          <group key={name}>
-            <Line points={[axisOrigin, end]} color={color} />
-            <Label at={end}>{name}</Label>
-          </group>
-        )
-      })}
     </>
   )
 }

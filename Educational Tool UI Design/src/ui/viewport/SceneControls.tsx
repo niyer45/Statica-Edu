@@ -8,6 +8,7 @@ import { useChallenge } from '../state/store'
 
 export interface SceneControlsProps {
   deformed: boolean
+  showFixedSupportLabel?: boolean
   onToggleDeformed: () => void
   onZoomIn: () => void
   onZoomOut: () => void
@@ -19,6 +20,7 @@ export const MATERIAL_LOCK_LABEL = 'Material is fixed by the challenge'
 
 export default function SceneControls({
   deformed,
+  showFixedSupportLabel = true,
   onToggleDeformed,
   onZoomIn,
   onZoomOut,
@@ -29,10 +31,10 @@ export default function SceneControls({
   const elasticModulusGpa = paToMpa(material.elasticModulusPa) / 1e3
   return (
     <>
-      <div className="scene-label fixed-label">
+      {showFixedSupportLabel && <div className="scene-label fixed-label">
         <Icon name="lock" size={10} />
         Fixed support
-      </div>
+      </div>}
       <div className="scene-controls">
         <button type="button" title="Zoom in" aria-label="Zoom in" onClick={onZoomIn}>
           <Icon name="plus" size={15} />

@@ -1,9 +1,7 @@
 import { useThree, type ThreeEvent } from '@react-three/fiber'
-import { Html } from '@react-three/drei/web/Html'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { handlesFor, type HandleDescriptor } from '../../geometry/handles'
 import type { SectionParam } from '../../geometry/params'
-import { formatMm } from '../../units/units'
 import { useChallenge, useDispatch, useSession } from '../state/store'
 import { createFrameQueue, dragLimit, parameterDeltaScale, projectToAxis } from './handleDrag'
 import { localToGlobalYZ, type Vec3 } from './sceneLayout'
@@ -25,14 +23,26 @@ interface ActiveDrag {
 function setOrbitEnabled(controls: unknown, enabled: boolean) {
   if (typeof controls === 'object' && controls !== null && 'enabled' in controls) controls.enabled = enabled
 }
-export interface DimensionHandlesProps { onDragActive: (active: boolean) => void }
+export interface HandleFeedback { label: string; valueM: number; limited: boolean }
+export interface DimensionHandlesProps {
+  onDragActive: (active: boolean) => void
+  onFeedback?: (feedback: HandleFeedback | null) => void
+}
 
-export default function DimensionHandles({ onDragActive }: DimensionHandlesProps) {
+export default function DimensionHandles({ onDragActive, onFeedback }: DimensionHandlesProps) {
   const session = useSession()
   const ch = useChallenge()
   const dispatch = useDispatch()
   const controls = useThree((s) => s.controls)
   const [feedback, setFeedback] = useState<{ param: SectionParam; limited: boolean } | null>(null)
+  // D-26: live values belong in the viewport chrome, not anchored over the 3D model.
+  useEffect(() => {
+    if (!feedback) { onFeedback?.(null); return }
+    const descriptor = handlesFor(session.draft.section, session.draft.orientationDeg, ch.sectionLimits).find((h) => h.param === feedback.param)
+    if (!descriptor) { onFeedback?.(null); return }
+    const values = session.draft.section as unknown as Record<SectionParam, number>
+    onFeedback?.({ label: descriptor.label, valueM: values[feedback.param], limited: feedback.limited })
+  }, [feedback, session.draft, ch.sectionLimits, onFeedback])
   const active = useRef<ActiveDrag | null>(null)
   const current = useRef({ session, ch, dispatch, onDragActive, controls })
   current.current = { session, ch, dispatch, onDragActive, controls }
@@ -111,10 +121,7 @@ export default function DimensionHandles({ onDragActive }: DimensionHandlesProps
       onLostPointerCapture={(e) => { if (active.current?.pointerId === e.pointerId) finish() }}>
       <sphereGeometry args={[0.0035, 16, 12]} />
       <meshBasicMaterial color={feedback?.param === h.param ? '#cf744b' : '#345640'} depthTest={false} />
-      {feedback?.param === h.param && <Html center position={[0.025, 0.016, 0]} className="pointer-events-none whitespace-nowrap rounded bg-[#f4f6ef] px-1 text-[10px] text-[#345640]">
-        {h.label}: {formatMm((session.draft.section as unknown as Record<SectionParam, number>)[h.param])} mm
-        {feedback.limited && <span role="tooltip"> · Limit reached</span>}
-      </Html>}
+
     </mesh>)}
   </group>
 }

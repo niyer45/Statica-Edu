@@ -359,7 +359,7 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
     - My designs lists session Test_Results via selectors; saved list and notebook stay in memory; "Statica" brand and help text
     - _Requirements: 34.1, 34.2, 34.3, 34.4, 34.5, 34.6, 34.7, 34.8, 34.9, 35.1, 35.2, 35.4_
 
-  - [ ]* 13.6 Write component tests for the platform shell
+  - [x]* 13.6 Write component tests for the platform shell
     - Preview challenge and Freeform cannot open a Workbench; filters/search/saved narrow the list; navigating away and back keeps draft and history; My designs shows only session results; Guided vs Parametric open the same challenge with locked fields read-only in both
     - _Requirements: 34.2, 34.3, 34.4, 34.5, 34.6, 34.7, 35.2, 35.4_
 
@@ -408,17 +408,17 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
     - Projection math, non-finite skip, one dispatch per frame with the latest value, limit-reached flag toggling
     - _Requirements: 25.10, 27.2, 27.4, 27.5, 27.7_
 
-- [ ] 17. Numeric controls
+- [x] 17. Numeric controls
   - [x] 17.1 Implement `ui/controls/NumericControls.tsx`
     - Extracted from the template `design-panel` (keep `.dimension-field`, `.number-field`, range slider, `.rotate-button` look, `.locked-features`); one field per typed parameter (separate flange and web thickness; tube inner diameter) replacing the shared "Web & flange" / "Wall thickness" fields and the hard-coded 8–80 / 3–15 mm ranges; sliders dispatch clamp-mode `setParam`; same fields in Guided and Parametric
     - Labeled mm inputs with min/max/step from challenge ranges; blur/Enter parse → mm→m → strict `setParam`; `aria-invalid` + `aria-describedby` inline errors and one live announcement; Escape reverts; orientation radio group (disabled, non-focusable for circle/tube); read-only locked fields with lock icon (accessible name) and "Fixed by challenge"
     - _Requirements: 2.3, 4.8, 4.9, 7.4, 7.6, 28.1, 28.2, 28.3, 28.4, 28.5, 28.6, 28.7, 28.8, 35.2_
 
-  - [ ]* 17.2 Write component tests for numeric controls
+  - [x]* 17.2 Write component tests for numeric controls
     - For each of the four section kinds, rendered input values equal typed state; invalid text, out-of-range, and d ≥ D keep draft unchanged with error; Escape revert; locked fields reject typing and paste; orientation disabled for circle/tube
     - _Requirements: 4.8, 4.9, 7.4, 28.1–28.8, 33.8_
 
-- [ ] 18. Checkpoint – Milestone 2 gate
+- [x] 18. Checkpoint – Milestone 2 gate
   - Ensure all component tests pass, all four section kinds render, and UI matches typed state; ask the user if questions arise.
   - _Requirements: 33.8_
 

@@ -1,8 +1,10 @@
 # Statica (Engineering Intuition MVP)
 
-Browser-only training app. The MVP ships one challenge, "Cantilever Beam I: Reduce Deflection". Students diagnose a flawed cantilever, swap and resize its cross-section in a 3D viewport, run a deterministic Euler-Bernoulli analysis, compare iterations, reflect, and submit. There is no backend and no runtime network access. Design decisions live in [DECISIONS.md](DECISIONS.md).
+Browser-only structures learning app built around "Cantilever Beam I: Reduce Deflection". Milestone 2 provides typed cross-section editing, a 3D viewport with dimension handles, a usable SVG fallback, and the platform shell. The domain solver is implemented; the student-facing prediction, test/results, comparison, persistence, and submission workflow is Milestone 3 work. Run Test is currently disabled.
 
-Current development status and the next task are tracked in [HANDOFF.md](HANDOFF.md). The domain and editing UI are implemented, including the 3D viewport, typed SVG fallback, and dimension handles. The full test/results/submission workflow remains in progress; Run Test is still disabled.
+**Milestone 2 is complete against its component-test gate**: 782 tests pass, along with lint, type checking, and build. [MILESTONE2.md](MILESTONE2.md) records the evidence and remaining browser-verification limits. [HANDOFF.md](HANDOFF.md) gives the current status and next task (19.1).
+
+The 3D model view deliberately omits its envelope and static text overlays; drag feedback appears below the Canvas. Numerical controls and the accessible summary retain the dimension/load information, and envelope constraints remain active. See decision D-26 in [DECISIONS.md](DECISIONS.md).
 
 ## Install
 
@@ -25,14 +27,14 @@ pnpm exec playwright install chromium   # needed once before `pnpm run e2e`
 | `pnpm run typecheck` | `tsc --noEmit` (strict) |
 | `pnpm run test` | Vitest unit, property-based (fast-check), and architecture tests |
 | `pnpm run build` | Production build to `dist/` (CSP injected) |
-| `pnpm run e2e` | Playwright end-to-end and axe accessibility tests (Chromium) |
+| `pnpm run e2e` | Playwright runner; end-to-end/axe specs are planned for Milestone 3 |
 | `pnpm run gen:schema` | Regenerate `schemas/challenge.schema.json` from the zod schemas |
 | `pnpm run format` | Format with oxfmt |
 
 ## Layout
 
 - `src/units`, `src/challenge`, `src/geometry`, `src/physics`, `src/evaluation`: pure, deterministic domain code
-- `src/state`: session reducer, persistence (`localStorage`), import/export
+- `src/state`: session model, edit reducer and import/export helpers; learning-loop actions and persistence are planned for Milestone 3
 - `src/ui`: React, React Three Fiber, and the platform shell (template CSS in `src/*.css`)
 - `test/`: shared arbitraries, fixtures, architecture tests; `e2e/`: Playwright specs
 - `schemas/`: generated JSON Schema (committed; CI checks for drift); `scripts/`: build helpers
