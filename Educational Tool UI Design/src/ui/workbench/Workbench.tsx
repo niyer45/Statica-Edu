@@ -15,6 +15,7 @@ import { useSession } from '../state/store'
 import PageFooter from './PageFooter'
 import WorkbenchChrome, { MODE_LABELS } from './WorkbenchChrome'
 import WorkflowStepper from './WorkflowStepper'
+import ViewportBoundary from '../viewport/ViewportBoundary'
 
 // Workbench layout (task 13.3; Req 24.1–24.7, 24.9–24.11).
 //
@@ -25,7 +26,7 @@ import WorkflowStepper from './WorkflowStepper'
 //
 // The viewport scene is a separate lazy chunk (Req 24.5): panels render first and the
 // viewport shows a same-footprint "3D view is loading" placeholder until it resolves (24.6,
-// 24.7). Task 14.4 adds ViewportBoundary for load failure.
+// 24.7). ViewportBoundary recovers from lazy-load/context failure.
 
 const Viewport3D = lazy(() => import('../viewport/Viewport3D'))
 
@@ -95,9 +96,11 @@ export default function Workbench({ onExit }: WorkbenchProps) {
                 <span className="draft-badge">{selectStatusBadge(session)}</span>
               </div>
             </div>
-            <Suspense fallback={<ViewportLoading />}>
-              <Viewport3D />
-            </Suspense>
+            <ViewportBoundary onUnavailable={notify}>
+              <Suspense fallback={<ViewportLoading />}>
+                <Viewport3D onUnavailable={notify} />
+              </Suspense>
+            </ViewportBoundary>
           </section>
           <aside className="challenge-panel panel" aria-label="The challenge">
             <RequirementsPanel onOpenHelp={openHelp} />

@@ -8,7 +8,7 @@ import Viewport3D from '../viewport/Viewport3D'
 import SectionPalette from './SectionPalette'
 import { SECTION_DRAG_MIME } from './useSectionDrop'
 
-// Task 15.1 (Req 26.1, 26.2, 26.4–26.7, 32.1). The bundled baseline draft is a solid circle.
+// Tasks 15.1/15.2 (Req 26.1, 26.2, 26.4–26.7, 32.1). The bundled baseline draft is a solid circle.
 
 const clock = () => '2025-01-01T00:00:00.000Z'
 const newId = () => 'baseline-id'
@@ -94,5 +94,34 @@ describe('SectionPalette', () => {
     fireEvent.drop(dropZone, { dataTransfer: transfer('text/plain', 'rectangle') })
     expect(latest!.draft).toBe(before.draft)
     expect(latest!.draftStatus).toBe(before.draftStatus)
+  })
+})
+
+
+describe('palette state equivalence (15.2)', () => {
+  it('applies by Space while retaining focus and marks a changed draft', () => {
+    setup()
+    const target=tile(/I-section/)
+    target.focus()
+    fireEvent.keyDown(target,{key:' '})
+    expect(latest!.draft.section.kind).toBe('iSection')
+    expect(latest!.draftStatus).toBe('draft')
+    expect(document.activeElement).toBe(target)
+    expect(pressed()).toHaveLength(1)
+  })
+  it('keeps the design and status unchanged for same-kind click, Enter, Space and drop', () => {
+    const {dropZone}=setup()
+    for (const name of [/Solid circle/,/Rectangle/]) {
+      const target=tile(name)
+      fireEvent.click(target)
+      const before=latest!
+      fireEvent.click(target)
+      fireEvent.keyDown(target,{key:'Enter'})
+      fireEvent.keyDown(target,{key:' '})
+      fireEvent.drop(dropZone,{dataTransfer:transfer(SECTION_DRAG_MIME,before.draft.section.kind)})
+      expect(latest!.draft).toEqual(before.draft)
+      expect(latest!.draftStatus).toBe(before.draftStatus)
+      expect(pressed()).toHaveLength(1)
+    }
   })
 })

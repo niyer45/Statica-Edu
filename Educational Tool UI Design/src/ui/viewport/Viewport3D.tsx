@@ -1,105 +1,118 @@
-import { useCallback, useState } from 'react'
-import BeamScene from '../../BeamScene'
+import { Canvas } from '@react-three/fiber'
+import { useCallback, useEffect, useRef, useState, type DragEvent } from 'react'
+import { Raycaster, Vector2, type Camera, type Mesh } from 'three'
 import type { SectionKind } from '../../challenge/types'
-import type { Section } from '../../geometry/sections'
-import { mToMm, paToMpa } from '../../units/units'
-import Icon from '../icons/Icon'
 import { useSectionDrop } from '../palette/useSectionDrop'
-import { useChallenge, useDispatch, useSession } from '../state/store'
+import { useChallenge, useDispatch } from '../state/store'
+import BeamView from './BeamView'
+import FallbackViewport, { type ViewportProps } from './FallbackViewport'
+import SceneControls from './SceneControls'
+import SceneSummary, { SCENE_SUMMARY_ID } from './SceneSummary'
 
-// STUB (task 13.3): lazy-loaded content of the template `section.viewport`.
-// Task 14.3 replaces this file with the R3F canvas and moves the chrome below into
-// `SceneControls`; task 14.4 replaces BeamScene with `Fallback2D` behind `ViewportBoundary`.
-// Until then it renders the template SVG scene so the Workbench stays visually complete.
-// View state (zoom, reset, deformation toggle) is local and never dispatches session actions.
-
-/** Display-only adapter from the typed draft section to the template scene's mm model. */
-function templateDesign(section: Section, orientationDeg: 0 | 90) {
-  const rotated = orientationDeg === 90
-  switch (section.kind) {
-    case 'circle': {
-      const d = mToMm(section.diameterM)
-      return { kind: section.kind, width: d, height: d, thickness: 0, rotated }
-    }
-    case 'tube': {
-      const outer = mToMm(section.outerDiameterM)
-      const wall = (outer - mToMm(section.innerDiameterM)) / 2
-      return { kind: section.kind, width: outer, height: outer, thickness: wall, rotated }
-    }
-    case 'rectangle':
-      return { kind: section.kind, width: mToMm(section.widthM), height: mToMm(section.heightM), thickness: 0, rotated }
-    case 'iSection':
-      return {
-        kind: section.kind,
-        width: mToMm(section.widthM),
-        height: mToMm(section.heightM),
-        thickness: mToMm(section.flangeThicknessM),
-        rotated,
-      }
-  }
+export interface SceneHitTarget {
+  camera: Camera
+  canvas: HTMLCanvasElement
+  beam: Mesh
 }
 
-export default function Viewport3D() {
-  const { draft } = useSession()
-  const { material, allowedSections } = useChallenge()
+/** Raycast the draft beam without relying on R3F pointer events during an HTML5 drag. */
+export function beamContainsPointer(target: SceneHitTarget, clientX: number, clientY: number): boolean {
+  const rect = target.canvas.getBoundingClientRect()
+  if (!rect.width || !rect.height || !Number.isFinite(clientX) || !Number.isFinite(clientY)) return false
+  const pointer = new Vector2(
+    (2 * (clientX - rect.left)) / rect.width - 1,
+    1 - (2 * (clientY - rect.top)) / rect.height,
+  )
+  const ray = new Raycaster()
+  target.camera.updateMatrixWorld()
+  ray.setFromCamera(pointer, target.camera)
+  target.beam.updateWorldMatrix(true, false)
+  return ray.intersectObject(target.beam, false).length > 0
+}
+
+// Camera controls are local view state and never dispatch session actions.
+export default function Viewport3D({ onUnavailable }: ViewportProps = {}) {
+  const { allowedSections } = useChallenge()
   const dispatch = useDispatch()
-  const applySection = useCallback((kind: SectionKind) => dispatch({ type: 'applySection', kind }), [dispatch])
-  const { highlight, dropProps } = useSectionDrop(allowedSections, applySection)
+  const hitTarget = useRef<SceneHitTarget | null>(null)
+  const canvas = useRef<HTMLCanvasElement | null>(null)
+  const [contextLost, setContextLost] = useState(false)
+  const onContextLost = useCallback((event: Event) => { event.preventDefault(); setContextLost(true) }, [])
+  useEffect(() => () => canvas.current?.removeEventListener('webglcontextlost', onContextLost), [onContextLost])
   const [deformed, setDeformed] = useState(true)
   const [zoom, setZoom] = useState(1)
   const [reset, setReset] = useState(0)
+  const [fit, setFit] = useState(0)
+  const applySection = useCallback(
+    (kind: SectionKind) => dispatch({ type: 'applySection', kind }),
+    [dispatch],
+  )
+  const isOverBeam = useCallback((e: DragEvent) => {
+    const target = hitTarget.current
+    // Until Canvas is ready there is no beam to highlight.
+    if (!target) return true
+    return beamContainsPointer(target, e.clientX, e.clientY)
+  }, [])
+  const { highlight, dropProps } = useSectionDrop(
+    allowedSections,
+    applySection,
+    isOverBeam,
+  )
+  // Three's renderer requires WebGL2. Avoid constructing it in non-WebGL environments.
+  const supportsWebGL = typeof WebGL2RenderingContext !== 'undefined'
   const resetView = () => {
-    setReset((r) => r + 1)
     setZoom(1)
+    setReset((n) => n + 1)
   }
+  if (!supportsWebGL || contextLost) return <FallbackViewport onUnavailable={onUnavailable} />
   return (
     <>
-      {/* Section_Palette drop zone (task 15.1); whole-scene fallback until 14.3 adds a beam raycast. */}
       <div
         data-section-drop-target={highlight ? 'active' : 'idle'}
-        className={`flex flex-1 flex-col rounded-md ${highlight ? 'outline-2 -outline-offset-4 outline-dashed outline-[#7f9470] bg-[#f0f4e9]' : ''}`}
+        className={`beam-scene relative flex flex-1 flex-col ${highlight
+            ? 'outline-2 -outline-offset-4 outline-dashed outline-[#7f9470]'
+            : ''
+          }`}
         {...dropProps}
       >
-        <BeamScene design={templateDesign(draft.section, draft.orientationDeg)} deformed={deformed} zoom={zoom} reset={reset} />
+        <Canvas
+          orthographic
+          frameloop="demand"
+          dpr={[1, 2]}
+          camera={{ position: [1, 0.55, 1], near: 0.001, far: 20, zoom: 500 }}
+          onCreated={({ gl }) => {
+            canvas.current = gl.domElement
+            gl.domElement.addEventListener('webglcontextlost', onContextLost)
+            // Canvas forwards DOM props to its wrapper; name the actual canvas too.
+            gl.domElement.setAttribute('role', 'img')
+            gl.domElement.setAttribute('aria-label', '3D beam view')
+            gl.domElement.setAttribute('aria-describedby', SCENE_SUMMARY_ID)
+            gl.domElement.tabIndex = 0
+          }}
+        >
+          <BeamView
+            deformed={deformed}
+            highlight={highlight}
+            zoom={zoom}
+            reset={reset}
+            fit={fit}
+            hitTarget={hitTarget}
+          />
+        </Canvas>
+
       </div>
-      <div className="scene-label fixed-label">
-        <Icon name="lock" size={10} />
-        Fixed support
-      </div>
-      <div className="scene-controls">
-        <button type="button" title="Zoom in" aria-label="Zoom in" onClick={() => setZoom((v) => Math.min(1.5, v + 0.1))}>
-          <Icon name="plus" size={15} />
-        </button>
-        <button type="button" title="Zoom out" aria-label="Zoom out" onClick={() => setZoom((v) => Math.max(0.6, v - 0.1))}>
-          <Icon name="minus" size={15} />
-        </button>
-        <span />
-        <button type="button" title="Reset view" aria-label="Reset view" onClick={resetView}>
-          <Icon name="reset" size={15} />
-        </button>
-        <button type="button" title="Fit view" aria-label="Fit view" onClick={() => setZoom(0.9)}>
-          <Icon name="expand" size={15} />
-        </button>
-      </div>
-      <div className="viewport-bottom">
-        <button type="button" className="toggle-row" onClick={() => setDeformed(!deformed)} aria-pressed={deformed}>
-          <span className={`toggle ${deformed ? 'on' : ''}`} />
-          <span>Show deformation</span>
-        </button>
-        <span className="exaggerated">
-          <span />
-          Exaggerated visualization
-        </span>
-      </div>
-      <div className="material-strip">
-        <span>
-          <span className="material-dot" />
-          {material.name}
-        </span>
-        <span>E = {(paToMpa(material.elasticModulusPa) / 1e3).toFixed(0)} GPa</span>
-        <span>ρ = {material.densityKgM3.toLocaleString('en-US')} kg/m³</span>
-        <Icon name="lock" size={12} />
-      </div>
+      <SceneSummary />
+      <SceneControls
+        deformed={deformed}
+        onToggleDeformed={() => setDeformed((v) => !v)}
+        onZoomIn={() => setZoom((v) => Math.min(1.5, v + 0.1))}
+        onZoomOut={() => setZoom((v) => Math.max(0.6, v - 0.1))}
+        onResetView={resetView}
+        onFitView={() => {
+          setZoom(1)
+          setFit((n) => n + 1)
+        }}
+      />
     </>
   )
 }

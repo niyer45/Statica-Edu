@@ -1,7 +1,8 @@
 import type { StudentChallenge } from '../../challenge/content'
 import { SECTION_PARAMS, PARAM_LABELS, type SectionParam } from '../../geometry/params'
 import type { BeamDesign, Orientation, Section } from '../../geometry/sections'
-import { deformedVertexY, sectionShape, visualDeflectionScale, type DeformationParams } from '../mesh'
+import { sectionOutline } from '../../geometry/outline'
+import { deformedVertexY, visualDeflectionScale, type DeformationParams } from '../mesh/deformation'
 
 // Display-only scene layout for Viewport3D (task 14.3; Req 25.1, 25.9, 25.12, 7.5, 7.7).
 // Positions are in metres in the global frame of the design's "Coordinate and Axis Convention":
@@ -103,11 +104,7 @@ export function dimensionGuides(s: Section, o: Orientation, lengthM: number, env
 
 /** Ordered outer outline of a section in (u, v), without a duplicated closing point. */
 function outerOutline(s: Section): { u: number; v: number }[] {
-  const pts = sectionShape(s).getPoints()
-  const first = pts[0]
-  const last = pts[pts.length - 1]
-  if (pts.length > 1 && first && last && first.equals(last)) pts.pop()
-  return pts.map((p) => ({ u: p.x, v: p.y }))
+  return sectionOutline(s).outer
 }
 
 /** Longitudinal samples for each deformed outline polyline. */

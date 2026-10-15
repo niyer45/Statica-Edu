@@ -363,7 +363,7 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
     - Preview challenge and Freeform cannot open a Workbench; filters/search/saved narrow the list; navigating away and back keeps draft and history; My designs shows only session results; Guided vs Parametric open the same challenge with locked fields read-only in both
     - _Requirements: 34.2, 34.3, 34.4, 34.5, 34.6, 34.7, 35.2, 35.4_
 
-- [ ] 14. Mesh, viewport, and WebGL fallback
+- [x] 14. Mesh, viewport, and WebGL fallback
   - [x] 14.1 Implement `ui/mesh/`
     - Outline → `THREE.Shape` (with tube hole) extruded along X with 40 segments; `deformedVertexY` using `deflectionShape` × exaggeration with uniform scale-down to 0.3·L
     - _Requirements: 25.1, 25.2, 25.3, 25.6_
@@ -372,19 +372,19 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
     - Max visual offset ≤ 0.3·L (tinyCircle); offset = 15·w(x) when under the cap; analysis deep-equal with and without mesh generation
     - _Requirements: 25.2, 25.3, 25.6, 9.12_
 
-  - [ ] 14.3 Implement `ui/viewport/Viewport3D.tsx` and `ui/viewport/SceneControls.tsx`
+  - [x] 14.3 Implement `ui/viewport/Viewport3D.tsx` and `ui/viewport/SceneControls.tsx`
     - Template styling: green beam material (`#345640`–`#91a99b`), wall with code-generated hatch texture (no `data:` URL), floor grid, orange `#cf744b` −Y force arrow at X = L with force/“TIP LOAD” label, span guide "{L} mm · fixed span", dashed orange deformed outline; all numbers from the challenge/draft; labels via drei `Html` (no remote fonts or environment maps)
     - Clamped root, extruded beam rotated by orientation, mm dimension guides, axis triad X/Y/Z, "Bending axis (resists vertical load)" label, 80×80 mm envelope wireframe with live envelope dims, deformed shape from latest tested snapshot (or baseline) only, `frameloop="demand"`, canvas `aria-label` plus text summary, reduced-motion static shape, default camera that keeps handles unoccluded
     - `SceneControls` (shared with the fallback): template Zoom in / Zoom out / Reset view / Fit view buttons, "Show deformation" toggle (`aria-pressed`, default on), "Exaggerated visualization (×15)" label, "Fixed support" label, material strip (name, E in GPa, ρ) with accessible lock icon; none dispatch session actions
     - _Requirements: 7.5, 7.7, 16.6, 25.1, 25.2, 25.3, 25.4, 25.5, 25.8, 25.9, 25.10, 25.12, 25.13, 25.14, 25.15, 32.2, 32.3, 32.7_
 
-  - [ ] 14.4 Refactor `BeamScene.tsx` into the SVG fallback and add the viewport error boundary
+  - [x] 14.4 Refactor `BeamScene.tsx` into the SVG fallback and add the viewport error boundary
     - `ui/viewport/ViewportBoundary.tsx` detects WebGL context failure or lazy-load failure
     - Move the template projection math into pure `ui/viewport/projection.ts`; `ui/viewport/Fallback2D.tsx` keeps its look (painter's sort, wall hatch, floor pattern, drag/arrow-key orbit, zoom/reset via `SceneControls`) but reads `sectionOutline(draft.section)` and `orientedEnvelope` (independent tf/tw, tube inner diameter) instead of `width/height/thickness`, and draws the deformed shape from `deflectionShape` × exaggeration capped at 0.3·L for the latest tested snapshot instead of the fixed `42·(x/330)²` curve; force/span labels read from the challenge
     - Adds the 2D section view (outline with hole, mm dims, envelope box), accessible names and summary, and the "3D view unavailable" notice announced once; delete `src/BeamScene.tsx` when done
     - _Requirements: 24.8, 25.11, 31.1, 31.2, 31.3, 31.4, 31.5, 31.6, 31.7, 31.8_
 
-  - [ ]* 14.5 Write component tests for the viewport summary, scene controls, and fallback
+  - [x]* 14.5 Write component tests for the viewport summary, scene controls, and fallback
     - Text summary updates on section/orientation/param change; scene controls and deformation toggle leave session state unchanged; fallback renders with WebGL mocked unavailable and controls remain operable; fallback outline matches typed I-section with tf ≠ tw; fallback tip offset equals min(15·δ, 0.3·L) in scene units; draft unchanged across the switch
     - _Requirements: 25.11, 25.13, 25.14, 31.1, 31.2, 31.3, 31.6, 31.7, 32.2, 32.3_
 
@@ -395,16 +395,16 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
     - In `Viewport3D.tsx`: HTML5 drop zone with beam raycast highlight (fallback to canvas), highlight cleared on leave/drop/cancel; drops outside canvas or Escape leave state unchanged
     - _Requirements: 26.1, 26.2, 26.3, 26.4, 26.5, 26.6, 26.7, 26.8, 26.9, 32.1_
 
-  - [ ]* 15.2 Write component tests for the palette
+  - [x]* 15.2 Write component tests for the palette
     - Click and Enter/Space apply; exactly one `aria-pressed="true"`; same-kind apply leaves draft and status unchanged; different kind sets `draft`
     - _Requirements: 26.1, 26.4, 26.5, 26.6, 26.8, 26.9_
 
-- [ ] 16. Dimension handles
-  - [ ] 16.1 Implement `ui/viewport/DimensionHandles.tsx`
+- [x] 16. Dimension handles
+  - [x] 16.1 Implement `ui/viewport/DimensionHandles.tsx`
     - One sphere per `HandleDescriptor`; pointer capture; pure `projectToAxis` helper (non-finite → skip); rAF-throttled clamp dispatch using latest pointer; live mm label via `formatMm`; "limit reached" tooltip; orbit disabled during drag and re-enabled on release/cancel
     - _Requirements: 25.7, 27.1, 27.2, 27.3, 27.4, 27.5, 27.6, 27.7_
 
-  - [ ]* 16.2 Write unit tests for handle projection and throttling
+  - [x]* 16.2 Write unit tests for handle projection and throttling
     - Projection math, non-finite skip, one dispatch per frame with the latest value, limit-reached flag toggling
     - _Requirements: 25.10, 27.2, 27.4, 27.5, 27.7_
 

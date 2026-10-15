@@ -298,7 +298,8 @@ describe('architecture boundaries (E6)', () => {
 
   it('code outside the domain modules computes no section properties, mass, deflection, stress, or pass/fail (Req 1.14)', () => {
     const files = nonDomainFiles()
-    expect(files.map(rel)).toEqual(expect.arrayContaining(['src/BeamScene.tsx']))
+    expect(files.map(rel)).toEqual(expect.arrayContaining(['src/ui/viewport/Fallback2D.tsx']))
+    expect(existsSync(path.join(SRC_ROOT, 'BeamScene.tsx'))).toBe(false)
     const report = files.flatMap((file) =>
       findFormulaMatches(readFileSync(file, 'utf8'), FORMULA_ALLOWLIST[rel(file)] ?? []).map(
         (m) => `${rel(file)}:${m.line} [${m.pattern}] ${m.text}`,

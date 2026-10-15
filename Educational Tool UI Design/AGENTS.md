@@ -29,7 +29,7 @@ Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuiti
 ## Tech stack
 
 - React 19, TypeScript (strict), Vite 8, Tailwind CSS v4 (`@tailwindcss/vite`), and the four Figma Make Vite plugins in `vite.config.ts` (leave them unchanged).
-- 3D: three 0.186.1, @react-three/fiber 9.8.2, @react-three/drei 10.7.9. The R3F viewport isn't built yet.
+- 3D: three 0.186.1, @react-three/fiber 9.8.2, @react-three/drei 10.7.9. The R3F viewport, typed SVG fallback/error recovery, and dimension handles are implemented (tasks 14 and 16). Real-browser rendering/CSP verification remains pending; see HANDOFF.md.
 - zod 3.25.76 (challenge and import schemas), zod-to-json-schema.
 - Testing: Vitest 5 (jsdom for `src/ui/**`), fast-check 4, Testing Library, Playwright 1.64 with axe-core.
 - ESLint 10 with typescript-eslint, oxfmt.
@@ -49,7 +49,8 @@ Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuiti
   - `ui/shell`: platform shell.
   - `ui/workbench`: layout.
   - `ui/mesh`: three.js geometry.
-- `src/BeamScene.tsx`: the template SVG scene. It's still in use and will be replaced by `ui/viewport/Fallback2D` in task 14.4.
+  - `ui/viewport`: lazy R3F Canvas/`BeamView`, `DimensionHandles`/`handleDrag`, shared controls/summary/layout; main-bundle `ViewportBoundary`, `FallbackViewport`, typed `Fallback2D`, and pure `projection` helpers.
+- The template `src/BeamScene.tsx` and temporary `LegacyFallback` are deleted. Their SVG projection now lives in `ui/viewport/projection.ts` and `Fallback2D.tsx`. Keep this fallback independent of Three.js so recovery works when the 3D chunk fails to load.
 - `test/`: shared arbitraries, pbt helper, fixtures (`test/fixtures/designs.ts`), architecture and config guard tests.
 - `e2e/`: Playwright (empty so far).
 - `schemas/`: generated JSON Schema. `scripts/`: schema generator.

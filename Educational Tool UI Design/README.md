@@ -2,6 +2,8 @@
 
 Browser-only training app. The MVP ships one challenge, "Cantilever Beam I: Reduce Deflection". Students diagnose a flawed cantilever, swap and resize its cross-section in a 3D viewport, run a deterministic Euler-Bernoulli analysis, compare iterations, reflect, and submit. There is no backend and no runtime network access. Design decisions live in [DECISIONS.md](DECISIONS.md).
 
+Current development status and the next task are tracked in [HANDOFF.md](HANDOFF.md). The domain and editing UI are implemented, including the 3D viewport, typed SVG fallback, and dimension handles. The full test/results/submission workflow remains in progress; Run Test is still disabled.
+
 ## Install
 
 Requires Node 22 and pnpm 10.34.3 (pinned in `.mise.toml` and `package.json#packageManager`).

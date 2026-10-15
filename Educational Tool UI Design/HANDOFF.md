@@ -1,6 +1,6 @@
 # Handoff: Statica MVP
 
-Last updated at the move from Kiro to Codex. Spec: `../.kiro/specs/engineering-intuition-mvp/` (requirements.md, design.md, tasks.md). Rules and commands: `AGENTS.md`.
+Last updated: 2026-10-15, viewport fallback/recovery, dimension handles, and related test suites. This handoff accompanies the authorized GitHub update. Spec: `../.kiro/specs/engineering-intuition-mvp/` (requirements.md, design.md, tasks.md). Rules and commands: `AGENTS.md`.
 
 ## A. Current state
 
@@ -22,7 +22,9 @@ Implemented and verified:
   - 13.4: tests.
   - 13.5: platform shell.
   - 14.1 and 14.2: three.js beam mesh and deformation, with tests.
-  - 15.1: section palette and drop target.
+  - 14.3–14.5: demand-rendered R3F viewport, shared controls/summary, beam drop raycast, typed SVG fallback, error recovery, and viewport tests. Automated checks pass; real-browser rendering validation remains pending.
+  - 15.1–15.2: section palette/drop target and full palette component suite.
+  - 16.1–16.2: dimension handles, ray/axis projection, frame throttling, limit feedback, and unit/integration tests.
   - 17.1: numeric controls.
 
 What works in the running app (`pnpm run dev`):
@@ -33,33 +35,36 @@ What works in the running app (`pnpm run dev`):
   - Preview challenges and Freeform are disabled ("Not available yet").
 - Opening Cantilever Beam I in Guided or Parametric mode. Both open the same Workbench and store, and the Workbench stays mounted across navigation.
 - Changing the section: click or Enter/Space on a palette tile, or drag a tile onto the viewport.
-- Editing dimensions: number inputs with strict validation and inline errors, sliders in clamp mode, orientation radios, and read-only locked fields.
+- Editing dimensions: number inputs with strict validation and inline errors, sliders in clamp mode, orientation radios, read-only locked fields, and clamped 3D dimension-handle drags.
+- Without WebGL, or on viewport failure: typed SVG beam/section views, stored-result deformation, shared camera/toggle controls, and one fallback notice through the existing live region.
 - Draft badge ("Draft" / "Tested #n"), workflow stepper, footer model-limits notice, and the live region.
 
 Incomplete:
 - **Run test is disabled.** The reducer's `runTest` and every other non-edit action are no-op stubs until task 19, so no results, pass/fail, or comparisons are shown.
-- **The viewport is still the template 2D SVG scene** (`src/BeamScene.tsx`, through a display-only adapter). No R3F canvas exists yet.
+- **Viewport code and automated tests are implemented.** Real browser rendering, CSP, label layout, touch ergonomics, and performance still need manual/browser verification; do not confuse the passing no-op-renderer integration tests with a real GPU/browser pass.
 - These panels and dialogs are non-interactive stubs from 13.3: RequirementsPanel, HistoryCompare, ReflectionPrompt, PredictionDialog, SubmitDialog, HelpDialog, ImportExportBar.
 - No persistence yet (task 20) and no E2E tests yet (`e2e/` is empty).
 
 ## B. Task progress
 
-- **Last completed:** 13.5 (platform shell).
-- **Partially complete:** 14.3, marked `[-]`. An interrupted earlier run left these unwired files in `src/ui/viewport/`:
+- **Completed this work batch:** 14.4, 14.5, 15.2, 16.1, 16.2. Parent tasks 14 and 16 are now checked; task 15's previously open test child is complete. Task 14.3 from the preceding session is included in the same GitHub update.
+- **Next:** complete the remaining component suites **13.6** (platform shell) and **17.2** (numeric controls), then evaluate **18**, the Milestone 2 gate. Do not mark the gate complete without the full four-section/UI-state checks. After that, start 19.1 (learning-loop reducer).
+- **Viewport files:**
 
-  | File | State |
+  | File | Role |
   |---|---|
-  | `SceneControls.tsx` | Zoom, reset, fit, deformation toggle, material strip. Not yet imported by Viewport3D, which still has its own inline chrome. |
-  | `SceneSummary.tsx` | Accessible text summary. Imports `sceneLayout.ts`. Not mounted. |
-  | `sceneLayout.ts` | Layout helpers used by SceneSummary. |
-  | `LegacyFallback.tsx` | The template SVG scene wrapper, meant as the temporary non-WebGL path. Not imported. |
+  | `Viewport3D.tsx` / `BeamView.tsx` | Lazy WebGL scene, actual canvas accessible name, raycast drop highlight, local camera controls, context-loss detection, scene geometry and resource disposal. |
+  | `ViewportBoundary.tsx` | Main-bundle error boundary outside Suspense; catches lazy import rejection and context/scene construction errors. |
+  | `FallbackViewport.tsx` | Main-bundle recovery UI, local view controls, section drop target, and one announcement through Workbench's existing `notify`. |
+  | `Fallback2D.tsx` / `projection.ts` | Template SVG projection/painter sorting, wall hatch/floor, pointer/arrow-key orbit; typed cross-section with tube hole and independent flange/web dimensions; SI coordinates mapped to 550 scene units per metre. |
+  | `SceneControls.tsx` / `SceneSummary.tsx` / `sceneLayout.ts` | Shared chrome and state-derived summary/layout. `sceneLayout` imports the pure deformation helper and geometry outline directly, keeping the main-bundle fallback independent of Three.js. |
+  | `DimensionHandles.tsx` / `handleDrag.ts` | One named sphere per geometry descriptor; pointer capture; closest-ray/axis projection; full-dimension and inward-flange scaling; latest-event-per-rAF clamp dispatch; live mm/limit feedback; immediate orbit suppression/restoration. |
 
-  Nothing imports `@react-three/*` yet. `Viewport3D.tsx` is still the 13.3 stub plus the 15.1 drop zone. Review these files, finish them, and wire them in.
-- **Next recommended:** finish 14.3. Then do 14.4 (Fallback2D, `projection.ts`, ViewportBoundary, delete `src/BeamScene.tsx`) and 16.1 (DimensionHandles, which depends on 14.3). Then run checkpoint 18 (the Milestone 2 gate). Milestone 3 starts at 19.1.
-- **Optional tests still open:** 13.6, 14.5, 15.2, 16.2, 17.2. Smoke tests exist for 13.5, 15.1, and 17.1, but the full optional suites don't. The user asked for all optional tests to be included.
-- **Dependencies:** the wave graph is in JSON at the end of tasks.md.
-  - Remaining Milestone 2: 14.3 → 14.4 and 16.1. 14.4 → 14.5. 16.1 → 16.2. Everything → 18.
-  - Milestone 3: 19.1 → 19.2 → 20 / 21–25 → 26 → 27 → 28.
+- `src/BeamScene.tsx` and `LegacyFallback.tsx` are deleted. The architecture test now requires the typed fallback and verifies the old scene remains absent.
+- Deformation remains static for all users, including reduced-motion users. Draft edits change solid geometry and dimensions; dashed deformation always comes from the latest frozen Test_Result or baseline. No formulas were moved out of the physics domain.
+- Handle cleanup covers release, pointer cancel/lost capture, window blur, Escape, unmount, and section-kind/orientation changes. Pending unrendered motion is discarded on release/cancel, preserving the last clamped edit. Diameters/width/height/web map half-dimension handle motion to full parameter changes; flange thickness has reversed inward-face motion. At 90°, local-v motion maps onto negative global Z.
+- **Tests:** viewport summary/control/raycast/layout tests; fallback hole/dimension/deformation/orbit tests; lazy-load/context-creation/context-loss recovery tests; palette Space/same-kind equivalence tests; handle projection/throttle/limit unit tests; real R3F reconciler + store integration with a no-op GPU renderer (capture, coalesced dispatch, clamping, labels, orbit, cancellation, and handle replacement).
+- **Still open:** 13.6 and 17.2 before gate 18; all Milestone 3 tasks. The dependency graph/specification content is unchanged; only completed task checkboxes were updated.
 - The optional and checkpoint tasks may need to be started by hand, because the task scheduler doesn't list them as ready.
 
 ## C. Technical context
@@ -67,7 +72,7 @@ Incomplete:
 ### Decisions and why
 
 - **Built inside the Figma template, keeping its stack and look** (user choice). Region and class names from the template's `index.css` and `platform*.css` drive the responsive layout. The product is named "Statica".
-- **3D view:** R3F for the main viewport. The template SVG scene is kept as the WebGL fallback (task 14.4).
+- **3D view:** R3F main scene, with a typed adaptation of the template SVG projection for fallback. Recovery is available from the main application bundle even when the separate 3D chunk fails.
 - **Shared types:** `TestResult`, `Prediction`, and `PredictionOutcome` live in `src/evaluation/types.ts`, so evaluation never imports state. `state/session.ts` re-exports them.
 - **Tolerance:** `REL_TOL` and `withinLimit` live in `physics/tolerance.ts`, so physics never imports evaluation. `evaluation/tolerance.ts` re-exports them.
 - **Section defaults (D-25):** Challenge has a required `sectionDefaults` field, which `convertSection` uses.
@@ -78,7 +83,7 @@ Incomplete:
 - **Dev snapshot:** `window.__EI_STATE__` is a frozen getter that exists only when `import.meta.env.DEV` is true or the mode is `'test'`. It is absent from production bundles.
 - **Live region:** `ui/a11y/LiveRegion` is portaled to `document.body`, because the shell hides the Workbench with `hidden` during navigation (Req 30.6). Toast has no `role="status"`, so messages aren't announced twice.
 - **Ranges:** NumericControls takes its ranges from `geometry/handlesFor`, so inputs, sliders, and future handles agree.
-- **Drag and drop:** the palette uses the MIME type `application/x-statica-section`. `ui/palette/useSectionDrop.ts` accepts an `isOverBeam` callback so 14.3 can add a raycast highlight. For now the whole viewport is the drop target.
+- **Drag and drop:** the palette uses `application/x-statica-section`. `Viewport3D` supplies a mesh raycast to `useSectionDrop` so only beam hits highlight in 3D; drops on empty canvas still apply the section. The SVG fallback highlights its whole scene.
 - **Deformed shape:** `ui/mesh` scales it uniformly by min(15, 0.3·L/δ_tip). rectFlat is also in the capped regime, not only tinyCircle.
 
 ### Deviations from the spec, not yet written into the spec
@@ -91,23 +96,24 @@ Incomplete:
 
 ### Known limitations
 
-- **CSP and R3F:** three.js or R3F may need a `blob:` exception (for workers or textures) under `default-src 'self'`. Check this against the production build (`pnpm run build && pnpm run preview`) once 14.3 is wired.
-- **Playwright browsers aren't installed.** Run `pnpm exec playwright install chromium` before `pnpm run e2e`.
-- **No git repository yet.** Ask the user before running `git init` or committing.
+- **CSP and R3F:** the scene uses a procedural `DataTexture` and DOM Html labels, with no remote assets or blob/data URLs added. The production build retains `default-src 'self'`. Actual browser CSP validation remains pending; do not add exceptions without observed evidence.
+- **Browser verification blocked in this environment.** Preview failed with `listen EPERM 127.0.0.1:4173`; launching cached Chromium aborted. The installed Playwright expects Chromium revision 1248, while the available cache contains 1208. In a normal development environment, run `pnpm exec playwright install chromium`, then verify the production preview. No browser/CSP/performance/visual pass is claimed.
+- **Repository/upload:** private `niyer45/Statica-Edu`, branch `main`. This work is delivered in the commit titled `Complete typed viewport fallback and dimension handles`, including the prior session's 14.3 changes. The local Kiro directory still has no `.git`; the authorized update uses GitHub's tree/commit API and a branch-head lease. Preserve the sibling application and `.kiro` directories and existing repository-root README. The CI workflow remains nested in the application directory; see audit below.
 - **No horizontal scroll at 320–2560 px** isn't verified in a browser. It relies on the template CSS.
 
 ## D. Testing
 
-Verified at handoff:
+Verified after tasks 14.4/14.5/15.2/16.1/16.2 (2026-10-15; Node 24.15.0, pnpm 10.34.3 in this environment; Node 22 remains the project/CI target):
 
 | Check | Result |
 |---|---|
-| `pnpm exec vitest run` | 72 files, 728 tests, all pass |
+| `pnpm exec vitest run` | 77 files, 754 tests, all pass (baseline at takeover: 72 files, 728 tests) |
 | `pnpm run typecheck` | clean |
 | `pnpm run lint` | 0 errors, 10 `no-explicit-any` warnings (in `src/challenge/*.test.ts` and `vite.config.ts`, left as is) |
-| `pnpm run build` | passed at the end of 13.5 (not re-run during handoff) |
+| `pnpm run build` | passed; R3F remains in the lazy viewport chunk (~971 kB minified / 261 kB gzip), which triggers Vite's non-failing size warning |
 
-- No known failing tests.
+- No known failing automated tests. Drei's dependency path emits `THREE_CJS_DEPRECATED` during Vitest; application code uses ES module imports.
+- The pinned oxfmt 0.2.0 changed string quotes and removed a required separator from an inline TypeScript object type during formatting. The affected type was repaired and all checks rerun; inspect formatting diffs before accepting them. No formatter dependency/config changes were made.
 - Property tests also passed at `PBT_RUNS=2000` at the Milestone 1 gate.
 - Not tested yet:
   - Real WebGL rendering
@@ -136,15 +142,23 @@ pnpm run typecheck && pnpm run lint && pnpm run build
   - Whether to amend Req 2.7 and 13.4 and the design's arithmetic note (see Deviations). This needs the user's decision.
   - Whether CSP needs `blob:` for R3F.
 
+### Takeover audit: documentation and specification discrepancies
+
+- The core milestone claims agree with the inspected domain, fixtures/property tests, session skeleton, and UI stubs. The full test suite passes. Coverage percentages above are historical M1 gate results, not remeasured during the viewport task.
+- Parent task 13 remains checked although optional child 13.6 is open. Existing shell smoke tests do not establish its full suite. Task 15.2 is now implemented and verified; the palette parent is accurate.
+- The old handoff said 14.3 was marked `[-]`; its actual task checkbox was `[ ]`. It is now `[x]` after the automated checks. Parent 14 is also complete after 14.4/14.5.
+- 15.1 previously claimed beam-raycast highlighting before a raycast existed. Task 14.3 now supplies a real mesh raycast for highlighting while canvas drops remain accepted.
+- `package.json` and the lockfile pin TypeScript 5.9.3, whereas Requirement 1.1/design D-01 specify 5.7. Existing dependency pins were preserved. The local Node runtime is 24.15.0 rather than the target 22; run CI checks under Node 22 when the CI location is corrected.
+- The GitHub repository keeps the requested sibling directories. Therefore `.github/workflows/ci.yml` is nested under `Educational Tool UI Design/` and is not discovered by GitHub Actions. A future repository-integration fix must put the workflow at repository-root `.github/workflows/` and set its commands/setup-node lockfile path to the app subfolder. Do not flatten the app: its `../.kiro` spec paths rely on the sibling layout.
+- `handlesFor` already requires a third `sectionLimits` argument, unlike the abbreviated design signature. Its existing comment explains why: descriptors expose challenge-dependent permissible ranges. This implementation was retained.
+- No requirements, design content, dependency graph, completed domain functionality, or existing CSS was regenerated.
+
 ### Immediate next steps
 
-1. **Finish 14.3.**
-   - Build the R3F canvas with `frameloop="demand"`, using `ui/mesh`.
-   - Wire in `SceneControls` and `SceneSummary`.
-   - Use `LegacyFallback` when WebGL is unavailable, including in jsdom, so the existing tests keep passing.
-   - Pass a beam raycast to `useSectionDrop`.
-2. **Do 14.4.** Build `projection.ts`, `Fallback2D.tsx`, and `ViewportBoundary.tsx`, then delete `src/BeamScene.tsx` and `LegacyFallback.tsx`.
-3. **Do 16.1**, then the optional tests (13.6, 14.5, 15.2, 16.2, 17.2), then checkpoint 18.
-4. **Start Milestone 3 at 19.1.**
-   - Add `runTest`, `setPrediction`, and `cancelPrediction` to the reducer.
-   - Then re-enable Run test in the UI.
+1. **Finish 13.6 and 17.2.** Preserve existing tests; extend them for full shell navigation/filter/saved/mode equivalence and every numeric section/invalid/locked-field case. Task 17.1 uses permissible dependent ranges from `handlesFor`; retain the documented architecture while comparing exact acceptance criteria.
+2. **Evaluate checkpoint 18.** Verify all four profiles and UI values against typed state. Run lint → typecheck → tests → build. Real browser checks remain outstanding because this environment cannot bind a preview server or launch Chromium; install the matching Playwright browser in a normal development environment.
+3. **Browser verification:** open the production preview at desktop/mobile widths, exercise handle drags/cancellation and camera controls, check label overlap and pointer targets, context failure/recovery, zero CSP violations, zero third-party requests, keyboard focus leaving SVG/Canvas, reduced-motion static shape, and idle rendering. No browser/CSP/performance pass is claimed by this handoff.
+4. **Then 19.1:** implement `runTest`, `setPrediction`, `cancelPrediction` in the existing reducer; follow the wave graph for remaining learning-loop UI. Run Test remains disabled until that work is wired.
+5. **Repository integration follow-up:** move/adapt the workflow to repository-root `.github/workflows/` with the application working directory and pnpm lockfile path; the root layout must continue to preserve sibling `.kiro` paths. E2E specs are still a Milestone 3 deliverable.
+
+Start with this document, `AGENTS.md`, and the remaining task/acceptance criteria. Keep task checkboxes, relevant architecture instructions, test counts, known limitations, and this handoff synchronized after each completed task.
