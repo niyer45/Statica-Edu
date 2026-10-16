@@ -62,3 +62,5 @@ Design history supports confirmed deletion of non-Baseline entries. Deletion per
 Fixed challenge values expand from Some things are fixed.; the lock/title remain visible and the redundant explanatory sentence is removed. Confirmation Cancel and Run Test icon/text are centered (UI-05/D-32, browser verification pending).
 
 My designs shows the saved local workspace and Return to workbench, with test results kept in the workbench. Informational feedback dismisses after five seconds (UI-06/D-33, browser CI pending).
+
+Responsive import fix (UI-07): the hidden native chooser is constrained inside its label so it cannot widen the page. The existing desktop/mobile responsive regression verifies this; CI verification is pending.

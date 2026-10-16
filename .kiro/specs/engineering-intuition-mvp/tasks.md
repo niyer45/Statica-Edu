@@ -627,6 +627,10 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
   - Remove permanent informational notice paragraphs from history; automatically dismiss the shared visual toast after five seconds while preserving the live region/errors. Show only the saved workspace card in My designs, with results available after Return to workbench. Preserve local session data (D-33).
   - Local lint/typecheck/build and 879 tests pass, including timer cleanup, no results table and draft/history preservation; browser/axe CI remains pending.
 
+- [-] UI-07 Fix hidden import chooser page overflow (2026-10-16)
+  - Failed run 38935876295 identifies the sr-only file input extending to 2431 px at a 1280 px viewport. Position its label and scope a 1×1 px file-input rule to override the template width:100% rule, preserving accessible native import and the existing responsive assertions.
+  - Local lint/typecheck/build and all 879 tests pass. Focused desktop/Pixel 7 responsive regression and full browser suite await the new CI run; no completion is claimed before verification.
+
 ### Post-MVP roadmap: scope and execution
 
 Added at the user's request after Milestone 3 passed. Tasks 1–28 and their completion evidence remain unchanged. Requirements 1–35 and the existing design describe the completed M0–M3 baseline; their statements that M4+ is outside MVP implementation scope remain historical boundaries, not specifications for these new features. New feature requirements and acceptance criteria must be written as scoped extensions before implementation, without regenerating the completed MVP specifications or inventing requirement IDs.

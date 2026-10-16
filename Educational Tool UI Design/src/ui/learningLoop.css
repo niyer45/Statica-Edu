@@ -151,3 +151,16 @@
 .locked-features > div { padding-top: 8px; }
 
 .locked-features > summary:focus-visible { outline: 2px solid #345640; outline-offset: 3px; }
+/* Keep the accessible native chooser inside its label, overriding the old full-width input rule. */
+.history-note .design-import { position: relative; }
+.history-note .design-import input[type="file"] {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+}

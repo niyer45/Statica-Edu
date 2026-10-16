@@ -1,6 +1,6 @@
 # Handoff: Statica MVP
 
-Last updated: 2026-10-16. **Milestone 3 complete:** tasks 19–27 (all 38 subtasks), pre-E2E checkpoint 26 and final checkpoint 28 are verified. The post-MVP roadmap now includes Milestones 4–6 (tasks 29–40). Next planned task: 29.1, the Milestone 4 review plan. Only roadmap documentation was requested; implementation has not started.
+Last updated: 2026-10-16. **Milestone 3 complete:** tasks 19–27 (all 38 subtasks), pre-E2E checkpoint 26 and final checkpoint 28 are verified. The post-MVP roadmap now includes Milestones 4–6 (tasks 29–40). Next planned task: 29.1, the Milestone 4 review plan. Post-MVP milestone implementation has not started. Current maintenance fix is UI-07 (hidden import chooser overflow), pending CI; see the latest section below.
 
 ## Implementation and verification
 
@@ -78,3 +78,11 @@ UI-05 verification before push: lint zero errors (10 existing warnings), typeche
 History no longer renders informational notices as permanent paragraphs; error notices remain. The existing Toast dismisses after five seconds, with a stable Workbench dismissal callback and timer cleanup on changes/unmount. LiveRegion remains separate/present. MyDesignsPage no longer receives or renders result data; it shows a workspace card with Return to workbench. Drafts, deletion metadata or reflections identify persisted workspaces even without visible test rows. Store persistence and recorded results are unchanged. Tests now verify no visible My designs table, same draft/history after returning, deletion notices absent from history, and timed toast cleanup. The deletion/reload E2E additionally visits My designs using desktop navigation or mobile selector and verifies return preserves state. D-33 records the presentation override. Push and trigger CI once, then stop polling until the user reports its result.
 
 UI-06 local verification: lint zero errors (10 existing warnings), typecheck, 879 tests across 109 files and production build pass. Browser/axe verification remains pending.
+
+## Responsive CI repair — import chooser overflow
+
+Run 38935876295 failed the focused responsive pair on desktop and Pixel 7 before the full E2E suite ran. At requested width 1280, document width was 2431; diagnostics identified the `input.sr-only` file chooser. The template `.history-note input[type=file] { width:100% }` overrode the generic sr-only width, and the absolutely positioned input had no positioned label ancestor. On mobile, innerWidth expanded to 2431 too, which the strengthened requested-width assertion correctly rejected.
+
+The targeted fix makes the import label position:relative and explicitly sets its file input to 1×1 px at the label origin with zero margin/padding/border and clipping. This preserves native file selection, its accessible label, keyboard focus-within indicator and Playwright setInputFiles; it does not hide page overflow or weaken any assertion. The existing responsive test is the regression case that will verify the exact failure on both viewports. Local browser launch remains sandbox-blocked. Push one candidate, then stop; the user will report workflow success/failure and any further solution can wait until credits reset.
+
+UI-07 candidate verification: lint zero errors (10 existing warnings), typecheck, all 879 tests across 109 files and production build pass. The existing focused responsive pair and full 20-case E2E suite will verify the browser behavior in the workflow. No browser pass is claimed before that run completes.

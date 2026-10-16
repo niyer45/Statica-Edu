@@ -7,7 +7,7 @@ template's visual design and platform shell are kept.
 
 Read `HANDOFF.md` first for the current status and the next task.
 
-Current task progress (2026-10-16): Milestone 3 complete, all 38 subtasks and checkpoint 28 verified. Post-MVP Milestones 4–6 are planned in tasks.md; next planned task is 29.1. Current maintenance: UI-01/UI-02 compact challenge/history/compare implemented; browser verification pending (D-28/D-29). Draft status belongs in viewport; overall acceptance belongs in history. See HANDOFF.md for CI evidence. Update documentation after future tasks and push verified batches.
+Current task progress (2026-10-16): M3 baseline complete; UI-01–UI-07 maintenance changes await a passing current browser run. Current fix: UI-07 hidden Import design input overflow. Post-MVP M4–M6 remain planned; next roadmap task is 29.1 when directed. See HANDOFF.md for the exact failure and candidate. Push once and await the user; do not continuously poll CI.
 
 ## Specifications (source of truth)
 
@@ -140,3 +140,5 @@ UI-04 (D-31): user-visible iteration deletion uses optional persisted deletedIte
 UI-05/D-32: fixed fields are collapsed under the lock/title summary; Cancel and Run Test icon/text are centered. Preserve read-only fields and native keyboard disclosure behavior. Browser verification pending.
 
 UI-06/D-33: informational notices belong in temporary Toast/LiveRegion, not permanent history paragraphs. My designs is a saved workspace card with no results table; Return to workbench reveals results without changing session state. Browser CI pending.
+
+Responsive repair: scope the accessible Import design file input to 1×1 px inside its positioned label. The old history-note input width:100% rule overrode sr-only and caused a 2431 px document at 1280 px (run 38935876295). Preserve this specificity fix and the requested-width responsive assertion; new CI verification pending.
