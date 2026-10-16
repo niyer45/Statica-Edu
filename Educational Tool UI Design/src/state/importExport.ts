@@ -29,6 +29,9 @@ import { validateDesign } from '../geometry/validate'
 // authority (e.g. it allows a solid tube, innerDiameterM = 0, which the zod shape rejects).
 // The returned design is a fresh object built from validated fields, never the parsed object.
 
+// Validation uses only public challenge fields; UI never receives referenceDesign.
+export type ImportChallenge = Pick<Challenge, 'id' | 'initialDesign' | 'allowedSections' | 'sectionLimits'>
+
 export const IMPORT_FORMAT = 'ei-design'
 export const IMPORT_SCHEMA_VERSION = 1
 /** 100 KB. Text strictly larger than this many UTF-8 bytes is rejected before parsing. */
@@ -106,7 +109,7 @@ function designInOrder(d: BeamDesign): BeamDesign {
 }
 
 /** Serializes a design for download. Exactly four top-level keys (Req 22.1). */
-export function exportDesign(d: BeamDesign, ch: Challenge): string {
+export function exportDesign(d: BeamDesign, ch: Pick<Challenge, 'id'>): string {
   return JSON.stringify(
     {
       format: IMPORT_FORMAT,
@@ -162,7 +165,7 @@ function unknownKeyReason(path: readonly (string | number)[], key: string): stri
   return `Unexpected key "${full}" is not part of the design file format.`
 }
 
-function check(data: Record<string, unknown>, ch: Challenge): Result<BeamDesign, string[]> {
+function check(data: Record<string, unknown>, ch: ImportChallenge): Result<BeamDesign, string[]> {
   const reasons: string[] = []
   const parsed = envelopeSchema.safeParse(data)
   const zodIssues = parsed.success ? [] : parsed.error.issues
@@ -220,7 +223,7 @@ function check(data: Record<string, unknown>, ch: Challenge): Result<BeamDesign,
  * Validates an imported design file (JSON text or a parsed value) against the active
  * challenge. Returns the design, or one human-readable reason per failed check. Never throws.
  */
-export function importDesign(input: unknown, ch: Challenge): Result<BeamDesign, string[]> {
+export function importDesign(input: unknown, ch: ImportChallenge): Result<BeamDesign, string[]> {
   try {
     let data: unknown = input
     if (typeof input === 'string') {

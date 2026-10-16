@@ -1,7 +1,8 @@
-import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
+import { lazy, Suspense, useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
 import LiveRegion, { nextAnnouncement, type Announcement } from '../a11y/LiveRegion'
 import Toast from '../a11y/Toast'
+import { AnnounceContext, useAnnouncements } from '../a11y/useAnnouncements'
 import NumericControls from '../controls/NumericControls'
 import HelpDialog from '../dialogs/HelpDialog'
 import PredictionDialog from '../dialogs/PredictionDialog'
@@ -61,16 +62,12 @@ export default function Workbench({ onExit }: WorkbenchProps) {
     setAnnouncement((prev) => nextAnnouncement(prev, message))
   }, [])
 
-  // Reducer notices (task 19) flow to the toast and live region.
-  const reducerNotice = session.ui.notice?.message
-  useEffect(() => {
-    if (reducerNotice !== undefined) notify(reducerNotice)
-  }, [reducerNotice, notify])
+  useAnnouncements(notify)
 
   const openHelp = () => setModal('help')
 
   return (
-    <>
+    <AnnounceContext.Provider value={notify}>
       <WorkbenchChrome
         onExit={onExit}
         onOpenHelp={openHelp}
@@ -118,6 +115,6 @@ export default function Workbench({ onExit }: WorkbenchProps) {
       {/* Portaled to <body> so it stays present and unhidden while the template shell hides
           the Workbench during page navigation (Req 30.6). */}
       {createPortal(<LiveRegion announcement={announcement} />, document.body)}
-    </>
+    </AnnounceContext.Provider>
   )
 }

@@ -236,7 +236,7 @@ const LOCKED_LABELS: Record<(typeof LOCKED_DESIGN_FIELDS)[number], string> = {
 }
 
 /** Validates a full design against a challenge. See the header for rule order. */
-export function validateDesign(d: BeamDesign, ch: Challenge): GeometryError[] {
+export function validateDesign(d: BeamDesign, ch: Pick<Challenge, 'initialDesign' | 'allowedSections' | 'sectionLimits'>): GeometryError[] {
   const raw: unknown = d
   const design: Record<string, unknown> = isRecord(raw) ? raw : {}
   const errors: GeometryError[] = []

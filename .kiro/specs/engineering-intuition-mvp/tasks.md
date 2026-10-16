@@ -504,17 +504,17 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
     - Load on startup (before first render of the session) and save after each appended Test_Result, submission, and state change; show notices
     - _Requirements: 17.4, 20.7, 21.3, 21.4, 21.5, 21.6_
 
-- [ ] 21. Requirements and results panel
-  - [ ] 21.1 Implement `ui/panels/RequirementsPanel.tsx`
+- [x] 21. Requirements and results panel
+  - [x] 21.1 Implement `ui/panels/RequirementsPanel.tsx`
     - Fills the template `aside.challenge-panel` (keep `.requirement`, `.insight`, `.test-action`, `.run-test` styling); every requirement pass mark, including "Section envelope" and "Min. feature size", comes from the latest Evaluation (remove the template's always-true rows); "Draft" / "Tested #n" badge replaces the template's "Draft"/"Baseline" text; the model-limits notice lives in `PageFooter` (13.3)
     - Statement, locked load/material/span, constraint list (mm/MPa/kg); "Draft" / "Tested #n" badge; sole primary "Run Test" button; `draftErrors` list; results table in fixed order with 2/1/3 decimals and ✓ Pass / ✗ Fail text; status banner with icon + text; warnings; facts; outside-model labels and reasons for `modelNotApplicable`; analysis error banner; persistent model-limits notice; college-details disclosure when enabled; numbers only from latest Test_Result
     - _Requirements: 9.4, 16.3, 16.4, 16.5, 16.7, 16.8, 17.5, 17.6, 17.8, 29.1–29.10, 32.4_
 
-  - [ ]* 21.2 Write component tests for the panel
+  - [x]* 21.2 Write component tests for the panel
     - Badge transitions; draft edits do not change displayed numbers; formatting precision; Pass/Fail text without color; banner text per status; college details hidden when disabled; wideI shows the envelope row as failed
     - _Requirements: 16.3, 16.4, 16.5, 29.3, 29.4, 29.5, 29.6, 29.8, 29.9, 29.10_
 
-- [ ] 22. Dialogs and live announcements
+- [x] 22. Dialogs and live announcements
   - [x] 22.1 Implement `ui/dialogs/Dialog.tsx` primitive
     - `role="dialog"`, `aria-modal`, labelled by title, initial focus, Tab/Shift+Tab trap, Escape close, focus restore to opener or RequirementsPanel
     - _Requirements: 30.1, 30.2, 30.3, 30.4_
@@ -524,41 +524,41 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
     - Three unselected radios, optional explanation ≤ 500 chars, inline errors on invalid confirm, confirm dispatches `setPrediction` then `runTest`, cancel dispatches `cancelPrediction`
     - _Requirements: 14.2, 14.3, 14.4, 14.5_
 
-  - [ ] 22.3 Wire live announcements
+  - [x] 22.3 Wire live announcements
     - `ui/a11y/useAnnouncements.ts` mounted in `App.tsx`: section applied (name), test appended (iteration, status, failure count, focus unchanged), restore (iteration), validation/import/analysis errors (cause), locked-field import rejection
     - _Requirements: 4.5, 30.5, 32.10_
 
-  - [ ]* 22.4 Write component tests for dialogs and announcements
+  - [x]* 22.4 Write component tests for dialogs and announcements
     - Focus trap and restore; Escape leaves state unchanged; prediction validation errors; announcement text per event
     - _Requirements: 14.2, 14.4, 30.1–30.5, 32.10_
 
-- [ ] 23. History and compare
-  - [ ] 23.1 Implement `ui/history/HistoryCompare.tsx`
+- [x] 23. History and compare
+  - [x] 23.1 Implement `ui/history/HistoryCompare.tsx`
     - Fills the template `section.results-panel`: "Design history" and "Compare results" tabs as an accessible tablist, `.iteration-list`, `.metrics` cards, `.result-explanation` (from `ExplanationFact`s, replacing the template's generic strings), "Restore design"; all values from stored Test_Results
     - Baseline first then ascending iterations with status, key results, section type, prediction outcome ("no prediction" when absent); compare checkboxes (baseline always included, max three with message); deltas vs baseline and vs previous iteration; per-constraint changes; Restore buttons
     - _Requirements: 18.3, 18.4, 18.5, 18.6, 18.7, 18.8, 19.1, 29.11_
 
-  - [ ]* 23.2 Write component tests for history and compare
+  - [x]* 23.2 Write component tests for history and compare
     - Fourth selection blocked with message; delta values; iteration 1 uses baseline as previous; restore updates draft and badge; tab switching by keyboard keeps state
     - _Requirements: 18.4, 18.6, 18.7, 18.8, 19.3, 29.11_
 
-- [ ] 24. Reflection and submission
-  - [ ] 24.1 Implement `ui/panels/ReflectionPrompt.tsx` and `ui/dialogs/SubmitDialog.tsx`
+- [x] 24. Reflection and submission
+  - [x] 24.1 Implement `ui/panels/ReflectionPrompt.tsx` and `ui/dialogs/SubmitDialog.tsx`
     - Opened from the `PageFooter` "Explain & submit" button (template submit modal look); enablement follows submit gating rather than the template's `draft || runs.length < 2` rule
     - Verbatim prompt text, labelled textarea capped at 2000 chars; disabled submit with reason text (no tested iteration / empty reflection / both); iteration selector listing only iteration ≥ 1, latest preselected; result status text with iteration number and separate efficiency region
     - _Requirements: 20.1, 20.3, 20.5, 20.6, 20.8, 35.6_
 
-  - [ ]* 24.2 Write component tests for reflection and submit
+  - [x]* 24.2 Write component tests for reflection and submit
     - Disabled reasons for each condition; selector contents; status text identical regardless of reflection content; `<script>` reflection rendered literally
     - _Requirements: 20.3, 20.5, 20.6, 20.8, 23.7_
 
-- [ ] 25. Import/export UI
-  - [ ] 25.1 Implement `ui/panels/ImportExportBar.tsx` and import error dialog
+- [x] 25. Import/export UI
+  - [x] 25.1 Implement `ui/panels/ImportExportBar.tsx` and import error dialog
     - Replaces the template's `.history-note` export button (which dumped raw prototype runs) using the same icon button styling; the download uses an object URL created on click (same-origin, not a CSP-blocked asset)
     - Export downloads `exportDesign` output; import checks `File.size` > 102,400 before reading, then dispatches `importDesign`; error dialog lists every reason
     - _Requirements: 4.5, 22.1, 22.5, 23.1, 23.7_
 
-  - [ ]* 25.2 Write component tests for import/export UI and escaping
+  - [x]* 25.2 Write component tests for import/export UI and escaping
     - Oversize file rejected without read; reasons listed; `<img onerror>` reasons rendered literally; source scan asserts zero `dangerouslySetInnerHTML`
     - _Requirements: 4.5, 22.5, 23.1, 23.7_
 

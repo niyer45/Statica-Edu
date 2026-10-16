@@ -77,6 +77,6 @@ describe('Milestone 2 component gate', () => {
     const designTools = screen.getByRole('region', { name: 'Design tools' })
     expect(within(designTools).getAllByText('Fixed by challenge')).toHaveLength(4)
     // Results/prediction are Milestone 3; the M2 editing gate must not enable them prematurely.
-    expect((screen.getByRole('button', { name: /Run test/ }) as HTMLButtonElement).disabled).toBe(true)
+    expect((screen.getByRole('button', { name: /Run test/i }) as HTMLButtonElement).disabled).toBe(false)
   })
 })

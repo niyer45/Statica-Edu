@@ -33,7 +33,7 @@ describe('Workbench', () => {
     }
     // Panels are present while the lazy viewport is still loading.
     expect(screen.getByText(VIEWPORT_LOADING_TEXT)).toBeTruthy()
-    expect(screen.getByRole('button', { name: /Run test/ })).toBeTruthy()
+    expect(screen.getByRole('button', { name: /Run test/i })).toBeTruthy()
     expect(container.querySelectorAll('.design-panel .shape-tile')).toHaveLength(4)
     expect(screen.getByText('Design history')).toBeTruthy()
     expect(screen.getByText(MODEL_LIMITS_NOTICE)).toBeTruthy()

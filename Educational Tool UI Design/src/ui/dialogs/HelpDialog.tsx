@@ -20,8 +20,8 @@ export default function HelpDialog({ open, onClose }: { open: boolean; onClose: 
         torsion, joints, and stress concentrations are not modeled.
       </p>
       <div className="help-limits">
-        Applicability screening: span/depth ≥ 10 and deflection/span ≤ 1/20. These are conservative
-        educational thresholds, not certification rules.
+        Warnings and model applicability are shown for the latest tested design. These are
+        educational screening checks, not certification rules.
       </div>
       <button type="button" className="primary modal-primary" onClick={onClose}>
         Back to design

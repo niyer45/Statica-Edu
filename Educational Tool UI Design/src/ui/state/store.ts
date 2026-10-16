@@ -21,6 +21,8 @@ import type { Clock, IdFactory } from './bootstrap'
 
 export interface Store {
   state: SessionState
+  /** Last domain action for accessible event announcements; not persisted. */
+  lastAction?: Action
   challenge: Readonly<StudentChallenge>
   dispatch: (a: Action) => void
   selectMode: (mode: InteractionMode) => boolean

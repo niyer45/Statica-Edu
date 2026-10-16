@@ -47,6 +47,7 @@ export default function StoreProvider({
     return { state, persistence, notices }
   })
   const [state, setState] = useState(boot.state)
+  const [lastAction, setLastAction] = useState<Action | undefined>()
   const current = useRef(state)
   // Reduce and persist synchronously before accepting the next action, even when React batches
   // renders. The domain reducer remains pure; only this injected UI adapter touches storage.
@@ -58,6 +59,7 @@ export default function StoreProvider({
     boot.notices.length = 0
     if (message) next = { ...next, ui: { ...next.ui, notice: { kind: 'error', message } } }
     current.current = next
+    setLastAction(action.type === 'selectMode' ? undefined : action)
     setState(next)
   }, [reducer, boot, clock])
   const studentChallenge = useMemo(() => toStudentChallenge(challenge), [challenge])
@@ -83,8 +85,8 @@ export default function StoreProvider({
   useEffect(() => clearSnapshot, [])
 
   const store = useMemo<Store>(
-    () => ({ state, challenge: studentChallenge, dispatch, selectMode, runTest, submit, clock, newId }),
-    [state, studentChallenge, dispatch, selectMode, runTest, submit, clock, newId],
+    () => ({ state, lastAction, challenge: studentChallenge, dispatch, selectMode, runTest, submit, clock, newId }),
+    [state, lastAction, studentChallenge, dispatch, selectMode, runTest, submit, clock, newId],
   )
 
   return <StoreContext.Provider value={store}>{children}</StoreContext.Provider>
