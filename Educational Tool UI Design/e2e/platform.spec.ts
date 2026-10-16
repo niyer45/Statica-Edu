@@ -7,10 +7,23 @@ test('responsive layout preserves state across breakpoints and has no horizontal
   await openWorkbench(page)
   await referenceDesign(page)
   await runTest(page)
+  await page.getByRole('tab', { name: 'Compare results' }).click()
+  const field = page.locator('#dim-heightM')
+  await field.fill('61') // uncommitted input must survive layout changes too
   const before = normalizeState(await readState(page))
-  for (const width of [1280, 1000, 800, 375, 320, 1280]) {
+  for (const width of [1280, 1051, 1050, 1000, 871, 870, 800, 621, 620, 375, 320, 620, 621, 870, 871, 1050, 1051, 1280]) {
     await page.setViewportSize({ width, height: 1000 })
     expect(normalizeState(await readState(page))).toEqual(before)
+    await expect(field).toHaveValue('61')
+    await expect(page.getByRole('tab', { name: 'Compare results' })).toHaveAttribute('aria-selected', 'true')
+    const sidebar = page.locator('.platform-sidebar')
+    if (width <= 620) await expect(sidebar).toBeHidden()
+    else {
+      await expect(sidebar).toBeVisible()
+      const bounds = await sidebar.boundingBox()
+      if (width <= 1050) expect(bounds?.width).toBe(72)
+      else expect(bounds!.width).toBeGreaterThan(72)
+    }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
     const design = await page.getByRole('region', { name: 'Design tools' }).boundingBox()
     const viewport = await page.getByRole('region', { name: 'Design view' }).boundingBox()
@@ -19,7 +32,7 @@ test('responsive layout preserves state across breakpoints and has no horizontal
     if (width > 870) expect(challenge.x).toBeGreaterThan(viewport.x)
     else if (width > 620) expect(challenge.y).toBeGreaterThan(design.y)
     else expect(design.y).toBeGreaterThan(viewport.y)
-    await audit(page)
+    if ([1280, 1000, 800, 375, 320].includes(width)) await audit(page)
   }
 })
 

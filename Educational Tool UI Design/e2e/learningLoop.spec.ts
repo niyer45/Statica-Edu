@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { audit, dragHeightHandle, normalizeState, openWorkbench, readState, referenceDesign, runTest, setDimension, tabTo } from './helpers'
+import { audit, dragHeightHandle, normalizeState, openWorkbench, projectScenePoint, readState, referenceDesign, runTest, setDimension, tabTo } from './helpers'
 
 test('happy path: edit, drag a height handle, predict, compare, restore, reflect and submit', async ({ page }) => {
   await openWorkbench(page)
@@ -7,13 +7,21 @@ test('happy path: edit, drag a height handle, predict, compare, restore, reflect
   await page.getByRole('button', { name: /I-section/ }).first().click()
   await dragHeightHandle(page)
   await referenceDesign(page)
-  for (let i = 0; i < 4; i++) await runTest(page)
+  for (let i = 0; i < 4; i++) {
+    await setDimension(page, 'heightM', String(60 + i))
+    await runTest(page)
+  }
   await expect(page.getByLabel('Result status')).toContainText('Accepted')
   await expect.poll(async () => (await readState(page)).history.length).toBe(5)
   await page.getByRole('tab', { name: 'Compare results' }).click()
   await expect(page.getByRole('tabpanel', { name: 'Compare results' }).getByRole('table')).toHaveCount(4)
   await page.getByRole('tab', { name: 'Design history' }).click()
+  const beforeRestore = await readState(page)
   await page.getByRole('button', { name: 'Restore Iteration 1', exact: true }).click()
+  const restored = await readState(page)
+  expect(restored.draft.section).toEqual(beforeRestore.history[1]!.designSnapshot.section)
+  expect(restored.history).toEqual(beforeRestore.history)
+  await expect(page.getByLabel('Test status')).toHaveText('Draft')
   await page.getByRole('button', { name: 'Explain & submit' }).click()
   await page.getByRole('dialog', { name: 'Explain & submit', exact: true }).getByRole('textbox').fill('Moving material into flanges improved stiffness.')
   await page.getByRole('button', { name: 'Submit design & reflection' }).click()
@@ -28,19 +36,20 @@ test('HTML5 palette drag-drop applies the section without recording a result', a
   // Preserve the target width while giving the stacked mobile layout room for a native drag.
   await page.setViewportSize({ width: page.viewportSize()!.width, height: 2400 })
   const tile = page.getByRole('button', { name: /I-section/ }).first()
-  await tile.scrollIntoViewIfNeeded()
+  const state = await readState(page)
+  const destination = await projectScenePoint(page, [state.draft.lengthM / 2, 0, 0])
   const source = await tile.boundingBox()
   const target = page.locator('[data-section-drop-target]').first()
-  await target.scrollIntoViewIfNeeded()
-  const destination = await target.boundingBox()
-  if (!source || !destination) throw new Error('Drag source or destination missing')
+  if (!source) throw new Error('Drag source missing')
   await page.mouse.move(source.x + source.width / 2, source.y + source.height / 2)
   await page.mouse.down()
   // Chromium needs repeated movement over the destination to deliver dragover before drop.
   await page.mouse.move(source.x + source.width / 2 + 10, source.y + source.height / 2, { steps: 5 })
-  await page.mouse.move(destination.x + destination.width / 2, destination.y + destination.height / 2, { steps: 20 })
-  await page.mouse.move(destination.x + destination.width / 2 + 1, destination.y + destination.height / 2)
+  await page.mouse.move(destination.x, destination.y, { steps: 20 })
+  await page.mouse.move(destination.x + 1, destination.y)
+  await expect(target).toHaveAttribute('data-section-drop-target', 'active')
   await page.mouse.up()
+  await expect(target).toHaveAttribute('data-section-drop-target', 'idle')
   await expect.poll(async () => (await readState(page)).draft.section.kind).toBe('iSection')
   await expect(tile).toHaveAttribute('aria-pressed', 'true')
   await expect(tile).toContainText('Active')
@@ -78,12 +87,13 @@ test('keyboard flow matches mouse state and focus can leave the canvas', async (
 
 test('invalid tube and flange geometry leave state/history unchanged; edits preserve tested values', async ({ page }) => {
   await openWorkbench(page)
-  await page.getByRole('button', { name: /Hollow tube/i }).first().click()
+  await page.getByRole('button', { name: /Hollow circle/i }).first().click()
   const beforeTube = await readState(page)
   await page.locator('#dim-innerDiameterM').fill('100')
   await page.locator('#dim-innerDiameterM').press('Enter')
   await expect(page.locator('#dim-innerDiameterM')).toHaveAttribute('aria-invalid', 'true')
   expect((await readState(page)).draft).toEqual(beforeTube.draft)
+  expect((await readState(page)).history).toEqual(beforeTube.history)
   await page.locator('#dim-innerDiameterM').press('Escape')
   await referenceDesign(page)
   const beforeI = await readState(page)
@@ -91,6 +101,7 @@ test('invalid tube and flange geometry leave state/history unchanged; edits pres
   await page.locator('#dim-flangeThicknessM').press('Enter')
   await expect(page.locator('#dim-flangeThicknessM')).toHaveAttribute('aria-invalid', 'true')
   expect((await readState(page)).draft).toEqual(beforeI.draft)
+  expect((await readState(page)).history).toEqual(beforeI.history)
   await page.locator('#dim-flangeThicknessM').press('Escape')
   await runTest(page)
   const table = await page.getByRole('table', { name: 'Latest tested results' }).textContent()

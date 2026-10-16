@@ -103,7 +103,7 @@ export default function PlatformShell() {
     setSaved((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]))
 
   return (
-    <div className="platform">
+    <div className={`platform${workspace ? ' workbench-open' : ''}`}>
       <aside className="platform-sidebar">
         <button type="button" className="brand" onClick={() => go('Challenges')} aria-label={`${PRODUCT_NAME} home`}>
           <span className="brand-mark">

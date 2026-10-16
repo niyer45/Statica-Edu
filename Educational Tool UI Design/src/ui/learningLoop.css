@@ -31,3 +31,26 @@
   .history-note { width: 100%; }
   .challenge-body table { font-size: 10px; }
 }
+
+/* The embedded Workbench follows its specified sidebar thresholds; library styling stays in platform.css. */
+@media (min-width: 621px) and (max-width: 1050px) {
+  .platform.workbench-open .platform-sidebar { display: flex; width: 72px; padding: 25px 10px; }
+  .platform.workbench-open .platform-main { margin-left: 72px; }
+  .workbench-open .platform-sidebar .brand { font-size: 0; padding: 0; justify-content: center; }
+  .workbench-open .platform-sidebar .brand-dot,
+  .workbench-open .platform-sidebar .workspace-label,
+  .workbench-open .platform-sidebar .sidebar-divider,
+  .workbench-open .platform-sidebar .resume-nav,
+  .workbench-open .platform-sidebar .practice-note,
+  .workbench-open .platform-sidebar .nav-item > span,
+  .workbench-open .platform-sidebar .profile > div:nth-child(2),
+  .workbench-open .platform-sidebar .profile > svg { display: none; }
+  .workbench-open .platform-sidebar nav { margin-top: 45px; }
+  .workbench-open .platform-sidebar .nav-item { justify-content: center; padding: 14px; }
+  .workbench-open .platform-sidebar .profile { justify-content: center; padding: 15px 0; }
+}
+@media (max-width: 620px) {
+  .platform.workbench-open .platform-sidebar { display: none; }
+  .platform.workbench-open .platform-main { margin-left: 0; }
+  .workbench-open .mobile-platform-nav { display: flex; }
+}

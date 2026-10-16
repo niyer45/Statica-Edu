@@ -75,11 +75,9 @@ export async function referenceDesign(page: Page, keyboard = false) {
   if (keyboard) { await tabTo(page, tile); await tile.press('Enter') } else await tile.click()
   for (const [param, value] of [['heightM', '60'], ['widthM', '40'], ['flangeThicknessM', '4'], ['webThicknessM', '3']] as const) await setDimension(page, param, value, keyboard)
 }
-/** Project the actual descriptor through the documented default orthographic camera. */
-export async function dragHeightHandle(page: Page) {
-  if (!bundledChallengeResult.ok) throw new Error('Invalid challenge')
+/** Use the same default camera framing as BeamView, without inspecting renderer internals. */
+export async function projectScenePoint(page: Page, pointM: [number, number, number]) {
   const state = await readState(page)
-  const handle = handlesFor(state.draft.section, state.draft.orientationDeg, bundledChallengeResult.value.sectionLimits).find((h) => h.param === 'heightM')!
   const canvas = page.getByRole('img', { name: '3D beam view', exact: true })
   await canvas.scrollIntoViewIfNeeded()
   const box = await canvas.boundingBox()
@@ -90,9 +88,16 @@ export async function dragHeightHandle(page: Page) {
   camera.lookAt(L / 2, -0.025, 0)
   camera.zoom = Math.min(box.width, box.height) / (2.2 * Math.hypot(L / 2 + 0.09, 0.29, 0.15))
   camera.updateProjectionMatrix(); camera.updateMatrixWorld()
+  const point = new Vector3(...pointM).project(camera)
+  return { x: box.x + (point.x + 1) * box.width / 2, y: box.y + (1 - point.y) * box.height / 2 }
+}
+/** Project the actual descriptor through the documented default orthographic camera. */
+export async function dragHeightHandle(page: Page) {
+  if (!bundledChallengeResult.ok) throw new Error('Invalid challenge')
+  const state = await readState(page)
+  const handle = handlesFor(state.draft.section, state.draft.orientationDeg, bundledChallengeResult.value.sectionLimits).find((h) => h.param === 'heightM')!
   const { y, z } = localToGlobalYZ(handle.anchorM.u, handle.anchorM.v, state.draft.orientationDeg)
-  const point = new Vector3(L + 0.004, y, z).project(camera)
-  const x = box.x + (point.x + 1) * box.width / 2, top = box.y + (1 - point.y) * box.height / 2
+  const { x, y: top } = await projectScenePoint(page, [state.draft.lengthM + 0.004, y, z])
   await page.mouse.move(x, top)
   await page.mouse.down()
   await expect(page.getByTestId('dimension-feedback')).toContainText('Height')

@@ -48,3 +48,5 @@ Implementation and existing documentation through task 27.1 were already pushed 
 Completed: tasks 19–25 (learning-loop implementation and unit/component/property tests), checkpoint 26, and helper task 27.1. Remaining: six subtasks 27.2–27.7 plus final checkpoint 28. The six test tasks have authored implementations but are not verified complete. This is 32 of 38 Milestone 3 subtasks complete, excluding checkpoints from the subtask count. No task completion was claimed during this documentation-only audit.
 
 Browser repair batch in progress: scoped ambiguous locators, fixed palette casing, darkened reported contrast colors, and made the native HTML5 drag movement deliberate. CI execution is required because local server startup remains blocked by EPERM. Tasks 27.2–27.7 remain in progress pending that evidence.
+
+The browser repair batch also strengthens real Tab traversal, projected beam hover/drop, active-tile checks, distinct-history restore assertions, and input/tab preservation at every layout boundary. Fixed the embedded Workbench sidebar threshold mismatch with scoped supplemental styles. Completion remains dependent on CI evidence.
