@@ -67,3 +67,20 @@
   .tools-body .dimensions-heading { margin-top: 24px; margin-bottom: 13px; }
   .tools-body .dimension-field { margin-bottom: 12px; }
 }
+
+/* D-28: keep the challenge brief; detailed evaluation remains available on demand. */
+.challenge-body { display: block; }
+.challenge-body > p:first-child { margin-bottom: 16px; }
+.challenge-body .draft-badge { margin: 10px 0; }
+.challenge-body .requirement { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 8px; }
+.challenge-body .requirement > strong { grid-column: 1; margin-left: 0; white-space: normal; font-variant-numeric: tabular-nums; }
+.challenge-body .requirement > strong > span { white-space: nowrap; }
+.challenge-body .requirement > .pass-mark,
+.challenge-body .requirement > .fail-mark { grid-column: 2; grid-row: 1 / span 2; width: auto; height: auto; min-width: 43px; padding: 3px 5px; border-radius: 4px; white-space: nowrap; align-self: center; font-size: 10px; }
+.challenge-body .fail-mark { color: #76552c; }
+.challenge-body .result-details { margin: 16px 0; overflow-x: auto; }
+.challenge-body .result-details > summary { cursor: pointer; color: #345640; font-weight: 600; }
+.challenge-body .result-details table { table-layout: auto; overflow-wrap: normal; font-size: 10px; }
+.challenge-body .result-details th { overflow-wrap: normal; word-break: normal; }
+.challenge-body .result-details td { white-space: normal; }
+.challenge-body .result-details [aria-label="Explanation facts"] p { margin: 8px 0; }

@@ -82,6 +82,10 @@ DM Sans and Manrope are self-hosted via `@fontsource` static weights (D-21). Non
 - Accepted exception: `.selected-check` white on #67805c is 4.36:1; it is an icon whose state is also conveyed by visible text, so 3:1 applies.
 - Ratios were computed per rule against mapped backgrounds; rendered-DOM verification is deferred to the axe E2E checks (task 27).
 
+## D-28 — Compact challenge panel (user-directed, 2026-10-16)
+
+Keep the original challenge statement visible, followed by draft/test status and a compact stored value/limit list with readable, correctly colored text/icon pass/fail badges. Move the duplicate full constraint table, fixed-load/material/span text, generated explanation paragraphs and college formulas into a collapsed Test details disclosure. Keep model applicability reasons, warnings and errors visible. Full details remain available with keyboard-accessible native disclosures; numerical values and scoring are unchanged. This user instruction supersedes the original default-expanded presentation in Requirement 29.6; do not regenerate the completed MVP specification. The detailed table uses natural word wrapping and can scroll inside its disclosure instead of splitting words into arbitrary fragments.
+
 ## Open questions
 
 - Final challenge constants and applicability thresholds are pending engineering review.

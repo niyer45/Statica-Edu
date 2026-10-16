@@ -600,6 +600,12 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
   - Ensure Properties 28–37 and the happy-path, invalid-path, keyboard, and persistence E2E scenarios pass on Chromium desktop and Pixel 7 with no serious/critical axe violations; ask the user if questions arise.
   - _Requirements: 33.5, 33.9, 33.10_
 
+### User-requested maintenance after MVP closeout
+
+- [-] UI-01 Simplify The challenge panel (2026-10-16)
+  - Keep the opening statement; consolidate visible stored values/limits and pass/fail into one compact list. Put the duplicate full table, explanations and technical details behind Test details. Keep model warnings/errors visible; fix badge wrapping and table word breaking. D-28 records the user-directed presentation override.
+  - Local verification: lint zero errors, typecheck, 873 tests and build passed. Browser/axe regression is pending the pushed CI run; completed MVP checkboxes describe the previously verified baseline. Update this item only after the changed presentation passes CI.
+
 ### Post-MVP roadmap: scope and execution
 
 Added at the user's request after Milestone 3 passed. Tasks 1–28 and their completion evidence remain unchanged. Requirements 1–35 and the existing design describe the completed M0–M3 baseline; their statements that M4+ is outside MVP implementation scope remain historical boundaries, not specifications for these new features. New feature requirements and acceptance criteria must be written as scoped extensions before implementation, without regenerating the completed MVP specifications or inventing requirement IDs.

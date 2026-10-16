@@ -7,7 +7,7 @@ template's visual design and platform shell are kept.
 
 Read `HANDOFF.md` first for the current status and the next task.
 
-Current task progress (2026-10-16): Milestone 3 complete, all 38 subtasks and checkpoint 28 verified. Post-MVP Milestones 4–6 are planned in tasks.md; next planned task is 29.1. See HANDOFF.md for CI evidence. Update documentation after future tasks and push verified batches.
+Current task progress (2026-10-16): Milestone 3 complete, all 38 subtasks and checkpoint 28 verified. Post-MVP Milestones 4–6 are planned in tasks.md; next planned task is 29.1. Current maintenance: UI-01 compact challenge panel implemented, awaiting browser verification (D-28). See HANDOFF.md for CI evidence. Update documentation after future tasks and push verified batches.
 
 ## Specifications (source of truth)
 
@@ -18,7 +18,7 @@ The spec lives outside this folder, one level up:
 - `../.kiro/specs/engineering-intuition-mvp/tasks.md`: the completed MVP plan (Milestones 0–3, tasks 1–28) and post-MVP roadmap (Milestones 4–6, tasks 29–40) with a JSON wave dependency graph at the end.
 
 Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuition-mvp/`.
-`DECISIONS.md` records D-01…D-27 and the 14 applicability thresholds. D-25 defines required `sectionDefaults`; D-26 records the user-directed uncluttered 3D presentation and overrides the original visible-overlay requirements.
+`DECISIONS.md` records D-01…D-28 and the 14 applicability thresholds. D-25 defines required `sectionDefaults`; D-26 records the user-directed uncluttered 3D presentation and overrides the original visible-overlay requirements.
 
 ## Rules for following the spec
 

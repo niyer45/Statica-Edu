@@ -105,6 +105,7 @@ test('invalid tube and flange geometry leave state/history unchanged; edits pres
   expect((await readState(page)).history).toEqual(beforeI.history)
   await page.locator('#dim-flangeThicknessM').press('Escape')
   await runTest(page)
+  await page.getByText('Test details', { exact: true }).click()
   const table = await page.getByRole('table', { name: 'Latest tested results' }).textContent()
   await setDimension(page, 'heightM', '65')
   await expect(page.getByLabel('Test status')).toHaveText('Draft')
