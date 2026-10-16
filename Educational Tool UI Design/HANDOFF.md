@@ -1,16 +1,20 @@
 # Handoff: Statica MVP
 
-Last updated: 2026-10-16. M0–M3, UI maintenance (41.1–41.7) and CI repair 42 are verified. Tasks 29.1, 31.1 and development tasks 33.1–33.2 are complete. **Next software task: 45.1, scope the five remaining original catalog challenges.** Further Beam II integration is deferred until original-catalog gate 51 (D-35). Task 44 is active by explicit user request: 44.1–44.2 implemented; 44.3 awaits current browser evidence and owner manual release checks. Nikhil is the nominated owner engineering reviewer; 29.2/manual checks/student QA are deferred to before customer deployment, remain unchecked and no longer block isolated development (D-34).
+Last updated: 2026-10-16. M0–M3, UI maintenance (41.1–41.7) and CI repair 42 are verified. Tasks 29.1, 31.1 and development tasks 33.1–33.2 are complete. **Next software task: 45.1, scope the five remaining original catalog challenges.** Further Beam II integration is deferred until original-catalog gate 51 (D-35). Task 44 is active by explicit user request: 44.1–44.2 implemented; 44.3 automated/browser gates passed run 38970465802; only owner manual release-mode evidence remains. Nikhil is the nominated owner engineering reviewer; 29.2/manual checks/student QA are deferred to before customer deployment, remain unchecked and no longer block isolated development (D-34).
 
-## Implementation and verification
+## Current implementation and verification
 
-The existing learning loop implements prediction, immutable tested results/history, compare/restore, reflection/submission, validated local persistence, import/export, accessible dialogs and announcements. Preview challenges and Freeform remain unavailable by design.
+The learning loop includes prediction, immutable tested results/history, compare/restore/deletion, reflection/submission, validated local persistence, import/export, accessible dialogs and announcements. Guided adds four browsable instruction steps and optional hints; Parametric provides direct editing without that scaffolding. Choose the mode before entry; there is no mode switch in the workbench. Reload/resume retains the selected mode and saved workspace (D-37). Only Cantilever Beam I is available. Other catalog entries/Freeform remain previews; Beam II configuration/tests are retained but further integration is deferred.
 
-[CI run 38936927907](https://github.com/niyer45/Statica-Edu/actions/runs/38936927907) passed on implementation commit `eb1b56757b42192934f1b4cd3240515bb02237de`, and the user confirmed success:
+[Passing CI run 38970465802](https://github.com/niyer45/Statica-Edu/actions/runs/38970465802) verified implementation `878fb87bbf514e746f2ecd477a473b22a6b0bf75`; the user confirmed success:
 
-- Lint, typecheck, **879 tests across 109 files**, domain coverage thresholds, build and schema drift passed.
-- Focused responsive regression: **2/2 passed**; full desktop Chromium/Pixel 7 E2E: **20/20 passed**, including axe gates.
-- This run verifies the cumulative UI maintenance and import overflow repair; it supersedes pending verification notes for UI-01–UI-07. Earlier baseline and failed-run evidence in MILESTONE3.md is historical.
+- Lint zero errors (10 existing warnings), typecheck, **906 tests across 111 files**, domain coverage thresholds, production build and schema drift passed.
+- **2/2 focused responsive cases** and **24/24 desktop Chromium/Pixel 7 E2E cases** passed, including axe gates.
+- Four mode cases verify keyboard pre-entry selection, no in-workbench switching, reload/state/submission preservation, prediction checkpoints and Parametric SVG fallback; responsive checks include narrow layouts.
+
+Tasks 44.1–44.2 are complete and automated/browser verification under 44.3 is passed. **44.3 and parent 44 remain in progress solely for owner manual release-mode checks**, including screen-reader/touch evidence under 30.1. Do not fabricate those checks or mark the release gate complete from CI alone. They remain required before customer deployment, while next software task **45.1** may proceed. No new test/browser execution is needed for this documentation-only closeout.
+
+Earlier appended status/candidate notes below are historical; this section and D-37 supersede pending-browser and in-workbench-switching descriptions.
 
 ## Completed maintenance to preserve
 
@@ -88,7 +92,7 @@ Owner directed the existing six library challenges ahead of second editions. Rea
 
 Retain Beam II configuration/specification/tests and historical completed tasks 33.1–33.2; do not integrate or activate it now. Task 52 revisits it after original-catalog gate 51. This supersedes prior pointers making Beam II/34.1 the immediate next work. Required mode distinction 44 and pre-deployment human QA remain open. Update current task pointers, never mark dormant assets or preview cards as runnable. Planning-only update; no source/test/model or available-card changes. Numeric IDs, graph references and cycles validated.
 
-## Current task 44 implementation — D-36
+## Historical task 44 implementation — D-36 (superseded by D-37)
 
 User explicitly selected task 44 ahead of catalog scoping. 44.1 and 44.2 are complete: additive interaction-modes specifications precede the implementation. ModeExperience renders a native Interaction mode selector in Workbench. Guided includes the existing workflow stepper and compact four-step instruction panel with collapsed hints/section-sensitive suggested experiments; Parametric omits this scaffolding and keeps direct editing plus all test/result tools. Instructions live outside the challenge and Canvas; no dense challenge text or overlays return. Drawer descriptions now match behavior.
 
@@ -96,10 +100,14 @@ The shared editor, numeric fields, viewport, history and solver stay mounted. Ex
 
 Local verification: lint zero errors (10 existing warnings), typecheck, full coverage/core suite **905 tests across 111 files**, production build passed. Seven new component cases pass. Playwright discovers **24 cases**, including four new mode cases (desktop/Pixel 7) for keyboard switching/reload with submitted workspace preservation and Parametric prediction + SVG fallback. Local browser launch is sandbox-blocked; no browser pass is claimed before pushed CI. Task 44.3 and parent 44 remain in progress pending browser evidence and owner manual screen-reader/touch/release-mode checks; retain task 30.1 human QA. Push this verified candidate and await the user's result, without continuous polling. After completing verification, resume original-catalog scoping 45.1; Beam II stays deferred.
 
-## Current mode correction — D-37
+## Mode correction — D-37 (now CI-verified)
 
 User requires choosing Guided/Parametric before entry and keeping it fixed inside the workbench. Removed ModeExperience's native selector/callback and selector CSS. Guided still has four browsable steps and optional hints; Parametric still has direct editing without scaffolding. Existing library/challenge drawer is the pre-entry choice; reload/resume retains session.mode. Leaving to the library permits a new entry choice while preserving the shared workspace; no permanent project/account lock or mode-specific persistence was added. This supersedes D-36's selector and all earlier live-switch test expectations.
 
 Eight focused component cases pass, including absence of mode controls in both modes and Parametric draft/history/deletion/prediction/reflection/submission persistence. Four replacement desktop/Pixel 7 browser cases choose mode before entry with keyboard, verify fixed presentation, retained prediction checkpoints/submission/reload, Parametric SVG fallback and 320 px/axe checks. Total browser discovery stays 24. No new browser pass or manual release QA is claimed before the pushed workflow. Parent 44/44.3 remain in progress; 44.1–44.2 remain implemented with corrected specifications.
 
 D-37 local verification: full coverage suite passed all **906 tests across 111 files**, including all eight mode cases; 95% domain line gates, lint (zero errors/10 existing warnings), typecheck and production build passed. Playwright discovery confirms four replacement mode cases/24 total cases; browser execution remains for CI.
+
+## Documentation closeout after passing mode workflow
+
+Recorded the passing implementation above in tasks.md and AGENTS.md; implementation/browser work is verified, owner manual QA remains open, and next software task stays 45.1. This commit changes documentation only and does not begin new feature work or claim deployment. Push once and stop; do not continuously poll the documentation workflow.

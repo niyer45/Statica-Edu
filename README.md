@@ -53,7 +53,7 @@ The dotted deformation outline represents the **latest tested design**. Editing 
 | --- | --- |
 | Cantilever Beam II | Configuration and domain tests are retained, but further development is **deferred until the original six catalog challenges are implemented**. It is not available in the UI. |
 | Engineering and student QA | Review plan and pilot materials are prepared. Owner engineering review, manual accessibility/readiness checks and actual student sessions remain open before customer deployment. |
-| Guided / Parametric distinction | Implemented locally under 44.1–44.2: staged Guided instructions/optional hints versus direct Parametric editing, sharing controls, predictions and results. Current browser verification and manual release QA remain open under 44.3. |
+| Guided / Parametric distinction | Implemented and browser-verified: staged Guided instructions/optional hints versus direct Parametric editing, sharing controls, predictions and results. Owner manual release QA remains open under 44.3. |
 | Multiple challenge workspaces | Planned integration with separate saved sessions and correctly attributed results for each challenge |
 | User accounts and saved information | Planned authentication, minimal profile information, owned projects and cross-device resume |
 | Challenge completion history | Planned per-user, per-challenge progress with explicit completion rules and versioned evidence |
@@ -94,9 +94,7 @@ See the [developer README](Educational%20Tool%20UI%20Design/README.md) for verif
 
 The application uses React 19, strict TypeScript, Vite, Three.js / React Three Fiber and a validated JSON challenge schema. Geometry, analysis and evaluation are pure domain modules; rendering does not determine numerical results. The existing Figma Make visual shell is retained.
 
-Verification includes Vitest, fast-check property tests, architecture checks and Playwright desktop/mobile flows with axe accessibility checks. The latest development batch passed **906 local tests across 111 files**, full domain coverage thresholds, lint, typecheck and production build. Its pushed workflow result is tracked in [GitHub Actions](https://github.com/niyer45/Statica-Edu/actions).
-
-The preceding [verified browser run](https://github.com/niyer45/Statica-Edu/actions/runs/38966388585) passed both focused responsive checks and all 20 desktop/Pixel 7 browser cases on commit `a76b8ad`. Automated results do not substitute for the pending human engineering review or student pilot.
+Verification includes Vitest, fast-check property tests, architecture checks and Playwright desktop/mobile flows with axe accessibility checks. [CI run 38970465802](https://github.com/niyer45/Statica-Edu/actions/runs/38970465802) passed **906 tests across 111 files**, domain coverage thresholds, lint, typecheck, production build and schema drift on commit `878fb87`. Both focused responsive checks and all **24 desktop/Pixel 7 browser cases** passed, including mode-specific and axe checks. Automated results do not substitute for the pending owner engineering review, manual accessibility/mode checks or student pilot.
 
 ## Project documentation
 

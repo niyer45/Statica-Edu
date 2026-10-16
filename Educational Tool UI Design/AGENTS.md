@@ -7,7 +7,7 @@ template's visual design and platform shell are kept.
 
 Read `HANDOFF.md` first for the current status and the next task.
 
-Current task progress (2026-10-16): user selected task 44 ahead of catalog scoping. 44.1–44.2 complete: Guided has instructions/optional hints; Parametric direct editing; mode is chosen before entry and fixed inside the workbench. 44.3/parent 44 pending pushed browser and owner manual release QA. Local coverage/core checks pass (906 tests/111 files); Playwright discovers 24 cases. Next after verification: 45.1 original-catalog scoping; Beam II deferred to 52. Read latest HANDOFF.md and additive interaction-modes specs; push once and await the user, no continuous CI polling.
+Current task progress (2026-10-16): task 44 implementation and automated/browser verification passed CI run 38970465802 on 878fb87bbf514e746f2ecd477a473b22a6b0bf75: 906 core tests, 2 responsive cases and all 24 E2E cases. Guided/Parametric chosen before entry, no switch inside workbench (D-37). 44.1–44.2 complete; parent 44/44.3 remain in progress only for owner manual release-mode checks under 30.1. Next software task 45.1 original-catalog scoping may proceed; Beam II remains deferred to 52. Read current HANDOFF.md section; older candidate notes are historical. Push verified batches once and await the user; no continuous CI polling.
 
 ## Specifications (source of truth)
 
@@ -58,7 +58,7 @@ Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuiti
 - The template `src/BeamScene.tsx` and temporary `LegacyFallback` are deleted. Their SVG projection now lives in `ui/viewport/projection.ts` and `Fallback2D.tsx`. Keep this fallback independent of Three.js so recovery works when the 3D chunk fails to load.
 - `test/state/model.ts`: reusable fast-check command harness, per-action invariant hooks and reachable-session generator (task 19.3). Dedicated reducer properties reuse it and the `test/pbt.ts` helper.
 - `test/`: shared arbitraries, pbt helper, fixtures (`test/fixtures/designs.ts`), architecture and config guard tests.
-- `e2e/`: 24 discovered Playwright desktop/Pixel 7 scenarios (including four new mode cases awaiting CI; the prior 20-case suite is verified); CI also runs the focused responsive pair before the full suite.
+- `e2e/`: 24 verified Playwright desktop/Pixel 7 scenarios (including four mode cases; run 38970465802); CI also runs the focused responsive pair before the full suite.
 - `schemas/`: generated JSON Schema. `scripts/`: schema generator.
 - Unit tests are colocated as `*.test.ts(x)`. Property tests are named `*.pN.test.ts`.
 
@@ -160,3 +160,5 @@ D-35 supersedes prior Beam-II-first pointers: implement the six existing catalog
 Mode implementation D-36: use ModeExperience and existing store.selectMode; never remount the editor or bypass challenge prediction requirements to distinguish modes. Guidance is transient, state-derived scaffolding, not progress/assessment or a passing solution. Keep hints collapsed and outside challenge/Canvas. Task 44.3 is not complete without current browser evidence and owner manual release checks. See .kiro/specs/interaction-modes/ and HANDOFF.md.
 
 D-37 supersedes all earlier in-workbench selector/switching instructions. ModeExperience has no selectMode control or callback. Choose mode in existing challenge-entry UI; resume/reload preserves it. Guided scaffolding and direct Parametric editing remain distinct. No permanent project lock or workspace reset is introduced; leaving to the library allows another entry choice. Specs/tests now verify no in-workbench switch, not live switching. Local suite: 906 tests/111 files, eight mode component cases. Task 44.3 remains pending current browser/manual QA.
+
+Mode workflow closeout: CI run 38970465802 passed 906 tests, coverage/core/build/schema gates, 2 focused responsive cases and all 24 E2E cases. Browser verification is no longer pending. Only owner manual release-mode evidence keeps 44.3/parent 44 open; do not imply screen-reader/touch QA is completed from axe/Playwright. D-37 remains authoritative: select mode before entry, no workbench selector; current implementation differs from D-36's historical switching UI. Next software task remains 45.1.
