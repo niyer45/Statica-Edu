@@ -604,26 +604,31 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
 
 All seven maintenance tasks are complete. [CI run 38936927907](https://github.com/niyer45/Statica-Edu/actions/runs/38936927907) verified implementation commit `eb1b56757b42192934f1b4cd3240515bb02237de`: lint, typecheck, 879 tests across 109 files, domain coverage gates, build, schema drift, 2/2 focused responsive cases and 20/20 desktop/Pixel 7 E2E cases passed, including axe checks. The user confirmed the workflow passed. D-30 supersedes the earlier challenge prose/comparison-card presentation choices.
 
-- [x] UI-01 Simplify The challenge panel (2026-10-16)
-  - Keep the opening statement and compact stored value/limit summary; keep warnings/errors visible and fix badge/table wrapping (D-28). Final Test details content is table-only under UI-03.
+- [x] 41. Complete post-MVP UI maintenance
+  - [x] 41.1 UI-01 Simplify The challenge panel (2026-10-16)
+    - Keep the opening statement and compact stored value/limit summary; keep warnings/errors visible and fix badge/table wrapping (D-28). Final Test details content is table-only under UI-03.
 
-- [x] UI-02 Restore compact history and comparison presentation (2026-10-16)
-  - Remove challenge draft/acceptance banners; keep draft in the viewport and recorded status in history. Compact rows and selected metrics preserve predictions, restore and accessible import/export (D-29). Not accepted has no exclamation prefix. Final comparison layout follows UI-03.
+  - [x] 41.2 UI-02 Restore compact history and comparison presentation (2026-10-16)
+    - Remove challenge draft/acceptance banners; keep draft in the viewport and recorded status in history. Compact rows and selected metrics preserve predictions, restore and accessible import/export (D-29). Not accepted has no exclamation prefix. Final comparison layout follows UI-03.
 
-- [x] UI-03 Selectable comparison details and table-only challenge disclosure (2026-10-16)
-  - Compare results reuses history's list/detail layout; clicking a design displays its stored values and deltas. Preserve Baseline and the maximum-three iteration selection rule. Challenge Test details contains only the stored constraint table (D-30).
+  - [x] 41.3 UI-03 Selectable comparison details and table-only challenge disclosure (2026-10-16)
+    - Compare results reuses history's list/detail layout; clicking a design displays its stored values and deltas. Preserve Baseline and the maximum-three iteration selection rule. Challenge Test details contains only the stored constraint table (D-30).
 
-- [x] UI-04 Delete non-Baseline history entries (2026-10-16)
-  - Confirm deletion, persist archival metadata, prune comparison/submission references and hide deleted choices. Protect Baseline, draft, last tested analysis and stable numbering (D-31). Protection/no-op, persistence, rejected hidden-reference and deletion/reload regressions pass. My designs results were subsequently removed under UI-06.
+  - [x] 41.4 UI-04 Delete non-Baseline history entries (2026-10-16)
+    - Confirm deletion, persist archival metadata, prune comparison/submission references and hide deleted choices. Protect Baseline, draft, last tested analysis and stable numbering (D-31). Protection/no-op, persistence, rejected hidden-reference and deletion/reload regressions pass. My designs results were subsequently removed under UI-06.
 
-- [x] UI-05 Center actions and collapse fixed-field details (2026-10-16)
-  - Center confirmation Cancel and Run Test icon/text. Keep the lock/title summary visible; fixed values expand from a collapsed native disclosure with read-only values and keyboard access (D-32).
+  - [x] 41.5 UI-05 Center actions and collapse fixed-field details (2026-10-16)
+    - Center confirmation Cancel and Run Test icon/text. Keep the lock/title summary visible; fixed values expand from a collapsed native disclosure with read-only values and keyboard access (D-32).
 
-- [x] UI-06 Temporary feedback and uncluttered My designs (2026-10-16)
-  - Remove permanent informational history paragraphs; dismiss the visual toast after five seconds while preserving live announcements/errors. My designs shows only the saved workspace card; Return to workbench reveals results without changing session data (D-33). Timer cleanup and state-preservation tests pass.
+  - [x] 41.6 UI-06 Temporary feedback and uncluttered My designs (2026-10-16)
+    - Remove permanent informational history paragraphs; dismiss the visual toast after five seconds while preserving live announcements/errors. My designs shows only the saved workspace card; Return to workbench reveals results without changing session data (D-33). Timer cleanup and state-preservation tests pass.
 
-- [x] UI-07 Fix hidden import chooser page overflow (2026-10-16)
-  - Failed run 38935876295 identified an sr-only file input extending to 2431 px at a 1280 px viewport. Position its label and scope a 1×1 px file-input rule to override the template width:100% rule. Accessible native import and the unchanged responsive assertions pass in the verified run above.
+  - [x] 41.7 UI-07 Fix hidden import chooser page overflow (2026-10-16)
+    - Failed run 38935876295 identified an sr-only file input extending to 2431 px at a 1280 px viewport. Position its label and scope a 1×1 px file-input rule to override the template width:100% rule. Accessible native import and the unchanged responsive assertions pass in the verified run above.
+
+- [-] 42. Verify CI preview-gating test repair
+  - Runs 38965356799 and 38965945029 exceeded the default five-second timeout in the aggregate PlatformShell preview/Freeform coverage test; browser steps were skipped.
+  - Parameterize the five preview entries and separate Freeform, retaining assertions without changing timeouts, retries or coverage thresholds. Local verification is recorded in HANDOFF.md; await a passing pushed workflow before marking complete. Depends on 41.7.
 
 ### Post-MVP roadmap: scope and execution
 
@@ -735,6 +740,8 @@ This milestone groups the previously named future areas: Freeform, advanced phys
 - Each property test lives in its own file (`<module>/<name>.p<N>.test.ts`) and each fixture example (E1–E5) in its own file under `test/fixtures/`, so parallel tasks in one wave never write the same file.
 - Properties 14, 17, and 26 are split: function-level halves in M1 (5.4, 6.4, 4.4) and reducer-level halves in 19.13.
 
+Numeric task 41 groups the historical UI-01–UI-07 maintenance work without renumbering roadmap tasks 29–40. Its subtasks were verified together in run 38936927907.
+
 ## Task Dependency Graph
 
 ```json
@@ -841,7 +848,15 @@ This milestone groups the previously named future areas: Freeform, advanced phys
     ],
     "40.2": [
       "40.1"
-    ]
+    ],
+    "41.1": ["28"],
+    "41.2": ["41.1"],
+    "41.3": ["41.2"],
+    "41.4": ["41.3"],
+    "41.5": ["41.4"],
+    "41.6": ["41.5"],
+    "41.7": ["41.6"],
+    "42": ["41.7"]
   }
 }
 ```

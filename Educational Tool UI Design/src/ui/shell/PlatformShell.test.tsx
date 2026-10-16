@@ -119,10 +119,13 @@ function openMode(name: 'Guided' | 'Parametric') {
 }
 
 describe('platform shell component suite (13.6)', () => {
-  it('prevents every preview and Freeform from opening or changing the session', () => {
-    renderShell()
-    const before = latest
-    for (const entry of catalog.filter((c) => !c.available)) {
+  // Each unavailable entry gets its own test budget under CI coverage. Keep all
+  // disabled-action/session invariants without aggregating six UI flows into 5s.
+  it.each(catalog.filter((entry) => !entry.available))(
+    'prevents preview $title from opening or changing the session',
+    (entry) => {
+      renderShell()
+      const before = latest
       fireEvent.click(screen.getByRole('button', { name: `View ${entry.title}` }))
       const drawer = screen.getByRole('dialog', { name: entry.title })
       const button = within(drawer).getByRole('button', { name: /Not available yet/ })
@@ -131,11 +134,20 @@ describe('platform shell component suite (13.6)', () => {
       expect(host().hidden).toBe(true)
       expect(latest).toBe(before)
       fireEvent.click(within(drawer).getByRole('button', { name: 'Close challenge details' }))
-    }
+      expect(screen.queryByRole('dialog')).toBeNull()
+      expect(latest).toBe(before)
+    },
+  )
+
+  it('prevents Freeform from opening or changing the session', () => {
+    renderShell()
+    const before = latest
     fireEvent.click(screen.getByRole('button', { name: 'View Cantilever Beam I' }))
     const drawer = screen.getByRole('dialog', { name: 'Cantilever Beam I' })
     fireEvent.click(within(drawer).getByRole('button', { name: /Freeform/ }))
-    fireEvent.click(within(drawer).getByRole('button', { name: /Not available yet/ }))
+    const button = within(drawer).getByRole('button', { name: /Not available yet/ })
+    expect((button as HTMLButtonElement).disabled).toBe(true)
+    fireEvent.click(button)
     expect(host().hidden).toBe(true)
     expect(latest).toBe(before)
   })

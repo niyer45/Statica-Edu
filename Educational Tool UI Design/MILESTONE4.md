@@ -118,3 +118,5 @@ Tasks 36.1–36.2 and 38.1–38.2 resolve these decisions and implement/verify t
 Task 29.1 produces this plan only. Reviewer/participants are confirmed not arranged; these are operational launch blockers, not missing fabricated planning results. Next task is 29.2: arrange and obtain an independent engineering review with the owner. Tasks 30.1 and 31.1 may be prepared according to their dependency graph; no participant contact is authorized by this document.
 
 Documentation-task validation: lint passed with zero errors (10 existing warnings), typecheck passed, all 879 tests across 109 files passed and production build passed. Existing chunk-size warning is nonblocking. Task dependency JSON and unchanged future-task statuses were checked. No new browser run is claimed for this documentation-only change.
+
+Follow-up verification note: the documentation push run 38965945029 failed in an existing aggregate shell-test timeout under coverage, before build/browser steps. Task 29.1 is an authored plan, not a claim of new runtime/browser verification. Repair task 42 separates the preview and Freeform regression cases; see HANDOFF.md for current evidence.

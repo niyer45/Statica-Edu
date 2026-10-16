@@ -1,6 +1,6 @@
 # Handoff: Statica MVP
 
-Last updated: 2026-10-16. **Milestones 0–3 and maintenance UI-01–UI-07 are complete and verified.** **Task 29.1 is complete:** MILESTONE4.md defines the review/pilot plan. Task 29 is in progress; next is **29.2: arrange and obtain an independent engineering review**. Remaining M4 tasks and M5–M6 are not started. This task changes documentation only.
+Last updated: 2026-10-16. **Milestones 0–3 and maintenance UI-01–UI-07 are complete and verified.** **Task 29.1 is complete:** MILESTONE4.md defines the review/pilot plan. Task 29 is in progress; next is **29.2: arrange and obtain an independent engineering review**. Remaining M4 tasks and M5–M6 are not started. Current maintenance candidate fixes CI component-test timing; current-run verification is pending.
 
 ## Implementation and verification
 
@@ -53,3 +53,11 @@ Read MILESTONE4.md for the authored plan. The owner chose a local-only pilot bef
 Accounts, saved user information and completed-challenge history are now explicit required future scope in 38.1–38.2, after the local pilot. The plan records data/progress requirements and open decisions without selecting a provider. Preserve guest/local operation and pure solver/reducer boundaries; no-network/CSP changes require the future scoped account specification. A submitted unsuccessful result must not be labelled a completed challenge. No account code was added.
 
 Validation: lint, typecheck, 879 tests across 109 files and production build passed for this documentation-only task. Existing browser evidence above remains the implementation baseline; no new browser execution is claimed. Documentation is delivered in a separate GitHub commit.
+
+## CI repair and task format — 2026-10-16
+
+Runs 38965356799 and 38965945029 failed in the coverage step: PlatformShell's combined unavailable-preview/Freeform test took about 6.9–7.2 seconds against the default 5-second budget. Build and browser steps were skipped; this is not a browser failure or evidence of a runtime regression. The repair parameterizes all five preview entries and gives Freeform its own test, retaining disabled-action, hidden-workbench and unchanged-session assertions, plus drawer-close verification. No timeout, retry, coverage threshold or production behavior is changed. The shell file now has 17 cases; the total is 884. Await the pushed CI result before closing repair task 42; do not continuously poll.
+
+Task formatting: completed maintenance entries now use numeric parent 41 and subtasks 41.1–41.7, retaining UI-01–UI-07 as historical labels. Roadmap IDs 29–40 are unchanged; graph entries reflect the historical maintenance sequence. Use numeric checkbox task IDs in future tasks.md edits. Task 29.1 remains complete and the next feature/review task is 29.2 (independent reviewer not arranged).
+
+Repair local verification: full `pnpm exec vitest run --coverage` passed all 884 tests across 109 files and the 95% domain line gates; lint zero errors (10 existing warnings), typecheck and production build passed. Numeric task-line format, unique IDs and dependency references validate. The focused shell run passed all 17 tests; its partial-coverage report cannot satisfy full-domain thresholds, so the full coverage run is the gate evidence. No new browser pass is claimed before CI.

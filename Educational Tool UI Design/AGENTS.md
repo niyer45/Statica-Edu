@@ -7,7 +7,7 @@ template's visual design and platform shell are kept.
 
 Read `HANDOFF.md` first for the current status and the next task.
 
-Current task progress (2026-10-16): M0–M3 and maintenance UI-01–UI-07 complete. CI run 38936927907 verified implementation eb1b56757b42192934f1b4cd3240515bb02237de: 879 core tests, 2 focused responsive cases and all 20 browser cases passed. M4 task 29.1 is complete (MILESTONE4.md); task 29 is in progress, next is 29.2 independent review. Other M4 and all M5–M6 tasks remain open. Read HANDOFF.md for current behavior and evidence. Push verified batches once and await the user; do not continuously poll CI.
+Current task progress (2026-10-16): M0–M3 and maintenance UI-01–UI-07 complete. CI run 38936927907 verified implementation eb1b56757b42192934f1b4cd3240515bb02237de: 879 core tests, 2 focused responsive cases and all 20 browser cases passed. M4 task 29.1 is complete (MILESTONE4.md); task 29 is in progress, next is 29.2 independent review. Other M4 and all M5–M6 tasks remain open. Current maintenance task 42 repairs a coverage-test timeout; pushed CI verification is pending. Read HANDOFF.md for current behavior and evidence. Push verified batches once and await the user; do not continuously poll CI.
 
 ## Specifications (source of truth)
 
@@ -144,3 +144,7 @@ UI-06/D-33: informational notices belong in temporary Toast/LiveRegion, not perm
 Responsive repair: scope the accessible Import design file input to 1×1 px inside its positioned label. The old history-note input width:100% rule overrode sr-only and caused a 2431 px document at 1280 px (run 38935876295). Preserve this specificity fix and the requested-width responsive assertion; verified by the focused responsive pair and full suite in run 38936927907.
 
 Task 29.1: MILESTONE4.md is the review/pilot plan. Owner confirmed local-only pilot first; reviewer and participants are not arranged. Never fabricate review or pilot evidence. Accounts with saved profile information, owned challenge sessions and completed-challenge history are required future scope under 38.1–38.2; the plan records inputs, not an implementation/provider decision. Specify completion separately from submission, since the existing reducer allows non-Accepted submissions. Keep current no-network/CSP and domain boundaries until an approved scoped extension changes them.
+
+CI maintenance: tasks.md checkbox entries must use numeric IDs; 41.1–41.7 retain the historical UI-01–UI-07 labels. Task 42 is pending CI: split the aggregate preview/Freeform shell regression into independent cases, retaining all assertions and default timeouts. Runs 38965356799/38965945029 failed before browsers in the 5-second aggregate component test; do not report them as browser failures. Current core count is 884 (17 shell cases). Await the user’s workflow result after pushing.
+
+Repair local verification: full `pnpm exec vitest run --coverage` passed all 884 tests across 109 files and the 95% domain line gates; lint zero errors (10 existing warnings), typecheck and production build passed. Numeric task-line format, unique IDs and dependency references validate. The focused shell run passed all 17 tests; its partial-coverage report cannot satisfy full-domain thresholds, so the full coverage run is the gate evidence. No new browser pass is claimed before CI.
