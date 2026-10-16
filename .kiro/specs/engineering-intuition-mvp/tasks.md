@@ -623,6 +623,10 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
   - Center confirmation Cancel and the Run Test icon/text group. Keep the lock and Some things are fixed. summary visible; collapse fixed values by default and remove the explanatory sentence. Preserve read-only values and keyboard access (D-32).
   - Local lint/typecheck/build and all 878 tests pass. Browser/axe CI is pending before this maintenance task is marked complete.
 
+- [-] UI-06 Temporary feedback and uncluttered My designs (2026-10-16)
+  - Remove permanent informational notice paragraphs from history; automatically dismiss the shared visual toast after five seconds while preserving the live region/errors. Show only the saved workspace card in My designs, with results available after Return to workbench. Preserve local session data (D-33).
+  - Local lint/typecheck/build and 879 tests pass, including timer cleanup, no results table and draft/history preservation; browser/axe CI remains pending.
+
 ### Post-MVP roadmap: scope and execution
 
 Added at the user's request after Milestone 3 passed. Tasks 1–28 and their completion evidence remain unchanged. Requirements 1–35 and the existing design describe the completed M0–M3 baseline; their statements that M4+ is outside MVP implementation scope remain historical boundaries, not specifications for these new features. New feature requirements and acceptance criteria must be written as scoped extensions before implementation, without regenerating the completed MVP specifications or inventing requirement IDs.

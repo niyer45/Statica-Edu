@@ -104,6 +104,10 @@ User-requested deletion removes a non-Baseline result from student-visible histo
 
 Per user direction, center the delete-confirmation Cancel action across the dialog width and center the Run Test play-icon/text group by overriding the template's obsolete auto-left icon margin. Fixed challenge values live in a native details disclosure, collapsed by default, with the lock icon and Some things are fixed. summary always visible. Remove the explanatory sentence under that title. Values retain their labels, read-only semantics, lock labels and domain sources when expanded. Keyboard focus has an explicit visible indicator. This replaces the old default-expanded fixed-fields presentation without changing which properties are locked or regenerating specifications.
 
+## D-33 — Temporary feedback and workspace-only My designs (2026-10-16)
+
+Per user direction, informational notices are shown through the existing live-region/toast channel rather than permanent paragraphs below history. Visual toasts dismiss automatically after five seconds, with manual dismissal still available; persistent error displays and the live region remain available. My designs shows only the local workspace card and Return to workbench action, not a results table. Session persistence, draft/history and recorded values remain unchanged and become visible in the workbench. Persisted untested drafts, deleted-history metadata or reflections also identify an existing workspace after reload. This supersedes the original My designs results-list presentation in Requirement 34.7; do not regenerate completed specifications.
+
 ## Open questions
 
 - Final challenge constants and applicability thresholds are pending engineering review.

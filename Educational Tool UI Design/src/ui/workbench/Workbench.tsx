@@ -64,6 +64,7 @@ export default function Workbench({ onExit }: WorkbenchProps) {
 
   useAnnouncements(notify)
 
+  const dismissNotice = useCallback(() => setNotice(null), [])
   const openHelp = () => setModal('help')
 
   return (
@@ -107,7 +108,7 @@ export default function Workbench({ onExit }: WorkbenchProps) {
           <HistoryCompare />
         </section>
         <PageFooter onExplainSubmit={() => setModal('submit')} />
-        <Toast message={notice} onDismiss={() => setNotice(null)} />
+        <Toast message={notice} onDismiss={dismissNotice} />
       </WorkbenchChrome>
       <PredictionDialog />
       <SubmitDialog open={modal === 'submit'} onClose={() => setModal(null)} />

@@ -1,4 +1,3 @@
-import { selectVisibleHistory } from '../../state/selectors'
 import { useEffect, useState } from 'react'
 import { catalog, type CatalogEntry } from '../../challenge/catalog'
 import type { InteractionMode } from '../../challenge/types'
@@ -70,7 +69,7 @@ export default function PlatformShell() {
   const featured = catalog.find(isRunnable) ?? catalog[0]
   if (featured === undefined) throw new Error('The challenge catalog is empty.')
   const testCount = selectTestCount(session)
-  const started = opened || testCount > 0
+  const started = opened || testCount > 0 || session.draftStatus === 'draft' || (session.deletedIterationIds?.length ?? 0) > 0 || session.reflectionAnswer.length > 0 || session.submission !== undefined
 
   const go = (p: Page) => {
     setPage(p)
@@ -209,7 +208,6 @@ export default function PlatformShell() {
                 <MyDesignsPage
                   title={challenge.title}
                   mode={session.mode}
-                  results={selectVisibleHistory(session)}
                   started={started}
                   onReturn={resume}
                   onFindChallenge={() => go('Challenges')}

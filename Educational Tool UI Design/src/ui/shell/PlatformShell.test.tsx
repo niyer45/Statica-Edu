@@ -7,8 +7,6 @@ import StoreProvider from '../state/StoreProvider'
 import { useSession, useDispatch } from '../state/store'
 import type { SessionState } from '../../state/session'
 import type { InteractionMode } from '../../challenge/types'
-import { formatMm, paToMpa } from '../../units/units'
-import { STATUS_LABELS } from './MyDesignsPage'
 import { DEFAULT_FILTERS, filterCatalog } from './LibraryPage'
 import { stepStatus } from './LearningPathsPage'
 import PlatformShell from './PlatformShell'
@@ -91,14 +89,12 @@ describe('PlatformShell', () => {
     expect(host().querySelector('.workbench')).toBe(workbench)
   })
 
-  it('My designs lists the session Test_Results', () => {
+  it('My designs shows a workspace card without a results table', () => {
     renderShell()
     fireEvent.click(screen.getByRole('button', { name: /Open challenge/ }))
     fireEvent.click(screen.getAllByRole('button', { name: /My designs/ })[0]!)
-    const table = screen.getByRole('table', { name: 'Session test results' })
-    // Bootstrap history holds only the Baseline.
-    expect(within(table).getAllByRole('row')).toHaveLength(2)
-    expect(within(table).getByText('Baseline')).toBeTruthy()
+    expect(screen.queryByRole('table', { name: 'Session test results' })).toBeNull()
+    expect(screen.getByRole('button', { name: /Return to workbench/ })).toBeTruthy()
   })
 
   it('filters the catalog and labels non-first learning-path steps Planned', () => {
@@ -188,7 +184,7 @@ describe('platform shell component suite (13.6)', () => {
     }
   })
 
-  it('shows only stored results and their metrics even after an untested draft edit', () => {
+  it('preserves the local draft and history while My designs hides results', () => {
     const boot = bootstrap(bundledChallengeResult, clock, newId)
     if (!boot.ok) throw new Error(boot.error.message)
     const baseline = boot.value.session.history[0]!
@@ -196,16 +192,13 @@ describe('platform shell component suite (13.6)', () => {
     openMode('Guided')
     act(() => dispatch({ type: 'setParam', param: 'diameterM', valueM: 0.08, mode: 'strict' }))
     navigate('My designs')
-    const table = screen.getByRole('table', { name: 'Session test results' })
-    const rows = within(table).getAllByRole('row').slice(1)
-    expect(rows).toHaveLength(latest.history.length)
-    rows.forEach((row, i) => {
-      const result = latest.history[i]!
-      expect(within(row).getAllByRole('cell').map((c) => c.textContent)).toEqual([
-        `${formatMm(result.analysis.tipDeflectionM)} mm`, `${result.analysis.massKg.toFixed(3)} kg`,
-        `${paToMpa(result.analysis.nominalMaxStressPa).toFixed(1)} MPa`, STATUS_LABELS[result.evaluation.status],
-      ])
-    })
+    const saved = latest
+    expect(screen.queryByRole('table', { name: 'Session test results' })).toBeNull()
+    expect(screen.queryByText('Test #1')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: /Return to workbench/ }))
+    expect(latest).toBe(saved)
+    expect(latest.draft.section).toEqual({ kind: 'circle', diameterM: 0.08 })
+    expect(latest.history).toHaveLength(2)
   })
 
   it.each(['Guided', 'Parametric'] as const)('opens the same challenge with all fields locked in %s', (modeName) => {

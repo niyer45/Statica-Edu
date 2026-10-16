@@ -85,6 +85,6 @@ export default function HistoryCompare() {
       <button type="button" className="primary modal-primary" onClick={() => { dispatch({ type: 'deleteIteration', testResultId: deleting.id }); setDeleteId(undefined) }}>Delete iteration</button>
       <button type="button" className="delete-cancel" onClick={() => setDeleteId(undefined)}>Cancel</button>
     </Dialog>}
-    {s.ui.notice && <p>{s.ui.notice.message}</p>}
+    {s.ui.notice?.kind === 'error' && <p>{s.ui.notice.message}</p>}
   </>
 }

@@ -60,3 +60,5 @@ Compare results uses the same selectable list/detail layout as Design history. T
 Design history supports confirmed deletion of non-Baseline entries. Deletion persists across reloads and removes comparison/submission choices, while current draft and last tested analysis stay unchanged. Archived numerical records preserve prediction provenance and iteration numbering (D-31). UI-04 awaits browser verification; the local suite has 878 passing tests.
 
 Fixed challenge values expand from Some things are fixed.; the lock/title remain visible and the redundant explanatory sentence is removed. Confirmation Cancel and Run Test icon/text are centered (UI-05/D-32, browser verification pending).
+
+My designs shows the saved local workspace and Return to workbench, with test results kept in the workbench. Informational feedback dismisses after five seconds (UI-06/D-33, browser CI pending).
