@@ -1,56 +1,58 @@
-# Statica (Engineering Intuition MVP)
+# Statica Edu — developer guide
 
-Browser-only structures learning app built around "Cantilever Beam I: Reduce Deflection". Cross-section editing, 3D handles and SVG fallback, prediction, stored test/results, comparison/restore, reflection/submission, local persistence and design import/export are implemented in the existing platform shell.
+Statica Edu helps students build engineering intuition by changing a design, predicting its behavior, testing constraints and explaining results. See the [repository README](../README.md) for the product overview, current features, roadmap and model/storage limitations.
 
-**Milestone 3 is complete.** All 38 subtasks and final checkpoint 28 are complete. Subsequent maintenance UI-01–UI-07 also passed: 879 core tests, 2 focused responsive cases and all 20 desktop/Pixel 7 browser cases. [Passing CI run](https://github.com/niyer45/Statica-Edu/actions/runs/38936927907). See [HANDOFF.md](HANDOFF.md) for current handoff and [MILESTONE3.md](MILESTONE3.md) for task evidence.
+Current UI: Cantilever Beam I with Guided/Parametric modes, section editing, 3D/SVG visualization, prediction, tested history, comparison/restore/deletion, reflection/submission and validated local saving/design import/export. Cantilever Beam II has a tested configuration but is not available in the UI yet. Accounts, cloud saves and completed-challenge history remain planned.
 
-The dotted deformation outline shows the latest **tested** design (initially the Baseline), so selecting or resizing a cross-section does not change it until a successful Run Test. This follows Requirements 25.2–25.5. Run Test and prediction confirmation are implemented; no separate deformation fix is needed.
+## Setup
 
-The 3D model view deliberately omits its envelope and static text overlays; drag feedback appears below the Canvas. Numerical controls and the accessible summary retain the dimension/load information, and envelope constraints remain active. See decision D-26 in [DECISIONS.md](DECISIONS.md).
-
-## Install
-
-Requires Node 22 and pnpm 10.34.3 (pinned in `.mise.toml` and `package.json#packageManager`).
+From this directory, use Node 22 and pnpm 10.34.3 (pinned in `.mise.toml` and `package.json`).
 
 ```sh
-mise install            # or: corepack enable && corepack prepare pnpm@10.34.3 --activate
 pnpm install --frozen-lockfile
-pnpm exec playwright install chromium   # needed once before `pnpm run e2e`
+pnpm run dev
 ```
 
-`.figma/make/install` is for the Figma Make preview environment only. Do not use it for local development or CI.
+`.figma/make/install` is for Figma Make preview only; do not use it for local development or CI. Open the URL Vite prints.
 
-## Scripts
+## Commands
 
 | Command | Purpose |
-|---------|---------|
-| `pnpm run dev` | Vite dev server |
-| `pnpm run lint` | ESLint, including the domain import-boundary rule |
-| `pnpm run typecheck` | `tsc --noEmit` (strict) |
-| `pnpm run test` | Vitest unit, property-based (fast-check), and architecture tests |
-| `pnpm run build` | Production build to `dist/` (CSP injected) |
-| `pnpm run e2e` | Playwright runner; 18 desktop/mobile cases; browser gate passed |
-| `pnpm run gen:schema` | Regenerate `schemas/challenge.schema.json` from the zod schemas |
+| --- | --- |
+| `pnpm run lint` | ESLint and import boundaries |
+| `pnpm run typecheck` | Strict TypeScript checking |
+| `pnpm run test` | Unit, component, property and architecture tests |
+| `pnpm exec vitest run --coverage` | Full suite with 95% domain line coverage gates |
+| `pnpm run build` | Production build with CSP |
+| `pnpm run preview` | Serve the built production app locally |
+| `pnpm exec playwright install chromium` | Install the browser before running E2E locally |
+| `pnpm run e2e` | Desktop Chromium and Pixel 7 flows, including axe checks |
+| `pnpm run gen:schema` | Regenerate the committed challenge JSON Schema |
 | `pnpm run format` | Format with oxfmt |
 
-## Layout
+The current development suite has 898 tests across 110 files. The existing browser suite has 20 cases, with a focused responsive pair also run separately in CI. See [GitHub Actions](https://github.com/niyer45/Statica-Edu/actions) and [HANDOFF.md](HANDOFF.md) for exact verified commits; local tests alone do not establish browser or human QA results.
 
-- `src/units`, `src/challenge`, `src/geometry`, `src/physics`, `src/evaluation`: pure, deterministic domain code
-- `src/state`: session model, learning-loop reducer, validated persistence and import/export helpers
-- `src/ui`: React, React Three Fiber, and the platform shell (template CSS in `src/*.css`)
-- `test/`: shared arbitraries, fixtures, architecture tests; `e2e/`: Playwright specs
-- `schemas/`: generated JSON Schema (committed; CI checks for drift); `scripts/`: build helpers
+## Structure and architecture
 
-## Architecture boundary
+| Path | Responsibility |
+| --- | --- |
+| `src/units`, `src/challenge`, `src/geometry`, `src/physics`, `src/evaluation` | Pure deterministic domain modules and validated challenge content |
+| `src/state` | Session model, reducer, validated persistence and design import/export |
+| `src/ui` | React shell/workbench, controls, R3F viewport, SVG fallback and accessibility primitives |
+| `test/` | Shared fixtures, property helpers, architecture and cross-layer integration tests |
+| `e2e/` | Playwright desktop/mobile scenarios |
+| `schemas/`, `scripts/` | Committed generated schema and generation helpers |
+| `../.kiro/specs/` | MVP specifications, roadmap and additive challenge specifications |
+| `../.github/workflows/ci.yml` | Active repository workflow; its working directory is this app |
 
-`units`, `challenge`, `geometry`, `physics`, and `evaluation` must not import `react`, `three`, `@react-three/*`, `ui/`, or `state/`, and `physics` must not import `evaluation`. ESLint (`no-restricted-imports`) and an architecture test enforce this. Every numeric result comes from typed section parameters through pure functions, never from meshes or rendering state.
+Domain modules cannot import React, Three.js, UI or state; physics cannot import evaluation. UI/state call the domain functions instead of reimplementing formulas. Solver results come from typed geometry, not rendered meshes. Reducer clock/IDs/storage are injected; preserve synchronous reduce/persist ordering.
 
-Milestone 3 is complete. Milestone 4 task 29.1 is complete; see [MILESTONE4.md](MILESTONE4.md) for the review and local-only pilot plan. Nikhil is the nominated owner engineering reviewer; review/manual checks/student evidence remain pre-deployment gates. Next software task is 34.1 challenge selection/session isolation. Accounts, saved user information and completed-challenge progress follow the pilot under tasks 38.1–38.2. The 320 px layout repair and strengthened responsive checks passed in CI.
+Keep the existing Figma Make shell/plugins and external styling architecture. Preserve D-26's uncluttered model: no envelope/static annotation overlays, with active handle feedback below Canvas. The deformation outline follows the latest tested snapshot until another successful Run Test.
 
-Post-MVP roadmap update (2026-10-16): tasks.md now tracks M4 review/pilot and remediation, M5 a reviewed second configuration and isolated multi-challenge flows, and scoped M6 extension tracks. Task 29.1 is complete; remaining roadmap subtasks are unchecked, with explicit dependencies and gates. Requirements/design for M0–M3 remain unchanged. Feature-specific specification extensions precede implementation. No new feature or pilot activity was performed in this documentation update.
+## Development handoff
 
-Verified UI maintenance (D-28–D-33): the challenge keeps a compact requirements summary and table-only Test details. History and comparison use selectable list/detail layouts; non-Baseline iterations support confirmed, persisted deletion while preserving archived records and numbering. Fixed values expand from Some things are fixed. My designs shows the saved workspace with Return to workbench; informational feedback dismisses after five seconds. Native import remains accessible without widening the page. See HANDOFF.md for preservation details and passing CI evidence.
+Read [AGENTS.md](AGENTS.md) and [HANDOFF.md](HANDOFF.md) before editing. Update those files and the [task list](../.kiro/specs/engineering-intuition-mvp/tasks.md) after completed work; preserve numeric task IDs and truthful evidence.
 
-CI repair 42 passed run 38966388585: preview and Freeform gating now have separate tests, with all assertions/timeouts preserved. The later configuration batch adds 14 domain tests; its browser gate awaits the new pushed run.
+Next software task is **34.1: challenge selection and isolated saved sessions**, followed by full second-challenge integration/regression work. See [MILESTONE5.md](MILESTONE5.md). Nikhil is the nominated owner engineering reviewer; human engineering/manual/student QA remains required before customer deployment under D-34. [MILESTONE4.md](MILESTONE4.md) and [PILOT_PROTOCOL.md](PILOT_PROTOCOL.md) contain prepared materials, not completed review/pilot evidence.
 
-Current development update (D-34): owner QA and pilot checks remain required before customer deployment, while software development proceeds. Prepared pilot materials are in PILOT_PROTOCOL.md. Cantilever Beam II has a versioned, tested configuration and additive specifications, but is not available in the UI yet; next task is 34.1 challenge-aware loading/session isolation. Repair 42 passed CI run 38966388585 (884 tests and all 20 browser cases). The new configuration adds 14 domain cases; prior counts above describe their historical runs. See MILESTONE5.md and the latest HANDOFF.md section.
+The app remains browser-local with no backend, sign-in or cloud sync. Future account work must explicitly specify the required network/CSP changes and user ownership rules; do not describe current local storage as account-backed saving.

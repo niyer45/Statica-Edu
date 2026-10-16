@@ -630,6 +630,9 @@ All seven maintenance tasks are complete. [CI run 38936927907](https://github.co
   - Runs 38965356799 and 38965945029 exceeded the default five-second timeout in the aggregate PlatformShell preview/Freeform coverage test; browser steps were skipped.
   - Parameterize the five preview entries and separate Freeform, retaining assertions without changing timeouts, retries or coverage thresholds. Verified by passing CI run 38966388585 on a76b8ad215720b0691ba566520d94ad995ade087: 884 tests, full coverage/core gates, 2 focused responsive cases and all 20 E2E cases. Depends on 41.7.
 
+- [x] 43. Expand repository and developer README documentation
+  - Explain the product purpose, current learning loop/features, planned accounts/progress, dormant second challenge, model/local-storage limits, setup and documentation entry points. Keep the root README product-focused and the app README developer-focused. Documentation only; relative links and capability statements checked against source/handoff. Next software task remains 34.1.
+
 ### Post-MVP roadmap: scope and execution
 
 Added at the user's request after Milestone 3 passed. Tasks 1–28 and their completion evidence remain unchanged. Requirements 1–35 and the existing design describe the completed M0–M3 baseline; their statements that M4+ is outside MVP implementation scope remain historical boundaries, not specifications for these new features. New feature requirements and acceptance criteria must be written as scoped extensions before implementation, without regenerating the completed MVP specifications or inventing requirement IDs.
