@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { audit, dragHeightHandle, normalizeState, openWorkbench, readState, referenceDesign, runTest, setDimension } from './helpers'
+import { audit, dragHeightHandle, normalizeState, openWorkbench, readState, referenceDesign, runTest, setDimension, tabTo } from './helpers'
 
 test('happy path: edit, drag a height handle, predict, compare, restore, reflect and submit', async ({ page }) => {
   await openWorkbench(page)
@@ -25,6 +25,8 @@ test('happy path: edit, drag a height handle, predict, compare, restore, reflect
 
 test('HTML5 palette drag-drop applies the section without recording a result', async ({ page }) => {
   await openWorkbench(page)
+  // Preserve the target width while giving the stacked mobile layout room for a native drag.
+  await page.setViewportSize({ width: page.viewportSize()!.width, height: 2400 })
   const tile = page.getByRole('button', { name: /I-section/ }).first()
   await tile.scrollIntoViewIfNeeded()
   const source = await tile.boundingBox()
@@ -40,25 +42,27 @@ test('HTML5 palette drag-drop applies the section without recording a result', a
   await page.mouse.move(destination.x + destination.width / 2 + 1, destination.y + destination.height / 2)
   await page.mouse.up()
   await expect.poll(async () => (await readState(page)).draft.section.kind).toBe('iSection')
+  await expect(tile).toHaveAttribute('aria-pressed', 'true')
+  await expect(tile).toContainText('Active')
   expect((await readState(page)).history).toHaveLength(1)
   await audit(page)
 })
 
 test('keyboard flow matches mouse state and focus can leave the canvas', async ({ page, context }) => {
-  await openWorkbench(page)
+  await openWorkbench(page, true, true)
   await referenceDesign(page, true)
   await runTest(page, true)
   const open = page.getByRole('button', { name: 'Explain & submit' })
-  await open.focus(); await open.press('Enter')
+  await tabTo(page, open); await open.press('Enter')
   const answer = page.getByRole('dialog', { name: 'Explain & submit', exact: true }).getByRole('textbox')
-  await answer.focus(); await answer.pressSequentially('Material placement improved stiffness.')
+  await tabTo(page, answer); await answer.pressSequentially('Material placement improved stiffness.')
   const submit = page.getByRole('button', { name: 'Submit design & reflection' })
-  await submit.focus(); await submit.press('Enter')
+  await tabTo(page, submit); await submit.press('Enter')
   await audit(page)
   await page.keyboard.press('Escape')
   const state = normalizeState(await readState(page))
   const canvas = page.getByRole('img', { name: '3D beam view', exact: true })
-  await canvas.focus(); await page.keyboard.press('Tab')
+  await tabTo(page, canvas); await page.keyboard.press('Tab')
   await expect(canvas).not.toBeFocused()
   await page.evaluate(() => localStorage.clear())
   const mouse = await context.newPage()

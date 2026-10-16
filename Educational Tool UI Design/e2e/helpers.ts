@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test'
+import { expect, type Locator, type Page } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 import { OrthographicCamera, Vector3 } from 'three'
 import type { SessionState } from '../src/state/session'
@@ -9,9 +9,19 @@ import { readFileSync } from 'node:fs'
 import { loadChallenge } from '../src/challenge/loader'
 const bundledChallengeResult = loadChallenge(JSON.parse(readFileSync(new URL('../src/challenge/challenges/cantilever-beam-1.json', import.meta.url), 'utf8')))
 
-export async function openWorkbench(page: Page, navigate = true) {
+/** Reach controls using the real document tab order, including off-screen controls. */
+export async function tabTo(page: Page, target: Locator) {
+  for (let i = 0; i < 100; i++) {
+    if (await target.evaluate((element) => element === document.activeElement)) return
+    await page.keyboard.press('Tab')
+  }
+  throw new Error(`Control not reachable by Tab: ${await target.getAttribute('aria-label') ?? await target.textContent()}`)
+}
+export async function openWorkbench(page: Page, navigate = true, keyboard = false) {
   if (navigate) await page.goto('/')
-  await page.getByRole('button', { name: /^(Open|Continue) challenge$/ }).first().click()
+  const open = page.getByRole('button', { name: /^(Open|Continue) challenge$/ }).first()
+  if (keyboard) { await tabTo(page, open); await page.keyboard.press('Enter') }
+  else await open.click()
   await expect(page.getByRole('button', { name: 'Run Test', exact: true })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Zoom in', exact: true })).toBeVisible()
 }
@@ -43,26 +53,26 @@ export async function audit(page: Page) {
 export async function setDimension(page: Page, param: SectionParam, value: string, keyboard = false) {
   const field = page.locator(`#dim-${param}`)
   await field.scrollIntoViewIfNeeded()
-  if (keyboard) { await field.focus(); await field.press('ControlOrMeta+A'); await field.pressSequentially(value) }
+  if (keyboard) { await tabTo(page, field); await field.press('ControlOrMeta+A'); await field.pressSequentially(value) }
   else await field.fill(value)
   await field.press('Enter')
   await expect(field).not.toHaveAttribute('aria-invalid', 'true')
 }
 export async function runTest(page: Page, keyboard = false) {
   const button = page.getByRole('button', { name: 'Run Test', exact: true })
-  if (keyboard) { await button.focus(); await button.press('Enter') } else await button.click()
+  if (keyboard) { await tabTo(page, button); await button.press('Enter') } else await button.click()
   const dialog = page.getByRole('dialog', { name: 'Predict deflection' })
   if (await dialog.isVisible()) {
     const radio = dialog.getByLabel('Decrease', { exact: true })
-    if (keyboard) { await radio.focus(); await radio.press('Space') } else await radio.check()
+    if (keyboard) { await tabTo(page, radio); await radio.press('Space') } else await radio.check()
     const confirm = dialog.getByRole('button', { name: 'Run structural test' })
-    if (keyboard) { await confirm.focus(); await confirm.press('Enter') } else await confirm.click()
+    if (keyboard) { await tabTo(page, confirm); await confirm.press('Enter') } else await confirm.click()
     await expect(dialog).not.toBeVisible()
   }
 }
 export async function referenceDesign(page: Page, keyboard = false) {
   const tile = page.getByRole('button', { name: /I-section/ }).filter({ has: page.locator('svg') }).first()
-  if (keyboard) { await tile.focus(); await tile.press('Enter') } else await tile.click()
+  if (keyboard) { await tabTo(page, tile); await tile.press('Enter') } else await tile.click()
   for (const [param, value] of [['heightM', '60'], ['widthM', '40'], ['flangeThicknessM', '4'], ['webThicknessM', '3']] as const) await setDimension(page, param, value, keyboard)
 }
 /** Project the actual descriptor through the documented default orthographic camera. */

@@ -63,3 +63,5 @@ Known historical spec differences remain: configured TypeScript is 5.9.3 versus 
 ## Browser repair batch in progress — 2026-10-16
 
 Scoped reflection inputs to the submission dialog and Freeform to the challenge drawer; corrected the Hollow tube lookup. Darkened pass-mark and challenge-paragraph text for the observed axe failures. Replaced single-step dragTo with repeated native mouse movement before release. No task completion is claimed until the updated CI browser scenarios pass. Local E2E startup still fails with port-bind EPERM. Next: inspect the CI result for this repair batch, starting with 27.2.
+
+The keyboard scenario now reaches controls using real Tab traversal (including opening the challenge), rather than programmatic focus. The native drag scenario keeps each project's viewport width while increasing height so source and target are simultaneously on screen in the stacked mobile layout, and asserts the active tile after drop. These changes still await CI; do not mark 27.3/27.4 complete yet.
