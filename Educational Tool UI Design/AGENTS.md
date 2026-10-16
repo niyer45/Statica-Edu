@@ -13,7 +13,10 @@ Read `HANDOFF.md` first for the current status and the next task.
 
 
 
-Current task progress: completed 19.12; next 19.13. Update HANDOFF.md, AGENTS.md and tasks.md after each completed task; push verified batches.
+
+
+
+Current task progress: completed 19.15; next 20.1. Update HANDOFF.md, AGENTS.md and tasks.md after each completed task; push verified batches.
 
 ## Specifications (source of truth)
 

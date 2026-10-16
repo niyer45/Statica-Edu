@@ -11,3 +11,6 @@ Each completed task below passed lint (zero errors), typecheck, the full Vitest 
 - **19.10 complete** — Property 34 verifies deterministic replay on frozen state/action/challenge, including null-prototype hostile imports. Verification: 835 tests pass. Next: 19.11.
 - **19.11 complete** — Property 36 verifies required-iteration prediction gating, cancellation and no consumed iteration on rejection. Verification: 835 tests pass. Next: 19.12.
 - **19.12 complete** — Property 37 verifies valid and rejected submissions preserve stored status/efficiency and untrimmed reflection. Verification: 835 tests pass. Next: 19.13.
+- **19.13 complete** — Properties 14,17,26 now cover hostile drafts/imports, strict rejection and immutable challenges in reducer sequences. Verification: 841 tests pass. Next: 19.14.
+- **19.14 complete** — The full specified example flow, cancel/confirm, bad restore, baseline submission, locked import reasons and invalid init are verified. Verification: 841 tests pass. Next: 19.15.
+- **19.15 complete** — Generated sequences produce identical state and evaluations in Guided and Parametric modes apart from mode. Verification: 841 tests pass. Next: 20.1.

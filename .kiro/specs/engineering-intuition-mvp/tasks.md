@@ -424,7 +424,7 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
 
 ### Milestone 3: Learning loop
 
-- [ ] 19. Complete the session reducer
+- [x] 19. Complete the session reducer
   - [x] 19.1 Add `runTest`, `setPrediction`, and `cancelPrediction` to `state/reducer.ts`
     - Prediction gating via `requiredOnIterations`; invalid draft sets `draftErrors` without opening dialog; frozen snapshot, analyze, evaluate, scorePrediction, append frozen TestResult with payload id/timestamp; catch `PhysicsInvariantError` (no iteration, error notice); compare selection keeps the last three non-baseline iterations
     - `cancelPrediction` is added to the design's Action union to satisfy 14.5
@@ -474,16 +474,16 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
     - **Property 37: Submit gating**
     - **Validates: Requirements 20.2, 20.4**
 
-  - [ ]* 19.13 Extend Properties 14, 17, and 26 to reducer sequences
+  - [x]* 19.13 Extend Properties 14, 17, and 26 to reducer sequences
     - **Property 14: Hostile input rejection** – hostile drafts/imports never add an iteration (**Validates: Requirements 17.2**)
     - **Property 17: Strict set** – rejected strict sets leave the draft deep-equal (**Validates: Requirements 6.6, 6.7**)
     - **Property 26: Constraints immutable** – no action sequence changes the challenge (**Validates: Requirements 4.6, 4.7**)
 
-  - [ ]* 19.14 Write unit tests for reducer example flows
+  - [x]* 19.14 Write unit tests for reducer example flows
     - Design "Example Usage" flow end to end; prediction dialog open/cancel/confirm; restore unknown id; submit on baseline rejected; locked-field import rejected with one reason per field; initSession error on invalid initial design
     - _Requirements: 4.4, 14.1, 14.5, 15.3, 19.7, 20.4_
 
-  - [ ]* 19.15 Write model-based test for mode invariance
+  - [x]* 19.15 Write model-based test for mode invariance
     - Run each generated action sequence from `initSession` under `mode: 'guided'` and `mode: 'parametric'`; assert drafts, history, and Evaluations are deep-equal apart from `mode` (separate file `test/state/modeInvariance.test.ts`)
     - _Requirements: 35.1, 35.3_
 
