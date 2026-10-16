@@ -224,15 +224,9 @@ function LockedFields() {
   }
   const fields = (Object.keys(LOCKED_LABELS) as LockedField[]).filter((f) => challenge.lockedFields.includes(f))
   return (
-    <div className="locked-features">
-      <Icon name="lock" size={13} />
-      <div className="min-w-0 flex-1">
-        Some things are fixed.
-        <p>
-          Span, material, support, and load
-          <br />
-          are part of the challenge.
-        </p>
+    <details className="locked-features">
+      <summary><Icon name="lock" size={13} />Some things are fixed.</summary>
+      <div className="min-w-0">
         {fields.map((f) => {
           const id = `locked-${f}`
           const { value, unit } = display[f]
@@ -257,6 +251,6 @@ function LockedFields() {
           )
         })}
       </div>
-    </div>
+    </details>
   )
 }

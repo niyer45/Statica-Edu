@@ -214,6 +214,11 @@ describe('numeric controls component suite (17.2)', () => {
     setup()
     const user = userEvent.setup()
     const before = latest!
+    const disclosure = screen.getByText('Some things are fixed.').closest('details')!
+    expect(disclosure.open).toBe(false)
+    expect(screen.queryByText('are part of the challenge.')).toBeNull()
+    fireEvent.click(screen.getByText('Some things are fixed.'))
+    expect(disclosure.open).toBe(true)
     for (const label of ['Span', 'Material', 'Load', 'Support']) {
       const input = screen.getByRole('textbox', { name: label }) as HTMLInputElement
       const value = input.value

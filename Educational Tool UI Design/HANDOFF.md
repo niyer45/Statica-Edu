@@ -66,3 +66,9 @@ History rows now have Delete (except Baseline) and a focus-safe confirmation/can
 Five new local tests cover protection/no-ops, frozen history/draft and submission/compare cleanup, persistence, numbering after deleting all rows, invalid metadata, and confirmation/cancel UI. The suite has 878 passing tests across 108 files. A new Playwright persistence scenario checks deletion/cancel, protected Baseline, comparison cleanup and reload persistence on desktop and Pixel 7 (20 browser cases total now). Browser/axe verification remains pending; push once and stop polling until the user reports the result.
 
 UI-04 verification before push: lint zero errors (10 existing warnings), typecheck, 878 tests across 108 files and production build pass. Playwright discovers 20 cases; no local browser pass is claimed.
+
+## Current maintenance — UI-05 action alignment and fixed-field disclosure
+
+Delete confirmation Cancel is now a full-width centered secondary action. Run Test overrides the old template icon auto-margin, centering play icon and text together. NumericControls renders fixed fields in a collapsed native details element; lock/title remain in the summary, the explanatory sentence is removed, and expanded fields keep read-only labels/values. Summary has a visible keyboard focus style. Existing read-only component checks open and verify the disclosure, including collapsed default and removed prose. D-32 records this user direction. Browser/axe verification awaits the new pushed CI run; stop after triggering it and await the user.
+
+UI-05 verification before push: lint zero errors (10 existing warnings), typecheck, 878 tests across 108 files and production build pass. No local browser pass is claimed.

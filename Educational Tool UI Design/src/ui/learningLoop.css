@@ -139,3 +139,15 @@
 .iteration .iteration-copy > .delete-iteration { grid-column: 1 / -1; justify-self: start; color: #76552c; font-size: 9px; }
 
 .iteration .iteration-copy > .restore-iteration { font-size: 9px; padding: 2px; justify-self: end; }
+
+/* D-32: centered actions and optional fixed challenge fields. */
+.run-test > svg { margin-left: 0; }
+.modal .delete-cancel { display: block; width: 100%; margin-top: 10px; padding: 8px; text-align: center; }
+.tools-body .locked-features { display: block; }
+.locked-features > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 6px 0; list-style: none; }
+.locked-features > summary::-webkit-details-marker { display: none; }
+.locked-features > summary::after { content: '▾'; margin-left: auto; }
+.locked-features[open] > summary::after { content: '▴'; }
+.locked-features > div { padding-top: 8px; }
+
+.locked-features > summary:focus-visible { outline: 2px solid #345640; outline-offset: 3px; }

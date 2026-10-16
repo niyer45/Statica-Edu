@@ -83,7 +83,7 @@ export default function HistoryCompare() {
       <p>Remove this iteration from design history and comparisons? Your current design and last test stay unchanged.</p>
       {s.submission?.testResultId === deleting.id && <p>This will also remove its recorded submission.</p>}
       <button type="button" className="primary modal-primary" onClick={() => { dispatch({ type: 'deleteIteration', testResultId: deleting.id }); setDeleteId(undefined) }}>Delete iteration</button>
-      <button type="button" onClick={() => setDeleteId(undefined)}>Cancel</button>
+      <button type="button" className="delete-cancel" onClick={() => setDeleteId(undefined)}>Cancel</button>
     </Dialog>}
     {s.ui.notice && <p>{s.ui.notice.message}</p>}
   </>

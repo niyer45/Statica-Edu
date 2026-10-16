@@ -216,6 +216,7 @@ describe('platform shell component suite (13.6)', () => {
     expect(latest.draft).toEqual(original.draft)
     expect(latest.history).toBe(original.history)
     expect(latest.mode).toBe(modeName.toLowerCase())
+    fireEvent.click(screen.getByText('Some things are fixed.'))
     for (const label of ['Span', 'Material', 'Load', 'Support']) {
       const input = screen.getByRole('textbox', { name: label }) as HTMLInputElement
       expect(input.readOnly).toBe(true)

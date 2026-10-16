@@ -619,6 +619,10 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
   - Confirm deletion, persist deleted-entry metadata, prune comparison membership and submitted references, hide entries from history/compare/My designs/submission, protect Baseline and preserve draft/last tested analysis and stable numbering. D-31 specifies archival semantics.
   - Local suite: 878 tests; deletion, protected/repeated/unknown ids, submission cleanup, rejected hidden references, persistence and next-run numbering covered. New desktop/Pixel 7 deletion/reload regression awaits CI before completion.
 
+- [-] UI-05 Center actions and collapse fixed-field details (2026-10-16)
+  - Center confirmation Cancel and the Run Test icon/text group. Keep the lock and Some things are fixed. summary visible; collapse fixed values by default and remove the explanatory sentence. Preserve read-only values and keyboard access (D-32).
+  - Local lint/typecheck/build and all 878 tests pass. Browser/axe CI is pending before this maintenance task is marked complete.
+
 ### Post-MVP roadmap: scope and execution
 
 Added at the user's request after Milestone 3 passed. Tasks 1–28 and their completion evidence remain unchanged. Requirements 1–35 and the existing design describe the completed M0–M3 baseline; their statements that M4+ is outside MVP implementation scope remain historical boundaries, not specifications for these new features. New feature requirements and acceptance criteria must be written as scoped extensions before implementation, without regenerating the completed MVP specifications or inventing requirement IDs.

@@ -18,7 +18,7 @@ The spec lives outside this folder, one level up:
 - `../.kiro/specs/engineering-intuition-mvp/tasks.md`: the completed MVP plan (Milestones 0–3, tasks 1–28) and post-MVP roadmap (Milestones 4–6, tasks 29–40) with a JSON wave dependency graph at the end.
 
 Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuition-mvp/`.
-`DECISIONS.md` records D-01…D-31 and the 14 applicability thresholds. D-25 defines required `sectionDefaults`; D-26 records the user-directed uncluttered 3D presentation and overrides the original visible-overlay requirements.
+`DECISIONS.md` records D-01…D-32 and the 14 applicability thresholds. D-25 defines required `sectionDefaults`; D-26 records the user-directed uncluttered 3D presentation and overrides the original visible-overlay requirements.
 
 ## Rules for following the spec
 
@@ -136,3 +136,5 @@ UI-02 presentation follow-up (2026-10-16): removed the exclamation prefix from N
 UI-03 (D-30): Compare results uses the history list/detail layout with one selected design; challenge Test details contains only the table. Local checks pass; browser CI pending. Preserve this newer user direction over D-28/D-29 descriptions of comparison cards or challenge explanation prose.
 
 UI-04 (D-31): user-visible iteration deletion uses optional persisted deletedIterationIds; keep archived TestResults/iteration numbering intact. Use selectVisibleHistory for user-facing lists and choices; latest tested analysis stays unchanged. Baseline is protected. Current local suite: 878 tests; new deletion browser pair awaits CI.
+
+UI-05/D-32: fixed fields are collapsed under the lock/title summary; Cancel and Run Test icon/text are centered. Preserve read-only fields and native keyboard disclosure behavior. Browser verification pending.
