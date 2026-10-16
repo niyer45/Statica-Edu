@@ -7,34 +7,7 @@ template's visual design and platform shell are kept.
 
 Read `HANDOFF.md` first for the current status and the next task.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Current task progress: completed 27.1; next 27.2. Update HANDOFF.md, AGENTS.md and tasks.md after each completed task; push verified batches.
+Current task progress (2026-10-16 audit): 32/38 Milestone 3 subtasks complete; next 27.2. CI core checks pass; all 18 browser cases currently fail. Update HANDOFF.md, AGENTS.md and tasks.md after each completed task; push verified batches.
 
 ## Specifications (source of truth)
 
@@ -85,7 +58,7 @@ Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuiti
 - The template `src/BeamScene.tsx` and temporary `LegacyFallback` are deleted. Their SVG projection now lives in `ui/viewport/projection.ts` and `Fallback2D.tsx`. Keep this fallback independent of Three.js so recovery works when the 3D chunk fails to load.
 - `test/state/model.ts`: reusable fast-check command harness, per-action invariant hooks and reachable-session generator (task 19.3). Dedicated reducer properties reuse it and the `test/pbt.ts` helper.
 - `test/`: shared arbitraries, pbt helper, fixtures (`test/fixtures/designs.ts`), architecture and config guard tests.
-- `e2e/`: Playwright (empty so far).
+- `e2e/`: 18 Playwright desktop/Pixel 7 scenarios; CI browser gate currently fails. See HANDOFF.md for observed failures.
 - `schemas/`: generated JSON Schema. `scripts/`: schema generator.
 - Unit tests are colocated as `*.test.ts(x)`. Property tests are named `*.pN.test.ts`.
 

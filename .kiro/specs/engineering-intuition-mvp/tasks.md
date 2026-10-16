@@ -567,6 +567,7 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
   - _Requirements: 33.1, 33.2, 33.4_
 
 - [ ] 27. End-to-end tests
+  - 2026-10-16 audit: 27.1 is complete; 27.2–27.7 are authored but all 18 browser cases failed in CI run 38841912543. Keep these in progress until verified. See application HANDOFF.md and MILESTONE3.md for failure details.
   - [x] 27.1 Create E2E helpers
     - `e2e/helpers.ts`: read `window.__EI_STATE__`, normalize state (strip timestamps/ids), axe check failing on serious/critical violations, network request recorder
     - _Requirements: 23.10, 33.5_

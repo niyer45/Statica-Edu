@@ -36,5 +36,13 @@ Each completed task below passed lint (zero errors), typecheck, the full Vitest 
 
 Verified batches were pushed as 9309633, 517ff2d, 19b2e30, 71fe69b, 6ed9265 and 6120f846ea22437b1268fdfcfb723102fbe86095. The last of these delivers the full learning-loop UI through task 25.
 
-Pre-E2E coverage passed: state 97.62%, geometry 99.05%, evaluation 98.76%, physics 100%. All 37 property tags are present. The 18 Playwright scenarios are discovered/typechecked, but local execution fails before the first page with `listen EPERM 127.0.0.1:4174`. No browser pass is claimed. Tasks 27.2–27.7 are in progress pending real execution, and 28 is unchecked. Repository-root CI now supplies the application working directory, matching Chromium, coverage/schema checks and browser artifact upload.
-- **27.1 complete** — E2E helpers load native ESM-safe challenge data, read the dev state hook, normalize ids/times, audit axe severity, record origins and perform true pointer/keyboard interactions. Playwright discovers all 18 desktop/Pixel scenarios; actual execution is pending external CI. Verification: 873 tests pass. Next: 27.2.
+Pre-E2E coverage passed: state 97.62%, geometry 99.05%, evaluation 98.76%, physics 100%. All 37 property tags are present. The 18 Playwright scenarios are discovered/typechecked, but local execution fails before the first page with `listen EPERM 127.0.0.1:4174`. No browser pass is claimed. Tasks 27.2–27.7 are in progress after failed CI execution, and 28 is unchecked. Repository-root CI now supplies the application working directory, matching Chromium, coverage/schema checks and browser artifact upload.
+- **27.1 complete** — E2E helpers load native ESM-safe challenge data, read the dev state hook, normalize ids/times, audit axe severity, record origins and perform true pointer/keyboard interactions. Playwright discovers all 18 desktop/Pixel scenarios; external CI execution failed; see the audit below. Verification: 873 tests pass. Next: 27.2.
+
+## Completion audit — 2026-10-16
+
+Implementation and existing documentation through task 27.1 were already pushed at `0eadb1425d2075aafa394968892ee26ba0dda747`; local/remote file hashes matched before this audit. No unpublished code was found.
+
+[Run 38841912543](https://github.com/niyer45/Statica-Edu/actions/runs/38841912543) passed lint, typecheck, coverage tests, build, schema drift and browser installation. All 18 browser scenarios failed, including retries. Failures include ambiguous reflection/Freeform selectors, a case-sensitive Tube lookup, drag/drop not updating the section, and serious axe color-contrast violations. HANDOFF.md records actionable details. Browser report artifacts are available on the run.
+
+Completed: tasks 19–25 (learning-loop implementation and unit/component/property tests), checkpoint 26, and helper task 27.1. Remaining: six subtasks 27.2–27.7 plus final checkpoint 28. The six test tasks have authored implementations but are not verified complete. This is 32 of 38 Milestone 3 subtasks complete, excluding checkpoints from the subtask count. No task completion was claimed during this documentation-only audit.

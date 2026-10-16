@@ -1,8 +1,8 @@
 # Statica (Engineering Intuition MVP)
 
-Browser-only structures learning app built around "Cantilever Beam I: Reduce Deflection". Milestone 2 provides typed cross-section editing, a 3D viewport with dimension handles, a usable SVG fallback, and the platform shell. The domain solver is implemented; the student-facing prediction, test/results, comparison, persistence, and submission workflow is Milestone 3 work. Run Test, prediction, results, history/compare/restore, reflection/submission, local persistence and design import/export are implemented. Browser milestone gates remain pending.
+Browser-only structures learning app built around "Cantilever Beam I: Reduce Deflection". Cross-section editing, 3D handles and SVG fallback, prediction, stored test/results, comparison/restore, reflection/submission, local persistence and design import/export are implemented in the existing platform shell.
 
-**Milestone 2 is complete against its component-test gate** (782 tests at closeout). Tasks 19.1–19.2 are implemented in the reducer: prediction gating, immutable test results, scoring, restore, comparison selection, reflection/submission, import and reset. Task 19.3 adds the reusable model-based command harness and reachable-session generator. Tasks 19.4–19.5 verify append-only history and snapshot isolation (Properties 28–29) after every generated action. The current full suite has **873 passing tests**, with lint, type checking and build passing too. [MILESTONE2.md](MILESTONE2.md) records the evidence and remaining browser-verification limits. [HANDOFF.md](HANDOFF.md) gives the current status and next task (27.2).
+**Milestone 3: tasks 19–26 and 27.1 are complete (32/38 subtasks).** The core gate passes with **873 tests**, lint, typecheck, build, coverage and schema checks. All 18 browser cases failed in [CI run 38841912543](https://github.com/niyer45/Statica-Edu/actions/runs/38841912543); tasks 27.2–27.7 and final checkpoint 28 remain. [HANDOFF.md](HANDOFF.md) records failures and next steps; [MILESTONE3.md](MILESTONE3.md) preserves task evidence.
 
 The dotted deformation outline shows the latest **tested** design (initially the Baseline), so selecting or resizing a cross-section does not change it until a successful Run Test. This follows Requirements 25.2–25.5. The pending Run Test/results panel (21.1) and prediction confirmation (22.2) complete that UI flow; no separate deformation fix is needed.
 
@@ -29,14 +29,14 @@ pnpm exec playwright install chromium   # needed once before `pnpm run e2e`
 | `pnpm run typecheck` | `tsc --noEmit` (strict) |
 | `pnpm run test` | Vitest unit, property-based (fast-check), and architecture tests |
 | `pnpm run build` | Production build to `dist/` (CSP injected) |
-| `pnpm run e2e` | Playwright runner; end-to-end/axe specs are planned for Milestone 3 |
+| `pnpm run e2e` | Playwright runner; 18 desktop/mobile cases authored, browser gate failing |
 | `pnpm run gen:schema` | Regenerate `schemas/challenge.schema.json` from the zod schemas |
 | `pnpm run format` | Format with oxfmt |
 
 ## Layout
 
 - `src/units`, `src/challenge`, `src/geometry`, `src/physics`, `src/evaluation`: pure, deterministic domain code
-- `src/state`: session model, edit reducer and import/export helpers; learning-loop actions and persistence are planned for Milestone 3
+- `src/state`: session model, learning-loop reducer, validated persistence and import/export helpers
 - `src/ui`: React, React Three Fiber, and the platform shell (template CSS in `src/*.css`)
 - `test/`: shared arbitraries, fixtures, architecture tests; `e2e/`: Playwright specs
 - `schemas/`: generated JSON Schema (committed; CI checks for drift); `scripts/`: build helpers

@@ -1,6 +1,6 @@
 # Handoff: Statica MVP
 
-Last updated: 2026-10-15, completed task 27.1. Next: 27.2. Current work is verified locally; see MILESTONE3.md for per-task evidence and pushed batch records.
+Last updated: 2026-10-16 completion audit. Tasks 19–26 and 27.1 are complete; next: 27.2. Core checks pass, but the browser gate failed. See MILESTONE3.md for evidence.
 
 ## Current implementation
 
@@ -19,7 +19,7 @@ Milestones 0–2 are complete against their documented gates; `MILESTONE2.md` pr
 - Pre-E2E coverage gate: state **97.62%**, geometry **99.05%**, evaluation **98.76%**, physics **100%** line coverage. Property tags cover all numbers 1–37.
 - `pnpm exec playwright test --list` discovers **18 scenarios across Chromium desktop and Pixel 7**. These cover happy path with a real height-handle drag, HTML5 section drop, keyboard/mouse state equivalence, invalid geometry, reload/import/export, breakpoints, fallback equivalence, production CSP/no third-party requests/no state hook, and preview gating. Each scenario checks serious/critical axe violations.
 - Actual local browser execution is blocked: `listen EPERM: operation not permitted 127.0.0.1:4174`. Earlier cached Chromium also mismatched the pinned Playwright version. Discovery/typechecking is not a browser pass.
-- The active CI workflow now lives at **repository root** `../.github/workflows/ci.yml`, with the application working directory and lockfile path. It installs matching Chromium and runs coverage/build/schema/E2E on Node 22. The older workflow nested inside this app is historical and is not discovered by GitHub. Inspect the root workflow run after the browser-suite push.
+- The active CI workflow now lives at **repository root** `../.github/workflows/ci.yml`, with the application working directory and lockfile path. It installs matching Chromium and runs coverage/build/schema/E2E on Node 22. The older workflow nested inside this app is historical and is not discovered by GitHub. The root workflow executed; its browser step failed (details below).
 - Tasks 27.2–27.7 must remain in progress until their browser scenarios actually pass; task 28 remains unchecked until the final desktop/mobile/axe gate passes. Do not mark them complete merely because files exist.
 
 ## Technical details for the next agent
@@ -36,11 +36,26 @@ Milestones 0–2 are complete against their documented gates; `MILESTONE2.md` pr
 
 ## Outstanding work and constraints
 
-1. Execute the browser scenarios, inspect failures/artifacts, fix observed issues and rerun required checks. The suite is unproven until that happens.
+1. Fix the observed browser failures described below, then rerun the scenarios and required checks. The suite has executed in CI and has no passing scenarios yet.
 2. Mark each browser task complete only after evidence, updating HANDOFF.md, AGENTS.md, tasks.md and MILESTONE3.md after every task. Push verified batches, as explicitly requested by the user.
 3. Complete task 28 only after all desktop/mobile scenarios and serious/critical axe checks pass. Record the final commit/workflow evidence.
 4. Preserve the sibling application/.kiro layout and repository-root README. The local Kiro folder has no `.git`; authorized uploads use GitHub tree/commit/ref APIs with expected-head leases and preserve remote-only files.
 
-Latest verified pushed application batch before E2E work: `6120f846ea22437b1268fdfcfb723102fbe86095` (through task 25). Earlier batches: `9309633` (19.6–19.8), `517ff2d` (19.9–19.12), `19b2e30` (task 19 complete), `71fe69b` (20.1–20.3), `6ed9265` (persistent store and prediction dialogs). Verify current main before a future push; newer browser/CI changes may already have been uploaded.
+## Completion audit — 2026-10-16
+
+All local application, spec/task and workflow files matched remote main `0eadb1425d2075aafa394968892ee26ba0dda747` before this documentation audit. No implementation work was left unpublished. The remote-only root README is intentionally preserved.
+
+[GitHub Actions run 38841912543](https://github.com/niyer45/Statica-Edu/actions/runs/38841912543) passed frozen dependency installation, lint, typecheck, coverage tests, production build, schema drift and Chromium installation. All 18 desktop/Pixel 7 browser scenarios failed, including retries; artifacts were uploaded. This is a failed browser gate, not merely pending execution.
+
+Observed failures to address next:
+
+- Happy path, keyboard, persistence and production flow use an ambiguous `getByRole('textbox')`: four read-only fields also match the reflection textarea. Scope the dialog or use an accessible label.
+- HTML5 drag/drop leaves the draft as `circle` instead of `iSection`; investigate the interaction and implementation before deciding the fix.
+- Invalid-path palette lookup uses case-sensitive `/Tube/`, which does not match the displayed label.
+- Responsive and WebGL-fallback audits report serious axe contrast failures, including `#7e9363` on `#f2f6eb` (3.06 versus required 4.5). Fix the actual reported elements and rerun axe.
+- Preview/Freeform gating uses an ambiguous Freeform button locator matching both the library card and drawer choice; scope the intended surface.
+
+Milestone 3 has **32 of 38 subtasks complete**. Tasks **27.2–27.7** remain in progress despite authored test files, followed by final checkpoint **28**. Task 26's unit/component/property coverage gate is complete; it does not certify browser behavior. No additional task is marked complete in this audit.
+
 
 Known historical spec differences remain: configured TypeScript is 5.9.3 versus the design's 5.7, local Node is 24.15.0 versus target/CI 22; exact floating-point boundary/large-distance tolerance notes remain in the historical docs. Do not change pinned versions or regenerate specifications to hide these differences. No browser/GPU/performance/CSP pass is inferred from component tests. The lazy viewport still produces the existing non-failing Vite chunk-size warning and dependencies emit THREE_CJS_DEPRECATED during tests.
