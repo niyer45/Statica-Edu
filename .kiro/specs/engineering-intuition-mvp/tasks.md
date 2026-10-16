@@ -643,15 +643,18 @@ Owner sequencing update (2026-10-16, D-34): develop software before human QA. Ni
 
 ### Required mode distinction before user deployment
 
-- [ ] 44. Implement distinct Guided and Parametric experiences before deployment
-  - [ ] 44.1 Specify mode behavior and acceptance criteria
+- [-] 44. Implement distinct Guided and Parametric experiences before deployment
+  - [x] 44.1 Specify mode behavior and acceptance criteria
     - Write an additive mode requirements/design/test plan for supported Cantilever challenges. Guided provides staged instructions, contextual hints and suggested experiments; Parametric exposes direct supported section/dimension/orientation editing with less instructional scaffolding. Define exactly which prompts differ and when they appear before coding.
+    - Completed 2026-10-16: additive .kiro/specs/interaction-modes/ requirements/design/test plan defines observable mode behavior and truthful state-derived guidance.
     - Keep the existing solver, constraints, challenge prediction policy, tested-snapshot semantics, history, reflection and submission shared. Define mode switching/reload behavior that preserves the same challenge workspace without fabricated progress or results. Do not remove prediction checkpoints merely to distinguish modes. Depends on 29.1.
-  - [ ] 44.2 Implement the reviewed mode distinction in the existing workbench
+  - [x] 44.2 Implement the reviewed mode distinction in the existing workbench
+    - Completed 2026-10-16: ModeExperience provides a labelled workbench mode selector, Guided instructions/optional hints/experiments and Parametric direct editing; original editor/viewport remain mounted. Seven component cases verify guidance browsing, state/saving preservation, allowed modes and numerical equivalence. Full local coverage/core checks pass: 905 tests across 111 files.
     - Reuse existing controls/store/components; make the distinction observable beyond labels and drawer descriptions. Add guidance without cluttering the challenge panel or restoring model overlays. Preserve numerical/keyboard alternatives, local saving and mode switching without losing draft/history/reflection/submission. Depends on 44.1.
-  - [ ] 44.3 Verify mode-specific behavior and gate user deployment
+  - [-] 44.3 Verify mode-specific behavior and gate user deployment
     - Add meaningful component and desktop/mobile keyboard/fallback/browser coverage for distinct experiences, shared numerical results and state preservation when switching/reloading. Run full required core/coverage/build/browser gates and manual mode checks on the release candidate. Depends on 44.2.
-    - Required before customer deployment and checkpoint 32.2; not optional or satisfied by the current label-only implementation. Keep Freeform separately tracked under 37.1, unavailable until its own complete flow is verified.
+    - Current candidate: e2e/modes.spec.ts adds four desktop/Pixel 7 cases for keyboard mode switching/reload, unchanged results/reflection/submission, retained predictions and SVG fallback. Playwright discovers 24 total cases; pushed browser verification and owner manual release-mode checks remain pending.
+    - Required before customer deployment and checkpoint 32.2; not optional or satisfied by component tests alone. Keep Freeform separately tracked under 37.1, unavailable until its own complete flow is verified.
 
 ### Milestone 4: Engineer review and student pilot
 

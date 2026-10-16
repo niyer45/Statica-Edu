@@ -25,14 +25,14 @@ export const MODE_INFO: readonly ModeInfo[] = [
   {
     mode: 'guided',
     icon: 'tune',
-    summary: 'Apply section presets and adjust dimensions.',
-    detail: 'Shape presets and step-by-step prompts',
+    summary: 'Explore designs with step-by-step guidance.',
+    detail: 'Step-by-step instructions, hints and suggested experiments',
   },
   {
     mode: 'parametric',
     icon: 'cube',
-    summary: 'Edit dimensions within a constrained design space.',
-    detail: 'Precise, constrained dimension editing',
+    summary: 'Edit sections and dimensions directly, with less guidance.',
+    detail: 'Direct section and dimension editing with shared test results',
   },
   {
     mode: 'freeform',

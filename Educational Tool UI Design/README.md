@@ -30,7 +30,7 @@ pnpm run dev
 | `pnpm run gen:schema` | Regenerate the committed challenge JSON Schema |
 | `pnpm run format` | Format with oxfmt |
 
-The current development suite has 898 tests across 110 files. The existing browser suite has 20 cases, with a focused responsive pair also run separately in CI. See [GitHub Actions](https://github.com/niyer45/Statica-Edu/actions) and [HANDOFF.md](HANDOFF.md) for exact verified commits; local tests alone do not establish browser or human QA results.
+The current development suite has 905 tests across 111 files. The browser suite now has 24 discovered cases (four new mode cases await CI); the prior 20-case suite is verified, with a focused responsive pair also run separately in CI. See [GitHub Actions](https://github.com/niyer45/Statica-Edu/actions) and [HANDOFF.md](HANDOFF.md) for exact verified commits; local tests alone do not establish browser or human QA results.
 
 ## Structure and architecture
 
@@ -57,6 +57,6 @@ Next software task is **45.1: scope the five remaining original catalog challeng
 
 The app remains browser-local with no backend, sign-in or cloud sync. Future account work must explicitly specify the required network/CSP changes and user ownership rules; do not describe current local storage as account-backed saving.
 
-Task 44 tracks the required pre-deployment Guided/Parametric distinction. Both modes currently share functionality; their labels differ. Mode-specific scaffolding/direct editing must be specified, implemented and verified while preserving the same session and numerical behavior. This is separate from Freeform geometry work.
+Task 44 tracks the required pre-deployment Guided/Parametric distinction. Guided now includes short browsable instructions and optional hints; Parametric offers direct editing without the scaffolding. Switch using Interaction mode in the workbench while preserving the same session and numerical behavior. Current browser/manual release verification remains pending under 44.3. This is separate from Freeform geometry work.
 
 Original-catalog priority (D-35): develop the six existing library challenges before second editions. See CATALOG_ROADMAP.md and tasks 45–52. Beam II configuration/tests are retained but further integration is deferred; the five original preview challenges remain unavailable until model-specific implementation and verification. Next is 45.1, then shared model architecture 45.2. Required mode distinction and human release gates are unchanged.

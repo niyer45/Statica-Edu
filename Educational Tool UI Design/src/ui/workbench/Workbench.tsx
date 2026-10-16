@@ -15,7 +15,7 @@ import { selectStatusBadge } from '../../state/selectors'
 import { useSession } from '../state/store'
 import PageFooter from './PageFooter'
 import WorkbenchChrome, { MODE_LABELS } from './WorkbenchChrome'
-import WorkflowStepper from './WorkflowStepper'
+import ModeExperience from './ModeExperience'
 import ViewportBoundary from '../viewport/ViewportBoundary'
 
 // Workbench layout (task 13.3; Req 24.1–24.7, 24.9–24.11).
@@ -48,8 +48,7 @@ export interface WorkbenchProps {
   onExit: () => void
 }
 
-// Mode selection lives in the platform shell (ui/shell/PlatformShell), which calls the
-// store's `selectMode`; the Workbench renders whatever `session.mode` is (Req 35.1, 35.4).
+// Shell and in-workbench mode selection share store.selectMode; the editor stays mounted.
 export default function Workbench({ onExit }: WorkbenchProps) {
   const session = useSession()
   const [modal, setModal] = useState<Modal>(null)
@@ -74,7 +73,7 @@ export default function Workbench({ onExit }: WorkbenchProps) {
         onOpenHelp={openHelp}
         onShowDesigns={() => notify('Your local designs are collected in the history below.')}
       >
-        <WorkflowStepper />
+        <ModeExperience onAnnounce={notify} />
         <div className="workbench">
           <section className="design-panel panel" aria-label="Design tools">
             <div className="panel-title">
