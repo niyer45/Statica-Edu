@@ -2,7 +2,7 @@
 
 Browser-only structures learning app built around "Cantilever Beam I: Reduce Deflection". Milestone 2 provides typed cross-section editing, a 3D viewport with dimension handles, a usable SVG fallback, and the platform shell. The domain solver is implemented; the student-facing prediction, test/results, comparison, persistence, and submission workflow is Milestone 3 work. Run Test is currently disabled.
 
-**Milestone 2 is complete against its component-test gate** (782 tests at closeout). Tasks 19.1–19.2 are implemented in the reducer: prediction gating, immutable test results, scoring, restore, comparison selection, reflection/submission, import and reset. Task 19.3 adds the reusable model-based command harness and reachable-session generator. Tasks 19.4–19.5 verify append-only history and snapshot isolation (Properties 28–29) after every generated action. The current full suite has **841 passing tests**, with lint, type checking and build passing too. [MILESTONE2.md](MILESTONE2.md) records the evidence and remaining browser-verification limits. [HANDOFF.md](HANDOFF.md) gives the current status and next task (20.1).
+**Milestone 2 is complete against its component-test gate** (782 tests at closeout). Tasks 19.1–19.2 are implemented in the reducer: prediction gating, immutable test results, scoring, restore, comparison selection, reflection/submission, import and reset. Task 19.3 adds the reusable model-based command harness and reachable-session generator. Tasks 19.4–19.5 verify append-only history and snapshot isolation (Properties 28–29) after every generated action. The current full suite has **856 passing tests**, with lint, type checking and build passing too. [MILESTONE2.md](MILESTONE2.md) records the evidence and remaining browser-verification limits. [HANDOFF.md](HANDOFF.md) gives the current status and next task (20.4).
 
 The dotted deformation outline shows the latest **tested** design (initially the Baseline), so selecting or resizing a cross-section does not change it until a successful Run Test. This follows Requirements 25.2–25.5. The pending Run Test/results panel (21.1) and prediction confirmation (22.2) complete that UI flow; no separate deformation fix is needed.
 
@@ -54,4 +54,7 @@ pnpm exec playwright install chromium   # needed once before `pnpm run e2e`
 
 
 
-Current Milestone 3 progress: task 19.15 complete; next 20.1. See [MILESTONE3.md](MILESTONE3.md) for the verified task ledger.
+
+
+
+Current Milestone 3 progress: task 20.3 complete; next 20.4. See [MILESTONE3.md](MILESTONE3.md) for the verified task ledger.

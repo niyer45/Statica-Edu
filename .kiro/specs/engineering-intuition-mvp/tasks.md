@@ -488,15 +488,15 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
     - _Requirements: 35.1, 35.3_
 
 - [ ] 20. Persistence
-  - [ ] 20.1 Implement `state/persistence.ts` and `state/migrations.ts`
+  - [x] 20.1 Implement `state/persistence.ts` and `state/migrations.ts`
     - `serializeSession` / `deserializeSession` (never throw); key `ei:session:{id}:v{version}` with `schemaVersion` and UTC `savedAt`; load applies migrations, re-validates and re-analyzes snapshots (1e-9 relative), removes entry and returns notice on failure; storage exceptions surface a once-per-load notice
     - _Requirements: 21.1, 21.2, 21.3, 21.4, 21.5, 21.6, 21.8_
 
-  - [ ]* 20.2 Write property test for persistence round-trip
+  - [x]* 20.2 Write property test for persistence round-trip
     - **Property 35: Persistence round-trip**
     - **Validates: Requirements 21.7, 21.8**
 
-  - [ ]* 20.3 Write unit tests for persistence failure modes
+  - [x]* 20.3 Write unit tests for persistence failure modes
     - Unknown `schemaVersion`, tampered analysis value, invalid snapshot, truncated JSON → entry removed and fresh session; throwing `localStorage` → in-memory with single notice; no entry → no notice
     - _Requirements: 21.4, 21.5, 21.6_
 

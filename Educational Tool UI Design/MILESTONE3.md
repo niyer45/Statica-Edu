@@ -14,3 +14,6 @@ Each completed task below passed lint (zero errors), typecheck, the full Vitest 
 - **19.13 complete** — Properties 14,17,26 now cover hostile drafts/imports, strict rejection and immutable challenges in reducer sequences. Verification: 841 tests pass. Next: 19.14.
 - **19.14 complete** — The full specified example flow, cancel/confirm, bad restore, baseline submission, locked import reasons and invalid init are verified. Verification: 841 tests pass. Next: 19.15.
 - **19.15 complete** — Generated sequences produce identical state and evaluations in Guided and Parametric modes apart from mode. Verification: 841 tests pass. Next: 20.1.
+- **20.1 complete** — Implemented versioned persistence, strict validation, reanalysis/re-evaluation, 1e-9 numeric tolerance, immutable history and storage-failure controller. Explicit undefined optional fields are tracked in the envelope for exact round-trips; save time is injected. Verification: 856 tests pass. Next: 20.2.
+- **20.2 complete** — Property 35 round-trips reachable sessions exactly; arbitrary corrupted strings are rejected without throwing. Verification: 856 tests pass. Next: 20.3.
+- **20.3 complete** — Verified corrupt/version/missing/invalid/tampered sessions, migration ordering, tolerance boundaries and once-per-load storage exception notices. Verification: 856 tests pass. Next: 20.4.
