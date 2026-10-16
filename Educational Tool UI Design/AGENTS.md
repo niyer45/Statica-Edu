@@ -7,7 +7,7 @@ template's visual design and platform shell are kept.
 
 Read `HANDOFF.md` first for the current status and the next task.
 
-Current task progress (2026-10-16): MVP/UI maintenance and repair 42 verified (run 38966388585). Tasks 29.1, 31.1, 33.1–33.2 complete for development. Next software task is 34.1 challenge selection/session isolation; Beam II configuration remains dormant. Nikhil is owner engineering reviewer; human QA/manual checks/student evidence remain unchecked pre-deployment gates, not development prerequisites (D-34). Task 44 Guided/Parametric differentiation is required before user deployment; currently only labels differ. Read the newest HANDOFF.md section; older appended status notes are historical. Push verified batches once and await the user; do not continuously poll CI.
+Current task progress (2026-10-16): MVP/UI maintenance and repair 42 verified (run 38966388585). Tasks 29.1, 31.1, 33.1–33.2 complete for development. Next software task is 45.1 original-catalog scoping, followed by 45.2 model contracts and shared task 34 infrastructure. Beam II integration is deferred to 52 after original-catalog gate 51 (D-35). Nikhil is owner engineering reviewer; human QA/manual checks/student evidence remain unchecked pre-deployment gates, not development prerequisites (D-34). Task 44 Guided/Parametric differentiation is required before user deployment; currently only labels differ. Read the newest HANDOFF.md section; older appended status notes are historical. Push verified batches once and await the user; do not continuously poll CI.
 
 ## Specifications (source of truth)
 
@@ -18,7 +18,7 @@ The spec lives outside this folder, one level up:
 - `../.kiro/specs/engineering-intuition-mvp/tasks.md`: the completed MVP plan (Milestones 0–3, tasks 1–28) and post-MVP roadmap (Milestones 4–6, tasks 29–40) with a JSON wave dependency graph at the end.
 
 Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuition-mvp/`.
-`DECISIONS.md` records D-01…D-34 and the 14 applicability thresholds. D-25 defines required `sectionDefaults`; D-26 records the user-directed uncluttered 3D presentation and overrides the original visible-overlay requirements.
+`DECISIONS.md` records D-01…D-35 and the 14 applicability thresholds. D-25 defines required `sectionDefaults`; D-26 records the user-directed uncluttered 3D presentation and overrides the original visible-overlay requirements.
 
 ## Rules for following the spec
 
@@ -154,3 +154,5 @@ Current sequencing (D-34) supersedes earlier 29.2-first/pilot-before-development
 README maintenance: ../README.md is the GitHub landing page and product overview; this app's README.md is the developer guide. Keep intended capabilities separate from implemented features, including dormant Beam II, local workspace persistence versus session-only notebook, design export versus full-session backup, and future accounts/completion history. Check relative links from each README's own directory.
 
 Mode planning: task 44.1–44.3 is mandatory before user deployment (release dependency in 32.2). Define the Guided scaffolding versus Parametric direct-edit experience in an additive specification before implementation. Preserve shared session/results/solver and challenge prediction policy when switching modes; do not confuse Freeform geometry work (37.1) with mode scaffolding. Current code has label-only Guided/Parametric differences.
+
+D-35 supersedes prior Beam-II-first pointers: implement the six existing catalog challenges before second editions. CATALOG_ROADMAP.md and tasks 45–52 govern model-specific scoping/validation/integration. Preserve dormant Beam II assets and historical completed markers, but do not make them the next integration target. Never pass non-beam challenges through the existing cantilever solver or enable preview cards before supported model flows exist. Task 44 and human pre-deployment QA remain required.

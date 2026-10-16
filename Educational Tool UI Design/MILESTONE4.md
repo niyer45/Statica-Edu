@@ -115,7 +115,7 @@ Tasks 36.1–36.2 and 38.1–38.2 resolve these decisions and implement/verify t
 
 ## Evidence and next action
 
-Task 29.1 produces this plan only. Reviewer is nominated but QA has not occurred; participants are not arranged; these are operational launch blockers, not missing fabricated planning results. Task 29.2 is owner engineering QA before deployment; the next software task is 34.1 after completing the configuration batch. Tasks 30.1 and 31.1 may be prepared according to their dependency graph; no participant contact is authorized by this document.
+Task 29.1 produces this plan only. Reviewer is nominated but QA has not occurred; participants are not arranged; these are operational launch blockers, not missing fabricated planning results. Task 29.2 is owner engineering QA before deployment; the next software task is 45.1 under the original-catalog priority (D-35). Tasks 30.1 and 31.1 may be prepared according to their dependency graph; no participant contact is authorized by this document.
 
 Documentation-task validation: lint passed with zero errors (10 existing warnings), typecheck passed, all 879 tests across 109 files passed and production build passed. Existing chunk-size warning is nonblocking. Task dependency JSON and unchanged future-task statuses were checked. No new browser run is claimed for this documentation-only change.
 
@@ -128,3 +128,5 @@ Nikhil is the owner engineering reviewer; do not label this external independent
 ## Additional user-deployment gate — task 44
 
 Owner requires an actual Guided/Parametric distinction before deployment to users. Task 44 specifies, implements and verifies mode-specific instructional scaffolding versus direct parameter editing. Both modes retain the same solver, challenge constraints, prediction policy and saved workspace. Current code changes labels only; it does not fulfill this gate. Checkpoint 32.2 depends on 44.3; manual QA must assess both distinct flows on the release build. Freeform remains separately planned.
+
+Original-catalog priority (D-35): develop the six existing library challenges before second editions. See CATALOG_ROADMAP.md and tasks 45–52. Beam II configuration/tests are retained but further integration is deferred; the five original preview challenges remain unavailable until model-specific implementation and verification. Next is 45.1, then shared model architecture 45.2. Required mode distinction and human release gates are unchanged.

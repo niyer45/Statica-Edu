@@ -53,8 +53,10 @@ Keep the existing Figma Make shell/plugins and external styling architecture. Pr
 
 Read [AGENTS.md](AGENTS.md) and [HANDOFF.md](HANDOFF.md) before editing. Update those files and the [task list](../.kiro/specs/engineering-intuition-mvp/tasks.md) after completed work; preserve numeric task IDs and truthful evidence.
 
-Next software task is **34.1: challenge selection and isolated saved sessions**, followed by full second-challenge integration/regression work. See [MILESTONE5.md](MILESTONE5.md). Nikhil is the nominated owner engineering reviewer; human engineering/manual/student QA remains required before customer deployment under D-34. [MILESTONE4.md](MILESTONE4.md) and [PILOT_PROTOCOL.md](PILOT_PROTOCOL.md) contain prepared materials, not completed review/pilot evidence.
+Next software task is **45.1: scope the five remaining original catalog challenges**, followed by full second-challenge integration/regression work. See [MILESTONE5.md](MILESTONE5.md). Nikhil is the nominated owner engineering reviewer; human engineering/manual/student QA remains required before customer deployment under D-34. [MILESTONE4.md](MILESTONE4.md) and [PILOT_PROTOCOL.md](PILOT_PROTOCOL.md) contain prepared materials, not completed review/pilot evidence.
 
 The app remains browser-local with no backend, sign-in or cloud sync. Future account work must explicitly specify the required network/CSP changes and user ownership rules; do not describe current local storage as account-backed saving.
 
 Task 44 tracks the required pre-deployment Guided/Parametric distinction. Both modes currently share functionality; their labels differ. Mode-specific scaffolding/direct editing must be specified, implemented and verified while preserving the same session and numerical behavior. This is separate from Freeform geometry work.
+
+Original-catalog priority (D-35): develop the six existing library challenges before second editions. See CATALOG_ROADMAP.md and tasks 45–52. Beam II configuration/tests are retained but further integration is deferred; the five original preview challenges remain unavailable until model-specific implementation and verification. Next is 45.1, then shared model architecture 45.2. Required mode distinction and human release gates are unchanged.

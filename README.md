@@ -47,9 +47,11 @@ The dotted deformation outline represents the **latest tested design**. Editing 
 
 ## In development and planned
 
+**Priority: complete the six challenges already displayed in the library before second editions.** Cantilever Beam I works today; Mounting Bracket I, Torsion Shaft I, Heat Sink I, Braced Frame I and Vibration Isolation I each need scoped, validated models and complete learning-loop integration. Next is task 45.1: define their requirements and delivery order. See the [catalog roadmap](Educational%20Tool%20UI%20Design/CATALOG_ROADMAP.md).
+
 | Area | Status |
 | --- | --- |
-| Cantilever Beam II | Requirements, configuration and domain tests are prepared. It teaches how rotating a rectangular section can improve stiffness without adding mass. It is **not available in the UI yet**; challenge selection and session isolation are next. |
+| Cantilever Beam II | Configuration and domain tests are retained, but further development is **deferred until the original six catalog challenges are implemented**. It is not available in the UI. |
 | Engineering and student QA | Review plan and pilot materials are prepared. Owner engineering review, manual accessibility/readiness checks and actual student sessions remain open before customer deployment. |
 | Guided / Parametric distinction | Required before user deployment (task 44). Currently both modes offer the same tools and learning loop; selecting a mode changes its label. Planned distinction: structured guidance versus direct parameter editing. |
 | Multiple challenge workspaces | Planned integration with separate saved sessions and correctly attributed results for each challenge |

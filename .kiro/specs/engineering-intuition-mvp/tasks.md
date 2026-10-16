@@ -637,7 +637,7 @@ All seven maintenance tasks are complete. [CI run 38936927907](https://github.co
 
 Added at the user's request after Milestone 3 passed. Tasks 1–28 and their completion evidence remain unchanged. Requirements 1–35 and the existing design describe the completed M0–M3 baseline; their statements that M4+ is outside MVP implementation scope remain historical boundaries, not specifications for these new features. New feature requirements and acceptance criteria must be written as scoped extensions before implementation, without regenerating the completed MVP specifications or inventing requirement IDs.
 
-Tasks 29.1, 31.1 and configuration-development tasks 33.1–33.2 are complete; tasks 29 and 31 remain in progress for human evidence. Task 34.1 is the next software task. Human QA is deferred until before customer deployment, not checked complete (D-34). The roadmap schedules future work; it does not start development, recruit participants, publish the app, or enable network services. No new testing task is optional. Update supporting documentation after each completed task and push verified batches. Preserve the existing architecture, solver-backed results, D-26/D-27 and the complete MVP regression suite. Feature-specific backend, model, provider and challenge choices remain decisions to make in the tasks below.
+Tasks 29.1, 31.1 and configuration-development tasks 33.1–33.2 are complete; tasks 29 and 31 remain in progress for human evidence. Task 45.1 is the next software task: scope the five remaining existing catalog challenges before any second edition. Human QA is deferred until before customer deployment, not checked complete (D-34). The roadmap schedules future work; it does not start development, recruit participants, publish the app, or enable network services. No new testing task is optional. Update supporting documentation after each completed task and push verified batches. Preserve the existing architecture, solver-backed results, D-26/D-27 and the complete MVP regression suite. Feature-specific backend, model, provider and challenge choices remain decisions to make in the tasks below.
 
 Owner sequencing update (2026-10-16, D-34): develop software before human QA. Nikhil is the nominated owner engineering reviewer; 29.2 is owner-conducted review, not external independent review. Tasks 29.2, 30, 31.2 and 32 remain required before customer deployment. Scoped configuration/specification work may proceed from 29.1 without completed pilot evidence; feature release checkpoints still require 32.2. No deployment is authorized or performed by this sequencing change.
 
@@ -686,36 +686,90 @@ Owner sequencing update (2026-10-16, D-34): develop software before human QA. Ni
   - [ ] 32.2 Milestone 4 checkpoint
     - Confirm task 44.3 mode-distinction verification, recorded owner engineering QA and actual pilot evidence exist, agreed success criteria are met, no blocking finding remains, and lint/typecheck/unit/property/component/build/browser gates pass for the release candidate. Record reviewer/project-owner disposition and any deferred limitations before customer deployment; isolated M5 development may proceed earlier under D-34.
 
-### Milestone 5: Second runnable challenge through configuration
+### Milestone 5: Original six-challenge catalog first
 
-- [x] 33. Define the second challenge
+- [x] 33. Define the second challenge (historical; further Beam II work deferred)
   - [x] 33.1 Select a challenge and document its scoped requirements
     - Choose the learning objective, initial flawed design, constraints, reference solution, prediction/reflection prompts and success criteria. No pilot evidence exists yet; record provisional choices and revisit them during pre-release QA. Use a challenge supported by the existing validated beam model; do not activate a preview whose physics differs.
     - Completed 2026-10-16: .kiro/specs/cantilever-beam-2/ defines the rectangle-orientation challenge and separately derived arithmetic fixtures (not human review). Write a challenge-specific requirements/design extension and reference calculations. Challenges requiring a new model are deferred to task 37.2 rather than introducing an M5/M6 dependency cycle. Development depends on 29.1 under D-34; customer release still requires checkpoint 32.2.
   - [x] 33.2 Validate the second challenge configuration for development
     - Add versioned configuration, explicit locked fields and section defaults; verify initial failure, reference acceptance, solvability, applicability, boundary cases and grounded explanation facts. Owner engineering review of constants/wording is tracked in 29.2 and required before checkpoint 35.2, not claimed by configuration tests.
-    - Completed 2026-10-16: Cantilever Beam II version-1 JSON, additive scoped requirements/design and 14 domain regression cases cover numeric fixtures, orientation ratios, solvability, boundaries, geometry/applicability, student redaction and cross-challenge import rejection. Configuration is not registered as available; task 34 performs integration.
+    - Completed 2026-10-16: Cantilever Beam II version-1 JSON, additive scoped requirements/design and 14 domain regression cases cover numeric fixtures, orientation ratios, solvability, boundaries, geometry/applicability, student redaction and cross-challenge import rejection. Configuration is not registered as available. Further Beam II integration is deferred to task 52 after the original catalog gate 51.
 
 - [ ] 34. Integrate multiple runnable challenges
   - [ ] 34.1 Generalize selection and isolate challenge sessions
-    - Route the selected available catalog entry to its validated configuration through the existing loader/store; replace single-challenge assumptions without duplicating solver or workbench components.
+    - After task 45.2 defines model/configuration contracts, route each selected available catalog entry to its own validated challenge and supported model. Replace single-challenge assumptions without duplicating the existing learning-loop shell; do not route non-beam challenges through the cantilever solver. Beam II remains deferred to 52.
     - Isolate draft/history/reflection/submission and versioned persistence by challenge; define and test switch/reload/reset behavior. Preserve existing Cantilever Beam I saves.
-  - [ ] 34.2 Connect the second challenge to the existing learning loop
-    - Reuse prediction, evaluation/results, compare/restore, reflection/submission, fallback and import/export. Reject cross-challenge imports and corrupt sessions; keep unavailable modes/challenges gated and My designs results correctly attributed.
+  - [ ] 34.2 Provide shared integration for original catalog challenges
+    - Reuse the shared learning-loop structure where appropriate, with model-specific controls, metrics, prediction/reflection prompts, evaluation and accessible visualization contracts from 45.2. Reject cross-challenge imports and corrupt sessions; keep unfinished catalog challenges gated and My designs results correctly attributed. Per-challenge activation occurs in 46–50 after that model is implemented and verified.
 
 - [ ] 35. Verify and release Milestone 5
   - [ ] 35.1 Add multi-challenge regression coverage
-    - Test configuration fixtures, challenge switching, storage/import isolation and migration behavior; complete both learning loops on desktop and Pixel 7, with keyboard/fallback and serious/critical axe gates. Retain all original challenge tests.
+    - Test configuration fixtures, challenge switching, storage/import isolation and migration behavior; complete each implemented original-catalog learning loop on desktop and Pixel 7, with keyboard/fallback and serious/critical axe gates. Retain all original challenge tests.
   - [ ] 35.2 Milestone 5 checkpoint
-    - Confirm both challenges meet their reviewed criteria, no fabricated results or cross-session leakage exist, all relevant coverage/core/browser gates pass, and documentation explains supported models and limits. Record the verified commit and review evidence in `MILESTONE5.md`.
+    - Confirm the original six catalog challenges meet their reviewed criteria and task 51 passes, no fabricated results or cross-session leakage exist, all relevant coverage/core/browser gates pass, and documentation explains supported models and limits. Record the verified commit and review evidence in `MILESTONE5.md`.
+
+Priority update (2026-10-16, D-35): implement the six existing catalog entries before second editions. Tasks 33.1–33.2 remain truthful historical completion for dormant Beam II assets; they do not prioritize its integration. The five preview challenges require scoped models/requirements and cannot be enabled by copying beam JSON. Shared infrastructure 34 and mode distinction 44 support the original catalog. See CATALOG_ROADMAP.md.
+
+- [ ] 45. Scope the original catalog and shared model architecture
+  - [ ] 45.1 Define requirements and delivery order for the five preview challenges
+    - Scope Mounting Bracket I, Torsion Shaft I, Heat Sink I, Braced Frame I and Vibration Isolation I: learner objective, adjustable/fixed variables, metrics/constraints, supported geometry/load cases, exclusions, reference cases and acceptance criteria. Choose bounded educational models before coding; record engineering-review obligations. Preserve the already implemented Cantilever Beam I. Depends on 29.1.
+  - [ ] 45.2 Specify shared multi-model learning-loop contracts
+    - Define explicit model/config/result identity and versioning, validation, model-specific units/metrics/evaluation/explanations, visualization/fallback, prediction/reflection and import/save migration contracts. Preserve the validated beam solver and legacy saves; pure model modules remain independent of UI/services. Prevent unsupported analyses rather than assigning invented beam outputs to other disciplines. Depends on 45.1.
+
+- [ ] 46. Develop Mounting Bracket I
+  - [ ] 46.1 Specify the bracket model and independent benchmark cases
+    - Bound geometry, support/load assumptions and stress/deflection metrics. Decide whether a simplified load-path model meets the advertised objective or a more capable solver is required; do not imply unresolved local stress concentrations are modeled. Depends on 45.1.
+  - [ ] 46.2 Implement and numerically verify the scoped bracket model
+    - Validate geometry/units, benchmarks, boundaries, applicability and failure behavior; record limitations and human review still required. Depends on 46.1 and 45.2.
+  - [ ] 46.3 Integrate and verify the bracket learning loop
+    - Add model-specific controls/results, grounded guidance, saved workspace isolation, accessible visualization and full desktop/mobile/keyboard/fallback regressions. Keep unavailable until the complete supported flow is verified; customer release still requires owner QA. Depends on 46.2 and 34.2.
+
+- [ ] 47. Develop Torsion Shaft I
+  - [ ] 47.1 Specify the torsion model and independent benchmark cases
+    - Define supported shafts, torque/boundaries, twist/shear-stress/mass metrics, geometry limits and exclusions; do not reuse bending inertia as torsional stiffness without a justified model. Depends on 45.1.
+  - [ ] 47.2 Implement and numerically verify the scoped torsion model
+    - Verify section properties, units, benchmarks, boundaries and unsupported cases through pure domain code. Depends on 47.1 and 45.2.
+  - [ ] 47.3 Integrate and verify the torsion learning loop
+    - Provide controls, deformation/metric presentation, prediction/reflection, isolated saving and accessible desktop/mobile/keyboard/fallback regressions. Preserve preview gating until supported integration passes. Depends on 47.2 and 34.2.
+
+- [ ] 48. Develop Heat Sink I
+  - [ ] 48.1 Specify the thermal model and independent benchmark cases
+    - Choose a bounded educational steady/transient scope, heat input/boundaries, material/geometry and temperature/thermal-performance constraints. Define convection/fin assumptions, units and omissions explicitly before implementation. Depends on 45.1.
+  - [ ] 48.2 Implement and numerically verify the scoped thermal model
+    - Validate thermal balances, reference cases, geometry/units, applicability and failure behavior; no beam stress/deflection placeholders. Depends on 48.1 and 45.2.
+  - [ ] 48.3 Integrate and verify the thermal learning loop
+    - Supply appropriate geometry tools/visualization, thermal results/constraints, prediction/reflection, isolated saves and accessible desktop/mobile/keyboard/fallback regressions. Depends on 48.2 and 34.2.
+
+- [ ] 49. Develop Braced Frame I
+  - [ ] 49.1 Specify the frame model and independent benchmark cases
+    - Define supported frame/truss idealization, joints/supports, loads, member edits and displacement/member-force/stability metrics. Make mechanisms, singular systems and excluded effects explicit. Depends on 45.1.
+  - [ ] 49.2 Implement and numerically verify the scoped frame model
+    - Verify equilibrium/compatibility, units, reference cases, mechanisms/invalid topology and model limits. Depends on 49.1 and 45.2.
+  - [ ] 49.3 Integrate and verify the frame learning loop
+    - Provide accessible topology/parameter editing, appropriate visualization/results, stored predictions/reflections, isolated saves and complete browser regressions. Depends on 49.2 and 34.2.
+
+- [ ] 50. Develop Vibration Isolation I
+  - [ ] 50.1 Specify the vibration model and independent benchmark cases
+    - Bound the degrees of freedom, excitation, damping and adjustable variables; define natural-frequency/response/isolation metrics and valid regimes before coding. Depends on 45.1.
+  - [ ] 50.2 Implement and numerically verify the scoped vibration model
+    - Verify units, independent reference/limiting cases, resonance/damping boundaries, numerical behavior and unsupported cases. Depends on 50.1 and 45.2.
+  - [ ] 50.3 Integrate and verify the vibration learning loop
+    - Provide appropriate controls, accessible response visualization/results, prediction/reflection, isolated saves and full browser regressions. Do not imply time simulation where only a frequency/steady-state model is implemented. Depends on 50.2 and 34.2.
+
+- [ ] 51. Verify original six-challenge catalog completion
+  - Confirm Cantilever Beam I and all five original preview challenges have implemented, numerically validated and integrated learning loops, correctly attributed/isolation-tested saves, truthful model limits and no placeholder results. Retain original regressions and record owner engineering/manual QA before customer release. Depends on 46.3–50.3 and 44.3. Do not mark complete merely because cards are clickable.
+
+- [ ] 52. Revisit second-edition challenges after the original catalog
+  - Review dormant Cantilever Beam II assets against the current architecture and findings only after 51. Keep its existing configuration/tests as retained work, not a runnable challenge or first-priority integration target. Specify any needed updates, then integrate and verify if still desired; do not activate it just because its configuration exists.
 
 ### Milestone 6: Scoped platform extensions
 
-This milestone groups the previously named future areas: Freeform, advanced physics, accounts and AI. Their implementation scope is not yet specified. Task 36 defines feature boundaries and delivery order; each track requires its own requirements/design/test plan before implementation. A decision to defer a track must remain visible in the roadmap rather than being checked off as implemented.
+Original-catalog model work is now explicitly tracked in 45–51 rather than blocked behind this milestone. This milestone groups the previously named future areas: Freeform, advanced physics, accounts and AI. Their implementation scope is not yet specified. Task 36 defines feature boundaries and delivery order; each track requires its own requirements/design/test plan before implementation. A decision to defer a track must remain visible in the roadmap rather than being checked off as implemented.
 
 - [ ] 36. Define Milestone 6 scope and architecture
   - [ ] 36.1 Prioritize the extension tracks and define acceptance criteria
-    - Use M4/M5 evidence to define concrete user stories, included/excluded capabilities, dependencies, measurable gates and delivery order in `MILESTONE6.md` and scoped specification extensions. Resolve the current browser-only/no-network boundary explicitly for any online capability. Development planning depends on 33.1 under D-34; customer release retains the M4/M5 gates.
+    - Use M4/M5 evidence to define concrete user stories, included/excluded capabilities, dependencies, measurable gates and delivery order in `MILESTONE6.md` and scoped specification extensions. Resolve the current browser-only/no-network boundary explicitly for any online capability. Development planning depends on 45.2 under D-35; customer release retains the M4/M5 gates.
   - [ ] 36.2 Record shared technical and data decisions
     - Specify model dispatch/versioning, geometry validation, save/import compatibility, local/offline behavior and any backend/auth/provider choices. Define data minimization, deletion/export, failure behavior, cost limits and rollback where applicable; keep pure domain modules independent of React and services.
 
@@ -724,7 +778,7 @@ This milestone groups the previously named future areas: Freeform, advanced phys
     - Specify supported sketch/extrusion/edit operations, invalid or unsupported geometry, section-property computation and model compatibility before coding. Provide numeric/keyboard equivalents and truthful fallback behavior; validate properties against independent fixtures.
     - Integrate valid geometry with the existing prediction/results/history/persistence loop. Keep Freeform marked Planned until its complete reviewed flow and accessibility/browser gates pass.
   - [ ] 37.2 Implement and validate the selected advanced physics model
-    - Choose a bounded model from the scoped requirements; document equations, assumptions, applicability and independent benchmarks before implementation. Dispatch by explicit model identity/version and keep recorded results reproducible.
+    - This track covers additional physics beyond the original catalog work in 46–50; avoid duplicating those model implementations. Choose a bounded model from the scoped requirements; document equations, assumptions, applicability and independent benchmarks before implementation. Dispatch by explicit model identity/version and keep recorded results reproducible.
     - Verify accuracy/tolerances, units, boundaries, failure states and runtime on target devices. Unsupported analyses must be rejected or clearly identified; preserve the validated Euler–Bernoulli path.
 
 - [ ] 38. Add accounts and saved-project synchronization
@@ -766,28 +820,238 @@ Numeric task 41 groups the historical UI-01–UI-07 maintenance work without ren
 ```json
 {
   "waves": [
-    { "id": 0, "tasks": ["1.1"] },
-    { "id": 1, "tasks": ["1.2", "1.4", "1.5", "1.6", "1.7", "1.9", "3.1"] },
-    { "id": 2, "tasks": ["1.3", "1.8", "1.10", "3.2", "4.1", "5.1"] },
-    { "id": 3, "tasks": ["4.2", "5.2", "8.1"] },
-    { "id": 4, "tasks": ["4.3", "4.4", "5.3", "6.1", "7.1", "8.2"] },
-    { "id": 5, "tasks": ["5.4", "5.5", "5.6", "6.2", "6.3", "6.4", "6.5", "7.2", "8.3", "8.4", "8.5", "8.6", "8.7", "9.1"] },
-    { "id": 6, "tasks": ["6.6", "6.7", "9.2", "11.6"] },
-    { "id": 7, "tasks": ["9.3", "9.4", "9.5", "9.6", "9.7", "9.8", "9.9", "9.10", "9.11", "10.1", "11.1", "11.7", "11.8"] },
-    { "id": 8, "tasks": ["10.2", "10.3", "10.4", "10.5", "10.6", "10.7", "10.9", "11.2", "11.3", "11.4", "11.5"] },
-    { "id": 9, "tasks": ["10.8", "10.10", "13.1"] },
-    { "id": 10, "tasks": ["13.2", "14.1"] },
-    { "id": 11, "tasks": ["13.3", "14.2"] },
-    { "id": 12, "tasks": ["13.4", "13.5", "14.3", "17.1"] },
-    { "id": 13, "tasks": ["13.6", "14.4", "15.1", "17.2"] },
-    { "id": 14, "tasks": ["14.5", "15.2", "16.1"] },
-    { "id": 15, "tasks": ["16.2", "19.1"] },
-    { "id": 16, "tasks": ["19.2", "22.1"] },
-    { "id": 17, "tasks": ["19.3", "19.14", "20.1", "21.1", "22.2", "23.1"] },
-    { "id": 18, "tasks": ["19.4", "19.5", "19.6", "19.7", "19.8", "19.9", "19.10", "19.11", "19.12", "19.13", "19.15", "20.2", "20.3", "21.2", "23.2", "24.1", "25.1"] },
-    { "id": 19, "tasks": ["20.4", "22.3", "24.2", "25.2"] },
-    { "id": 20, "tasks": ["22.4", "27.1"] },
-    { "id": 21, "tasks": ["27.2", "27.3", "27.4", "27.5", "27.6", "27.7"] }
+    {
+      "id": 0,
+      "tasks": [
+        "1.1"
+      ]
+    },
+    {
+      "id": 1,
+      "tasks": [
+        "1.2",
+        "1.4",
+        "1.5",
+        "1.6",
+        "1.7",
+        "1.9",
+        "3.1"
+      ]
+    },
+    {
+      "id": 2,
+      "tasks": [
+        "1.3",
+        "1.8",
+        "1.10",
+        "3.2",
+        "4.1",
+        "5.1"
+      ]
+    },
+    {
+      "id": 3,
+      "tasks": [
+        "4.2",
+        "5.2",
+        "8.1"
+      ]
+    },
+    {
+      "id": 4,
+      "tasks": [
+        "4.3",
+        "4.4",
+        "5.3",
+        "6.1",
+        "7.1",
+        "8.2"
+      ]
+    },
+    {
+      "id": 5,
+      "tasks": [
+        "5.4",
+        "5.5",
+        "5.6",
+        "6.2",
+        "6.3",
+        "6.4",
+        "6.5",
+        "7.2",
+        "8.3",
+        "8.4",
+        "8.5",
+        "8.6",
+        "8.7",
+        "9.1"
+      ]
+    },
+    {
+      "id": 6,
+      "tasks": [
+        "6.6",
+        "6.7",
+        "9.2",
+        "11.6"
+      ]
+    },
+    {
+      "id": 7,
+      "tasks": [
+        "9.3",
+        "9.4",
+        "9.5",
+        "9.6",
+        "9.7",
+        "9.8",
+        "9.9",
+        "9.10",
+        "9.11",
+        "10.1",
+        "11.1",
+        "11.7",
+        "11.8"
+      ]
+    },
+    {
+      "id": 8,
+      "tasks": [
+        "10.2",
+        "10.3",
+        "10.4",
+        "10.5",
+        "10.6",
+        "10.7",
+        "10.9",
+        "11.2",
+        "11.3",
+        "11.4",
+        "11.5"
+      ]
+    },
+    {
+      "id": 9,
+      "tasks": [
+        "10.8",
+        "10.10",
+        "13.1"
+      ]
+    },
+    {
+      "id": 10,
+      "tasks": [
+        "13.2",
+        "14.1"
+      ]
+    },
+    {
+      "id": 11,
+      "tasks": [
+        "13.3",
+        "14.2"
+      ]
+    },
+    {
+      "id": 12,
+      "tasks": [
+        "13.4",
+        "13.5",
+        "14.3",
+        "17.1"
+      ]
+    },
+    {
+      "id": 13,
+      "tasks": [
+        "13.6",
+        "14.4",
+        "15.1",
+        "17.2"
+      ]
+    },
+    {
+      "id": 14,
+      "tasks": [
+        "14.5",
+        "15.2",
+        "16.1"
+      ]
+    },
+    {
+      "id": 15,
+      "tasks": [
+        "16.2",
+        "19.1"
+      ]
+    },
+    {
+      "id": 16,
+      "tasks": [
+        "19.2",
+        "22.1"
+      ]
+    },
+    {
+      "id": 17,
+      "tasks": [
+        "19.3",
+        "19.14",
+        "20.1",
+        "21.1",
+        "22.2",
+        "23.1"
+      ]
+    },
+    {
+      "id": 18,
+      "tasks": [
+        "19.4",
+        "19.5",
+        "19.6",
+        "19.7",
+        "19.8",
+        "19.9",
+        "19.10",
+        "19.11",
+        "19.12",
+        "19.13",
+        "19.15",
+        "20.2",
+        "20.3",
+        "21.2",
+        "23.2",
+        "24.1",
+        "25.1"
+      ]
+    },
+    {
+      "id": 19,
+      "tasks": [
+        "20.4",
+        "22.3",
+        "24.2",
+        "25.2"
+      ]
+    },
+    {
+      "id": 20,
+      "tasks": [
+        "22.4",
+        "27.1"
+      ]
+    },
+    {
+      "id": 21,
+      "tasks": [
+        "27.2",
+        "27.3",
+        "27.4",
+        "27.5",
+        "27.6",
+        "27.7"
+      ]
+    }
   ],
   "postMvpDependencies": {
     "29.1": [
@@ -825,21 +1089,22 @@ Numeric task 41 groups the historical UI-01–UI-07 maintenance work without ren
       "33.1"
     ],
     "34.1": [
-      "33.2"
+      "45.2"
     ],
     "34.2": [
       "34.1"
     ],
     "35.1": [
       "34.2",
-      "44.3"
+      "44.3",
+      "51"
     ],
     "35.2": [
       "35.1",
       "32.2"
     ],
     "36.1": [
-      "33.1"
+      "45.2"
     ],
     "36.2": [
       "36.1"
@@ -871,17 +1136,111 @@ Numeric task 41 groups the historical UI-01–UI-07 maintenance work without ren
     "40.2": [
       "40.1"
     ],
-    "41.1": ["28"],
-    "41.2": ["41.1"],
-    "41.3": ["41.2"],
-    "41.4": ["41.3"],
-    "41.5": ["41.4"],
-    "41.6": ["41.5"],
-    "41.7": ["41.6"],
-    "42": ["41.7"],
-    "44.1": ["29.1"],
-    "44.2": ["44.1"],
-    "44.3": ["44.2"]
+    "41.1": [
+      "28"
+    ],
+    "41.2": [
+      "41.1"
+    ],
+    "41.3": [
+      "41.2"
+    ],
+    "41.4": [
+      "41.3"
+    ],
+    "41.5": [
+      "41.4"
+    ],
+    "41.6": [
+      "41.5"
+    ],
+    "41.7": [
+      "41.6"
+    ],
+    "42": [
+      "41.7"
+    ],
+    "44.1": [
+      "29.1"
+    ],
+    "44.2": [
+      "44.1"
+    ],
+    "44.3": [
+      "44.2"
+    ],
+    "45.1": [
+      "29.1"
+    ],
+    "45.2": [
+      "45.1"
+    ],
+    "46.1": [
+      "45.1"
+    ],
+    "46.2": [
+      "46.1",
+      "45.2"
+    ],
+    "46.3": [
+      "46.2",
+      "34.2"
+    ],
+    "47.1": [
+      "45.1"
+    ],
+    "47.2": [
+      "47.1",
+      "45.2"
+    ],
+    "47.3": [
+      "47.2",
+      "34.2"
+    ],
+    "48.1": [
+      "45.1"
+    ],
+    "48.2": [
+      "48.1",
+      "45.2"
+    ],
+    "48.3": [
+      "48.2",
+      "34.2"
+    ],
+    "49.1": [
+      "45.1"
+    ],
+    "49.2": [
+      "49.1",
+      "45.2"
+    ],
+    "49.3": [
+      "49.2",
+      "34.2"
+    ],
+    "50.1": [
+      "45.1"
+    ],
+    "50.2": [
+      "50.1",
+      "45.2"
+    ],
+    "50.3": [
+      "50.2",
+      "34.2"
+    ],
+    "51": [
+      "46.3",
+      "47.3",
+      "48.3",
+      "49.3",
+      "50.3",
+      "44.3"
+    ],
+    "52": [
+      "51"
+    ]
   }
 }
 ```

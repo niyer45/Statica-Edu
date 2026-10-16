@@ -1,6 +1,6 @@
 # Handoff: Statica MVP
 
-Last updated: 2026-10-16. M0–M3, UI maintenance (41.1–41.7) and CI repair 42 are verified. Tasks 29.1, 31.1 and development tasks 33.1–33.2 are complete. **Next software task: 34.1, generalize challenge selection and isolate sessions.** Required pre-deployment task 44 now tracks a real Guided/Parametric distinction (currently labels only). Nikhil is the nominated owner engineering reviewer; 29.2/manual checks/student QA are deferred to before customer deployment, remain unchecked and no longer block isolated development (D-34).
+Last updated: 2026-10-16. M0–M3, UI maintenance (41.1–41.7) and CI repair 42 are verified. Tasks 29.1, 31.1 and development tasks 33.1–33.2 are complete. **Next software task: 45.1, scope the five remaining original catalog challenges.** Further Beam II integration is deferred until original-catalog gate 51 (D-35). Required pre-deployment task 44 now tracks a real Guided/Parametric distinction (currently labels only). Nikhil is the nominated owner engineering reviewer; 29.2/manual checks/student QA are deferred to before customer deployment, remain unchecked and no longer block isolated development (D-34).
 
 ## Implementation and verification
 
@@ -81,3 +81,9 @@ The root README.md now explains the educational goal, the current Cantilever Bea
 ## Required Guided/Parametric distinction — 2026-10-16
 
 Owner requested Parametric differentiation before deploying to users. Task 44.1–44.3 is unchecked: specify mode-specific guidance/direct editing, implement in the shared workbench, then verify accessible desktop/mobile flows and switch/reload state preservation. Current modes still share the same functionality and differ only in labels; do not claim the distinction exists. Keep solver, constraints, prediction checkpoints and saved workspace shared. Checkpoint 32.2 and M5 regression task 35.1 now explicitly depend on 44.3 so deployment cannot overlook it. Freeform remains separate task 37.1. This update changes planning/documentation only; next software task remains 34.1 and 44.1 is also ready for specification work.
+
+## Current priority — original six catalog entries (D-35)
+
+Owner directed the existing six library challenges ahead of second editions. Read CATALOG_ROADMAP.md and tasks 45–52. Next 45.1 scopes objectives, model boundaries/benchmarks and delivery order; 45.2 defines shared multi-model contracts before 34.1 selection/session work. Implement the five previews through their own specification/numerical/integration tracks 46–50. The old beam-only requirements cannot be silently applied to thermal/torsion/frame/dynamics models. All five remain unavailable.
+
+Retain Beam II configuration/specification/tests and historical completed tasks 33.1–33.2; do not integrate or activate it now. Task 52 revisits it after original-catalog gate 51. This supersedes prior pointers making Beam II/34.1 the immediate next work. Required mode distinction 44 and pre-deployment human QA remain open. Update current task pointers, never mark dormant assets or preview cards as runnable. Planning-only update; no source/test/model or available-card changes. Numeric IDs, graph references and cycles validated.
