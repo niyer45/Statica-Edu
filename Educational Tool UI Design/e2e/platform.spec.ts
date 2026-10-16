@@ -50,7 +50,7 @@ test('production obeys CSP, makes no other-origin requests, and exposes no state
   await referenceDesign(page)
   await runTest(page)
   await page.getByRole('button', { name: 'Explain & submit' }).click()
-  await page.getByRole('textbox').fill('Production flow with stored results.')
+  await page.getByRole('dialog', { name: 'Explain & submit', exact: true }).getByRole('textbox').fill('Production flow with stored results.')
   await page.getByRole('button', { name: 'Submit design & reflection' }).click()
   await expect(page.getByLabel('Recorded submission')).toContainText('Accepted')
   await audit(page)
@@ -66,7 +66,7 @@ test('production obeys CSP, makes no other-origin requests, and exposes no state
 test('preview challenges and Freeform cannot open a workbench', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'View Cantilever Beam I', exact: true }).click()
-  await page.getByRole('button', { name: /Freeform/ }).click()
+  await page.getByRole('dialog', { name: 'Cantilever Beam I', exact: true }).getByRole('button', { name: /Freeform/ }).click()
   await expect(page.getByRole('button', { name: 'Not available yet', exact: true })).toBeDisabled()
   await page.getByRole('button', { name: 'Close challenge details' }).click()
   const previews = page.locator('.challenge-card').filter({ hasText: 'Concept preview' })

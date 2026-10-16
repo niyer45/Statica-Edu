@@ -59,3 +59,7 @@ Milestone 3 has **32 of 38 subtasks complete**. Tasks **27.2–27.7** remain in 
 
 
 Known historical spec differences remain: configured TypeScript is 5.9.3 versus the design's 5.7, local Node is 24.15.0 versus target/CI 22; exact floating-point boundary/large-distance tolerance notes remain in the historical docs. Do not change pinned versions or regenerate specifications to hide these differences. No browser/GPU/performance/CSP pass is inferred from component tests. The lazy viewport still produces the existing non-failing Vite chunk-size warning and dependencies emit THREE_CJS_DEPRECATED during tests.
+
+## Browser repair batch in progress — 2026-10-16
+
+Scoped reflection inputs to the submission dialog and Freeform to the challenge drawer; corrected the Hollow tube lookup. Darkened pass-mark and challenge-paragraph text for the observed axe failures. Replaced single-step dragTo with repeated native mouse movement before release. No task completion is claimed until the updated CI browser scenarios pass. Local E2E startup still fails with port-bind EPERM. Next: inspect the CI result for this repair batch, starting with 27.2.

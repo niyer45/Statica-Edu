@@ -6,7 +6,7 @@ test('reload restores reflection/submission; import/export round-trips; corrupt 
   await referenceDesign(page)
   await runTest(page)
   await page.getByRole('button', { name: 'Explain & submit' }).click()
-  await page.getByRole('textbox').fill('I changed the section distribution.')
+  await page.getByRole('dialog', { name: 'Explain & submit', exact: true }).getByRole('textbox').fill('I changed the section distribution.')
   await page.getByRole('button', { name: 'Submit design & reflection' }).click()
   await page.keyboard.press('Escape')
   const before = normalizeState(await readState(page))
