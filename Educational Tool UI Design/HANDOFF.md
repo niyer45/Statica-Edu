@@ -1,6 +1,8 @@
 # Handoff: Statica MVP
 
-Last updated: 2026-10-15, task 19.4 and deformation-behavior review for GitHub delivery. Milestone 2 checkpoint evidence remains in `MILESTONE2.md`. This delivery includes tasks 19.1–19.4 and the deformation-behavior documentation; the next development task remains 19.5. Spec: `../.kiro/specs/engineering-intuition-mvp/` (requirements.md, design.md, tasks.md). Rules and commands: `AGENTS.md`.
+Last updated: 2026-10-15, completed task 19.8. Next: 19.9. Current work is verified locally; see MILESTONE3.md for per-task evidence and pushed batch records.
+
+Current Milestone 3 progress: **19.8 complete; next 19.9**. The per-task ledger in [MILESTONE3.md](MILESTONE3.md) supersedes historical open-task statements below.
 
 ## A. Current state
 
@@ -29,7 +31,7 @@ Implemented and verified:
   - 18: four-profile Workbench gate; all component tests and required checks pass.
   - User override D-26: uncluttered 3D scene, with envelope/static annotations removed and handle feedback below Canvas.
 
-- **Milestone 3, partial:** tasks 19.1–19.2 are implemented and verified. Task 19.3 adds the reusable model-based test harness; task 19.4 verifies Property 28 (append-only history). Reducer `runTest`, `setPrediction` and `cancelPrediction` now work; student-facing panel/dialog wiring remains later tasks.
+- **Milestone 3, partial:** tasks 19.1–19.2 are implemented and verified. Task 19.3 adds the reusable model-based test harness; tasks 19.4–19.5 verify Properties 28–29 (append-only history and snapshot isolation). Reducer `runTest`, `setPrediction` and `cancelPrediction` now work; student-facing panel/dialog wiring remains later tasks.
 
 What works in the running app (`pnpm run dev`):
 - Platform shell:
@@ -51,8 +53,8 @@ Incomplete:
 
 ## B. Task progress
 
-- **Last completed:** task 19.4. All Milestone 2 tasks 13–18 remain complete, including optional suites and the D-26 uncluttered presentation.
-- **Next implementation:** **19.5**, add Property 29 (snapshot isolation) using the completed model-based harness, then the remaining Milestone 3 wave graph. Keep the current domain/edit architecture and existing stubs.
+- **Last completed:** task 19.8.
+- **Next implementation:** **19.9**, following the existing task specifications and dependency graph.
 - **Gate evidence:** `src/ui/workbench/milestone2.test.tsx` drives the real Workbench/palette/controls/lazy fallback for all four profiles, checking each numeric value, oriented SVG outline/envelope summary and actual Three.js mesh bounds against typed state. Edits leave stored history/deformation unchanged. `BeamView.test.tsx` renders the real R3F scene with a no-op GPU renderer for all four profiles and checks the D-26 uncluttered presentation. Neither suite is a real-browser/GPU pass.
 - **Viewport files:**
 
@@ -69,12 +71,16 @@ Incomplete:
 - Deformation remains static for all users, including reduced-motion users. Draft edits change solid geometry and dimensions; dashed deformation always comes from the latest frozen Test_Result or baseline. No formulas were moved out of the physics domain.
 - Handle cleanup covers release, pointer cancel/lost capture, window blur, Escape, unmount, and section-kind/orientation changes. Pending unrendered motion is discarded on release/cancel, preserving the last clamped edit. Diameters/width/height/web map half-dimension handle motion to full parameter changes; flange thickness has reversed inward-face motion. At 90°, local-v motion maps onto negative global Z.
 - **Tests:** viewport summary/control/raycast/layout tests; fallback hole/dimension/deformation/orbit tests; lazy-load/context-creation/context-loss recovery tests; palette Space/same-kind equivalence tests; handle projection/throttle/limit unit tests; real R3F reconciler + store integration with a no-op GPU renderer (capture, coalesced dispatch, clamping, labels, orbit, cancellation, and handle replacement).
-- **Still open:** task 19.5 onward, including the dedicated property sequence suites and later Milestone 3 gates, plus the separately listed real-browser/CI integration follow-ups. All M2 checkboxes, including checkpoint 18, are complete. The original requirements/design and dependency graph were not rewritten; D-26 records the explicit user override.
+- **Still open:** task 19.6 onward, including the dedicated property sequence suites and later Milestone 3 gates, plus the separately listed real-browser/CI integration follow-ups. All M2 checkboxes, including checkpoint 18, are complete. The original requirements/design and dependency graph were not rewritten; D-26 records the explicit user override.
 - The optional and checkpoint tasks may need to be started by hand, because the task scheduler doesn't list them as ready.
 
 ## C. Technical context
 
 ### Decisions and why
+
+- **Task 19.5 / Property 29:** `test/state/snapshot.p29.test.ts` captures detached full TestResult values at record time and checks them after every action through the existing command harness. The generated sequence records every section kind with stored predictions, applies dimension/orientation changes and rejected locked edits, records an iteration without prediction, and exercises restore/import/submission/reset before a random valid/hostile command tail. It also checks that draft objects/sections never alias stored snapshots. Four regression cases demonstrate detection of corrupted design snapshots, Analysis, Evaluation and stored predictions. Existing reducer/architecture/spec content required no changes or deviations.
+- **Property runtime:** the first full run timed out while using many Vitest structural matchers. The final hook uses Node strict structural/reference assertions, preserving complete field coverage and 200 default sequences while reducing runtime. This property has a 30-second test timeout for the supported `PBT_RUNS=2000` mode; that targeted deep run passes in about nine seconds.
+- **Standing documentation instruction:** after every completed task, synchronize HANDOFF.md, the current-task pointer/rules in AGENTS.md, and sibling tasks.md checkboxes; update other supporting Markdown when affected. Record verification results, next task and local/pushed status.
 
 - **Task 19.4 / Property 28:** `test/state/history.p28.test.ts` registers an append-only hook with the existing command harness. It captures all recorded entry references independently of the history array, checks their original indexes after every action, verifies baseline value/iteration preservation, and checks exact growth against the independent model. A successful Run Test adds one fresh result with injected id/time and the next iteration; all other/rejected actions add zero. Each generated sequence first records three iterations and exercises gated rejection, cancel, restore, valid import and reset, then runs a random command tail with valid/hostile payloads. The tagged property uses `assertProperty` (200 runs by default, fixed seed, `PBT_RUNS` override). A regression test proves the hook catches replacement of a non-baseline entry even when ids, values and length match. No reducer changes or new deviations were needed.
 
@@ -123,24 +129,25 @@ Incomplete:
 
 - **CSP and R3F:** the scene uses a procedural `DataTexture` and DOM Html labels, with no remote assets or blob/data URLs added. The production build retains `default-src 'self'`. Actual browser CSP validation remains pending; do not add exceptions without observed evidence.
 - **Browser verification blocked in this environment.** Preview failed with `listen EPERM 127.0.0.1:4173`; launching cached Chromium aborted. The installed Playwright expects Chromium revision 1248, while the available cache contains 1208. In a normal development environment, run `pnpm exec playwright install chromium`, then verify the production preview. No browser/CSP/performance/visual pass is claimed.
-- **Repository/upload:** private `niyer45/Statica-Edu`, branch `main`. Milestone 2 closeout is delivered in the commit titled `Finish Milestone 2 and simplify the 3D scene`; the preceding viewport/handle commit is `cfa40ccfbf31f0933afeed27ebb2c19b184f3e24`. The local Kiro directory still has no `.git`; previous authorized updates used GitHub's tree/commit API with a branch-head lease. The base for this delivery is M2 closeout commit `af02592edadc4a128958d66cc21ee2519927d019`. The follow-up delivery is titled `Complete reducer tasks 19.1–19.4 and document tested deformation`; verify the branch head when resuming. Preserve the sibling application and `.kiro` directories and existing repository-root README. The CI workflow remains nested in the application directory; see audit below.
+- **Repository/upload:** private `niyer45/Statica-Edu`, branch `main`. Milestone 2 closeout is delivered in the commit titled `Finish Milestone 2 and simplify the 3D scene`; the preceding viewport/handle commit is `cfa40ccfbf31f0933afeed27ebb2c19b184f3e24`. The local Kiro directory still has no `.git`; previous authorized updates used GitHub's tree/commit API with a branch-head lease. Last verified pushed main is `a8a3c6b5b37bb162675de5738d2d9c9df85aec33` (`Complete reducer tasks 19.1–19.4 and document tested deformation`), based on M2 closeout `af02592edadc4a128958d66cc21ee2519927d019`. Task 19.5 is local and not yet pushed; inspect the current branch head before any future upload. Preserve the sibling application and `.kiro` directories and existing repository-root README. The CI workflow remains nested in the application directory; see audit below.
 - **No horizontal scroll at 320–2560 px** isn't verified in a browser. It relies on the template CSS.
 
 ## D. Testing
 
-Verified after task 19.4 (2026-10-15; Node 24.15.0, pnpm 10.34.3 in this environment; Node 22 remains the project/CI target):
+Verified after task 19.5 (2026-10-15; Node 24.15.0, pnpm 10.34.3 in this environment; Node 22 remains the project/CI target):
 
 | Check | Result |
 |---|---|
-| `pnpm exec vitest run` | 83 files, 823 tests, all pass (M2 closeout: 79 files, 782 tests) |
+| `pnpm exec vitest run` | 831 tests pass; lint, typecheck and build pass |
 | `pnpm run typecheck` | clean |
 | `pnpm run lint` | 0 errors, 10 `no-explicit-any` warnings (in `src/challenge/*.test.ts` and `vite.config.ts`, left as is) |
 | `pnpm run build` | passed; R3F remains in the lazy viewport chunk (~963 kB minified / 258 kB gzip), which triggers Vite's non-failing size warning |
 
-- Task 19.4 adds the tagged model-based Property 28 and one regression-detection test in `test/state/history.p28.test.ts`. All required checks pass; Properties 29–37 remain open.
+- Task 19.5 adds one tagged model-based property and four regression-detection cases in `test/state/snapshot.p29.test.ts`; all five also pass with `PBT_RUNS=2000`.
+- Task 19.4 adds the tagged model-based Property 28 and one regression-detection test in `test/state/history.p28.test.ts`. All required checks pass; Properties 30–37 remain open.
 - Task 19.3 adds six tests in `test/state/model.test.ts`: randomized command execution, reachable-state replay in both modes, every action/hook ordering, detection of a broken runTest reducer, seed/path propagation on hook failure, and empty reachable-state generation. No application source or specification content was changed during 19.3.
 - Task 19.2 adds 14 focused cases in `src/state/learningLoop.test.ts`, covering all six actions, frozen-input purity, restore/retest, comparison limits, exact rejection identity and submission replacement. Remaining property tasks remain open.
-- Task 19.1 adds 18 focused reducer cases in `src/state/runTest.test.ts` plus one injected-time/id confirmation test in `src/ui/state/StoreProvider.test.tsx`. Dedicated reducer property/example suites (19.5–19.15) remain open; they were not marked complete.
+- Task 19.1 adds 18 focused reducer cases in `src/state/runTest.test.ts` plus one injected-time/id confirmation test in `src/ui/state/StoreProvider.test.tsx`. Dedicated reducer property/example suites (19.6–19.15) remain open; they were not marked complete.
 - No known failing automated tests. Drei's dependency path emits `THREE_CJS_DEPRECATED` during Vitest; application code uses ES module imports.
 - The pinned oxfmt 0.2.0 changed string quotes and removed a required separator from an inline TypeScript object type during formatting. The affected type was repaired and all checks rerun; inspect formatting diffs before accepting them. No formatter dependency/config changes were made.
 - Property tests also passed at `PBT_RUNS=2000` at the Milestone 1 gate.
@@ -150,7 +157,7 @@ Verified after task 19.4 (2026-10-15; Node 24.15.0, pnpm 10.34.3 in this environ
   - E2E flows
   - Accessibility audit (axe)
   - Persistence
-  - Reducer Properties 29–37
+  - Reducer Properties 30–37
 
 Commands, run from this folder:
 
@@ -184,10 +191,10 @@ pnpm run typecheck && pnpm run lint && pnpm run build
 
 ### Immediate next steps
 
-1. **Implement 19.5 (Property 29: Snapshot isolation).** Reuse `test/state/model.ts` and capture stored result values at record time, then verify later edits/actions cannot alter snapshots, Analysis, Evaluation or stored predictions. Use the required feature/property tag and `assertProperty` helper. Preserve the completed Property 28 suite; task 19.14 remains a separate example-flow suite.
-2. **Continue the wave graph and tests.** Complete 19.5–19.15 as scheduled, then persistence and the existing panel/dialog/history stubs. For task 22.2, use D-27's injected prediction `now` and dispatch confirmation then Run Test. Do not enable the current disabled UI button until the corresponding learning-loop UI is wired; do not fabricate numeric results.
+1. **Continue at 19.7.** Read the corresponding specifications; see MILESTONE3.md for completed task evidence. Preserve D-26/D-27 and the existing architecture.
+2. **Continue the wave graph and tests.** Complete 19.6–19.15 as scheduled, then persistence and the existing panel/dialog/history stubs. For task 22.2, use D-27's injected prediction `now` and dispatch confirmation then Run Test. Do not enable the current disabled UI button until the corresponding learning-loop UI is wired; do not fabricate numeric results.
 3. **Preserve D-26.** No 3D envelope/static text or dimension/span/axis guide overlays. Keep transient handle values/limits below Canvas. Numeric controls, accessible summary, solver envelope checks, and dedicated 2D section diagram continue to provide the information.
 4. **Real-browser follow-up:** install matching Playwright Chromium in an environment that permits the preview server/browser. Verify desktop/mobile layout, no horizontal scroll, pointer targets, handle cancellation, camera controls, SVG/context recovery, keyboard focus, reduced motion, CSP, network origins and idle rendering. Do not interpret the no-op GPU renderer as this validation.
 5. **Repository/CI follow-up:** the workflow is still nested inside the application directory. Adapt it to repository-root `.github/workflows/` with the application working directory and lockfile path, preserving sibling `.kiro` paths. E2E specs remain a Milestone 3 deliverable. Node 22 CI and live browser checks are not claimed by the local M2 checkpoint.
 
-Read `MILESTONE2.md`, this handoff, `AGENTS.md`, D-26, then D-27 and task 19.5 with its linked requirements. Keep supporting documentation, checkboxes, counts, deviations and next steps synchronized after each completed task.
+Read `MILESTONE2.md`, this handoff, `AGENTS.md`, D-26, then D-27 and task 19.6 with its linked requirements. Keep supporting documentation, checkboxes, counts, deviations and next steps synchronized after each completed task.

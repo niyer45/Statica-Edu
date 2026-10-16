@@ -442,19 +442,19 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
     - **Property 28: Append-only**
     - **Validates: Requirements 15.4, 17.1, 18.1**
 
-  - [ ]* 19.5 Write property test for snapshot isolation
+  - [x]* 19.5 Write property test for snapshot isolation
     - **Property 29: Snapshot isolation**
     - **Validates: Requirements 18.2**
 
-  - [ ]* 19.6 Write property test for draft status
+  - [x]* 19.6 Write property test for draft status
     - **Property 30: Draft status**
     - **Validates: Requirements 16.1, 16.2**
 
-  - [ ]* 19.7 Write property test for restore
+  - [x]* 19.7 Write property test for restore
     - **Property 31: Restore**
     - **Validates: Requirements 19.1, 19.2, 19.5**
 
-  - [ ]* 19.8 Write property test for draft validity invariant
+  - [x]* 19.8 Write property test for draft validity invariant
     - **Property 32: Draft validity invariant**
     - **Validates: Requirements 15.9, 23.6**
 

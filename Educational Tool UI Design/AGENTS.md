@@ -7,6 +7,10 @@ template's visual design and platform shell are kept.
 
 Read `HANDOFF.md` first for the current status and the next task.
 
+
+
+Current task progress: completed 19.8; next 19.9. Update HANDOFF.md, AGENTS.md and tasks.md after each completed task; push verified batches.
+
 ## Specifications (source of truth)
 
 The spec lives outside this folder, one level up:
@@ -21,7 +25,7 @@ Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuiti
 ## Rules for following the spec
 
 - Implement tasks in `tasks.md` order, respecting the wave graph. Each task lists the requirement IDs it must satisfy.
-- Milestone 2 and its component gate are complete; see `MILESTONE2.md` for evidence and limitations. Tasks 19.1–19.4 are complete; continue at 19.5.
+- Milestone 2 and its component gate are complete; see `MILESTONE2.md` for evidence and limitations. Tasks through 19.6 are complete; continue at 19.7.
 - Prediction actions use D-27: `setPrediction` requires `now` from the injected store clock. Confirm by dispatching `setPrediction`, then `runTest`; the reducer never reads time itself.
 - Follow D-26: no visible envelope or static annotations on the 3D model. Keep active drag feedback below Canvas, numerical controls and the accessible summary. Do not restore the original spec overlays; the user explicitly requested their removal.
 - Do not rewrite requirements, design, or tasks. If the code must deviate, record it under "Deviations" in `HANDOFF.md` (and in `DECISIONS.md` if it is a design decision).
@@ -116,9 +120,9 @@ When you finish a task:
 
 ## Updating handoff docs
 
-At the end of each work session, update `HANDOFF.md`:
+After every completed task and at the end of each work session, update `HANDOFF.md`:
 - the last completed task and the next task
 - test counts
 - new deviations and known issues
 
-Update this file only if commands, structure, or rules change.
+Per the user's standing instruction, also update this file's current-task pointer and the relevant sibling `tasks.md` checkboxes after every completed task. Keep README status/counts synchronized when they change. Record whether work is local or pushed, and keep commands, structure and rules current.
