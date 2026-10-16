@@ -58,7 +58,7 @@ Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuiti
 - The template `src/BeamScene.tsx` and temporary `LegacyFallback` are deleted. Their SVG projection now lives in `ui/viewport/projection.ts` and `Fallback2D.tsx`. Keep this fallback independent of Three.js so recovery works when the 3D chunk fails to load.
 - `test/state/model.ts`: reusable fast-check command harness, per-action invariant hooks and reachable-session generator (task 19.3). Dedicated reducer properties reuse it and the `test/pbt.ts` helper.
 - `test/`: shared arbitraries, pbt helper, fixtures (`test/fixtures/designs.ts`), architecture and config guard tests.
-- `e2e/`: 18 Playwright desktop/Pixel 7 scenarios; 12 currently pass. Tasks 27.4 and 27.7 await the latest CI repair run.
+- `e2e/`: 18 Playwright desktop/Pixel 7 scenarios. Tasks 27.2–27.6 have passing evidence; 27.7 awaits the targeted 320 px repair run. See HANDOFF.md.
 - `schemas/`: generated JSON Schema. `scripts/`: schema generator.
 - Unit tests are colocated as `*.test.ts(x)`. Property tests are named `*.pN.test.ts`.
 
@@ -127,4 +127,4 @@ Per the user's standing instruction, also update this file's current-task pointe
 
 ## Milestone 3 execution notes
 
-Tasks 19–26 are complete. Task 27 scenarios are implemented but must pass in a real browser before completion; task 28 remains the final gate. The root workflow is `../.github/workflows/ci.yml`; its run commands use this application directory. Playwright development is on 4174 (state hook), production preview on 4173 (CSP/no hook). See HANDOFF.md and MILESTONE3.md for current evidence. `StoreProvider` synchronously reduces/persists with injected storage; preserve that ordering when changing the store API.
+Tasks 19–26 and 27.1–27.6 are complete. Task 27.7 awaits browser verification of the 320 px repair; task 28 remains the final gate. The root workflow is `../.github/workflows/ci.yml`; its run commands use this application directory. Playwright development is on 4174 (state hook), production preview on 4173 (CSP/no hook). See HANDOFF.md and MILESTONE3.md for current evidence. `StoreProvider` synchronously reduces/persists with injected storage; preserve that ordering when changing the store API.

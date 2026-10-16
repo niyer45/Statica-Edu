@@ -39,11 +39,18 @@ test('responsive layout preserves state across breakpoints and has no horizontal
         columns: getComputedStyle(element).gridTemplateColumns,
       })),
     }))
-    expect(layout.scrollWidth, JSON.stringify(layout)).toBeLessThanOrEqual(layout.width)
+    expect(layout.scrollWidth, JSON.stringify({ requestedWidth: width, ...layout })).toBeLessThanOrEqual(width)
     const design = await page.getByRole('region', { name: 'Design tools' }).boundingBox()
     const viewport = await page.getByRole('region', { name: 'Design view' }).boundingBox()
     const challenge = await page.getByRole('complementary', { name: 'The challenge' }).boundingBox()
     if (!design || !viewport || !challenge) throw new Error('Workbench regions missing')
+    for (const input of await page.locator('.design-panel input:not([type="range"])').all()) {
+      const box = await input.boundingBox()
+      if (box) {
+        expect(box.x).toBeGreaterThanOrEqual(design.x)
+        expect(box.x + box.width, `Clipped design input at ${width}px`).toBeLessThanOrEqual(design.x + design.width)
+      }
+    }
     if (width > 870) expect(challenge.x).toBeGreaterThan(viewport.x)
     else if (width > 620) expect(challenge.y).toBeGreaterThan(design.y)
     else expect(design.y).toBeGreaterThan(viewport.y)

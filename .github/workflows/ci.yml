@@ -36,6 +36,8 @@ jobs:
           git diff --exit-code -- schemas/
           test -z "$(git ls-files --others --exclude-standard -- schemas/)"
       - run: pnpm exec playwright install --with-deps chromium
+      - name: Responsive regression (desktop and Pixel 7)
+        run: pnpm exec playwright test e2e/platform.spec.ts --grep "responsive layout"
       - run: pnpm run e2e
       - uses: actions/upload-artifact@v4
         if: always()

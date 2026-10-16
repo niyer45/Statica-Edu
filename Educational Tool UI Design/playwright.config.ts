@@ -3,6 +3,7 @@ import { defineConfig, devices } from '@playwright/test'
 // Development exposes the read-only state hook. Separate production preview verifies CSP
 // and the absence of that hook without weakening the shipped production bundle.
 export default defineConfig({
+  timeout: 60_000, // Complete flows include software WebGL, navigation and axe audits.
   testDir: './e2e', fullyParallel: true, forbidOnly: !!process.env.CI, retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? 2 : undefined,
   reporter: [['list'], ['html', { open: 'never' }]],

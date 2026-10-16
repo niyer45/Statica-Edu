@@ -567,7 +567,7 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
   - _Requirements: 33.1, 33.2, 33.4_
 
 - [ ] 27. End-to-end tests
-  - 2026-10-16 progress: 27.2, 27.3, 27.5 and 27.6 passed on desktop and Pixel 7 in CI run 38890827051. Tasks 27.4 and 27.7 remain in progress; latest repairs await CI. See application HANDOFF.md and MILESTONE3.md.
+  - 2026-10-16 progress: 27.1–27.6 have passing desktop/Pixel 7 evidence. Task 27.7 remains in progress: a 332 px workflow overflow at 320 px is fixed locally and submitted for focused CI verification. See application HANDOFF.md.
   - [x] 27.1 Create E2E helpers
     - `e2e/helpers.ts`: read `window.__EI_STATE__`, normalize state (strip timestamps/ids), axe check failing on serious/critical violations, network request recorder
     - _Requirements: 23.10, 33.5_

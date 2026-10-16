@@ -60,3 +60,11 @@ The browser repair batch also strengthens real Tab traversal, projected beam hov
 - **27.6 complete** — Reload restores reflection and submission; native JSON downloads round-trip through import without changing history, and corrupt storage restarts with a notice. Desktop and Pixel 7 plus axe passed in [run 38890827051](https://github.com/niyer45/Statica-Edu/actions/runs/38890827051); core checks and 873 tests passed. Next: 27.4.
 
 - **27.4 complete** — Real Tab/Enter/Space traversal completes the flow, focus leaves the canvas, and normalized keyboard and mouse sessions are identical; axe passes for both flows. Desktop and Pixel 7 plus axe passed in [run 38891807513](https://github.com/niyer45/Statica-Edu/actions/runs/38891807513); core checks and 873 tests passed. Next: 27.7.
+
+## Targeted repair — 2026-10-16, awaiting new CI
+
+Run 38892699099 confirms the exact overflow: viewport/client width 320 px, document scroll width 332 px, offending element `span.step.active` at right=332. The existing local fix wraps workflow steps below 620 px, wraps orientation radios and stacks tools below 360 px to prevent the clipped controls seen in the screenshot. The responsive regression now compares against the requested viewport width (rather than potentially expanded mobile innerWidth) and checks every design input stays inside its panel.
+
+The same run had five additional scenario failures from the 30-second total budget (happy path on both projects, persistence on both, desktop fallback); earlier runs passed these flows. Set the default complete-flow budget to 60 seconds; keyboard and multi-breakpoint tests retain 90 seconds. Assertions and per-control reachability limits are unchanged. The root CI now runs the focused responsive regression on both projects before the full E2E suite, preserving all existing gates. Task 27.7 and checkpoint 28 remain incomplete until verified. Per user instruction, trigger this run once and stop; do not continuously poll.
+
+Targeted repair local verification: lint zero errors (10 existing warnings), typecheck, all 873 tests across 107 files, and build pass. The next push triggers the focused responsive regression followed by the full browser suite. Stop after confirming the run is queued; await the user before further work.

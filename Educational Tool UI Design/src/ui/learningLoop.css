@@ -54,3 +54,16 @@
   .platform.workbench-open .platform-main { margin-left: 0; }
   .workbench-open .mobile-platform-nav { display: flex; }
 }
+
+/* Refactored workflow labels and orientation radios must remain readable at narrow widths. */
+.rotate-button { flex-wrap: wrap; height: auto; }
+@media (max-width: 620px) {
+  .workflow { flex-wrap: wrap; height: auto; min-height: 52px; padding-block: 10px; row-gap: 8px; }
+  .workflow .step { flex: 1 1 calc(50% - 5px); white-space: normal; }
+  .workflow .step-line { display: none; }
+}
+@media (max-width: 360px) {
+  .tools-body { display: block; }
+  .tools-body .dimensions-heading { margin-top: 24px; margin-bottom: 13px; }
+  .tools-body .dimension-field { margin-bottom: 12px; }
+}

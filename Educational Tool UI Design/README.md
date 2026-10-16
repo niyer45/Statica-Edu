@@ -73,3 +73,5 @@ pnpm exec playwright install chromium   # needed once before `pnpm run e2e`
 
 
 Current Milestone 3 progress: 37/38 Milestone 3 subtasks complete; next 27.7. Browser tasks verified: 27.2, 27.3, 27.4, 27.5, 27.6. See [MILESTONE3.md](MILESTONE3.md) for the verified task ledger.
+
+Latest browser repair: the 320 px workflow overflow is corrected with wrapping; narrow design controls remain inside their panel. CI runs the focused desktop/Pixel 7 responsive regression before the full browser suite. Verification is pending; task 27.7 and checkpoint 28 remain open. See HANDOFF.md for the exact failure and the user-requested stop after triggering the run.
