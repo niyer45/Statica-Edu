@@ -19,3 +19,8 @@ logs/
 # beside it.
 /.plugins/
 /.opencode-skills/
+
+# Generated test and coverage artifacts.
+coverage/
+playwright-report/
+test-results/

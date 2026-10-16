@@ -562,36 +562,36 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
     - Oversize file rejected without read; reasons listed; `<img onerror>` reasons rendered literally; source scan asserts zero `dangerouslySetInnerHTML`
     - _Requirements: 4.5, 22.5, 23.1, 23.7_
 
-- [ ] 26. Checkpoint – pre-E2E
+- [x] 26. Checkpoint – pre-E2E
   - Ensure all unit, component, and property tests (Properties 1–37) pass and coverage ≥ 95% for `state/`; ask the user if questions arise.
   - _Requirements: 33.1, 33.2, 33.4_
 
 - [ ] 27. End-to-end tests
-  - [ ] 27.1 Create E2E helpers
+  - [x] 27.1 Create E2E helpers
     - `e2e/helpers.ts`: read `window.__EI_STATE__`, normalize state (strip timestamps/ids), axe check failing on serious/critical violations, network request recorder
     - _Requirements: 23.10, 33.5_
 
-  - [ ]* 27.2 Write E2E happy-path scenario
+  - [-]* 27.2 Write E2E happy-path scenario
     - Baseline "Not accepted"; apply I-section by click; drag height handle; set values numerically; predict; run; Accepted; compare baseline + three iterations; restore; reflect; submit Accepted
     - _Requirements: 14.1, 17.1, 18.5, 19.1, 20.2, 20.6, 33.5, 33.9_
 
-  - [ ]* 27.3 Write E2E drag-drop scenario
+  - [-]* 27.3 Write E2E drag-drop scenario
     - Drag I-section tile onto the beam; active tile and draft update
     - _Requirements: 26.2, 26.3, 26.6_
 
-  - [ ]* 27.4 Write E2E keyboard scenario
+  - [-]* 27.4 Write E2E keyboard scenario
     - Full flow by keyboard; normalized state equals mouse flow; focus order and escape from canvas
     - _Requirements: 32.1, 32.8, 32.9, 33.9_
 
-  - [ ]* 27.5 Write E2E invalid-path scenario
+  - [-]* 27.5 Write E2E invalid-path scenario
     - d ≥ D and overlapping flanges show errors with draft/history unchanged; edit after test shows "Draft" while tested numbers remain
     - _Requirements: 5.5, 5.7, 16.2, 16.5, 28.5, 33.9_
 
-  - [ ]* 27.6 Write E2E persistence scenario
+  - [-]* 27.6 Write E2E persistence scenario
     - Reload restores session; import → export → import stable; corrupted storage shows notice
     - _Requirements: 21.3, 21.4, 22.3, 33.9_
 
-  - [ ]* 27.7 Write E2E platform checks
+  - [-]* 27.7 Write E2E platform checks
     - Zero requests to other origins during a full flow (fonts included); built CSS/HTML contain no `fonts.googleapis.com`/`fonts.gstatic.com`; layout at 1280, 1000, 800, and 375 px matches the template grid (three columns / collapsed sidebar / two columns / single column with viewport first), crossing 1050, 870, and 620 px preserves state, and no horizontal scroll at 320 px; WebGL-disabled flow reaches the same normalized state; production build has CSP meta, zero CSP console violations through a full flow, and no `__EI_STATE__`; preview challenge and Freeform cannot open a Workbench
     - _Requirements: 1.11, 1.13, 23.8, 23.9, 23.11, 24.1, 24.2, 24.3, 24.4, 24.9, 24.10, 31.6, 34.3, 34.4_
 

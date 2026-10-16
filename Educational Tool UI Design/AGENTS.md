@@ -32,7 +32,9 @@ Read `HANDOFF.md` first for the current status and the next task.
 
 
 
-Current task progress: completed 25.2; next 26. Update HANDOFF.md, AGENTS.md and tasks.md after each completed task; push verified batches.
+
+
+Current task progress: completed 27.1; next 27.2. Update HANDOFF.md, AGENTS.md and tasks.md after each completed task; push verified batches.
 
 ## Specifications (source of truth)
 
@@ -48,7 +50,7 @@ Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuiti
 ## Rules for following the spec
 
 - Implement tasks in `tasks.md` order, respecting the wave graph. Each task lists the requirement IDs it must satisfy.
-- Milestone 2 and its component gate are complete; see `MILESTONE2.md` for evidence and limitations. Tasks through 19.6 are complete; continue at 19.7.
+- Milestone 2 and its component gate are complete; see `MILESTONE2.md` for evidence and limitations. Tasks through 27.1 are complete; continue at 27.2.
 - Prediction actions use D-27: `setPrediction` requires `now` from the injected store clock. Confirm by dispatching `setPrediction`, then `runTest`; the reducer never reads time itself.
 - Follow D-26: no visible envelope or static annotations on the 3D model. Keep active drag feedback below Canvas, numerical controls and the accessible summary. Do not restore the original spec overlays; the user explicitly requested their removal.
 - Do not rewrite requirements, design, or tasks. If the code must deviate, record it under "Deviations" in `HANDOFF.md` (and in `DECISIONS.md` if it is a design decision).
@@ -149,3 +151,7 @@ After every completed task and at the end of each work session, update `HANDOFF.
 - new deviations and known issues
 
 Per the user's standing instruction, also update this file's current-task pointer and the relevant sibling `tasks.md` checkboxes after every completed task. Keep README status/counts synchronized when they change. Record whether work is local or pushed, and keep commands, structure and rules current.
+
+## Milestone 3 execution notes
+
+Tasks 19–26 are complete. Task 27 scenarios are implemented but must pass in a real browser before completion; task 28 remains the final gate. The root workflow is `../.github/workflows/ci.yml`; its run commands use this application directory. Playwright development is on 4174 (state hook), production preview on 4173 (CSP/no hook). See HANDOFF.md and MILESTONE3.md for current evidence. `StoreProvider` synchronously reduces/persists with injected storage; preserve that ordering when changing the store API.

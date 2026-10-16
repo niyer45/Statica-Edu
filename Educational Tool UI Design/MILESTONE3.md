@@ -30,3 +30,11 @@ Each completed task below passed lint (zero errors), typecheck, the full Vitest 
 - **24.2 complete** — Verified no-test/blank-reflection reasons, latest-only selector semantics, reflection cap, literal script input and unchanged stored status across reflection content. Verification: 868 tests pass. Next: 25.1.
 - **25.1 complete** — Import/export UI downloads validated current-design JSON, checks file size before reads, lists every error and announces causes without changing rejected session state. Public-only challenge typing avoids exposing referenceDesign. Verification: 873 tests pass. Next: 25.2.
 - **25.2 complete** — Verified size/read boundaries, failed-read handling, literal malicious text, all error reasons, state identity on rejection, valid import and object-URL download/revocation. Source scan enforces escaped React rendering. Verification: 873 tests pass. Next: 26.
+- **26 complete** — Pre-E2E gate passed: all Properties 1–37 are tagged and pass; line coverage state 97.62%, geometry 99.05%, evaluation 98.76%, physics 100%. Full lint/typecheck/test/build pass. Verification: 873 tests pass. Next: 27.1.
+
+## Batch delivery and browser gate
+
+Verified batches were pushed as 9309633, 517ff2d, 19b2e30, 71fe69b, 6ed9265 and 6120f846ea22437b1268fdfcfb723102fbe86095. The last of these delivers the full learning-loop UI through task 25.
+
+Pre-E2E coverage passed: state 97.62%, geometry 99.05%, evaluation 98.76%, physics 100%. All 37 property tags are present. The 18 Playwright scenarios are discovered/typechecked, but local execution fails before the first page with `listen EPERM 127.0.0.1:4174`. No browser pass is claimed. Tasks 27.2–27.7 are in progress pending real execution, and 28 is unchecked. Repository-root CI now supplies the application working directory, matching Chromium, coverage/schema checks and browser artifact upload.
+- **27.1 complete** — E2E helpers load native ESM-safe challenge data, read the dev state hook, normalize ids/times, audit axe severity, record origins and perform true pointer/keyboard interactions. Playwright discovers all 18 desktop/Pixel scenarios; actual execution is pending external CI. Verification: 873 tests pass. Next: 27.2.

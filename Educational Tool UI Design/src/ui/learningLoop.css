@@ -1,0 +1,33 @@
+/* Learning-loop elements use the template regions/palette without inline style attributes. */
+.challenge-body > *, .results-panel > *, .iteration > div { min-width: 0; }
+.challenge-body ul { padding-left: 16px; }
+.challenge-body ul[aria-label="Design requirements"] { list-style: none; padding: 0; }
+.challenge-body table, .results-panel table { width: 100%; table-layout: fixed; border-collapse: collapse; overflow-wrap: anywhere; font-size: 11px; }
+.challenge-body th, .challenge-body td, .results-panel th, .results-panel td { padding: 6px 3px; text-align: left; vertical-align: top; border-bottom: 1px solid #dfe4d8; }
+.challenge-body small { display: block; }
+.challenge-body .status-banner { margin: 12px 0; padding: 10px; background: #e9efdf; color: #345640; font-weight: 600; }
+.challenge-body [aria-label="Explanation facts"], .challenge-body details, .challenge-body ul { font-size: 11px; line-height: 1.7; overflow-wrap: anywhere; }
+.results-header { flex-wrap: wrap; height: auto; min-height: 57px; gap: 12px; }
+.result-tabs { min-height: 45px; }
+.history-note { flex-wrap: wrap; font-size: 10px; color: #46583b; min-width: 0; }
+.history-note label { display: flex; flex-direction: column; max-width: 180px; gap: 4px; }
+.history-note input[type="file"] { width: 100%; min-width: 0; font-size: 10px; }
+.iteration { height: auto; align-items: flex-start; }
+.iteration > div { flex: 1; }
+.iteration p, .iteration ul { font-size: 10px; line-height: 1.6; margin: 6px 0; padding-left: 0; list-style: none; overflow-wrap: anywhere; }
+.iteration label { display: block; font-size: 10px; margin: 8px 0; }
+.iteration button { text-align: left; text-decoration: underline; padding: 3px 0; }
+.results-panel [role="tabpanel"] > section { padding: 16px; overflow-wrap: anywhere; }
+.modal { max-width: 100%; max-height: calc(100dvh - 40px); overflow-y: auto; }
+.modal label, .modal legend { font-size: 12px; color: #345640; line-height: 1.6; }
+.modal textarea, .modal select { display: block; width: 100%; max-width: 100%; margin: 8px 0; padding: 10px; font: inherit; border: 1px solid #8a977d; border-radius: 5px; background: #fff; color: #26352b; }
+.modal textarea { min-height: 90px; resize: vertical; }
+.modal fieldset { border: 0; padding: 0; }
+.modal .prediction-options { display: flex; flex-wrap: wrap; gap: 12px; }
+.modal .prediction-options label { padding: 8px 0; }
+.modal [aria-label="Submission efficiency"] { font-size: 12px; }
+@media (max-width: 620px) {
+  .results-header { align-items: flex-start; }
+  .history-note { width: 100%; }
+  .challenge-body table { font-size: 10px; }
+}

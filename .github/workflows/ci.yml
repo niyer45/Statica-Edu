@@ -1,0 +1,47 @@
+name: Statica Milestone 3
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: statica-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: Educational Tool UI Design
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: Educational Tool UI Design/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run lint
+      - run: pnpm run typecheck
+      - run: pnpm exec vitest run --coverage
+      - run: pnpm run build
+      - name: Check schema drift
+        run: |
+          pnpm run gen:schema
+          git diff --exit-code -- schemas/
+          test -z "$(git ls-files --others --exclude-standard -- schemas/)"
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm run e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-report
+          path: |
+            Educational Tool UI Design/playwright-report/
+            Educational Tool UI Design/test-results/
+          if-no-files-found: ignore
