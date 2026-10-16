@@ -13,9 +13,11 @@ export default function HistoryCompare() {
   const { state: s, dispatch } = useStore()
   const [tab, setTab] = useState<'history' | 'compare'>('history')
   const [selectedId, setSelectedId] = useState<string>()
+  const [compareId, setCompareId] = useState<string>()
   const id = useId()
   const selected = s.history.find((r) => r.id === selectedId) ?? s.history[s.history.length - 1]!
   const compared = s.history.filter((r) => r.iteration === 0 || s.compareSelection.includes(r.id))
+  const activeComparison = compared.find((r) => r.id === compareId) ?? compared[compared.length - 1]!
   const keys = (event: KeyboardEvent<HTMLButtonElement>) => {
     if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
     event.preventDefault()
@@ -46,15 +48,21 @@ export default function HistoryCompare() {
         <div className="result-explanation"><Icon name="bulb" size={15} /><div>{facts.map((fact) => <p key={fact.id}>{fact.text}</p>)}</div></div>
       </details></div>
     </div>
-    <div id={`${id}-panel-compare`} role="tabpanel" aria-labelledby={`${id}-compare`} hidden={tab !== 'compare'} className="comparison-content">
-      <p className="comparison-hint">Baseline + up to 3 iterations</p><div className="comparison-grid">
+    <div id={`${id}-panel-compare`} role="tabpanel" aria-labelledby={`${id}-compare`} hidden={tab !== 'compare'} className="results-content comparison-content">
+      <div className="iteration-list" aria-label="Compared designs">{compared.map((r) => <div className={`iteration ${r.id === activeComparison.id ? 'active' : ''}`} key={r.id}>
+        <span className="iteration-symbol"><SectionIcon kind={r.designSnapshot.section.kind} /></span>
+        <div className="iteration-copy"><button type="button" className="iteration-select" aria-pressed={r.id === activeComparison.id} onClick={() => setCompareId(r.id)}><strong>{label(r)}</strong><small>{SECTION_KIND_NAMES[r.designSnapshot.section.kind]}</small></button>
+          <span className={r.evaluation.accepted ? 'status-pass' : 'status-fail'}>{r.evaluation.accepted ? '✓ ' : r.evaluation.status === 'modelNotApplicable' ? '! ' : ''}{STATUS_LABELS[r.evaluation.status]}</span>
+        </div>
+      </div>)}</div>
+      <div className="analysis-results comparison-selection">
       {compared.map((r) => {
         const baseline = r.iteration > 0 ? compareResults(s.history[0]!, r) : undefined
         const prev = r.iteration > 0 ? compareResults(s.history[r.iteration - 1]!, r) : undefined
-        return <section className="comparison-card" key={r.id} aria-label={`Compare ${label(r)}`}><header><h3>{label(r)}</h3><span className={r.evaluation.accepted ? 'status-pass' : 'status-fail'}>{r.evaluation.accepted ? '✓ ' : r.evaluation.status === 'modelNotApplicable' ? '! ' : ''}{STATUS_LABELS[r.evaluation.status]}</span></header>
+        return <section className="comparison-card" hidden={r.id !== activeComparison.id} key={r.id} aria-label={`Compare ${label(r)}`}><header><h3>{label(r)}</h3><span className={r.evaluation.accepted ? 'status-pass' : 'status-fail'}>{r.evaluation.accepted ? '✓ ' : r.evaluation.status === 'modelNotApplicable' ? '! ' : ''}{STATUS_LABELS[r.evaluation.status]}</span></header>
           {r.evaluation.status === 'modelNotApplicable' && <p>Outside model assumptions</p>}
           <table aria-label={`${label(r)} differences`}><thead><tr><th>Metric</th><th>Value</th><th>Δ vs Baseline</th><th>Δ vs previous iteration</th></tr></thead><tbody>
-            {([['massKg', 'Mass', 'kg'], ['tipDeflectionM', 'Tip deflection', 'm'], ['nominalMaxStressPa', 'Bending stress', 'Pa']] as const).map(([key, name, unit]) => <tr key={key}><th scope="row">{name}</th><td>{formatConstraint(r.analysis[key], unit)}</td><td>{baseline ? signed(baseline.metrics[key].delta, unit) : '—'}</td><td>{prev ? signed(prev.metrics[key].delta, unit) : '—'}</td></tr>)}
+            {([['massKg', 'Mass', 'kg'], ['tipDeflectionM', 'Tip deflection', 'm'], ['nominalMaxStressPa', 'Bending stress', 'Pa']] as const).map(([key, name, unit]) => <tr key={key}><th scope="row">{name}</th><td className="comparison-value">{formatConstraint(r.analysis[key], unit).split(' ')[0]}<small>{formatConstraint(r.analysis[key], unit).split(' ').slice(1).join(' ')}</small></td><td>{baseline ? signed(baseline.metrics[key].delta, unit) : '—'}</td><td>{prev ? signed(prev.metrics[key].delta, unit) : '—'}</td></tr>)}
           </tbody></table>
           {r.iteration > 0 && <details className="comparison-details"><summary>Constraint changes</summary>
           {([['Baseline', baseline], ['previous iteration', prev]] as const).map(([name, delta]) => delta && <div key={name}><p>Section type vs {name}: {delta.section.changed ? 'changed' : 'unchanged'}</p><ul>{r.evaluation.constraints.map((c) => {

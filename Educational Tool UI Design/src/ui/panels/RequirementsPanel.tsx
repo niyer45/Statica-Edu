@@ -1,5 +1,5 @@
 import { selectLatestResult } from '../../state/selectors'
-import { formatMm, m4ToMm4 } from '../../units/units'
+import { formatMm } from '../../units/units'
 import Icon from '../icons/Icon'
 import { useStore } from '../state/store'
 import { formatConstraint } from './resultPresentation'
@@ -24,12 +24,9 @@ export default function RequirementsPanel({ onOpenHelp }: { onOpenHelp: () => vo
       {outside && <ul aria-label="Model applicability reasons">{analysis.notApplicableReasons.map((reason) => <li key={reason.code}>{reason.message}</li>)}</ul>}
       <ul aria-label="Model warnings">{analysis.warnings.map((warning) => <li key={warning.code}>{warning.message}</li>)}</ul>
       <details className="result-details"><summary>Test details</summary>
-      <p>{ch.load.forceN} N downward · {ch.material.name} · {formatMm(ch.initialDesign.lengthM, 0)} mm span</p>
       <table aria-label="Latest tested results"><thead><tr><th scope="col">Constraint</th><th scope="col">Value</th><th scope="col">Limit</th><th scope="col">Result</th></tr></thead>
         <tbody>{evaluation.constraints.map((c) => <tr key={c.id}><th scope="row">{c.label}</th><td>{formatConstraint(c.value, c.unit)}{outside && c.unit !== 'bool' && <small> Outside model assumptions</small>}</td><td>{c.unit === 'bool' ? '' : formatConstraint(c.limit, c.unit)}</td><td>{c.passed ? '✓ Pass' : '✗ Fail'}</td></tr>)}</tbody>
       </table>
-      <div aria-label="Explanation facts">{evaluation.facts.map((fact) => <p key={fact.id}>{fact.text}</p>)}</div>
-      {ch.content.collegeDetails && <details><summary>College details</summary><p>δ = FL³ / (3EI); σ = Mc / I</p><p>I_bend: {m4ToMm4(analysis.bendingInertiaM4).toFixed(2)} mm⁴; c: {formatMm(analysis.extremeFiberM)} mm</p><ul>{analysis.assumptions.map((text) => <li key={text}>{text}</li>)}</ul></details>}
       </details>
       {state.draftErrors.length > 0 && <ul aria-label="Design errors">{state.draftErrors.map((e, i) => <li key={i}>{e.message}</li>)}</ul>}
       {state.ui.notice?.kind === 'error' && <p role="alert">{state.ui.notice.message}</p>}

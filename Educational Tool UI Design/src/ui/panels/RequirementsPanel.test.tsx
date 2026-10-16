@@ -23,7 +23,7 @@ function mount(design?: typeof reference.design, details = true) {
   render(<StoreProvider challenge={{ ...ch, content: { ...ch.content, collegeDetails: details } }} initialSession={s}><Probe /><RequirementsPanel onOpenHelp={() => {}} /><PredictionDialog /></StoreProvider>)
   return () => store!
 }
-it('displays ordered stored constraints, fixed units, textual pass/fail and collapsed college details', () => {
+it('shows only the stored constraint table inside collapsed test details', () => {
   const store = mount(reference.design)
   const disclosure = screen.getByText('Test details').closest('details')!
   expect(disclosure.open).toBe(false)
@@ -38,9 +38,9 @@ it('displays ordered stored constraints, fixed units, textual pass/fail and coll
   expect(rows[5]!.textContent).toContain('Pass')
   expect(screen.queryByLabelText('Result status')).toBeNull()
   expect(screen.queryByLabelText('Test status')).toBeNull()
-  expect(screen.getByText('College details').closest('details')!.open).toBe(false)
-  fireEvent.click(screen.getByText('College details'))
-  expect(screen.getByText('College details').closest('details')!.open).toBe(true)
+  expect(disclosure.querySelectorAll('p')).toHaveLength(0)
+  expect(screen.queryByText('College details')).toBeNull()
+  expect(screen.queryByLabelText('Explanation facts')).toBeNull()
 })
 it('leaves displayed numbers unchanged during edits and records a new result after prediction', () => {
   const store = mount()

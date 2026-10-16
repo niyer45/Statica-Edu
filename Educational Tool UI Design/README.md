@@ -54,3 +54,5 @@ The challenge panel keeps a compact value/limit summary visible. Test details ex
 Draft status appears in the viewport; recorded test acceptance appears in design history. History and comparison views keep compact rows/cards, with extended explanations under disclosures (D-29). UI-01/UI-02 await CI verification.
 
 UI-02 presentation follow-up (2026-10-16): removed the exclamation prefix from Not accepted badges in history rows, selected results and comparison cards, as requested. Accepted and model-applicability indicators remain unchanged.
+
+Compare results uses the same selectable list/detail layout as Design history. The challenge Test details disclosure contains only the constraint table (D-30). These updates are tracked as UI-03 pending CI.

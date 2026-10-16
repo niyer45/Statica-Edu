@@ -128,3 +128,11 @@
 
 .history-note .design-import { display: inline-flex; flex-direction: row; border: 1px solid #dce1d4; border-radius: 5px; padding: 7px 10px; background: #fafbf7; cursor: pointer; color: #46583b; }
 .design-import:focus-within { outline: 2px solid #345640; outline-offset: 4px; }
+/* D-30: comparison uses the same list/detail layout as design history. */
+.results-panel .comparison-content { padding: 0; }
+.comparison-selection .comparison-card { padding: 0; border: 0; background: transparent; }
+.comparison-selection .comparison-card > header { margin: 0; padding: 0 0 12px; }
+.comparison-selection .comparison-card h3 { font-size: 11px; }
+.comparison-selection .comparison-value { font-size: 22px; color: #46583b; font-variant-numeric: tabular-nums; }
+.comparison-value small { display: inline; margin-left: 3px; font-size: 10px; }
+.challenge-body .result-details td:not(:has(small)) { white-space: nowrap; }

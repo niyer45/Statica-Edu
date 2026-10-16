@@ -54,3 +54,7 @@ CI browser/axe verification is pending for UI-01/UI-02; prior M3 passing evidenc
 UI-02 local verification: all 873 tests across 107 files pass; lint has zero errors (10 existing warnings), typecheck and production build pass. Documentation and source are being pushed together for CI; browser verification remains pending.
 
 UI-02 presentation follow-up (2026-10-16): removed the exclamation prefix from Not accepted badges in history rows, selected results and comparison cards, as requested. Accepted and model-applicability indicators remain unchanged.
+
+## Current maintenance — UI-03 comparison selection
+
+Compare results now reuses the history list/detail layout: Baseline plus the comparison-member iterations appear in the list, and a design click displays one stored metric/delta panel. A separate local compareId preserves independent history focus; removing that member falls back to the latest remaining compared design. The selection limit and restore semantics are unchanged. The challenge Test details now contains only its evaluation table; all context prose, explanation paragraphs and college formulas were removed there. Applicability warnings/reasons remain visible outside it, and history retains its explanation disclosure. D-30 supersedes the earlier D-28/D-29 presentation choices. Component and E2E assertions now verify selecting Baseline and displaying only one comparison table. Local lint/typecheck/873 tests/build pass; browser/axe CI is pending. Push once, then stop polling and await the user.

@@ -92,6 +92,10 @@ Remove draft and overall acceptance banners from The challenge: draft status is 
 
 D-29 follow-up: the user explicitly requested no exclamation mark before Not accepted. All history/result/comparison badges therefore use the text alone for that state; this overrides the earlier icon-plus-text presentation for notAccepted.
 
+## D-30 — Selectable comparison and table-only challenge details (2026-10-16)
+
+Per user direction, Compare results uses the same iteration-list/detail layout as Design history. The comparison list contains Baseline and the selected comparison iterations; clicking a design shows only its stored values and baseline/previous deltas. Comparison focus is local UI state, independent of history selection and persisted comparison membership; removing a focused member falls back to the last remaining compared design. Existing comparison limits and restore behavior remain unchanged. The challenge Test details disclosure contains only the evaluation table: remove its contextual paragraph, explanation prose and college/formula disclosure. Model applicability reasons/warnings remain outside that disclosure; explanations remain available for the selected test in history. This supersedes D-28's inclusion of prose/formulas in challenge Test details and D-29's simultaneous comparison cards, plus the corresponding original presentation requirements. Do not regenerate the MVP specification.
+
 ## Open questions
 
 - Final challenge constants and applicability thresholds are pending engineering review.
