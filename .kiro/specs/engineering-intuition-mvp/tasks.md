@@ -641,6 +641,18 @@ Tasks 29.1, 31.1 and configuration-development tasks 33.1–33.2 are complete; t
 
 Owner sequencing update (2026-10-16, D-34): develop software before human QA. Nikhil is the nominated owner engineering reviewer; 29.2 is owner-conducted review, not external independent review. Tasks 29.2, 30, 31.2 and 32 remain required before customer deployment. Scoped configuration/specification work may proceed from 29.1 without completed pilot evidence; feature release checkpoints still require 32.2. No deployment is authorized or performed by this sequencing change.
 
+### Required mode distinction before user deployment
+
+- [ ] 44. Implement distinct Guided and Parametric experiences before deployment
+  - [ ] 44.1 Specify mode behavior and acceptance criteria
+    - Write an additive mode requirements/design/test plan for supported Cantilever challenges. Guided provides staged instructions, contextual hints and suggested experiments; Parametric exposes direct supported section/dimension/orientation editing with less instructional scaffolding. Define exactly which prompts differ and when they appear before coding.
+    - Keep the existing solver, constraints, challenge prediction policy, tested-snapshot semantics, history, reflection and submission shared. Define mode switching/reload behavior that preserves the same challenge workspace without fabricated progress or results. Do not remove prediction checkpoints merely to distinguish modes. Depends on 29.1.
+  - [ ] 44.2 Implement the reviewed mode distinction in the existing workbench
+    - Reuse existing controls/store/components; make the distinction observable beyond labels and drawer descriptions. Add guidance without cluttering the challenge panel or restoring model overlays. Preserve numerical/keyboard alternatives, local saving and mode switching without losing draft/history/reflection/submission. Depends on 44.1.
+  - [ ] 44.3 Verify mode-specific behavior and gate user deployment
+    - Add meaningful component and desktop/mobile keyboard/fallback/browser coverage for distinct experiences, shared numerical results and state preservation when switching/reloading. Run full required core/coverage/build/browser gates and manual mode checks on the release candidate. Depends on 44.2.
+    - Required before customer deployment and checkpoint 32.2; not optional or satisfied by the current label-only implementation. Keep Freeform separately tracked under 37.1, unavailable until its own complete flow is verified.
+
 ### Milestone 4: Engineer review and student pilot
 
 - [-] 29. Prepare educational and engineering review
@@ -672,7 +684,7 @@ Owner sequencing update (2026-10-16, D-34): develop software before human QA. Ni
   - [ ] 32.1 Fix blocking findings and verify them
     - Turn findings into reproducible tasks; resolve pilot-blocking correctness/accessibility/usability issues in the existing architecture. Add meaningful regression coverage and repeat affected manual checks; record deferred issues and rationale.
   - [ ] 32.2 Milestone 4 checkpoint
-    - Confirm recorded owner engineering QA and actual pilot evidence exist, agreed success criteria are met, no blocking finding remains, and lint/typecheck/unit/property/component/build/browser gates pass for the release candidate. Record reviewer/project-owner disposition and any deferred limitations before customer deployment; isolated M5 development may proceed earlier under D-34.
+    - Confirm task 44.3 mode-distinction verification, recorded owner engineering QA and actual pilot evidence exist, agreed success criteria are met, no blocking finding remains, and lint/typecheck/unit/property/component/build/browser gates pass for the release candidate. Record reviewer/project-owner disposition and any deferred limitations before customer deployment; isolated M5 development may proceed earlier under D-34.
 
 ### Milestone 5: Second runnable challenge through configuration
 
@@ -803,7 +815,8 @@ Numeric task 41 groups the historical UI-01–UI-07 maintenance work without ren
       "31.2"
     ],
     "32.2": [
-      "32.1"
+      "32.1",
+      "44.3"
     ],
     "33.1": [
       "29.1"
@@ -818,7 +831,8 @@ Numeric task 41 groups the historical UI-01–UI-07 maintenance work without ren
       "34.1"
     ],
     "35.1": [
-      "34.2"
+      "34.2",
+      "44.3"
     ],
     "35.2": [
       "35.1",
@@ -864,7 +878,10 @@ Numeric task 41 groups the historical UI-01–UI-07 maintenance work without ren
     "41.5": ["41.4"],
     "41.6": ["41.5"],
     "41.7": ["41.6"],
-    "42": ["41.7"]
+    "42": ["41.7"],
+    "44.1": ["29.1"],
+    "44.2": ["44.1"],
+    "44.3": ["44.2"]
   }
 }
 ```

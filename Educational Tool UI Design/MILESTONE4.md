@@ -124,3 +124,7 @@ Follow-up verification note: the documentation push run 38965945029 failed in an
 ## Development sequencing update — D-34
 
 Nikhil is the owner engineering reviewer; do not label this external independent review. Owner direction permits development before human QA. Owner review, manual accessibility/readiness and actual pilot/disposition remain unchecked release obligations; no customer deployment occurs until those gates pass. Local-only pilot remains the agreed first pilot; account requirements may be specified/developed separately without enabling cloud features or claiming pilot approval. PILOT_PROTOCOL.md completes prepared materials for 31.1; consent/participants/results are still absent. Second-challenge development choices are provisional and must be revisited if human findings contradict them.
+
+## Additional user-deployment gate — task 44
+
+Owner requires an actual Guided/Parametric distinction before deployment to users. Task 44 specifies, implements and verifies mode-specific instructional scaffolding versus direct parameter editing. Both modes retain the same solver, challenge constraints, prediction policy and saved workspace. Current code changes labels only; it does not fulfill this gate. Checkpoint 32.2 depends on 44.3; manual QA must assess both distinct flows on the release build. Freeform remains separately planned.

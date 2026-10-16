@@ -51,6 +51,7 @@ The dotted deformation outline represents the **latest tested design**. Editing 
 | --- | --- |
 | Cantilever Beam II | Requirements, configuration and domain tests are prepared. It teaches how rotating a rectangular section can improve stiffness without adding mass. It is **not available in the UI yet**; challenge selection and session isolation are next. |
 | Engineering and student QA | Review plan and pilot materials are prepared. Owner engineering review, manual accessibility/readiness checks and actual student sessions remain open before customer deployment. |
+| Guided / Parametric distinction | Required before user deployment (task 44). Currently both modes offer the same tools and learning loop; selecting a mode changes its label. Planned distinction: structured guidance versus direct parameter editing. |
 | Multiple challenge workspaces | Planned integration with separate saved sessions and correctly attributed results for each challenge |
 | User accounts and saved information | Planned authentication, minimal profile information, owned projects and cross-device resume |
 | Challenge completion history | Planned per-user, per-challenge progress with explicit completion rules and versioned evidence |

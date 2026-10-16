@@ -1,6 +1,6 @@
 # Handoff: Statica MVP
 
-Last updated: 2026-10-16. M0–M3, UI maintenance (41.1–41.7) and CI repair 42 are verified. Tasks 29.1, 31.1 and development tasks 33.1–33.2 are complete. **Next software task: 34.1, generalize challenge selection and isolate sessions.** Nikhil is the nominated owner engineering reviewer; 29.2/manual checks/student QA are deferred to before customer deployment, remain unchecked and no longer block isolated development (D-34).
+Last updated: 2026-10-16. M0–M3, UI maintenance (41.1–41.7) and CI repair 42 are verified. Tasks 29.1, 31.1 and development tasks 33.1–33.2 are complete. **Next software task: 34.1, generalize challenge selection and isolate sessions.** Required pre-deployment task 44 now tracks a real Guided/Parametric distinction (currently labels only). Nikhil is the nominated owner engineering reviewer; 29.2/manual checks/student QA are deferred to before customer deployment, remain unchecked and no longer block isolated development (D-34).
 
 ## Implementation and verification
 
@@ -77,3 +77,7 @@ During verification, the pre-existing lazy-viewport recovery test observed fallb
 ## Repository README refresh — 2026-10-16
 
 The root README.md now explains the educational goal, the current Cantilever Beam I learning loop, implemented versus planned features, dormant Beam II configuration, model/storage limits, local setup and documentation links. The app README is a concise developer guide instead of an accumulated status log. Root README is now mirrored locally at Kiro/README.md and intentionally updated by the authorized GitHub tree push; continue preserving other remote-only files. No source/specification behavior changed. Next software task remains 34.1; the prior development workflow result was still pending at the read-only status check, so no new browser pass is claimed.
+
+## Required Guided/Parametric distinction — 2026-10-16
+
+Owner requested Parametric differentiation before deploying to users. Task 44.1–44.3 is unchecked: specify mode-specific guidance/direct editing, implement in the shared workbench, then verify accessible desktop/mobile flows and switch/reload state preservation. Current modes still share the same functionality and differ only in labels; do not claim the distinction exists. Keep solver, constraints, prediction checkpoints and saved workspace shared. Checkpoint 32.2 and M5 regression task 35.1 now explicitly depend on 44.3 so deployment cannot overlook it. Freeform remains separate task 37.1. This update changes planning/documentation only; next software task remains 34.1 and 44.1 is also ready for specification work.
