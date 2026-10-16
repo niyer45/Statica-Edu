@@ -608,6 +608,7 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
 
 - [-] UI-02 Restore compact history and comparison presentation (2026-10-16)
   - Remove challenge draft/acceptance banners; leave draft in the viewport and recorded status in history. Use compact iteration rows, selected metrics, styled comparison cards and collapsed detailed explanations/transitions. Preserve comparisons, predictions, restore and accessible import/export. D-29 records the user-directed override.
+  - Follow-up: Not accepted badges have no exclamation prefix in history or comparison views, per user request.
   - Browser/axe verification pending the new CI run. Existing MVP milestones retain their previously verified baseline status.
 
 ### Post-MVP roadmap: scope and execution

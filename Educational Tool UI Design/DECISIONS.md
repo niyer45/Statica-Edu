@@ -90,6 +90,8 @@ Keep the original challenge statement visible, followed by draft/test status and
 
 Remove draft and overall acceptance banners from The challenge: draft status is already displayed in the viewport, and recorded acceptance belongs to design history. The history sidebar uses compact template-sized iteration rows (section icon/name, acceptance badge, compare checkbox and Restore), while the selected result keeps its three numerical metrics and acceptance badge. Prediction details, per-constraint results and explanation facts remain available in a collapsed Test details disclosure. Compare uses styled cards and metric/delta tables; repeated section/constraint transition lists move behind Constraint changes. Preserve stored evaluations, compare selection semantics, restore behavior and keyboard navigation. The import chooser uses a compact label styled as a template control with a visually hidden accessible native file input. This presentation instruction supersedes the original default-visible acceptance banner in Requirement 29.6 and verbose default history/compare presentation; no domain calculations or completed specifications are regenerated.
 
+D-29 follow-up: the user explicitly requested no exclamation mark before Not accepted. All history/result/comparison badges therefore use the text alone for that state; this overrides the earlier icon-plus-text presentation for notAccepted.
+
 ## Open questions
 
 - Final challenge constants and applicability thresholds are pending engineering review.

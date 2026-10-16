@@ -52,3 +52,5 @@ Post-MVP roadmap update (2026-10-16): tasks.md now tracks M4 review/pilot and re
 The challenge panel keeps a compact value/limit summary visible. Test details expands the full result table, explanations and technical context; model warnings remain visible. This user-directed presentation change is recorded in D-28 and tracked as UI-01 pending CI.
 
 Draft status appears in the viewport; recorded test acceptance appears in design history. History and comparison views keep compact rows/cards, with extended explanations under disclosures (D-29). UI-01/UI-02 await CI verification.
+
+UI-02 presentation follow-up (2026-10-16): removed the exclamation prefix from Not accepted badges in history rows, selected results and comparison cards, as requested. Accepted and model-applicability indicators remain unchanged.

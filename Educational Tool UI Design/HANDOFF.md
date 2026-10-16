@@ -52,3 +52,5 @@ User requested removing both challenge status blocks and returning history/compa
 CI browser/axe verification is pending for UI-01/UI-02; prior M3 passing evidence applies to the baseline. After pushing, stop polling and await the user's workflow result. Milestone 4 has not started.
 
 UI-02 local verification: all 873 tests across 107 files pass; lint has zero errors (10 existing warnings), typecheck and production build pass. Documentation and source are being pushed together for CI; browser verification remains pending.
+
+UI-02 presentation follow-up (2026-10-16): removed the exclamation prefix from Not accepted badges in history rows, selected results and comparison cards, as requested. Accepted and model-applicability indicators remain unchanged.
