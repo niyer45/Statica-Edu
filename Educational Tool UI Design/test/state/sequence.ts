@@ -19,6 +19,10 @@ export function sequenceHarness(hook: InvariantHook) {
     { kind: 'runTest' },
     { kind: 'target', type: 'restore', target: 'latest' },
     { kind: 'importCurrent' },
+    { kind: 'literal', action: { type: 'setReflection', text: '  Material distribution matters.  ' } },
+    { kind: 'target', type: 'submit', target: 'latest' },
+    { kind: 'literal', action: { type: 'setReflection', text: ' ' } },
+    { kind: 'target', type: 'submit', target: 'latest' },
     { kind: 'literal', action: { type: 'reset' } },
   ]
   for (const input of inputs) new SessionCommand(input).run(h.model, h.real)

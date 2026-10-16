@@ -458,19 +458,19 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
     - **Property 32: Draft validity invariant**
     - **Validates: Requirements 15.9, 23.6**
 
-  - [ ]* 19.9 Write property test for locked fields
+  - [x]* 19.9 Write property test for locked fields
     - **Property 33: Locked fields**
     - **Validates: Requirements 4.1**
 
-  - [ ]* 19.10 Write property test for reducer purity
+  - [x]* 19.10 Write property test for reducer purity
     - **Property 34: Reducer purity**
     - **Validates: Requirements 15.5, 15.6**
 
-  - [ ]* 19.11 Write property test for prediction gating
+  - [x]* 19.11 Write property test for prediction gating
     - **Property 36: Prediction gating**
     - **Validates: Requirements 14.1, 14.11**
 
-  - [ ]* 19.12 Write property test for submit gating
+  - [x]* 19.12 Write property test for submit gating
     - **Property 37: Submit gating**
     - **Validates: Requirements 20.2, 20.4**
 
