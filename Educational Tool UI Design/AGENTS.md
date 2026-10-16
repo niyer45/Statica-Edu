@@ -7,7 +7,7 @@ template's visual design and platform shell are kept.
 
 Read `HANDOFF.md` first for the current status and the next task.
 
-Current task progress (2026-10-16): 37/38 Milestone 3 subtasks complete; next 27.7. Browser tasks verified: 27.2, 27.3, 27.4, 27.5, 27.6. Update HANDOFF.md, AGENTS.md and tasks.md after each completed task; push verified batches.
+Current task progress (2026-10-16): Milestone 3 complete, all 38 subtasks and checkpoint 28 verified. No incomplete task remains in the current specification. See HANDOFF.md for CI evidence. Update documentation after future tasks and push verified batches.
 
 ## Specifications (source of truth)
 
@@ -58,7 +58,7 @@ Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuiti
 - The template `src/BeamScene.tsx` and temporary `LegacyFallback` are deleted. Their SVG projection now lives in `ui/viewport/projection.ts` and `Fallback2D.tsx`. Keep this fallback independent of Three.js so recovery works when the 3D chunk fails to load.
 - `test/state/model.ts`: reusable fast-check command harness, per-action invariant hooks and reachable-session generator (task 19.3). Dedicated reducer properties reuse it and the `test/pbt.ts` helper.
 - `test/`: shared arbitraries, pbt helper, fixtures (`test/fixtures/designs.ts`), architecture and config guard tests.
-- `e2e/`: 18 Playwright desktop/Pixel 7 scenarios. Tasks 27.2–27.6 have passing evidence; 27.7 awaits the targeted 320 px repair run. See HANDOFF.md.
+- `e2e/`: 18 passing Playwright desktop/Pixel 7 scenarios; CI also runs the focused responsive pair before the full suite.
 - `schemas/`: generated JSON Schema. `scripts/`: schema generator.
 - Unit tests are colocated as `*.test.ts(x)`. Property tests are named `*.pN.test.ts`.
 
@@ -127,4 +127,4 @@ Per the user's standing instruction, also update this file's current-task pointe
 
 ## Milestone 3 execution notes
 
-Tasks 19–26 and 27.1–27.6 are complete. Task 27.7 awaits browser verification of the 320 px repair; task 28 remains the final gate. The root workflow is `../.github/workflows/ci.yml`; its run commands use this application directory. Playwright development is on 4174 (state hook), production preview on 4173 (CSP/no hook). See HANDOFF.md and MILESTONE3.md for current evidence. `StoreProvider` synchronously reduces/persists with injected storage; preserve that ordering when changing the store API.
+Milestone 3 is complete through checkpoint 28. CI run 38927191840 passed all core gates, 2 focused responsive cases and all 18 E2E cases on commit 48bfdd33a33632aa443ebae105f864645724b4c1. No further task is specified; await user direction. Root workflow is `../.github/workflows/ci.yml`; app servers use 4174 (dev state hook) and 4173 (production CSP/no hook). Complete browser flows have a 60-second budget, with 90 seconds for keyboard and multi-breakpoint scenarios. Preserve assertions and real Tab/native drag interactions. Local sandbox restrictions still prevent server/browser startup; Safari is the user's preferred browser for artifact inspection. Preserve synchronous reduce/persist ordering in StoreProvider.
