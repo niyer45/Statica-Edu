@@ -210,14 +210,25 @@ export function sessionReducer(s: SessionState, a: Action, ch: Challenge): Sessi
       return { ...s, pendingPrediction: undefined, ui: { ...s.ui, predictionDialogOpen: false, notice: undefined } }
     case 'runTest':
       return runTest(s, a, ch)
+    case 'deleteIteration': {
+      const result = s.history.find((r) => r.id === a.testResultId && !s.deletedIterationIds?.includes(r.id))
+      if (!result || result.iteration === 0 || s.deletedIterationIds?.includes(result.id)) return s
+      return {
+        ...s,
+        deletedIterationIds: [...(s.deletedIterationIds ?? []), result.id],
+        compareSelection: s.compareSelection.filter((id) => id !== result.id),
+        submission: s.submission?.testResultId === result.id ? undefined : s.submission,
+        ui: { ...s.ui, notice: { kind: 'info', message: `Iteration ${result.iteration} deleted from history.${s.submission?.testResultId === result.id ? ' Its submission was removed.' : ''}` } },
+      }
+    }
     case 'restore': {
-      const result = s.history.find((r) => r.id === a.testResultId)
+      const result = s.history.find((r) => r.id === a.testResultId && !s.deletedIterationIds?.includes(r.id))
       if (result === undefined) return s
       const draft = copyForRestore(result.designSnapshot, s)
       return { ...s, draft, draftStatus: draftStatusOf(draft, s.history), draftErrors: [], pendingPrediction: undefined, ui: { predictionDialogOpen: false } }
     }
     case 'toggleCompare': {
-      const result = s.history.find((r) => r.id === a.testResultId)
+      const result = s.history.find((r) => r.id === a.testResultId && !s.deletedIterationIds?.includes(r.id))
       if (result === undefined || result.iteration === 0) return s
       if (s.compareSelection.includes(result.id)) {
         return { ...s, compareSelection: s.compareSelection.filter((id) => id !== result.id), ui: { ...s.ui, notice: undefined } }
@@ -232,7 +243,7 @@ export function sessionReducer(s: SessionState, a: Action, ch: Challenge): Sessi
       // Reject hostile/oversized payloads; valid text is stored verbatim, without grading.
       return typeof a.text === 'string' && a.text.length <= 2000 ? { ...s, reflectionAnswer: a.text } : s
     case 'submit': {
-      const result = s.history.find((r) => r.id === a.testResultId)
+      const result = s.history.find((r) => r.id === a.testResultId && !s.deletedIterationIds?.includes(r.id))
       if (result === undefined || result.iteration < 1 || s.reflectionAnswer.trim() === '') return s
       return { ...s, submission: deepFreeze({ testResultId: result.id, status: result.evaluation.status, reflection: s.reflectionAnswer, efficiency: { ...result.evaluation.efficiency }, submittedAt: a.now }) }
     }

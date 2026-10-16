@@ -27,14 +27,19 @@ export function selectStatusBadge(s: SessionState): string {
   return s.draftStatus === 'draft' ? 'Draft' : `Tested #${selectLatestResult(s).iteration}`
 }
 
-/** Number of non-baseline tests run so far. */
+/** Student-visible history; archived tests still preserve analysis/prediction provenance. */
+export function selectVisibleHistory(s: SessionState): ReadonlyArray<TestResult> {
+  return s.history.filter((r) => !s.deletedIterationIds?.includes(r.id))
+}
+
+/** Number of available non-baseline tests. */
 export function selectTestCount(s: SessionState): number {
-  return s.history.filter((r) => r.iteration >= 1).length
+  return selectVisibleHistory(s).filter((r) => r.iteration >= 1).length
 }
 
 /** Iteration number the next Run Test would produce. */
 export function selectNextIteration(s: SessionState): number {
-  return selectTestCount(s) + 1
+  return selectLatestResult(s).iteration + 1
 }
 
 /** True if the next Run Test requires a prediction (predictionPolicy). */

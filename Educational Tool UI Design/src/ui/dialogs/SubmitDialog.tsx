@@ -1,3 +1,4 @@
+import { selectVisibleHistory } from '../../state/selectors'
 import { useState } from 'react'
 import { STATUS_LABELS } from '../panels/resultPresentation'
 import ReflectionPrompt from '../panels/ReflectionPrompt'
@@ -6,7 +7,7 @@ import Dialog from './Dialog'
 
 function SubmissionForm({ onClose }: { onClose: () => void }) {
   const { state, submit } = useStore()
-  const results = state.history.filter((r) => r.iteration >= 1)
+  const results = selectVisibleHistory(state).filter((r) => r.iteration >= 1)
   const [target, setTarget] = useState(results[results.length - 1]?.id ?? '')
   const hasResult = results.some((r) => r.id === target)
   const hasReflection = state.reflectionAnswer.trim().length > 0

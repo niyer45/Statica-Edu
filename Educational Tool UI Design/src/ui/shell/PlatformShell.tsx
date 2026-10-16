@@ -1,3 +1,4 @@
+import { selectVisibleHistory } from '../../state/selectors'
 import { useEffect, useState } from 'react'
 import { catalog, type CatalogEntry } from '../../challenge/catalog'
 import type { InteractionMode } from '../../challenge/types'
@@ -208,7 +209,7 @@ export default function PlatformShell() {
                 <MyDesignsPage
                   title={challenge.title}
                   mode={session.mode}
-                  results={session.history}
+                  results={selectVisibleHistory(session)}
                   started={started}
                   onReturn={resume}
                   onFindChallenge={() => go('Challenges')}

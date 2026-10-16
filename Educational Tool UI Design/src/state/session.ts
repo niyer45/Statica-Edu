@@ -48,6 +48,8 @@ export interface SessionState {
   draftErrors: GeometryError[]
   /** Append-only; index 0 is always the Baseline. */
   history: ReadonlyArray<TestResult>
+  /** Deleted history entries remain archived so recorded predictions and numbering stay immutable. */
+  deletedIterationIds?: string[]
   pendingPrediction?: Prediction
   /** TestResult ids; the baseline is always available. */
   compareSelection: string[]
@@ -66,6 +68,7 @@ export type Action =
   | { type: 'cancelPrediction' }
   /** Time and id are injected for determinism. */
   | { type: 'runTest'; now: string; id: string }
+  | { type: 'deleteIteration'; testResultId: string }
   | { type: 'restore'; testResultId: string }
   | { type: 'toggleCompare'; testResultId: string }
   | { type: 'setReflection'; text: string }

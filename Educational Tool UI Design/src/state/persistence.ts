@@ -24,6 +24,7 @@ const sessionSchema = z.object({
   mode: z.enum(['guided', 'parametric']), draft: z.unknown(), draftStatus: z.enum(['draft', 'tested']),
   draftErrors: z.array(z.object({ code: z.enum(['NON_FINITE', 'NON_POSITIVE', 'BELOW_MIN', 'ABOVE_MAX', 'INNER_NOT_LESS_THAN_OUTER', 'WALL_TOO_THIN', 'FLANGES_OVERLAP', 'WEB_WIDER_THAN_FLANGE', 'FLANGE_TOO_THIN', 'WEB_TOO_THIN', 'SECTION_NOT_ALLOWED', 'LOCKED_FIELD_CHANGED', 'BAD_ORIENTATION']), param: z.string().optional(), message: z.string() }).strict()),
   history: z.array(resultSchema).min(1), pendingPrediction: prediction.optional(), compareSelection: z.array(z.string()).max(3),
+  deletedIterationIds: z.array(z.string()).optional(),
   reflectionAnswer: z.string().max(2000),
   submission: z.object({ testResultId: z.string(), status, reflection: z.string().max(2000), efficiency, submittedAt: z.string() }).strict().optional(),
   ui: z.object({ predictionDialogOpen: z.boolean(), notice: z.object({ kind: z.enum(['info', 'error']), message: z.string() }).strict().optional() }).strict(),
@@ -87,6 +88,9 @@ export function deserializeSession(raw: string, ch: Challenge): Result<SessionSt
       history.push(deepFreeze({ ...result, designSnapshot: design }) as TestResult)
     }
     if (draftStatusOf(draft, history) !== saved.draftStatus) throw new Error('Invalid draft status')
+    const deleted = saved.deletedIterationIds ?? []
+    if (new Set(deleted).size !== deleted.length || deleted.some((id) => !history.some((r) => r.id === id && r.iteration > 0))) throw new Error('Invalid deleted iteration')
+    if (saved.compareSelection.some((id) => deleted.includes(id)) || (saved.submission && deleted.includes(saved.submission.testResultId))) throw new Error('Deleted iteration reference')
     if (new Set(saved.compareSelection).size !== saved.compareSelection.length || saved.compareSelection.some((id) => !history.some((r) => r.id === id && r.iteration > 0))) throw new Error('Invalid comparison selection')
     if (saved.pendingPrediction && saved.pendingPrediction.iteration !== history.length) throw new Error('Invalid pending prediction')
     if (saved.submission) {

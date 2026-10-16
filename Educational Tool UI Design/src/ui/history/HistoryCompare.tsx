@@ -1,5 +1,7 @@
 import { useId, useState, type KeyboardEvent } from 'react'
 import { compareResults, explainChange, SECTION_KIND_NAMES } from '../../evaluation/explain'
+import { selectVisibleHistory } from '../../state/selectors'
+import Dialog from '../dialogs/Dialog'
 import type { TestResult } from '../../state/session'
 import Icon from '../icons/Icon'
 import SectionIcon from '../icons/SectionIcon'
@@ -14,9 +16,12 @@ export default function HistoryCompare() {
   const [tab, setTab] = useState<'history' | 'compare'>('history')
   const [selectedId, setSelectedId] = useState<string>()
   const [compareId, setCompareId] = useState<string>()
+  const [deleteId, setDeleteId] = useState<string>()
+  const visible = selectVisibleHistory(s)
+  const deleting = visible.find((r) => r.id === deleteId)
   const id = useId()
-  const selected = s.history.find((r) => r.id === selectedId) ?? s.history[s.history.length - 1]!
-  const compared = s.history.filter((r) => r.iteration === 0 || s.compareSelection.includes(r.id))
+  const selected = visible.find((r) => r.id === selectedId) ?? visible[visible.length - 1]!
+  const compared = visible.filter((r) => r.iteration === 0 || s.compareSelection.includes(r.id))
   const activeComparison = compared.find((r) => r.id === compareId) ?? compared[compared.length - 1]!
   const keys = (event: KeyboardEvent<HTMLButtonElement>) => {
     if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
@@ -32,12 +37,13 @@ export default function HistoryCompare() {
       {(['history', 'compare'] as const).map((value) => <button key={value} type="button" id={`${id}-${value}`} role="tab" aria-selected={tab === value} aria-controls={`${id}-panel-${value}`} tabIndex={tab === value ? 0 : -1} className={tab === value ? 'active' : ''} onClick={() => setTab(value)} onKeyDown={keys}>{value === 'history' ? 'Design history' : 'Compare results'}</button>)}
     </div><ImportExportBar /></div>
     <div id={`${id}-panel-history`} role="tabpanel" aria-labelledby={`${id}-history`} hidden={tab !== 'history'} className="results-content">
-      <div className="iteration-list">{s.history.map((r) => <div className={`iteration ${r.id === selected.id ? 'active' : ''}`} key={r.id}>
+      <div className="iteration-list">{visible.map((r) => <div className={`iteration ${r.id === selected.id ? 'active' : ''}`} key={r.id}>
         <span className="iteration-symbol"><SectionIcon kind={r.designSnapshot.section.kind} /></span>
         <div className="iteration-copy"><button type="button" className="iteration-select" aria-pressed={r.id === selected.id} onClick={() => setSelectedId(r.id)}><strong>{label(r)}</strong><small>{SECTION_KIND_NAMES[r.designSnapshot.section.kind]}</small></button>
           <span className={r.evaluation.accepted ? 'status-pass' : 'status-fail'}>{r.evaluation.accepted ? '✓ ' : r.evaluation.status === 'modelNotApplicable' ? '! ' : ''}{STATUS_LABELS[r.evaluation.status]}</span>
           <label className="iteration-compare"><input type="checkbox" checked={r.iteration === 0 || s.compareSelection.includes(r.id)} disabled={r.iteration === 0} onChange={() => dispatch({ type: 'toggleCompare', testResultId: r.id })} /><span className="sr-only">Compare {label(r)}{r.iteration === 0 && ' (always included)'}</span></label>
-          <button type="button" onClick={() => dispatch({ type: 'restore', testResultId: r.id })} aria-label={`Restore ${label(r)}`}>Restore</button>
+          <button type="button" className="restore-iteration" onClick={() => dispatch({ type: 'restore', testResultId: r.id })} aria-label={`Restore ${label(r)}`}>Restore</button>
+          {r.iteration > 0 && <button type="button" className="delete-iteration" aria-label={`Delete ${label(r)}`} onClick={() => setDeleteId(r.id)}>Delete</button>}
         </div>
       </div>)}</div>
       <div className="analysis-results"><div className="analysis-heading"><span>{label(selected)} results</span><span aria-label="Result status" className={selected.evaluation.accepted ? 'status-pass' : 'status-fail'}>{selected.evaluation.accepted ? '✓ ' : selected.evaluation.status === 'modelNotApplicable' ? '! ' : ''}{STATUS_LABELS[selected.evaluation.status]}</span></div><div className="metrics">
@@ -73,6 +79,12 @@ export default function HistoryCompare() {
         </section>
       })}</div>
     </div>
+    {deleting && <Dialog title={`Delete ${label(deleting)}?`} onClose={() => setDeleteId(undefined)}>
+      <p>Remove this iteration from design history and comparisons? Your current design and last test stay unchanged.</p>
+      {s.submission?.testResultId === deleting.id && <p>This will also remove its recorded submission.</p>}
+      <button type="button" className="primary modal-primary" onClick={() => { dispatch({ type: 'deleteIteration', testResultId: deleting.id }); setDeleteId(undefined) }}>Delete iteration</button>
+      <button type="button" onClick={() => setDeleteId(undefined)}>Cancel</button>
+    </Dialog>}
     {s.ui.notice && <p>{s.ui.notice.message}</p>}
   </>
 }

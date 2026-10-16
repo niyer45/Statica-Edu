@@ -136,3 +136,6 @@
 .comparison-selection .comparison-value { font-size: 22px; color: #46583b; font-variant-numeric: tabular-nums; }
 .comparison-value small { display: inline; margin-left: 3px; font-size: 10px; }
 .challenge-body .result-details td:not(:has(small)) { white-space: nowrap; }
+.iteration .iteration-copy > .delete-iteration { grid-column: 1 / -1; justify-self: start; color: #76552c; font-size: 9px; }
+
+.iteration .iteration-copy > .restore-iteration { font-size: 9px; padding: 2px; justify-self: end; }

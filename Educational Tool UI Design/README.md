@@ -56,3 +56,5 @@ Draft status appears in the viewport; recorded test acceptance appears in design
 UI-02 presentation follow-up (2026-10-16): removed the exclamation prefix from Not accepted badges in history rows, selected results and comparison cards, as requested. Accepted and model-applicability indicators remain unchanged.
 
 Compare results uses the same selectable list/detail layout as Design history. The challenge Test details disclosure contains only the constraint table (D-30). These updates are tracked as UI-03 pending CI.
+
+Design history supports confirmed deletion of non-Baseline entries. Deletion persists across reloads and removes comparison/submission choices, while current draft and last tested analysis stay unchanged. Archived numerical records preserve prediction provenance and iteration numbering (D-31). UI-04 awaits browser verification; the local suite has 878 passing tests.

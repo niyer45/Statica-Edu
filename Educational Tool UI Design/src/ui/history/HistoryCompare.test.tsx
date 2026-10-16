@@ -40,3 +40,20 @@ it('blocks the fourth comparison, computes deltas, restores a draft and supports
   expect(second.textContent).toContain('Δ vs previous iteration')
   expect(store!.state.history).toBe(initial.history)
 })
+
+it('confirms deletion, protects Baseline and removes a selected row from both tabs', () => {
+  const initial = sequenceHarness(() => {}).real.state
+  let store: Store
+  function Probe() { store = useStore(); return null }
+  render(<StoreProvider challenge={bundledChallenge()} initialSession={initial}><Probe /><HistoryCompare /></StoreProvider>)
+  expect(screen.queryByRole('button', { name: 'Delete Baseline' })).toBeNull()
+  fireEvent.click(screen.getByRole('button', { name: 'Delete Iteration 2' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+  expect(store!.state.deletedIterationIds).toBeUndefined()
+  fireEvent.click(screen.getByRole('button', { name: 'Delete Iteration 2' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Delete iteration' }))
+  expect(screen.queryByRole('button', { name: 'Delete Iteration 2' })).toBeNull()
+  expect(store!.state.deletedIterationIds).toContain(initial.history[2]!.id)
+  fireEvent.click(screen.getByRole('tab', { name: 'Compare results' }))
+  expect(within(screen.getByLabelText('Compared designs')).queryByRole('button', { name: /Iteration 2/ })).toBeNull()
+})

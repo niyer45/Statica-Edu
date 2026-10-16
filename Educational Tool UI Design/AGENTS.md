@@ -18,7 +18,7 @@ The spec lives outside this folder, one level up:
 - `../.kiro/specs/engineering-intuition-mvp/tasks.md`: the completed MVP plan (Milestones 0–3, tasks 1–28) and post-MVP roadmap (Milestones 4–6, tasks 29–40) with a JSON wave dependency graph at the end.
 
 Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuition-mvp/`.
-`DECISIONS.md` records D-01…D-30 and the 14 applicability thresholds. D-25 defines required `sectionDefaults`; D-26 records the user-directed uncluttered 3D presentation and overrides the original visible-overlay requirements.
+`DECISIONS.md` records D-01…D-31 and the 14 applicability thresholds. D-25 defines required `sectionDefaults`; D-26 records the user-directed uncluttered 3D presentation and overrides the original visible-overlay requirements.
 
 ## Rules for following the spec
 
@@ -58,7 +58,7 @@ Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuiti
 - The template `src/BeamScene.tsx` and temporary `LegacyFallback` are deleted. Their SVG projection now lives in `ui/viewport/projection.ts` and `Fallback2D.tsx`. Keep this fallback independent of Three.js so recovery works when the 3D chunk fails to load.
 - `test/state/model.ts`: reusable fast-check command harness, per-action invariant hooks and reachable-session generator (task 19.3). Dedicated reducer properties reuse it and the `test/pbt.ts` helper.
 - `test/`: shared arbitraries, pbt helper, fixtures (`test/fixtures/designs.ts`), architecture and config guard tests.
-- `e2e/`: 18 passing Playwright desktop/Pixel 7 scenarios; CI also runs the focused responsive pair before the full suite.
+- `e2e/`: 20 Playwright desktop/Pixel 7 scenarios (new deletion pair pending verification); CI also runs the focused responsive pair before the full suite.
 - `schemas/`: generated JSON Schema. `scripts/`: schema generator.
 - Unit tests are colocated as `*.test.ts(x)`. Property tests are named `*.pN.test.ts`.
 
@@ -134,3 +134,5 @@ Post-MVP roadmap update (2026-10-16): tasks.md now tracks M4 review/pilot and re
 UI-02 presentation follow-up (2026-10-16): removed the exclamation prefix from Not accepted badges in history rows, selected results and comparison cards, as requested. Accepted and model-applicability indicators remain unchanged.
 
 UI-03 (D-30): Compare results uses the history list/detail layout with one selected design; challenge Test details contains only the table. Local checks pass; browser CI pending. Preserve this newer user direction over D-28/D-29 descriptions of comparison cards or challenge explanation prose.
+
+UI-04 (D-31): user-visible iteration deletion uses optional persisted deletedIterationIds; keep archived TestResults/iteration numbering intact. Use selectVisibleHistory for user-facing lists and choices; latest tested analysis stays unchanged. Baseline is protected. Current local suite: 878 tests; new deletion browser pair awaits CI.

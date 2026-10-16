@@ -615,6 +615,10 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
   - Reuse history's list/detail layout in Compare results; clicking one compared design displays its values and deltas. Keep Baseline membership and the maximum-three iteration selection rule. Limit challenge Test details to its stored constraint table. D-30 records the updated presentation.
   - Local checks pass: lint zero errors, typecheck, 873 tests and build. Browser/axe verification is pending CI; earlier MVP completion evidence describes the baseline.
 
+- [-] UI-04 Delete non-Baseline history entries (2026-10-16)
+  - Confirm deletion, persist deleted-entry metadata, prune comparison membership and submitted references, hide entries from history/compare/My designs/submission, protect Baseline and preserve draft/last tested analysis and stable numbering. D-31 specifies archival semantics.
+  - Local suite: 878 tests; deletion, protected/repeated/unknown ids, submission cleanup, rejected hidden references, persistence and next-run numbering covered. New desktop/Pixel 7 deletion/reload regression awaits CI before completion.
+
 ### Post-MVP roadmap: scope and execution
 
 Added at the user's request after Milestone 3 passed. Tasks 1–28 and their completion evidence remain unchanged. Requirements 1–35 and the existing design describe the completed M0–M3 baseline; their statements that M4+ is outside MVP implementation scope remain historical boundaries, not specifications for these new features. New feature requirements and acceptance criteria must be written as scoped extensions before implementation, without regenerating the completed MVP specifications or inventing requirement IDs.
