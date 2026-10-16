@@ -48,7 +48,7 @@ export interface WorkbenchProps {
   onExit: () => void
 }
 
-// Shell and in-workbench mode selection share store.selectMode; the editor stays mounted.
+// The shell selects the mode before entry; Workbench has no mode-changing control.
 export default function Workbench({ onExit }: WorkbenchProps) {
   const session = useSession()
   const [modal, setModal] = useState<Modal>(null)
@@ -73,7 +73,7 @@ export default function Workbench({ onExit }: WorkbenchProps) {
         onOpenHelp={openHelp}
         onShowDesigns={() => notify('Your local designs are collected in the history below.')}
       >
-        <ModeExperience onAnnounce={notify} />
+        <ModeExperience />
         <div className="workbench">
           <section className="design-panel panel" aria-label="Design tools">
             <div className="panel-title">

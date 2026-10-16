@@ -22,14 +22,11 @@ let store: Store
 function Probe() { store = useStore(); return null }
 function setup(initial = fresh(), storage?: SessionStorage, ch: Challenge = challenge, full = false) {
   let id = 0
-  const announce = vi.fn()
   const rendered = render(<StoreProvider challenge={ch} initialSession={initial} clock={() => now} newId={() => `test-${++id}`} storage={storage}>
-    {full ? <Workbench onExit={() => {}} /> : <ModeExperience onAnnounce={announce} />}<Probe />
+    {full ? <Workbench onExit={() => {}} /> : <ModeExperience />}<Probe />
   </StoreProvider>)
-  return { ...rendered, announce }
+  return rendered
 }
-const select = () => screen.getByRole('combobox', { name: 'Interaction mode' })
-const switchTo = (mode: string) => fireEvent.change(select(), { target: { value: mode } })
 afterEach(cleanup)
 
 describe('mode guidance (task 44)', () => {
@@ -62,31 +59,29 @@ describe('mode guidance (task 44)', () => {
     expect(within(guidance).getByRole('heading', { name: 'Explain' })).toBeTruthy()
   })
 
-  it('Parametric removes scaffolding, preserves mounted editor elements and announces switching', () => {
-    setup(fresh(), undefined, challenge, true)
-    const input = screen.getByRole('spinbutton', { name: /Diameter/ })
-    const viewport = screen.getByRole('region', { name: 'Design view' })
+  it.each(['guided', 'parametric'] as const)('keeps %s fixed in the workbench with no mode-changing control', (mode) => {
+    setup({ ...fresh(), mode }, undefined, challenge, true)
     const before = store.state
-    select().focus()
-    switchTo('parametric')
-    expect(screen.queryByRole('region', { name: 'Guided instructions' })).toBeNull()
-    expect(screen.queryByRole('list', { name: 'Workflow' })).toBeNull()
-    expect(screen.getByText('Direct section and dimension editing')).toBeTruthy()
-    expect(screen.getByRole('spinbutton', { name: /Diameter/ })).toBe(input)
-    expect(screen.getByRole('region', { name: 'Design view' })).toBe(viewport)
-    expect(document.activeElement).toBe(select())
-    expect(store.state).toEqual({ ...before, mode: 'parametric' })
-    expect(screen.getByTestId('live-region').textContent).toContain('Parametric mode')
-    switchTo('guided')
-    expect(screen.getByRole('region', { name: 'Guided instructions' })).toBeTruthy()
-    expect(screen.getByRole('spinbutton', { name: /Diameter/ })).toBe(input)
-    expect(store.state).toEqual(before)
+    expect(screen.queryByRole('combobox', { name: 'Interaction mode' })).toBeNull()
+    expect(screen.queryByRole('button', { name: /^Switch.*mode/ })).toBeNull()
+    expect(screen.getByRole('spinbutton', { name: /Diameter/ })).toBeTruthy()
+    expect(screen.getByRole('region', { name: 'Design view' })).toBeTruthy()
+    if (mode === 'guided') {
+      expect(screen.getByRole('region', { name: 'Guided instructions' })).toBeTruthy()
+      expect(screen.getByRole('list', { name: 'Workflow' })).toBeTruthy()
+      fireEvent.click(screen.getByRole('button', { name: '3. Compare' }))
+    } else {
+      expect(screen.queryByRole('region', { name: 'Guided instructions' })).toBeNull()
+      expect(screen.queryByRole('list', { name: 'Workflow' })).toBeNull()
+      expect(screen.getByText('Direct section and dimension editing')).toBeTruthy()
+    }
+    expect(store.state).toBe(before)
   })
 
-  it('preserves pending prediction, archived history, comparison, reflection and submission across switching/reload', () => {
+  it('preserves the entry-selected mode, pending prediction and saved workspace after reload', () => {
     const values = new Map<string, string>()
     const storage = { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => { values.set(key, value) }, removeItem: (key: string) => { values.delete(key) } }
-    const mounted = setup(fresh(), storage)
+    const mounted = setup({ ...fresh(), mode: 'parametric' }, storage)
     act(() => { store.dispatch({ type: 'setPrediction', direction: 'decrease', now }); store.runTest(); store.runTest() })
     act(() => {
       store.dispatch({ type: 'toggleCompare', testResultId: 'test-2' })
@@ -97,22 +92,18 @@ describe('mode guidance (task 44)', () => {
       store.dispatch({ type: 'setPrediction', direction: 'decrease', now })
     })
     const before = store.state
-    switchTo('parametric')
-    expect(store.state).toEqual({ ...before, mode: 'parametric' })
-    expect(store.state.history).toBe(before.history)
-    expect(store.state.draft).toBe(before.draft)
     mounted.unmount()
     setup(fresh(), storage)
-    expect(store.state).toEqual({ ...before, mode: 'parametric' })
-    expect(select()).toHaveProperty('value', 'parametric')
-    switchTo('guided')
     expect(store.state).toEqual(before)
+    expect(store.state.mode).toBe('parametric')
+    expect(screen.queryByRole('region', { name: 'Guided instructions' })).toBeNull()
+    expect(screen.queryByRole('combobox', { name: 'Interaction mode' })).toBeNull()
   })
 
-  it('only offers allowed modes and never offers Freeform', () => {
+  it('does not expose unsupported modes and rejects a disallowed entry selection', () => {
     const ch = { ...challenge, allowedModes: ['parametric'] as Challenge['allowedModes'] }
     setup({ ...fresh(), mode: 'parametric' }, undefined, ch)
-    expect(within(select()).getAllByRole('option').map((node) => node.textContent)).toEqual(['Parametric'])
+    expect(screen.queryByRole('combobox', { name: 'Interaction mode' })).toBeNull()
     const before = store.state
     act(() => expect(store.selectMode('guided')).toBe(false))
     expect(store.state).toBe(before)

@@ -166,10 +166,6 @@
 }
 
 /* Task 44: compact mode scaffolding outside challenge text and Canvas. */
-.interaction-mode-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 12px; min-width: 0; color: #46583b; font-size: 11px; }
-.interaction-mode-bar label { font-weight: 600; }
-.interaction-mode-bar select { max-width: 100%; min-width: 0; border: 1px solid #a4b496; border-radius: 5px; padding: 6px 10px; background: #fff; color: #345640; font: inherit; }
-.interaction-mode-bar span { font-size: 10px; }
 .guided-instructions { min-width: 0; border: 1px solid #dce3d4; border-radius: 7px; padding: 12px; margin-bottom: 14px; background: #fafbf7; color: #46583b; font-size: 11px; line-height: 1.6; overflow-wrap: break-word; }
 .guidance-steps { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
 .guidance-steps button { border: 1px solid #a4b496; border-radius: 5px; padding: 5px 9px; background: #fff; color: #345640; font: inherit; }
@@ -178,4 +174,5 @@
 .guided-instructions p { margin: 4px 0; }
 .guided-instructions details { margin-top: 6px; }
 .guided-instructions summary { cursor: pointer; font-weight: 600; }
-.interaction-mode-bar select:focus-visible, .guidance-steps button:focus-visible, .guided-instructions summary:focus-visible { outline: 2px solid #345640; outline-offset: 3px; }
+
+.parametric-context { margin: 0 0 12px; color: #46583b; font-size: 11px; }

@@ -7,7 +7,7 @@ template's visual design and platform shell are kept.
 
 Read `HANDOFF.md` first for the current status and the next task.
 
-Current task progress (2026-10-16): user selected task 44 ahead of catalog scoping. 44.1–44.2 complete: Guided has instructions/optional hints; Parametric direct editing; native selector preserves one saved workspace. 44.3/parent 44 pending pushed browser and owner manual release QA. Local coverage/core checks pass (905 tests/111 files); Playwright discovers 24 cases. Next after verification: 45.1 original-catalog scoping; Beam II deferred to 52. Read latest HANDOFF.md and additive interaction-modes specs; push once and await the user, no continuous CI polling.
+Current task progress (2026-10-16): user selected task 44 ahead of catalog scoping. 44.1–44.2 complete: Guided has instructions/optional hints; Parametric direct editing; mode is chosen before entry and fixed inside the workbench. 44.3/parent 44 pending pushed browser and owner manual release QA. Local coverage/core checks pass (906 tests/111 files); Playwright discovers 24 cases. Next after verification: 45.1 original-catalog scoping; Beam II deferred to 52. Read latest HANDOFF.md and additive interaction-modes specs; push once and await the user, no continuous CI polling.
 
 ## Specifications (source of truth)
 
@@ -158,3 +158,5 @@ Mode planning: task 44.1–44.3 is mandatory before user deployment (release dep
 D-35 supersedes prior Beam-II-first pointers: implement the six existing catalog challenges before second editions. CATALOG_ROADMAP.md and tasks 45–52 govern model-specific scoping/validation/integration. Preserve dormant Beam II assets and historical completed markers, but do not make them the next integration target. Never pass non-beam challenges through the existing cantilever solver or enable preview cards before supported model flows exist. Task 44 and human pre-deployment QA remain required.
 
 Mode implementation D-36: use ModeExperience and existing store.selectMode; never remount the editor or bypass challenge prediction requirements to distinguish modes. Guidance is transient, state-derived scaffolding, not progress/assessment or a passing solution. Keep hints collapsed and outside challenge/Canvas. Task 44.3 is not complete without current browser evidence and owner manual release checks. See .kiro/specs/interaction-modes/ and HANDOFF.md.
+
+D-37 supersedes all earlier in-workbench selector/switching instructions. ModeExperience has no selectMode control or callback. Choose mode in existing challenge-entry UI; resume/reload preserves it. Guided scaffolding and direct Parametric editing remain distinct. No permanent project lock or workspace reset is introduced; leaving to the library allows another entry choice. Specs/tests now verify no in-workbench switch, not live switching. Local suite: 906 tests/111 files, eight mode component cases. Task 44.3 remains pending current browser/manual QA.

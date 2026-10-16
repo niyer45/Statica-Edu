@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { SessionState } from '../../state/session'
 import { selectTestCount } from '../../state/selectors'
-import { useChallenge, useSession, useStore } from '../state/store'
+import { useSession } from '../state/store'
 import WorkflowStepper from './WorkflowStepper'
 
 export type GuidanceStep = 'inspect' | 'experiment' | 'compare' | 'explain'
@@ -25,8 +25,7 @@ function GuidedInstructions() {
   const session = useSession()
   const phase = recommendedStep(session)
   const [browsed, setBrowsed] = useState<{ step: GuidanceStep; session: SessionState } | null>(null)
-  // A mode-independent session change resets the recommendation; mode-only changes do not
-  // alter the editor. This component remounts only when leaving/re-entering Guided.
+  // Actual session changes reset the recommended focus; browsing does not change progress.
   const active = browsed?.session === session ? browsed.step : phase
   const current = STEPS.find((step) => step.id === active)!
   const round = session.draft.section.kind === 'circle' || session.draft.section.kind === 'tube'
@@ -54,26 +53,11 @@ function GuidedInstructions() {
   )
 }
 
-export default function ModeExperience({ onAnnounce }: { onAnnounce: (message: string) => void }) {
+export default function ModeExperience() {
   const session = useSession()
-  const challenge = useChallenge()
-  const { selectMode } = useStore()
   return (
     <>
-      <div className="interaction-mode-bar">
-        <label htmlFor="workbench-mode">Interaction mode</label>
-        <select id="workbench-mode" value={session.mode} onChange={(event) => {
-          const mode = event.target.value
-          if ((mode === 'guided' || mode === 'parametric') && selectMode(mode)) {
-            onAnnounce(`${mode === 'guided' ? 'Guided' : 'Parametric'} mode. Your design and recorded results are preserved.`)
-          }
-        }}>
-          {(['guided', 'parametric'] as const).filter((mode) => challenge.allowedModes.includes(mode)).map((mode) => (
-            <option key={mode} value={mode}>{mode === 'guided' ? 'Guided' : 'Parametric'}</option>
-          ))}
-        </select>
-        <span>{session.mode === 'guided' ? 'Step-by-step support' : 'Direct section and dimension editing'}</span>
-      </div>
+      {session.mode === 'parametric' && <p className="parametric-context">Direct section and dimension editing</p>}
       {session.mode === 'guided' && <><WorkflowStepper /><GuidedInstructions /></>}
     </>
   )

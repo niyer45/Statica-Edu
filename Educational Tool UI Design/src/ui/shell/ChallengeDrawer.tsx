@@ -118,7 +118,7 @@ export default function ChallengeDrawer({
           </div>
           <div className="detail-section">
             <h3>Choose how you design</h3>
-            <p>Independent of challenge difficulty. Pick the tools that fit how you like to learn.</p>
+            <p>Choose before opening. Your mode stays fixed while you work.</p>
             {MODE_INFO.map((m) => {
               const status = modeStatus(m.mode, allowedModes)
               return (

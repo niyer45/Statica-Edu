@@ -21,7 +21,7 @@ As the platform develops, students should be able to work through more challenge
 
 | Capability | Current implementation |
 | --- | --- |
-| Runnable challenge | Cantilever Beam I; Guided adds browsable instructions and optional hints, while Parametric provides direct editing without scaffolding. Switch modes within the same saved workspace. |
+| Runnable challenge | Cantilever Beam I; Guided adds browsable instructions and optional hints, while Parametric provides direct editing without scaffolding. Choose the mode before entering; it stays fixed inside the workbench. |
 | Cross-section editing | Solid circles, hollow tubes, rectangles and I-sections; numeric dimensions, orientation controls and supported visual drag handles |
 | Interactive visualization | 3D beam view, scene controls and a deformation outline; an SVG 2D fallback keeps the numeric workflow available if 3D is unavailable |
 | Numerical analysis | Cross-sectional area, bending inertia, mass, tip deflection and nominal maximum bending stress |
@@ -94,7 +94,7 @@ See the [developer README](Educational%20Tool%20UI%20Design/README.md) for verif
 
 The application uses React 19, strict TypeScript, Vite, Three.js / React Three Fiber and a validated JSON challenge schema. Geometry, analysis and evaluation are pure domain modules; rendering does not determine numerical results. The existing Figma Make visual shell is retained.
 
-Verification includes Vitest, fast-check property tests, architecture checks and Playwright desktop/mobile flows with axe accessibility checks. The latest development batch passed **905 local tests across 111 files**, full domain coverage thresholds, lint, typecheck and production build. Its pushed workflow result is tracked in [GitHub Actions](https://github.com/niyer45/Statica-Edu/actions).
+Verification includes Vitest, fast-check property tests, architecture checks and Playwright desktop/mobile flows with axe accessibility checks. The latest development batch passed **906 local tests across 111 files**, full domain coverage thresholds, lint, typecheck and production build. Its pushed workflow result is tracked in [GitHub Actions](https://github.com/niyer45/Statica-Edu/actions).
 
 The preceding [verified browser run](https://github.com/niyer45/Statica-Edu/actions/runs/38966388585) passed both focused responsive checks and all 20 desktop/Pixel 7 browser cases on commit `a76b8ad`. Automated results do not substitute for the pending human engineering review or student pilot.
 
