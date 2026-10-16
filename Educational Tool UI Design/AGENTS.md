@@ -7,7 +7,7 @@ template's visual design and platform shell are kept.
 
 Read `HANDOFF.md` first for the current status and the next task.
 
-Current task progress (2026-10-16): M3 baseline complete; UI-01–UI-07 maintenance changes await a passing current browser run. Current fix: UI-07 hidden Import design input overflow. Post-MVP M4–M6 remain planned; next roadmap task is 29.1 when directed. See HANDOFF.md for the exact failure and candidate. Push once and await the user; do not continuously poll CI.
+Current task progress (2026-10-16): M0–M3 and maintenance UI-01–UI-07 complete. CI run 38936927907 verified implementation eb1b56757b42192934f1b4cd3240515bb02237de: 879 core tests, 2 focused responsive cases and all 20 browser cases passed. Post-MVP M4–M6 remain planned; next task is 29.1 when directed. Read HANDOFF.md for current behavior and evidence. Push verified batches once and await the user; do not continuously poll CI.
 
 ## Specifications (source of truth)
 
@@ -34,7 +34,7 @@ Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuiti
 ## Tech stack
 
 - React 19, TypeScript (strict), Vite 8, Tailwind CSS v4 (`@tailwindcss/vite`), and the four Figma Make Vite plugins in `vite.config.ts` (leave them unchanged).
-- 3D: three 0.186.1, @react-three/fiber 9.8.2, @react-three/drei 10.7.9. Milestone 2 is complete: viewport, typed SVG fallback/recovery, handles, shell/numeric test suites and four-profile component gate. Real-browser rendering/CSP verification remains pending; see MILESTONE2.md and HANDOFF.md.
+- 3D: three 0.186.1, @react-three/fiber 9.8.2, @react-three/drei 10.7.9. Milestone 2 is complete: viewport, typed SVG fallback/recovery, handles, shell/numeric test suites and four-profile component gate. Real-browser rendering/CSP verification passed in CI; see MILESTONE2.md and HANDOFF.md.
 - zod 3.25.76 (challenge and import schemas), zod-to-json-schema.
 - Testing: Vitest 5 (jsdom for `src/ui/**`), fast-check 4, Testing Library, Playwright 1.64 with axe-core.
 - ESLint 10 with typescript-eslint, oxfmt.
@@ -58,7 +58,7 @@ Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuiti
 - The template `src/BeamScene.tsx` and temporary `LegacyFallback` are deleted. Their SVG projection now lives in `ui/viewport/projection.ts` and `Fallback2D.tsx`. Keep this fallback independent of Three.js so recovery works when the 3D chunk fails to load.
 - `test/state/model.ts`: reusable fast-check command harness, per-action invariant hooks and reachable-session generator (task 19.3). Dedicated reducer properties reuse it and the `test/pbt.ts` helper.
 - `test/`: shared arbitraries, pbt helper, fixtures (`test/fixtures/designs.ts`), architecture and config guard tests.
-- `e2e/`: 20 Playwright desktop/Pixel 7 scenarios (new deletion pair pending verification); CI also runs the focused responsive pair before the full suite.
+- `e2e/`: 20 verified Playwright desktop/Pixel 7 scenarios (including deletion/reload); CI also runs the focused responsive pair before the full suite.
 - `schemas/`: generated JSON Schema. `scripts/`: schema generator.
 - Unit tests are colocated as `*.test.ts(x)`. Property tests are named `*.pN.test.ts`.
 
@@ -133,12 +133,12 @@ Post-MVP roadmap update (2026-10-16): tasks.md now tracks M4 review/pilot and re
 
 UI-02 presentation follow-up (2026-10-16): removed the exclamation prefix from Not accepted badges in history rows, selected results and comparison cards, as requested. Accepted and model-applicability indicators remain unchanged.
 
-UI-03 (D-30): Compare results uses the history list/detail layout with one selected design; challenge Test details contains only the table. Local checks pass; browser CI pending. Preserve this newer user direction over D-28/D-29 descriptions of comparison cards or challenge explanation prose.
+UI-03 (D-30): Compare results uses the history list/detail layout with one selected design; challenge Test details contains only the table. Verified in CI run 38936927907. Preserve this newer user direction over D-28/D-29 descriptions of comparison cards or challenge explanation prose.
 
-UI-04 (D-31): user-visible iteration deletion uses optional persisted deletedIterationIds; keep archived TestResults/iteration numbering intact. Use selectVisibleHistory for user-facing lists and choices; latest tested analysis stays unchanged. Baseline is protected. Current local suite: 878 tests; new deletion browser pair awaits CI.
+UI-04 (D-31): user-visible iteration deletion uses optional persisted deletedIterationIds; keep archived TestResults/iteration numbering intact. Use selectVisibleHistory for user-facing lists and choices; latest tested analysis stays unchanged. Baseline is protected. Current suite: 879 tests; deletion/reload browser pair passed in CI run 38936927907.
 
-UI-05/D-32: fixed fields are collapsed under the lock/title summary; Cancel and Run Test icon/text are centered. Preserve read-only fields and native keyboard disclosure behavior. Browser verification pending.
+UI-05/D-32: fixed fields are collapsed under the lock/title summary; Cancel and Run Test icon/text are centered. Preserve read-only fields and native keyboard disclosure behavior. Browser verification passed in CI run 38936927907.
 
-UI-06/D-33: informational notices belong in temporary Toast/LiveRegion, not permanent history paragraphs. My designs is a saved workspace card with no results table; Return to workbench reveals results without changing session state. Browser CI pending.
+UI-06/D-33: informational notices belong in temporary Toast/LiveRegion, not permanent history paragraphs. My designs is a saved workspace card with no results table; Return to workbench reveals results without changing session state. Browser CI passed in run 38936927907.
 
-Responsive repair: scope the accessible Import design file input to 1×1 px inside its positioned label. The old history-note input width:100% rule overrode sr-only and caused a 2431 px document at 1280 px (run 38935876295). Preserve this specificity fix and the requested-width responsive assertion; new CI verification pending.
+Responsive repair: scope the accessible Import design file input to 1×1 px inside its positioned label. The old history-note input width:100% rule overrode sr-only and caused a 2431 px document at 1280 px (run 38935876295). Preserve this specificity fix and the requested-width responsive assertion; verified by the focused responsive pair and full suite in run 38936927907.

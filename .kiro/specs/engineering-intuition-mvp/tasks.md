@@ -602,34 +602,28 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
 
 ### User-requested maintenance after MVP closeout
 
-- [-] UI-01 Simplify The challenge panel (2026-10-16)
-  - Keep the opening statement; consolidate visible stored values/limits and pass/fail into one compact list. Put the duplicate full table, explanations and technical details behind Test details. Keep model warnings/errors visible; fix badge wrapping and table word breaking. D-28 records the user-directed presentation override.
-  - Local verification: lint zero errors, typecheck, 873 tests and build passed. Browser/axe regression is pending the pushed CI run; completed MVP checkboxes describe the previously verified baseline. Update this item only after the changed presentation passes CI.
+All seven maintenance tasks are complete. [CI run 38936927907](https://github.com/niyer45/Statica-Edu/actions/runs/38936927907) verified implementation commit `eb1b56757b42192934f1b4cd3240515bb02237de`: lint, typecheck, 879 tests across 109 files, domain coverage gates, build, schema drift, 2/2 focused responsive cases and 20/20 desktop/Pixel 7 E2E cases passed, including axe checks. The user confirmed the workflow passed. D-30 supersedes the earlier challenge prose/comparison-card presentation choices.
 
-- [-] UI-02 Restore compact history and comparison presentation (2026-10-16)
-  - Remove challenge draft/acceptance banners; leave draft in the viewport and recorded status in history. Use compact iteration rows, selected metrics, styled comparison cards and collapsed detailed explanations/transitions. Preserve comparisons, predictions, restore and accessible import/export. D-29 records the user-directed override.
-  - Follow-up: Not accepted badges have no exclamation prefix in history or comparison views, per user request.
-  - Browser/axe verification pending the new CI run. Existing MVP milestones retain their previously verified baseline status.
+- [x] UI-01 Simplify The challenge panel (2026-10-16)
+  - Keep the opening statement and compact stored value/limit summary; keep warnings/errors visible and fix badge/table wrapping (D-28). Final Test details content is table-only under UI-03.
 
-- [-] UI-03 Selectable comparison details and table-only challenge disclosure (2026-10-16)
-  - Reuse history's list/detail layout in Compare results; clicking one compared design displays its values and deltas. Keep Baseline membership and the maximum-three iteration selection rule. Limit challenge Test details to its stored constraint table. D-30 records the updated presentation.
-  - Local checks pass: lint zero errors, typecheck, 873 tests and build. Browser/axe verification is pending CI; earlier MVP completion evidence describes the baseline.
+- [x] UI-02 Restore compact history and comparison presentation (2026-10-16)
+  - Remove challenge draft/acceptance banners; keep draft in the viewport and recorded status in history. Compact rows and selected metrics preserve predictions, restore and accessible import/export (D-29). Not accepted has no exclamation prefix. Final comparison layout follows UI-03.
 
-- [-] UI-04 Delete non-Baseline history entries (2026-10-16)
-  - Confirm deletion, persist deleted-entry metadata, prune comparison membership and submitted references, hide entries from history/compare/My designs/submission, protect Baseline and preserve draft/last tested analysis and stable numbering. D-31 specifies archival semantics.
-  - Local suite: 878 tests; deletion, protected/repeated/unknown ids, submission cleanup, rejected hidden references, persistence and next-run numbering covered. New desktop/Pixel 7 deletion/reload regression awaits CI before completion.
+- [x] UI-03 Selectable comparison details and table-only challenge disclosure (2026-10-16)
+  - Compare results reuses history's list/detail layout; clicking a design displays its stored values and deltas. Preserve Baseline and the maximum-three iteration selection rule. Challenge Test details contains only the stored constraint table (D-30).
 
-- [-] UI-05 Center actions and collapse fixed-field details (2026-10-16)
-  - Center confirmation Cancel and the Run Test icon/text group. Keep the lock and Some things are fixed. summary visible; collapse fixed values by default and remove the explanatory sentence. Preserve read-only values and keyboard access (D-32).
-  - Local lint/typecheck/build and all 878 tests pass. Browser/axe CI is pending before this maintenance task is marked complete.
+- [x] UI-04 Delete non-Baseline history entries (2026-10-16)
+  - Confirm deletion, persist archival metadata, prune comparison/submission references and hide deleted choices. Protect Baseline, draft, last tested analysis and stable numbering (D-31). Protection/no-op, persistence, rejected hidden-reference and deletion/reload regressions pass. My designs results were subsequently removed under UI-06.
 
-- [-] UI-06 Temporary feedback and uncluttered My designs (2026-10-16)
-  - Remove permanent informational notice paragraphs from history; automatically dismiss the shared visual toast after five seconds while preserving the live region/errors. Show only the saved workspace card in My designs, with results available after Return to workbench. Preserve local session data (D-33).
-  - Local lint/typecheck/build and 879 tests pass, including timer cleanup, no results table and draft/history preservation; browser/axe CI remains pending.
+- [x] UI-05 Center actions and collapse fixed-field details (2026-10-16)
+  - Center confirmation Cancel and Run Test icon/text. Keep the lock/title summary visible; fixed values expand from a collapsed native disclosure with read-only values and keyboard access (D-32).
 
-- [-] UI-07 Fix hidden import chooser page overflow (2026-10-16)
-  - Failed run 38935876295 identifies the sr-only file input extending to 2431 px at a 1280 px viewport. Position its label and scope a 1×1 px file-input rule to override the template width:100% rule, preserving accessible native import and the existing responsive assertions.
-  - Local lint/typecheck/build and all 879 tests pass. Focused desktop/Pixel 7 responsive regression and full browser suite await the new CI run; no completion is claimed before verification.
+- [x] UI-06 Temporary feedback and uncluttered My designs (2026-10-16)
+  - Remove permanent informational history paragraphs; dismiss the visual toast after five seconds while preserving live announcements/errors. My designs shows only the saved workspace card; Return to workbench reveals results without changing session data (D-33). Timer cleanup and state-preservation tests pass.
+
+- [x] UI-07 Fix hidden import chooser page overflow (2026-10-16)
+  - Failed run 38935876295 identified an sr-only file input extending to 2431 px at a 1280 px viewport. Position its label and scope a 1×1 px file-input rule to override the template width:100% rule. Accessible native import and the unchanged responsive assertions pass in the verified run above.
 
 ### Post-MVP roadmap: scope and execution
 
