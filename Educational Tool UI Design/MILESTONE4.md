@@ -1,6 +1,6 @@
 # Milestone 4: Engineering review and student pilot
 
-Plan created 2026-10-16 for task 29.1. Status: plan complete; independent review, manual readiness checks and student sessions have not occurred. The owner selected a **local-only pilot first**, followed by accounts and cloud-saved progress. Reviewer and participants are **not arranged**, as confirmed by the owner. No recruitment, deployment or invitations have been performed.
+Plan created 2026-10-16 for task 29.1. Status: plan complete; owner engineering review, manual readiness checks and student sessions have not occurred. The owner selected a **local-only pilot first**, followed by accounts and cloud-saved progress. Nikhil subsequently nominated themself as owner engineering reviewer; student participants remain **not arranged**. Human QA is deferred until before customer deployment while development proceeds (D-34). No recruitment, deployment or invitations have been performed.
 
 ## Learners and learning objectives
 
@@ -25,15 +25,15 @@ Verified baseline: implementation `eb1b56757b42192934f1b4cd3240515bb02237de`, [C
 | Role | Responsibility | Arrangement |
 | --- | --- | --- |
 | Project owner (Nikhil) | Confirm audience, nominate reviewer, arrange access/recruitment and accept release decisions | Owner identified; availability not supplied |
-| Independent engineering reviewer | Check model, constants and explanations against independent calculations/references; record signed/date-attributed findings | Not arranged; blocks 29.2 and pilot launch |
+| Owner engineering reviewer (Nikhil) | Check model, constants and explanations against independent calculations/references; record signed/date-attributed findings | Nominated; review/qualifications/date/evidence not yet recorded; blocks release, not isolated development |
 | Facilitator | Prepare consent/script, observe without teaching answers, collect de-identified notes | Not arranged; owner to nominate before sessions |
 | Manual accessibility/usability reviewer | Execute task 30.1 using actual devices, assistive technology and build | Not arranged; may share facilitator role |
 | Students | Participate voluntarily in the agreed learner group | Group, count and dates not arranged; target 5 adults pending recruitment |
-| Development agent | Prepare materials, reproduce/remediate findings and record verification | Cannot substitute for independent review or real participants |
+| Development agent | Prepare materials, reproduce/remediate findings and record verification | Cannot substitute for owner engineering QA or real participants |
 
-Next owner inputs: reviewer name/qualification and availability; course/group and participant dates; facilitator; agreed access URL or local delivery arrangement. Scheduling remains open under 29.2/30.2/31.1; task 29.1 records the confirmed unavailability rather than inventing arrangements.
+Next owner inputs: reviewer qualification and review availability; course/group and participant dates; facilitator; agreed access URL or local delivery arrangement. Scheduling remains open under 29.2/30.2/31.1; task 29.1 records the confirmed unavailability rather than inventing arrangements.
 
-## Engineering review checklist — task 29.2
+## Owner engineering review checklist — task 29.2
 
 Record reviewer, date, build/configuration version, calculation/reference evidence, expected/actual values, tolerance, finding severity and disposition for each check.
 
@@ -58,7 +58,7 @@ Proposed access is an owner-approved static build URL, with same-origin assets a
 
 ## Pilot protocol and measures — tasks 31.1–31.2
 
-Before sessions, prepare a consent/introduction appropriate to the setting, a consistent script, pre/post questions and an observation sheet. Participation is voluntary; use participant codes P01 onward and collect no names/emails in research notes. Default to no audio/video or behavioral analytics. Notes should contain task outcomes, timings, prompts, short de-identified explanations and issues. Owner/facilitator holds notes with restricted access; proposed deletion is 30 days after pilot analysis, to be confirmed in 31.1. Publish only de-identified aggregate findings to the repository. If recruitment includes minors, resolve the setting's consent requirements before including them; this plan assumes adults.
+Before sessions, prepare a consent/introduction appropriate to the setting, a consistent script, pre/post questions and an observation sheet. Participation is voluntary; use participant codes P01 onward and collect no names/emails in research notes. Default to no audio/video or behavioral analytics. Notes should contain task outcomes, timings, prompts, short de-identified explanations and issues. Owner/facilitator holds notes with restricted access; proposed deletion is 30 days after pilot analysis, to be confirmed with the owner before sessions. Publish only de-identified aggregate findings to the repository. If recruitment includes minors, resolve the setting's consent requirements before including them; this plan assumes adults.
 
 Proposed 25–35 minute session:
 
@@ -92,13 +92,13 @@ The 4-of-5 targets are formative decision aids. If the final sample differs, agr
 | S2 medium | Recoverable confusion or friction with an available accessible workaround | Log owner disposition; defer only with rationale and if success criteria remain met |
 | S3 low | Cosmetic issue without functional/instructional impact | May defer with owner acknowledgement and tracked task |
 
-Pilot launch requires recorded independent review (29.2), manual checks (30.1), verified access/recovery (30.2), protocol/consent materials (31.1), arranged participants/facilitator and zero open S0/S1 findings. Passing CI alone cannot clear this gate.
+Pilot launch requires recorded owner engineering QA (29.2), manual checks (30.1), verified access/recovery (30.2), protocol/consent materials (31.1), arranged participants/facilitator and zero open S0/S1 findings. Passing CI alone cannot clear this gate.
 
-Milestone 4 closeout (32.2) additionally requires actual student evidence, agreed measures met or remediation/retest demonstrating they are met, no unresolved S0/S1, documented S2/S3 dispositions, project-owner/reviewer disposition and passing required core/browser gates on the release candidate. A missed criterion is a finding to remediate or transparently re-plan, not a fabricated pass. Milestone 5 starts after this checkpoint.
+Milestone 4 closeout (32.2) additionally requires owner engineering QA and actual student evidence, agreed measures met or remediation/retest demonstrating they are met, no unresolved S0/S1, documented S2/S3 dispositions, project-owner/reviewer disposition and passing required core/browser gates on the release candidate. A missed criterion is a finding to remediate or transparently re-plan, not a fabricated pass. Customer release remains gated; isolated M5 development may proceed before this checkpoint under D-34.
 
 ## Requested account and saved-progress extension
 
-Owner direction on 2026-10-16: support users, save their information and record completed challenges, **after the local-only pilot**. This is required future product scope tracked in 38.1–38.2, not functionality delivered by 29.1. Provider, hosting, costs and precise profile fields remain undecided. Do not add a pretend sign-in or describe local storage as cloud sync.
+Owner direction on 2026-10-16: support users, save their information and record completed challenges, **after the local-only pilot for customer release**. This is required future product scope tracked in 38.1–38.2, not functionality delivered by 29.1. Provider, hosting, costs and precise profile fields remain undecided. Do not add a pretend sign-in or describe local storage as cloud sync.
 
 Inputs for the scoped account specification:
 
@@ -115,8 +115,12 @@ Tasks 36.1–36.2 and 38.1–38.2 resolve these decisions and implement/verify t
 
 ## Evidence and next action
 
-Task 29.1 produces this plan only. Reviewer/participants are confirmed not arranged; these are operational launch blockers, not missing fabricated planning results. Next task is 29.2: arrange and obtain an independent engineering review with the owner. Tasks 30.1 and 31.1 may be prepared according to their dependency graph; no participant contact is authorized by this document.
+Task 29.1 produces this plan only. Reviewer is nominated but QA has not occurred; participants are not arranged; these are operational launch blockers, not missing fabricated planning results. Task 29.2 is owner engineering QA before deployment; the next software task is 34.1 after completing the configuration batch. Tasks 30.1 and 31.1 may be prepared according to their dependency graph; no participant contact is authorized by this document.
 
 Documentation-task validation: lint passed with zero errors (10 existing warnings), typecheck passed, all 879 tests across 109 files passed and production build passed. Existing chunk-size warning is nonblocking. Task dependency JSON and unchanged future-task statuses were checked. No new browser run is claimed for this documentation-only change.
 
 Follow-up verification note: the documentation push run 38965945029 failed in an existing aggregate shell-test timeout under coverage, before build/browser steps. Task 29.1 is an authored plan, not a claim of new runtime/browser verification. Repair task 42 separates the preview and Freeform regression cases; see HANDOFF.md for current evidence.
+
+## Development sequencing update — D-34
+
+Nikhil is the owner engineering reviewer; do not label this external independent review. Owner direction permits development before human QA. Owner review, manual accessibility/readiness and actual pilot/disposition remain unchecked release obligations; no customer deployment occurs until those gates pass. Local-only pilot remains the agreed first pilot; account requirements may be specified/developed separately without enabling cloud features or claiming pilot approval. PILOT_PROTOCOL.md completes prepared materials for 31.1; consent/participants/results are still absent. Second-challenge development choices are provisional and must be revisited if human findings contradict them.

@@ -1,6 +1,6 @@
 # Handoff: Statica MVP
 
-Last updated: 2026-10-16. **Milestones 0–3 and maintenance UI-01–UI-07 are complete and verified.** **Task 29.1 is complete:** MILESTONE4.md defines the review/pilot plan. Task 29 is in progress; next is **29.2: arrange and obtain an independent engineering review**. Remaining M4 tasks and M5–M6 are not started. Current maintenance candidate fixes CI component-test timing; current-run verification is pending.
+Last updated: 2026-10-16. M0–M3, UI maintenance (41.1–41.7) and CI repair 42 are verified. Tasks 29.1, 31.1 and development tasks 33.1–33.2 are complete. **Next software task: 34.1, generalize challenge selection and isolate sessions.** Nikhil is the nominated owner engineering reviewer; 29.2/manual checks/student QA are deferred to before customer deployment, remain unchecked and no longer block isolated development (D-34).
 
 ## Implementation and verification
 
@@ -61,3 +61,15 @@ Runs 38965356799 and 38965945029 failed in the coverage step: PlatformShell's co
 Task formatting: completed maintenance entries now use numeric parent 41 and subtasks 41.1–41.7, retaining UI-01–UI-07 as historical labels. Roadmap IDs 29–40 are unchanged; graph entries reflect the historical maintenance sequence. Use numeric checkbox task IDs in future tasks.md edits. Task 29.1 remains complete and the next feature/review task is 29.2 (independent reviewer not arranged).
 
 Repair local verification: full `pnpm exec vitest run --coverage` passed all 884 tests across 109 files and the 95% domain line gates; lint zero errors (10 existing warnings), typecheck and production build passed. Numeric task-line format, unique IDs and dependency references validate. The focused shell run passed all 17 tests; its partial-coverage report cannot satisfy full-domain thresholds, so the full coverage run is the gate evidence. No new browser pass is claimed before CI.
+
+## Current development batch and owner QA sequencing
+
+CI repair 42 passed [run 38966388585](https://github.com/niyer45/Statica-Edu/actions/runs/38966388585) on a76b8ad215720b0691ba566520d94ad995ade087: 884 tests, coverage/core gates, 2 responsive and all 20 browser cases. Earlier pending-repair and reviewer-unarranged notes above are historical. Nikhil volunteered as owner reviewer; this is not external independent review. D-34 records permission to develop before QA, with customer release still blocked on 29.2/30–32 evidence and disposition. No deployment or actual pilot has occurred.
+
+31.1: PILOT_PROTOCOL.md now supplies ready-to-review script, consent discussion, pre/post questions, rubric and blank observation/findings sheets; actual setting/retention/access/participants remain to arrange before sessions.
+
+33.1–33.2: MILESTONE5.md and sibling .kiro/specs/cantilever-beam-2/ specify a rectangle-orientation challenge. JSON configuration and 14 domain tests validate initial deflection failure, same-mass rotated acceptance, arithmetic fixtures, constraints, invalid/applicability cases, redaction and cross-challenge imports. Configuration is dormant: shell/catalog still offers only Beam I; no second-challenge availability/browser integration is claimed. Tests are not owner engineering sign-off. Next 34.1 must bind the selected validated configuration to the actual StoreProvider lifecycle and isolate draft/history/reflection/submission/storage by challenge/version without changing old saves. Do not merely relabel a still-bound Beam I store. Follow with 34.2 and multi-challenge browser cases under 35.1; 35.2 explicitly depends on 32.2 before release. Task 36.1 account/extension planning may proceed after 33.1; accounts remain required future work, not shipped.
+
+Local batch verification: lint zero errors (10 existing warnings), typecheck, full coverage with 898 tests across 110 files and production build passed. Schema generation via node --import tsx produced identical committed schema bytes; pnpm gen:schema itself hit the known sandbox IPC EPERM. No new browser pass is claimed before the pushed CI run.
+
+During verification, the pre-existing lazy-viewport recovery test observed fallback DOM before its passive announcement effect. Its assertion now waits for the same single announcement rather than assuming effect timing. Production fallback behavior, timeouts and assertions remain unchanged. Cross-layer configuration regression is under test/challenges/ so import/export checks do not violate the pure challenge module boundary. No browser/server was started locally. Push this verified batch, then await the workflow result per standing instruction.

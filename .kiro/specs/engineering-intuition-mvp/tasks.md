@@ -626,15 +626,17 @@ All seven maintenance tasks are complete. [CI run 38936927907](https://github.co
   - [x] 41.7 UI-07 Fix hidden import chooser page overflow (2026-10-16)
     - Failed run 38935876295 identified an sr-only file input extending to 2431 px at a 1280 px viewport. Position its label and scope a 1×1 px file-input rule to override the template width:100% rule. Accessible native import and the unchanged responsive assertions pass in the verified run above.
 
-- [-] 42. Verify CI preview-gating test repair
+- [x] 42. Verify CI preview-gating test repair
   - Runs 38965356799 and 38965945029 exceeded the default five-second timeout in the aggregate PlatformShell preview/Freeform coverage test; browser steps were skipped.
-  - Parameterize the five preview entries and separate Freeform, retaining assertions without changing timeouts, retries or coverage thresholds. Local verification is recorded in HANDOFF.md; await a passing pushed workflow before marking complete. Depends on 41.7.
+  - Parameterize the five preview entries and separate Freeform, retaining assertions without changing timeouts, retries or coverage thresholds. Verified by passing CI run 38966388585 on a76b8ad215720b0691ba566520d94ad995ade087: 884 tests, full coverage/core gates, 2 focused responsive cases and all 20 E2E cases. Depends on 41.7.
 
 ### Post-MVP roadmap: scope and execution
 
 Added at the user's request after Milestone 3 passed. Tasks 1–28 and their completion evidence remain unchanged. Requirements 1–35 and the existing design describe the completed M0–M3 baseline; their statements that M4+ is outside MVP implementation scope remain historical boundaries, not specifications for these new features. New feature requirements and acceptance criteria must be written as scoped extensions before implementation, without regenerating the completed MVP specifications or inventing requirement IDs.
 
-Task 29.1 is complete; task 29 is in progress and the remaining roadmap tasks are not started. The roadmap schedules future work; it does not start development, recruit participants, publish the app, or enable network services. No new testing task is optional. Update supporting documentation after each completed task and push verified batches. Preserve the existing architecture, solver-backed results, D-26/D-27 and the complete MVP regression suite. Feature-specific backend, model, provider and challenge choices remain decisions to make in the tasks below.
+Tasks 29.1, 31.1 and configuration-development tasks 33.1–33.2 are complete; tasks 29 and 31 remain in progress for human evidence. Task 34.1 is the next software task. Human QA is deferred until before customer deployment, not checked complete (D-34). The roadmap schedules future work; it does not start development, recruit participants, publish the app, or enable network services. No new testing task is optional. Update supporting documentation after each completed task and push verified batches. Preserve the existing architecture, solver-backed results, D-26/D-27 and the complete MVP regression suite. Feature-specific backend, model, provider and challenge choices remain decisions to make in the tasks below.
+
+Owner sequencing update (2026-10-16, D-34): develop software before human QA. Nikhil is the nominated owner engineering reviewer; 29.2 is owner-conducted review, not external independent review. Tasks 29.2, 30, 31.2 and 32 remain required before customer deployment. Scoped configuration/specification work may proceed from 29.1 without completed pilot evidence; feature release checkpoints still require 32.2. No deployment is authorized or performed by this sequencing change.
 
 ### Milestone 4: Engineer review and student pilot
 
@@ -643,9 +645,9 @@ Task 29.1 is complete; task 29 is in progress and the remaining roadmap tasks ar
     - Record intended learners, learning objectives, review checklist, roles, pilot access method and measurable success criteria in `MILESTONE4.md`; identify the engineer/reviewer and participant availability with the project owner.
     - Define severity levels and what blocks a pilot or milestone closeout before gathering results. Depends on checkpoint 28.
     - Completed 2026-10-16: MILESTONE4.md records learners/objectives, checklist, roles, access/recovery, measures and severity/launch/closeout gates. Owner chose a local-only pilot first and confirmed reviewer/participants are not arranged; scheduling blocks launch, not the authored plan. Accounts, saved user information and challenge completion are required future scope under 38.1–38.2. No review or pilot is claimed.
-  - [ ] 29.2 Obtain and record an independent engineering review
+  - [ ] 29.2 Obtain and record owner engineering QA before customer deployment
     - Review challenge constants, units, fixtures, formulas, applicability thresholds, boundary behavior, explanation wording and limitations against independent calculations/references.
-    - Record reviewer, date, evidence, discrepancies and disposition. An agent's self-review or passing tests cannot substitute for the independent review.
+    - Nikhil is the nominated owner reviewer; record qualifications, date, reviewed release commit, independent calculations/references, discrepancies and disposition. Include each new challenge/model before release. Do not describe owner review as external independence or substitute agent self-review/passing tests for human findings. Deferred until pre-deployment QA, not complete.
 
 - [ ] 30. Verify pilot readiness manually
   - [ ] 30.1 Run manual usability and accessibility checks
@@ -654,10 +656,11 @@ Task 29.1 is complete; task 29 is in progress and the remaining roadmap tasks ar
   - [ ] 30.2 Verify pilot delivery and recovery
     - Test the agreed access method, offline/local-storage limitations, reset/reload, import/export, update compatibility and recovery instructions using the actual pilot build. Record the tested commit and access instructions; deployment/access decisions precede publishing.
 
-- [ ] 31. Conduct and analyze the student pilot
-  - [ ] 31.1 Prepare the pilot protocol and materials
+- [-] 31. Conduct and analyze the student pilot
+  - [x] 31.1 Prepare the pilot protocol and materials
     - Define recruitment/consent appropriate to the setting, session script, facilitator prompts, pre/post questions, observation rubric and minimal feedback collection/retention. Use de-identified notes; do not add analytics or accounts for the pilot.
     - Define how to measure completion, interpretation of constraints, prediction/reflection quality and confusion about idealized model limits.
+    - Completed 2026-10-16: PILOT_PROTOCOL.md supplies introduction/consent discussion, pre/post questions, neutral prompts, rubric, blank observation/finding sheets and retention/session-cleanup instructions. Owner must confirm the actual setting/retention/access before sessions. No consent, recruitment or outcomes are claimed.
   - [ ] 31.2 Run sessions with actual students and summarize findings
     - Record participant count, sessions completed, observations and results against the predefined criteria; distinguish reported feedback from inference. Do not fabricate participants, approvals or outcomes.
     - Produce prioritized findings and limitations, including sample-size limitations, in `MILESTONE4.md`.
@@ -666,16 +669,17 @@ Task 29.1 is complete; task 29 is in progress and the remaining roadmap tasks ar
   - [ ] 32.1 Fix blocking findings and verify them
     - Turn findings into reproducible tasks; resolve pilot-blocking correctness/accessibility/usability issues in the existing architecture. Add meaningful regression coverage and repeat affected manual checks; record deferred issues and rationale.
   - [ ] 32.2 Milestone 4 checkpoint
-    - Confirm independent review and actual pilot evidence exist, agreed success criteria are met, no blocking finding remains, and lint/typecheck/unit/property/component/build/browser gates pass for the release candidate. Record reviewer/project-owner disposition and any deferred limitations before proceeding to M5.
+    - Confirm recorded owner engineering QA and actual pilot evidence exist, agreed success criteria are met, no blocking finding remains, and lint/typecheck/unit/property/component/build/browser gates pass for the release candidate. Record reviewer/project-owner disposition and any deferred limitations before customer deployment; isolated M5 development may proceed earlier under D-34.
 
 ### Milestone 5: Second runnable challenge through configuration
 
-- [ ] 33. Define the second challenge
-  - [ ] 33.1 Select a challenge and document its scoped requirements
-    - Use pilot findings to choose the learning objective, initial flawed design, constraints, reference solution, prediction/reflection prompts and success criteria. Use a challenge supported by the existing validated beam model; do not activate a preview whose physics differs.
-    - Write a challenge-specific requirements/design extension and independent reference calculations. Challenges requiring a new model are deferred to task 37.2 rather than introducing an M5/M6 dependency cycle. Depends on checkpoint 32.2.
-  - [ ] 33.2 Review and validate the challenge configuration
-    - Add versioned configuration, explicit locked fields and section defaults; verify initial failure, reference acceptance, solvability, applicability, boundary cases and grounded explanation facts. Obtain engineering review of the new constants and wording.
+- [x] 33. Define the second challenge
+  - [x] 33.1 Select a challenge and document its scoped requirements
+    - Choose the learning objective, initial flawed design, constraints, reference solution, prediction/reflection prompts and success criteria. No pilot evidence exists yet; record provisional choices and revisit them during pre-release QA. Use a challenge supported by the existing validated beam model; do not activate a preview whose physics differs.
+    - Completed 2026-10-16: .kiro/specs/cantilever-beam-2/ defines the rectangle-orientation challenge and separately derived arithmetic fixtures (not human review). Write a challenge-specific requirements/design extension and reference calculations. Challenges requiring a new model are deferred to task 37.2 rather than introducing an M5/M6 dependency cycle. Development depends on 29.1 under D-34; customer release still requires checkpoint 32.2.
+  - [x] 33.2 Validate the second challenge configuration for development
+    - Add versioned configuration, explicit locked fields and section defaults; verify initial failure, reference acceptance, solvability, applicability, boundary cases and grounded explanation facts. Owner engineering review of constants/wording is tracked in 29.2 and required before checkpoint 35.2, not claimed by configuration tests.
+    - Completed 2026-10-16: Cantilever Beam II version-1 JSON, additive scoped requirements/design and 14 domain regression cases cover numeric fixtures, orientation ratios, solvability, boundaries, geometry/applicability, student redaction and cross-challenge import rejection. Configuration is not registered as available; task 34 performs integration.
 
 - [ ] 34. Integrate multiple runnable challenges
   - [ ] 34.1 Generalize selection and isolate challenge sessions
@@ -696,7 +700,7 @@ This milestone groups the previously named future areas: Freeform, advanced phys
 
 - [ ] 36. Define Milestone 6 scope and architecture
   - [ ] 36.1 Prioritize the extension tracks and define acceptance criteria
-    - Use M4/M5 evidence to define concrete user stories, included/excluded capabilities, dependencies, measurable gates and delivery order in `MILESTONE6.md` and scoped specification extensions. Resolve the current browser-only/no-network boundary explicitly for any online capability. Depends on checkpoint 35.2.
+    - Use M4/M5 evidence to define concrete user stories, included/excluded capabilities, dependencies, measurable gates and delivery order in `MILESTONE6.md` and scoped specification extensions. Resolve the current browser-only/no-network boundary explicitly for any online capability. Development planning depends on 33.1 under D-34; customer release retains the M4/M5 gates.
   - [ ] 36.2 Record shared technical and data decisions
     - Specify model dispatch/versioning, geometry validation, save/import compatibility, local/offline behavior and any backend/auth/provider choices. Define data minimization, deletion/export, failure behavior, cost limits and rollback where applicable; keep pure domain modules independent of React and services.
 
@@ -799,7 +803,7 @@ Numeric task 41 groups the historical UI-01–UI-07 maintenance work without ren
       "32.1"
     ],
     "33.1": [
-      "32.2"
+      "29.1"
     ],
     "33.2": [
       "33.1"
@@ -814,10 +818,11 @@ Numeric task 41 groups the historical UI-01–UI-07 maintenance work without ren
       "34.2"
     ],
     "35.2": [
-      "35.1"
+      "35.1",
+      "32.2"
     ],
     "36.1": [
-      "35.2"
+      "33.1"
     ],
     "36.2": [
       "36.1"

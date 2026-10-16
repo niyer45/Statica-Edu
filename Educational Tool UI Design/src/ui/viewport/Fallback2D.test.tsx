@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { lazy, Suspense, useEffect, type ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { bundledChallengeResult } from '../../challenge/content'
@@ -113,8 +113,9 @@ describe('viewport recovery', () => {
     setup(<ViewportBoundary onUnavailable={notify}><Suspense fallback="Loading"><Broken /></Suspense></ViewportBoundary>)
     const before = latest
     expect(await screen.findByText(FALLBACK_NOTICE)).toBeTruthy()
+    // The fallback DOM can commit before its passive announcement effect runs.
+    await waitFor(() => expect(notify.mock.calls).toEqual([[FALLBACK_NOTICE]]))
     expect(latest).toBe(before)
-    expect(notify.mock.calls).toEqual([[FALLBACK_NOTICE]])
   })
   it('recovers from WebGL context creation failure', () => {
     vi.spyOn(console, 'error').mockImplementation(() => { })

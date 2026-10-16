@@ -1,0 +1,136 @@
+{
+  "id": "cantilever-beam-2",
+  "version": 1,
+  "title": "Cantilever Beam II",
+  "difficulty": "intermediate",
+  "allowedModes": [
+    "guided",
+    "parametric"
+  ],
+  "statement": "A rectangular cantilever bends too far under its tip load. Meet the deflection, stress, mass and packaging limits by changing its dimensions or orientation. Compare a rotation before adding material; span, material, support and load remain fixed.",
+  "material": {
+    "id": "al-educational",
+    "name": "Aluminum (educational nominal)",
+    "elasticModulusPa": 69000000000.0,
+    "densityKgM3": 2700,
+    "allowableStressPa": 120000000.0,
+    "yieldStressPa": 240000000.0
+  },
+  "initialDesign": {
+    "id": "baseline",
+    "section": {
+      "kind": "rectangle",
+      "widthM": 0.04,
+      "heightM": 0.02
+    },
+    "orientationDeg": 0,
+    "lengthM": 0.6,
+    "materialId": "al-educational"
+  },
+  "referenceDesign": {
+    "id": "reference",
+    "section": {
+      "kind": "rectangle",
+      "widthM": 0.04,
+      "heightM": 0.02
+    },
+    "orientationDeg": 90,
+    "lengthM": 0.6,
+    "materialId": "al-educational"
+  },
+  "lockedFields": [
+    "lengthM",
+    "materialId",
+    "forceN",
+    "support"
+  ],
+  "support": "fixedRoot",
+  "load": {
+    "forceN": 300,
+    "location": "freeEnd",
+    "direction": "down"
+  },
+  "constraints": {
+    "maxMassKg": 1.4,
+    "maxDeflectionM": 0.003,
+    "maxStressPa": 120000000.0,
+    "maxWidthM": 0.06,
+    "maxHeightM": 0.06
+  },
+  "sectionLimits": {
+    "circle": {
+      "diameterM": {
+        "minM": 0.005,
+        "maxM": 0.1,
+        "stepM": 0.0005
+      }
+    },
+    "tube": {
+      "outerDiameterM": {
+        "minM": 0.01,
+        "maxM": 0.1,
+        "stepM": 0.0005
+      },
+      "minWallM": 0.002
+    },
+    "rectangle": {
+      "widthM": {
+        "minM": 0.003,
+        "maxM": 0.1,
+        "stepM": 0.0005
+      },
+      "heightM": {
+        "minM": 0.003,
+        "maxM": 0.1,
+        "stepM": 0.0005
+      }
+    },
+    "iSection": {
+      "widthM": {
+        "minM": 0.01,
+        "maxM": 0.1,
+        "stepM": 0.0005
+      },
+      "heightM": {
+        "minM": 0.01,
+        "maxM": 0.1,
+        "stepM": 0.0005
+      },
+      "minFlangeThicknessM": 0.003,
+      "minWebThicknessM": 0.003,
+      "minClearWebHeightM": 0.003
+    }
+  },
+  "sectionDefaults": {
+    "tubeWallM": 0.004,
+    "iSectionFlangeThicknessM": 0.004,
+    "iSectionWebThicknessM": 0.004
+  },
+  "allowedSections": [
+    "rectangle"
+  ],
+  "predictionPolicy": {
+    "requiredOnIterations": [
+      1,
+      3
+    ]
+  },
+  "reflectionPrompt": {
+    "id": "cantilever-beam-2-reflection",
+    "text": "Compare your rectangular section before and after rotation. What changed in bending stiffness, deflection and nominal stress, and why did mass stay the same for an unchanged section? Use your tested values to explain whether adding material was necessary."
+  },
+  "visualization": {
+    "exaggerationFactor": 15,
+    "maxVisualDeflectionFractionOfL": 0.3
+  },
+  "content": {
+    "conceptNotes": {
+      "secondMoment": "The second moment of area I measures how a section's area is distributed about its bending axis. In this model, tip deflection is inversely proportional to I, and each element of area contributes in proportion to the square of its distance from that axis.",
+      "neutralAxis": "For these symmetric sections under elastic bending, the neutral axis passes through the centroid. Bending stress is zero there and grows linearly with distance from it, so material near the axis carries little bending stress.",
+      "orientation": "Rotating a rectangle or I-section by 90\u00b0 changes which dimension lies along the load direction. The area and mass stay the same, but I, and therefore deflection and stress, can change considerably.",
+      "massBudget": "Mass here is density \u00d7 cross-sectional area \u00d7 length, because span and material are fixed. Within the mass limit, stiffness gains come mainly from placing the available area farther from the neutral axis.",
+      "modelLimits": "Results come from small-deflection Euler-Bernoulli beam theory with an educational nominal material. Shear deformation, local and lateral-torsional buckling, plasticity, root stress concentrations, joint compliance, and self-weight are not modeled. Use the results for comparison and learning, not for certified design."
+    },
+    "collegeDetails": true
+  }
+}

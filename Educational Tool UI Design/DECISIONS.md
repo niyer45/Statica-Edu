@@ -114,3 +114,7 @@ Per user direction, informational notices are shown through the existing live-re
 - A narrow CSP exception may be needed if React Three Fiber requires `blob:` URLs.
 - Storage keys and the export `format` keep the `ei` prefix despite the Statica brand.
 - `.figma/make/install` uses `--no-frozen-lockfile`; local development and CI use `pnpm install --frozen-lockfile`.
+
+## D-34: Develop before owner QA; retain pre-deployment release gates (2026-10-16)
+
+The owner nominated themself as engineering reviewer and directed human QA to occur before customer deployment so software work can proceed now. Task 29.2 records owner-conducted engineering QA, not an external independent review; reviewer conclusions must still be based on independent calculations/references and recorded evidence. Manual readiness/student sessions and their findings remain open. They no longer block isolated configuration/specification development, but checkpoint 32.2 and release checkpoints remain required before customer release. Do not mark human work complete, publish, or activate an unfinished challenge based on development tests. The pilot stays local-only; accounts/saved user information/challenge progress remain required future scope. Preserve existing task IDs and record revised dependencies explicitly.
