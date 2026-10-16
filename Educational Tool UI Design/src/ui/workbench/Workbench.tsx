@@ -90,7 +90,7 @@ export default function Workbench({ onExit }: WorkbenchProps) {
             <div className="viewport-top">
               <div>
                 <span className="viewport-label">DESIGN VIEW</span>
-                <span className="draft-badge">{selectStatusBadge(session)}</span>
+                <span className="draft-badge" aria-label="Test status">{selectStatusBadge(session)}</span>
               </div>
             </div>
             <ViewportBoundary onUnavailable={notify}>

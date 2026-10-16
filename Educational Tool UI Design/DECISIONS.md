@@ -86,6 +86,10 @@ DM Sans and Manrope are self-hosted via `@fontsource` static weights (D-21). Non
 
 Keep the original challenge statement visible, followed by draft/test status and a compact stored value/limit list with readable, correctly colored text/icon pass/fail badges. Move the duplicate full constraint table, fixed-load/material/span text, generated explanation paragraphs and college formulas into a collapsed Test details disclosure. Keep model applicability reasons, warnings and errors visible. Full details remain available with keyboard-accessible native disclosures; numerical values and scoring are unchanged. This user instruction supersedes the original default-expanded presentation in Requirement 29.6; do not regenerate the completed MVP specification. The detailed table uses natural word wrapping and can scroll inside its disclosure instead of splitting words into arbitrary fragments.
 
+## D-29 — Status ownership and compact history (user-directed, 2026-10-16)
+
+Remove draft and overall acceptance banners from The challenge: draft status is already displayed in the viewport, and recorded acceptance belongs to design history. The history sidebar uses compact template-sized iteration rows (section icon/name, acceptance badge, compare checkbox and Restore), while the selected result keeps its three numerical metrics and acceptance badge. Prediction details, per-constraint results and explanation facts remain available in a collapsed Test details disclosure. Compare uses styled cards and metric/delta tables; repeated section/constraint transition lists move behind Constraint changes. Preserve stored evaluations, compare selection semantics, restore behavior and keyboard navigation. The import chooser uses a compact label styled as a template control with a visually hidden accessible native file input. This presentation instruction supersedes the original default-visible acceptance banner in Requirement 29.6 and verbose default history/compare presentation; no domain calculations or completed specifications are regenerated.
+
 ## Open questions
 
 - Final challenge constants and applicability thresholds are pending engineering review.

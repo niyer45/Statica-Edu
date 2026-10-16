@@ -84,3 +84,47 @@
 .challenge-body .result-details th { overflow-wrap: normal; word-break: normal; }
 .challenge-body .result-details td { white-space: normal; }
 .challenge-body .result-details [aria-label="Explanation facts"] p { margin: 8px 0; }
+/* D-29: template-sized history rows and comparison cards; extended prose is opt-in. */
+.iteration-list .iteration { position: relative; align-items: flex-start; gap: 10px; padding: 10px; }
+.iteration .iteration-copy { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 7px; align-items: center; }
+.iteration .iteration-select { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 4px; padding: 0; text-decoration: none; }
+.iteration .iteration-select strong { font-size: 11px; font-weight: 600; }
+.iteration .iteration-select small { display: block; font-size: 9px; color: #58664a; }
+.iteration .status-pass, .iteration .status-fail { margin: 0; justify-self: start; }
+.iteration .iteration-compare { position: absolute; top: 10px; right: 8px; margin: 0; }
+.iteration .iteration-select { padding-right: 18px; }
+.iteration .iteration-compare input { accent-color: #345640; }
+.iteration .iteration-copy > button:last-child { font-size: 9px; padding: 2px; justify-self: end; }
+.analysis-heading { gap: 12px; }
+.analysis-heading [aria-label="Result status"] { letter-spacing: 0; font-size: 9px; }
+.analysis-results { min-width: 0; padding-bottom: 16px; }
+.history-details, .comparison-details { font-size: 10px; color: #46583b; line-height: 1.7; }
+.history-details > summary, .comparison-details > summary { cursor: pointer; font-weight: 500; padding: 8px 0; }
+.history-details ul, .comparison-details ul { padding-left: 16px; }
+.results-panel .comparison-content { padding: 16px; }
+.comparison-hint { margin: 0 0 12px; font-size: 10px; color: #58664a; }
+.comparison-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.comparison-card { min-width: 0; padding: 14px; border: 1px solid #e0e5d9; border-radius: 6px; background: #fcfdf9; }
+.comparison-card > header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+.comparison-card h3 { font: 600 12px Manrope, sans-serif; margin: 0; color: #43533a; }
+.comparison-card .status-pass, .comparison-card .status-fail { font-size: 9px; }
+.results-panel .comparison-card table { font-size: 10px; overflow-wrap: normal; }
+.results-panel .comparison-card th, .results-panel .comparison-card td { padding: 8px 4px; word-break: normal; }
+.comparison-card > p { font-size: 10px; }
+@media (max-width: 870px) { .comparison-grid { grid-template-columns: 1fr; } }
+@media (max-width: 620px) {
+  .iteration-list .iteration { min-width: 190px; }
+  .results-panel .comparison-content { padding: 12px; }
+  .comparison-card { padding: 10px; }
+  .analysis-heading { flex-wrap: wrap; }
+}
+
+@media (max-width: 620px) {
+  .analysis-results .metric { min-width: 0; padding: 0 8px; }
+  .analysis-results .metric:first-child { padding-left: 0; }
+  .analysis-results .metric:last-child { padding-right: 0; }
+  .analysis-results .metric strong { font-size: 22px; }
+}
+
+.history-note .design-import { display: inline-flex; flex-direction: row; border: 1px solid #dce1d4; border-radius: 5px; padding: 7px 10px; background: #fafbf7; cursor: pointer; color: #46583b; }
+.design-import:focus-within { outline: 2px solid #345640; outline-offset: 4px; }

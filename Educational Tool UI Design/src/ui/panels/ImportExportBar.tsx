@@ -34,7 +34,7 @@ export default function ImportExportBar() {
   }
   return <div className="history-note"><span className="tiny-dot" />Local design files
     <button type="button" title="Export current design" aria-label="Export design" onClick={exportFile}><Icon name="download" size={15} /></button>
-    <label>Import design<input type="file" aria-label="Import design" accept=".json,application/json" onChange={async (event) => {
+    <label className="design-import">Import design<input className="sr-only" type="file" aria-label="Import design" accept=".json,application/json" onChange={async (event) => {
       const file = event.currentTarget.files?.[0]
       event.currentTarget.value = ''
       if (!file) return

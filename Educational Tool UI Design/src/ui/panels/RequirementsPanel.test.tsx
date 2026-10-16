@@ -36,7 +36,8 @@ it('displays ordered stored constraints, fixed units, textual pass/fail and coll
   expect(rows[1]!.textContent).toMatch(/\d+\.\d MPa/)
   expect(rows[2]!.textContent).toMatch(/\d+\.\d{3} kg/)
   expect(rows[5]!.textContent).toContain('Pass')
-  expect(screen.getByLabelText('Result status').textContent).toContain('Accepted')
+  expect(screen.queryByLabelText('Result status')).toBeNull()
+  expect(screen.queryByLabelText('Test status')).toBeNull()
   expect(screen.getByText('College details').closest('details')!.open).toBe(false)
   fireEvent.click(screen.getByText('College details'))
   expect(screen.getByText('College details').closest('details')!.open).toBe(true)
@@ -47,11 +48,11 @@ it('leaves displayed numbers unchanged during edits and records a new result aft
   const table = screen.getByRole('table').textContent
   act(() => store().dispatch({ type: 'applySection', kind: 'iSection' }))
   expect(screen.getByRole('table').textContent).toBe(table)
-  expect(screen.getByLabelText('Test status').textContent).toBe('Draft')
+  expect(store().state.draftStatus).toBe('draft')
   fireEvent.click(screen.getByRole('button', { name: 'Run Test' }))
   fireEvent.click(screen.getByLabelText('Decrease'))
   fireEvent.click(screen.getByText('Run structural test'))
-  expect(screen.getByLabelText('Test status').textContent).toBe('Tested #1')
+  expect(store().state.history).toHaveLength(2)
   expect(screen.getByRole('table').textContent).not.toBe(table)
 })
 it('shows envelope failure from the evaluator and omits disabled college details', () => {
@@ -62,7 +63,7 @@ it('shows envelope failure from the evaluator and omits disabled college details
 })
 it('labels every out-of-assumption numeric result and lists applicability reasons', () => {
   mount(tinyCircle.design)
-  expect(screen.getByLabelText('Result status').textContent).toContain('Model not applicable')
+  expect(screen.queryByLabelText('Result status')).toBeNull()
   fireEvent.click(screen.getByText('Test details'))
   expect(screen.getAllByText('Outside model assumptions')).toHaveLength(8)
   expect(screen.getByRole('list', { name: 'Model applicability reasons' }).textContent!.length).toBeGreaterThan(0)

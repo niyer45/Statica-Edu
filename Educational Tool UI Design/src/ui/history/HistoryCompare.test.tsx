@@ -11,6 +11,8 @@ it('blocks the fourth comparison, computes deltas, restores a draft and supports
   let store: Store
   function Probe() { store = useStore(); return null }
   render(<StoreProvider challenge={bundledChallenge()} initialSession={initial}><Probe /><HistoryCompare /></StoreProvider>)
+  expect(screen.getByText('Test details').closest('details')!.open).toBe(false)
+  expect(screen.getByLabelText('Result status')).toBeTruthy()
   for (let i = 1; i <= 3; i++) fireEvent.click(screen.getByLabelText(`Compare Iteration ${i}`))
   fireEvent.click(screen.getByLabelText('Compare Iteration 4'))
   expect(store!.state.compareSelection).toHaveLength(3)
@@ -21,6 +23,7 @@ it('blocks the fourth comparison, computes deltas, restores a draft and supports
   const history = screen.getByRole('tab', { name: 'Design history' })
   fireEvent.keyDown(history, { key: 'ArrowRight' })
   expect(document.activeElement).toBe(screen.getByRole('tab', { name: 'Compare results' }))
+  document.querySelectorAll('.comparison-details').forEach((details) => expect((details as HTMLDetailsElement).open).toBe(false))
   const baseline = screen.getByRole('table', { name: 'Baseline differences' })
   expect(baseline.textContent).toContain('—')
   const first = screen.getByRole('table', { name: 'Iteration 1 differences' })
