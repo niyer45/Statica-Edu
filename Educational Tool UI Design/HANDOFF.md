@@ -1,8 +1,8 @@
 # Handoff: Statica MVP
 
-Last updated: 2026-10-15, completed task 20.3. Next: 20.4. Current work is verified locally; see MILESTONE3.md for per-task evidence and pushed batch records.
+Last updated: 2026-10-15, completed task 22.2. Next: 21.1. Current work is verified locally; see MILESTONE3.md for per-task evidence and pushed batch records.
 
-Current Milestone 3 progress: **20.3 complete; next 20.4**. The per-task ledger in [MILESTONE3.md](MILESTONE3.md) supersedes historical open-task statements below.
+Current Milestone 3 progress: **22.2 complete; next 21.1**. The per-task ledger in [MILESTONE3.md](MILESTONE3.md) supersedes historical open-task statements below.
 
 ## A. Current state
 
@@ -53,8 +53,8 @@ Incomplete:
 
 ## B. Task progress
 
-- **Last completed:** task 20.3.
-- **Next implementation:** **20.4**, following the existing task specifications and dependency graph.
+- **Last completed:** task 22.2.
+- **Next implementation:** **21.1**, following the existing task specifications and dependency graph.
 - **Gate evidence:** `src/ui/workbench/milestone2.test.tsx` drives the real Workbench/palette/controls/lazy fallback for all four profiles, checking each numeric value, oriented SVG outline/envelope summary and actual Three.js mesh bounds against typed state. Edits leave stored history/deformation unchanged. `BeamView.test.tsx` renders the real R3F scene with a no-op GPU renderer for all four profiles and checks the D-26 uncluttered presentation. Neither suite is a real-browser/GPU pass.
 - **Viewport files:**
 
@@ -138,7 +138,7 @@ Verified after task 19.5 (2026-10-15; Node 24.15.0, pnpm 10.34.3 in this environ
 
 | Check | Result |
 |---|---|
-| `pnpm exec vitest run` | 856 tests pass; lint, typecheck and build pass |
+| `pnpm exec vitest run` | 860 tests pass; lint, typecheck and build pass |
 | `pnpm run typecheck` | clean |
 | `pnpm run lint` | 0 errors, 10 `no-explicit-any` warnings (in `src/challenge/*.test.ts` and `vite.config.ts`, left as is) |
 | `pnpm run build` | passed; R3F remains in the lazy viewport chunk (~963 kB minified / 258 kB gzip), which triggers Vite's non-failing size warning |

@@ -487,7 +487,7 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
     - Run each generated action sequence from `initSession` under `mode: 'guided'` and `mode: 'parametric'`; assert drafts, history, and Evaluations are deep-equal apart from `mode` (separate file `test/state/modeInvariance.test.ts`)
     - _Requirements: 35.1, 35.3_
 
-- [ ] 20. Persistence
+- [x] 20. Persistence
   - [x] 20.1 Implement `state/persistence.ts` and `state/migrations.ts`
     - `serializeSession` / `deserializeSession` (never throw); key `ei:session:{id}:v{version}` with `schemaVersion` and UTC `savedAt`; load applies migrations, re-validates and re-analyzes snapshots (1e-9 relative), removes entry and returns notice on failure; storage exceptions surface a once-per-load notice
     - _Requirements: 21.1, 21.2, 21.3, 21.4, 21.5, 21.6, 21.8_
@@ -500,7 +500,7 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
     - Unknown `schemaVersion`, tampered analysis value, invalid snapshot, truncated JSON → entry removed and fresh session; throwing `localStorage` → in-memory with single notice; no entry → no notice
     - _Requirements: 21.4, 21.5, 21.6_
 
-  - [ ] 20.4 Wire persistence into the store
+  - [x] 20.4 Wire persistence into the store
     - Load on startup (before first render of the session) and save after each appended Test_Result, submission, and state change; show notices
     - _Requirements: 17.4, 20.7, 21.3, 21.4, 21.5, 21.6_
 
@@ -515,11 +515,11 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
     - _Requirements: 16.3, 16.4, 16.5, 29.3, 29.4, 29.5, 29.6, 29.8, 29.9, 29.10_
 
 - [ ] 22. Dialogs and live announcements
-  - [ ] 22.1 Implement `ui/dialogs/Dialog.tsx` primitive
+  - [x] 22.1 Implement `ui/dialogs/Dialog.tsx` primitive
     - `role="dialog"`, `aria-modal`, labelled by title, initial focus, Tab/Shift+Tab trap, Escape close, focus restore to opener or RequirementsPanel
     - _Requirements: 30.1, 30.2, 30.3, 30.4_
 
-  - [ ] 22.2 Implement `ui/dialogs/PredictionDialog.tsx` and `ui/dialogs/HelpDialog.tsx`
+  - [x] 22.2 Implement `ui/dialogs/PredictionDialog.tsx` and `ui/dialogs/HelpDialog.tsx`
     - Keep the template `.modal` / `.prediction-options` look; wording compares against the previous tested iteration; opens only when the reducer sets `predictionDialogOpen` (iterations 1 and 3), not on every Run Test as in the template; `HelpDialog` keeps the template help/stiffness-reference content with no computed numbers
     - Three unselected radios, optional explanation ≤ 500 chars, inline errors on invalid confirm, confirm dispatches `setPrediction` then `runTest`, cancel dispatches `cancelPrediction`
     - _Requirements: 14.2, 14.3, 14.4, 14.5_

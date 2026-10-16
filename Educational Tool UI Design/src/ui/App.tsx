@@ -4,6 +4,14 @@ import { bundledChallengeResult } from '../challenge/content'
 import type { Challenge, Result, SchemaIssue } from '../challenge/types'
 import { bootstrap, randomIdFactory, systemClock, type BootFailure, type Clock, type IdFactory } from './state/bootstrap'
 import StoreProvider from './state/StoreProvider'
+import type { SessionStorage } from '../state/persistence'
+
+// Lazy browser access keeps storage exceptions inside the persistence controller.
+const browserStorage: SessionStorage = {
+  getItem: (key) => window.localStorage.getItem(key),
+  setItem: (key, value) => window.localStorage.setItem(key, value),
+  removeItem: (key) => window.localStorage.removeItem(key),
+}
 
 // App bootstrap (task 13.2; Req 3.3, 3.7, 35.1).
 // Loads the bundled challenge, builds the session, and either shows a full-page error that
@@ -48,7 +56,7 @@ export default function App({ loaded = bundledChallengeResult, clock = systemClo
   const [boot] = useState(() => bootstrap(loaded, clock, newId))
   if (!boot.ok) return <BootErrorPage failure={boot.error} />
   return (
-    <StoreProvider challenge={boot.value.challenge} initialSession={boot.value.session} clock={clock} newId={newId}>
+    <StoreProvider challenge={boot.value.challenge} initialSession={boot.value.session} storage={browserStorage} clock={clock} newId={newId}>
       <PlatformShell />
     </StoreProvider>
   )

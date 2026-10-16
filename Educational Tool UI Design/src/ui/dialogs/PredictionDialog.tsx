@@ -1,30 +1,36 @@
+import { useState } from 'react'
+import type { PredictionDirection } from '../../state/session'
 import Icon from '../icons/Icon'
-import { useDispatch, useSession } from '../state/store'
-import ModalFrame from './ModalFrame'
+import { useSession, useStore } from '../state/store'
+import Dialog from './Dialog'
 
-// STUB (task 13.3): the template "Predict deflection" modal moved here in look
-// (`.prediction-options`). Opens only when the reducer sets `ui.predictionDialogOpen`.
-// Non-interactive: options and confirm are disabled until task 22.2 wires `setPrediction`
-// and `runTest`. Close dispatches `cancelPrediction` (stores nothing, Req 14.5).
-
+function PredictionForm() {
+  const store = useStore()
+  const [direction, setDirection] = useState<PredictionDirection | ''>('')
+  const [explanation, setExplanation] = useState('')
+  const [error, setError] = useState('')
+  const previous = store.state.history[store.state.history.length - 1]!
+  const cancel = () => store.dispatch({ type: 'cancelPrediction' })
+  const confirm = () => {
+    if (!direction) { setError('Select a prediction direction.'); return }
+    if (explanation.length > 500) { setError('Explanation must contain at most 500 characters.'); return }
+    store.dispatch({ type: 'setPrediction', direction, explanation, now: store.clock() })
+    store.runTest()
+  }
+  return <Dialog title="Predict deflection" icon="bulb" onClose={cancel}>
+    <p>Compared with {previous.iteration === 0 ? 'the Baseline' : `iteration ${previous.iteration}`}, how will your new section change tip deflection?</p>
+    <fieldset className="prediction-options"><legend>Predicted change in tip deflection</legend>
+      {([['decrease', 'Decrease'], ['same', 'Stay the same'], ['increase', 'Increase']] as const).map(([value, label]) => <label key={value}>
+        <input type="radio" name="prediction" value={value} checked={direction === value} onChange={() => { setDirection(value); setError('') }} /> {label}
+      </label>)}
+    </fieldset>
+    <label htmlFor="prediction-explanation">Explanation (optional, up to 500 characters)</label>
+    <textarea id="prediction-explanation" maxLength={500} value={explanation} onChange={(e) => setExplanation(e.target.value)} />
+    {(error || store.state.ui.notice?.kind === 'error') && <p role="alert">{error || store.state.ui.notice?.message}</p>}
+    <button type="button" className="primary modal-primary" onClick={confirm}><Icon name="play" size={15} />Run structural test</button>
+    <button type="button" onClick={cancel}>Cancel</button>
+  </Dialog>
+}
 export default function PredictionDialog() {
-  const open = useSession().ui.predictionDialogOpen
-  const dispatch = useDispatch()
-  if (!open) return null
-  return (
-    <ModalFrame title="Predict deflection" icon="bulb" onClose={() => dispatch({ type: 'cancelPrediction' })}>
-      <p>Compared with your previous tested design, how will your new section change tip deflection?</p>
-      <div className="prediction-options">
-        {['Decrease', 'Stay the same', 'Increase'].map((p) => (
-          <button type="button" key={p} disabled>
-            {p === 'Decrease' ? '↘' : p === 'Increase' ? '↗' : '→'} {p}
-          </button>
-        ))}
-      </div>
-      <button type="button" className="primary modal-primary" disabled>
-        <Icon name="play" size={15} />
-        Run structural test
-      </button>
-    </ModalFrame>
-  )
+  return useSession().ui.predictionDialogOpen ? <PredictionForm /> : null
 }
