@@ -1,6 +1,6 @@
 # Handoff: Statica MVP
 
-Last updated: 2026-10-16 completion audit. Tasks 19–26 and 27.1 are complete; next: 27.2. Core checks pass, but the browser gate failed. See MILESTONE3.md for evidence.
+Last updated: 2026-10-16, completed 27.5; next 27.4. 35/38 Milestone 3 subtasks complete; next 27.4. Browser tasks verified: 27.2, 27.3, 27.5. See the latest verification entries below.
 
 ## Current implementation
 
@@ -67,3 +67,15 @@ Scoped reflection inputs to the submission dialog and Freeform to the challenge 
 The keyboard scenario now reaches controls using real Tab traversal (including opening the challenge), rather than programmatic focus. The native drag scenario keeps each project's viewport width while increasing height so source and target are simultaneously on screen in the stacked mobile layout, and asserts the active tile after drop. These changes still await CI; do not mark 27.3/27.4 complete yet.
 
 Further browser repairs: the palette's actual tube label is "Hollow circle" (not "Hollow tube"). Drag coordinates now project the beam midpoint and verify hover/clear plus active state. Happy path uses distinct tested heights and verifies restore leaves history unchanged. Invalid-path and persistence scenarios explicitly compare stored history. Platform checks cover both sides of 1050/870/620, preserve a typed uncommitted dimension and active tab, and assert sidebar width/visibility. A `workbench-open` shell class scopes required 1050/620 sidebar behavior in learningLoop.css, preserving the library's template rules. These additions await CI.
+
+### Task 27.2 complete — 2026-10-16
+
+Happy path verifies native height-handle drag, prediction, four distinct iterations, comparison, isolated restore, reflection and Accepted submission. Both target viewports passed in [CI run 38890827051](https://github.com/niyer45/Statica-Edu/actions/runs/38890827051), including serious/critical axe checks. Lint, typecheck, all 873 unit/component/property tests, coverage, schema drift and build passed for the verified implementation. 33/38 Milestone 3 subtasks complete; next 27.3. Browser tasks verified: 27.2. Documentation is local until the next batch push. Earlier failed-run notes above are historical.
+
+### Task 27.3 complete — 2026-10-16
+
+Native HTML5 drag reaches the projected beam, verifies hover/clear and active tile, and preserves result history at desktop and mobile widths. Both target viewports passed in [CI run 38890827051](https://github.com/niyer45/Statica-Edu/actions/runs/38890827051), including serious/critical axe checks. Lint, typecheck, all 873 unit/component/property tests, coverage, schema drift and build passed for the verified implementation. 34/38 Milestone 3 subtasks complete; next 27.4. Browser tasks verified: 27.2, 27.3. Documentation is local until the next batch push. Earlier failed-run notes above are historical.
+
+### Task 27.5 complete — 2026-10-16
+
+Invalid tube/flange input preserves draft and history; editing after a test leaves stored numerical results unchanged and displays Draft. Both target viewports passed in [CI run 38890827051](https://github.com/niyer45/Statica-Edu/actions/runs/38890827051), including serious/critical axe checks. Lint, typecheck, all 873 unit/component/property tests, coverage, schema drift and build passed for the verified implementation. 35/38 Milestone 3 subtasks complete; next 27.4. Browser tasks verified: 27.2, 27.3, 27.5. Documentation is local until the next batch push. Earlier failed-run notes above are historical.

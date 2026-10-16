@@ -2,7 +2,7 @@
 
 Browser-only structures learning app built around "Cantilever Beam I: Reduce Deflection". Cross-section editing, 3D handles and SVG fallback, prediction, stored test/results, comparison/restore, reflection/submission, local persistence and design import/export are implemented in the existing platform shell.
 
-**Milestone 3: tasks 19–26 and 27.1 are complete (32/38 subtasks).** The core gate passes with **873 tests**, lint, typecheck, build, coverage and schema checks. All 18 browser cases failed in [CI run 38841912543](https://github.com/niyer45/Statica-Edu/actions/runs/38841912543); tasks 27.2–27.7 and final checkpoint 28 remain. [HANDOFF.md](HANDOFF.md) records failures and next steps; [MILESTONE3.md](MILESTONE3.md) preserves task evidence.
+**Milestone 3: 35/38 Milestone 3 subtasks complete; next 27.4. Browser tasks verified: 27.2, 27.3, 27.5.** The core gate passes with **873 tests**, lint, typecheck, build, coverage and schema checks. See [HANDOFF.md](HANDOFF.md) for current browser evidence and remaining work; [MILESTONE3.md](MILESTONE3.md) preserves the task ledger.
 
 The dotted deformation outline shows the latest **tested** design (initially the Baseline), so selecting or resizing a cross-section does not change it until a successful Run Test. This follows Requirements 25.2–25.5. The pending Run Test/results panel (21.1) and prediction confirmation (22.2) complete that UI flow; no separate deformation fix is needed.
 
@@ -72,4 +72,4 @@ pnpm exec playwright install chromium   # needed once before `pnpm run e2e`
 
 
 
-Current Milestone 3 progress: task 27.1 complete; next 27.2. See [MILESTONE3.md](MILESTONE3.md) for the verified task ledger.
+Current Milestone 3 progress: 35/38 Milestone 3 subtasks complete; next 27.4. Browser tasks verified: 27.2, 27.3, 27.5. See [MILESTONE3.md](MILESTONE3.md) for the verified task ledger.

@@ -7,7 +7,7 @@ template's visual design and platform shell are kept.
 
 Read `HANDOFF.md` first for the current status and the next task.
 
-Current task progress (2026-10-16 audit): 32/38 Milestone 3 subtasks complete; next 27.2. CI core checks pass; all 18 browser cases currently fail. Update HANDOFF.md, AGENTS.md and tasks.md after each completed task; push verified batches.
+Current task progress (2026-10-16): 35/38 Milestone 3 subtasks complete; next 27.4. Browser tasks verified: 27.2, 27.3, 27.5. Update HANDOFF.md, AGENTS.md and tasks.md after each completed task; push verified batches.
 
 ## Specifications (source of truth)
 
@@ -23,7 +23,7 @@ Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuiti
 ## Rules for following the spec
 
 - Implement tasks in `tasks.md` order, respecting the wave graph. Each task lists the requirement IDs it must satisfy.
-- Milestone 2 and its component gate are complete; see `MILESTONE2.md` for evidence and limitations. Tasks through 27.1 are complete; continue at 27.2.
+- Milestone 2 and its component gate are complete; see `MILESTONE2.md` for evidence and limitations. Tasks through 27.1 and browser subtasks 27.2 are complete; continue at 27.3.
 - Prediction actions use D-27: `setPrediction` requires `now` from the injected store clock. Confirm by dispatching `setPrediction`, then `runTest`; the reducer never reads time itself.
 - Follow D-26: no visible envelope or static annotations on the 3D model. Keep active drag feedback below Canvas, numerical controls and the accessible summary. Do not restore the original spec overlays; the user explicitly requested their removal.
 - Do not rewrite requirements, design, or tasks. If the code must deviate, record it under "Deviations" in `HANDOFF.md` (and in `DECISIONS.md` if it is a design decision).

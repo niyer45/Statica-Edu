@@ -50,3 +50,9 @@ Completed: tasks 19–25 (learning-loop implementation and unit/component/proper
 Browser repair batch in progress: scoped ambiguous locators, fixed palette casing, darkened reported contrast colors, and made the native HTML5 drag movement deliberate. CI execution is required because local server startup remains blocked by EPERM. Tasks 27.2–27.7 remain in progress pending that evidence.
 
 The browser repair batch also strengthens real Tab traversal, projected beam hover/drop, active-tile checks, distinct-history restore assertions, and input/tab preservation at every layout boundary. Fixed the embedded Workbench sidebar threshold mismatch with scoped supplemental styles. Completion remains dependent on CI evidence.
+
+- **27.2 complete** — Happy path verifies native height-handle drag, prediction, four distinct iterations, comparison, isolated restore, reflection and Accepted submission. Desktop and Pixel 7 plus axe passed in [run 38890827051](https://github.com/niyer45/Statica-Edu/actions/runs/38890827051); core checks and 873 tests passed. Next: 27.3.
+
+- **27.3 complete** — Native HTML5 drag reaches the projected beam, verifies hover/clear and active tile, and preserves result history at desktop and mobile widths. Desktop and Pixel 7 plus axe passed in [run 38890827051](https://github.com/niyer45/Statica-Edu/actions/runs/38890827051); core checks and 873 tests passed. Next: 27.4.
+
+- **27.5 complete** — Invalid tube/flange input preserves draft and history; editing after a test leaves stored numerical results unchanged and displays Draft. Desktop and Pixel 7 plus axe passed in [run 38890827051](https://github.com/niyer45/Statica-Edu/actions/runs/38890827051); core checks and 873 tests passed. Next: 27.4.

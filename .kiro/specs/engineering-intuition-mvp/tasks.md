@@ -572,11 +572,11 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
     - `e2e/helpers.ts`: read `window.__EI_STATE__`, normalize state (strip timestamps/ids), axe check failing on serious/critical violations, network request recorder
     - _Requirements: 23.10, 33.5_
 
-  - [-]* 27.2 Write E2E happy-path scenario
+  - [x]* 27.2 Write E2E happy-path scenario
     - Baseline "Not accepted"; apply I-section by click; drag height handle; set values numerically; predict; run; Accepted; compare baseline + three iterations; restore; reflect; submit Accepted
     - _Requirements: 14.1, 17.1, 18.5, 19.1, 20.2, 20.6, 33.5, 33.9_
 
-  - [-]* 27.3 Write E2E drag-drop scenario
+  - [x]* 27.3 Write E2E drag-drop scenario
     - Drag I-section tile onto the beam; active tile and draft update
     - _Requirements: 26.2, 26.3, 26.6_
 
@@ -584,7 +584,7 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
     - Full flow by keyboard; normalized state equals mouse flow; focus order and escape from canvas
     - _Requirements: 32.1, 32.8, 32.9, 33.9_
 
-  - [-]* 27.5 Write E2E invalid-path scenario
+  - [x]* 27.5 Write E2E invalid-path scenario
     - d ≥ D and overlapping flanges show errors with draft/history unchanged; edit after test shows "Draft" while tested numbers remain
     - _Requirements: 5.5, 5.7, 16.2, 16.5, 28.5, 33.9_
 
