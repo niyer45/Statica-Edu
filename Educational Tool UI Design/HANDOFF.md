@@ -1,6 +1,6 @@
 # Handoff: Statica MVP
 
-Last updated: 2026-10-16. **Milestones 0–3 and maintenance UI-01–UI-07 are complete and verified.** Next planned task is **29.1: create the Milestone 4 review plan**, when directed. Milestones 4–6 (tasks 29–40) remain not started. This closeout changes documentation only.
+Last updated: 2026-10-16. **Milestones 0–3 and maintenance UI-01–UI-07 are complete and verified.** **Task 29.1 is complete:** MILESTONE4.md defines the review/pilot plan. Task 29 is in progress; next is **29.2: arrange and obtain an independent engineering review**. Remaining M4 tasks and M5–M6 are not started. This task changes documentation only.
 
 ## Implementation and verification
 
@@ -36,7 +36,7 @@ The existing learning loop implements prediction, immutable tested results/histo
 ## Delivery and future work
 
 - Implementation is pushed at the verified commit above. This closeout updates only documentation/task markers; the final documentation commit is recorded in GitHub history. MILESTONE3.md preserves task-by-task evidence and earlier failed-run history.
-- The user requested a roadmap extension for M4 engineer review/student pilot, M5 a second runnable challenge, and M6 Freeform/advanced physics/accounts/AI. These are unchecked planning tasks 29–40, not changes to the completed MVP requirements. Start with 29.1 when directed; independent review and student sessions require actual human participation.
+- The user requested a roadmap extension for M4 engineer review/student pilot, M5 a second runnable challenge, and M6 Freeform/advanced physics/accounts/AI. Task 29.1 is complete; the remaining tasks stay open and do not change the completed MVP requirements. Independent review and student sessions require actual human participation.
 - Active workflow is repository-root `../.github/workflows/ci.yml`, with app working directory, Node 22, frozen pnpm install, core gates, focused responsive regression and full E2E. The nested app workflow is historical.
 - Local Kiro has no `.git`; authorized pushes use GitHub tree/commit/ref APIs with expected-head leases, preserving remote-only root README and sibling .kiro/app layout. Generated output stays ignored.
 - Local sandbox denies server port binding and Chromium Mach-port startup; no local browser pass is claimed. Normal Terminal or CI can run Playwright with matching Chromium. The user prefers Safari for browser inspection; it successfully downloaded CI artifacts.
@@ -45,3 +45,11 @@ Known historical spec differences remain: configured TypeScript is 5.9.3 versus 
 
 
 For future implementation, push a verified batch once and await the user’s workflow result; do not continuously poll CI. This documentation closeout is pushed separately from the verified implementation; GitHub history records its commit.
+
+## Task 29.1 handoff — 2026-10-16
+
+Read MILESTONE4.md for the authored plan. The owner chose a local-only pilot before accounts and confirmed reviewer/participants are not arranged. Proposed audience is introductory college mechanics learners, with a formative target of five adults; recruitment, access build/URL, reviewer and dates remain to arrange before launch. No independent review, manual pilot readiness, student sessions or deployment has occurred. Task 29.2 requires actual reviewer evidence; do not substitute agent review or CI.
+
+Accounts, saved user information and completed-challenge history are now explicit required future scope in 38.1–38.2, after the local pilot. The plan records data/progress requirements and open decisions without selecting a provider. Preserve guest/local operation and pure solver/reducer boundaries; no-network/CSP changes require the future scoped account specification. A submitted unsuccessful result must not be labelled a completed challenge. No account code was added.
+
+Validation: lint, typecheck, 879 tests across 109 files and production build passed for this documentation-only task. Existing browser evidence above remains the implementation baseline; no new browser execution is claimed. Documentation is delivered in a separate GitHub commit.

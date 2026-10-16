@@ -7,7 +7,7 @@ template's visual design and platform shell are kept.
 
 Read `HANDOFF.md` first for the current status and the next task.
 
-Current task progress (2026-10-16): M0–M3 and maintenance UI-01–UI-07 complete. CI run 38936927907 verified implementation eb1b56757b42192934f1b4cd3240515bb02237de: 879 core tests, 2 focused responsive cases and all 20 browser cases passed. Post-MVP M4–M6 remain planned; next task is 29.1 when directed. Read HANDOFF.md for current behavior and evidence. Push verified batches once and await the user; do not continuously poll CI.
+Current task progress (2026-10-16): M0–M3 and maintenance UI-01–UI-07 complete. CI run 38936927907 verified implementation eb1b56757b42192934f1b4cd3240515bb02237de: 879 core tests, 2 focused responsive cases and all 20 browser cases passed. M4 task 29.1 is complete (MILESTONE4.md); task 29 is in progress, next is 29.2 independent review. Other M4 and all M5–M6 tasks remain open. Read HANDOFF.md for current behavior and evidence. Push verified batches once and await the user; do not continuously poll CI.
 
 ## Specifications (source of truth)
 
@@ -127,9 +127,9 @@ Per the user's standing instruction, also update this file's current-task pointe
 
 ## Milestone 3 execution notes
 
-Milestone 3 is complete through checkpoint 28. CI run 38927191840 passed all core gates, 2 focused responsive cases and all 18 E2E cases on commit 48bfdd33a33632aa443ebae105f864645724b4c1. Post-MVP tasks 29–40 are planned; next planned task is 29.1. This planning update does not start implementation. Root workflow is `../.github/workflows/ci.yml`; app servers use 4174 (dev state hook) and 4173 (production CSP/no hook). Complete browser flows have a 60-second budget, with 90 seconds for keyboard and multi-breakpoint scenarios. Preserve assertions and real Tab/native drag interactions. Local sandbox restrictions still prevent server/browser startup; Safari is the user's preferred browser for artifact inspection. Preserve synchronous reduce/persist ordering in StoreProvider.
+Milestone 3 is complete through checkpoint 28. CI run 38927191840 passed all core gates, 2 focused responsive cases and all 18 E2E cases on commit 48bfdd33a33632aa443ebae105f864645724b4c1. Task 29.1 review plan is complete; next is 29.2 independent review. Other roadmap work remains open; no account implementation has started. Root workflow is `../.github/workflows/ci.yml`; app servers use 4174 (dev state hook) and 4173 (production CSP/no hook). Complete browser flows have a 60-second budget, with 90 seconds for keyboard and multi-breakpoint scenarios. Preserve assertions and real Tab/native drag interactions. Local sandbox restrictions still prevent server/browser startup; Safari is the user's preferred browser for artifact inspection. Preserve synchronous reduce/persist ordering in StoreProvider.
 
-Post-MVP roadmap update (2026-10-16): tasks.md now tracks M4 review/pilot and remediation, M5 a reviewed second configuration and isolated multi-challenge flows, and scoped M6 extension tracks. All new tasks are unchecked; dependencies and milestone gates are explicit. Requirements/design for M0–M3 remain unchanged. Feature-specific specification extensions precede implementation. No new feature or pilot activity was performed in this documentation update.
+Post-MVP roadmap update (2026-10-16): tasks.md now tracks M4 review/pilot and remediation, M5 a reviewed second configuration and isolated multi-challenge flows, and scoped M6 extension tracks. Task 29.1 is complete; other roadmap subtasks are unchecked and dependencies/gates remain explicit. Requirements/design for M0–M3 remain unchanged. Feature-specific specification extensions precede implementation. No new feature or pilot activity was performed in this documentation update.
 
 UI-02 presentation follow-up (2026-10-16): removed the exclamation prefix from Not accepted badges in history rows, selected results and comparison cards, as requested. Accepted and model-applicability indicators remain unchanged.
 
@@ -142,3 +142,5 @@ UI-05/D-32: fixed fields are collapsed under the lock/title summary; Cancel and 
 UI-06/D-33: informational notices belong in temporary Toast/LiveRegion, not permanent history paragraphs. My designs is a saved workspace card with no results table; Return to workbench reveals results without changing session state. Browser CI passed in run 38936927907.
 
 Responsive repair: scope the accessible Import design file input to 1×1 px inside its positioned label. The old history-note input width:100% rule overrode sr-only and caused a 2431 px document at 1280 px (run 38935876295). Preserve this specificity fix and the requested-width responsive assertion; verified by the focused responsive pair and full suite in run 38936927907.
+
+Task 29.1: MILESTONE4.md is the review/pilot plan. Owner confirmed local-only pilot first; reviewer and participants are not arranged. Never fabricate review or pilot evidence. Accounts with saved profile information, owned challenge sessions and completed-challenge history are required future scope under 38.1–38.2; the plan records inputs, not an implementation/provider decision. Specify completion separately from submission, since the existing reducer allows non-Accepted submissions. Keep current no-network/CSP and domain boundaries until an approved scoped extension changes them.

@@ -629,14 +629,15 @@ All seven maintenance tasks are complete. [CI run 38936927907](https://github.co
 
 Added at the user's request after Milestone 3 passed. Tasks 1–28 and their completion evidence remain unchanged. Requirements 1–35 and the existing design describe the completed M0–M3 baseline; their statements that M4+ is outside MVP implementation scope remain historical boundaries, not specifications for these new features. New feature requirements and acceptance criteria must be written as scoped extensions before implementation, without regenerating the completed MVP specifications or inventing requirement IDs.
 
-All tasks below are not started. This roadmap update schedules future work; it does not start development, recruit participants, publish the app, or enable network services. No new testing task is optional. Update supporting documentation after each completed task and push verified batches. Preserve the existing architecture, solver-backed results, D-26/D-27 and the complete MVP regression suite. Feature-specific backend, model, provider and challenge choices remain decisions to make in the tasks below.
+Task 29.1 is complete; task 29 is in progress and the remaining roadmap tasks are not started. The roadmap schedules future work; it does not start development, recruit participants, publish the app, or enable network services. No new testing task is optional. Update supporting documentation after each completed task and push verified batches. Preserve the existing architecture, solver-backed results, D-26/D-27 and the complete MVP regression suite. Feature-specific backend, model, provider and challenge choices remain decisions to make in the tasks below.
 
 ### Milestone 4: Engineer review and student pilot
 
-- [ ] 29. Prepare educational and engineering review
-  - [ ] 29.1 Create the Milestone 4 review plan
+- [-] 29. Prepare educational and engineering review
+  - [x] 29.1 Create the Milestone 4 review plan
     - Record intended learners, learning objectives, review checklist, roles, pilot access method and measurable success criteria in `MILESTONE4.md`; identify the engineer/reviewer and participant availability with the project owner.
     - Define severity levels and what blocks a pilot or milestone closeout before gathering results. Depends on checkpoint 28.
+    - Completed 2026-10-16: MILESTONE4.md records learners/objectives, checklist, roles, access/recovery, measures and severity/launch/closeout gates. Owner chose a local-only pilot first and confirmed reviewer/participants are not arranged; scheduling blocks launch, not the authored plan. Accounts, saved user information and challenge completion are required future scope under 38.1–38.2. No review or pilot is claimed.
   - [ ] 29.2 Obtain and record an independent engineering review
     - Review challenge constants, units, fixtures, formulas, applicability thresholds, boundary behavior, explanation wording and limitations against independent calculations/references.
     - Record reviewer, date, evidence, discrepancies and disposition. An agent's self-review or passing tests cannot substitute for the independent review.
@@ -705,8 +706,9 @@ This milestone groups the previously named future areas: Freeform, advanced phys
 - [ ] 38. Add accounts and saved-project synchronization
   - [ ] 38.1 Specify account, storage and offline behavior
     - Define provider/backend, identity, ownership/access rules, session lifecycle, data retention/export/deletion and sync/conflict handling. Document the migration from local-only use and necessary CSP/network changes before implementation.
+    - Owner-confirmed scope (2026-10-16): accounts with minimal profile information, cloud-saved owned challenge sessions and cross-device progress/completion, after the local-only pilot. MILESTONE4.md records planning inputs: explicit completion rules distinct from unsuccessful submissions, versioned provenance, guest migration, deletion/reset semantics and server-side ownership enforcement. Resolve these in a scoped specification before coding; no account feature is implemented by task 29.1.
   - [ ] 38.2 Implement and verify the scoped account/sync flow
-    - Test authentication lifecycle, authorization isolation, project ownership, offline editing, conflicts, interrupted saves and recovery. Preserve local-only operation according to the agreed requirements; do not expose credentials or other users' projects in client state or logs.
+    - Implement the reviewed user profile, challenge session and completion-history flows; verify cross-device resume, challenge/version attribution and completion evidence. Test authentication lifecycle, authorization isolation, project ownership, offline editing, conflicts, interrupted saves and recovery. Preserve local-only operation according to the agreed requirements; do not expose credentials or other users' projects in client state or logs.
 
 - [ ] 39. Add optional AI learning assistance
   - [ ] 39.1 Specify the assistant's educational and data boundaries
