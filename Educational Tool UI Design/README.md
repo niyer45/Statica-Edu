@@ -45,4 +45,6 @@ pnpm exec playwright install chromium   # needed once before `pnpm run e2e`
 
 `units`, `challenge`, `geometry`, `physics`, and `evaluation` must not import `react`, `three`, `@react-three/*`, `ui/`, or `state/`, and `physics` must not import `evaluation`. ESLint (`no-restricted-imports`) and an architecture test enforce this. Every numeric result comes from typed section parameters through pure functions, never from meshes or rendering state.
 
-Milestone 3 is complete; no incomplete task remains in the current specification. The 320 px layout repair and strengthened responsive checks passed in CI.
+Milestone 3 is complete. Post-MVP Milestones 4–6 are planned in tasks.md; next planned task is 29.1. The 320 px layout repair and strengthened responsive checks passed in CI.
+
+Post-MVP roadmap update (2026-10-16): tasks.md now tracks M4 review/pilot and remediation, M5 a reviewed second configuration and isolated multi-challenge flows, and scoped M6 extension tracks. All new tasks are unchecked; dependencies and milestone gates are explicit. Requirements/design for M0–M3 remain unchanged. Feature-specific specification extensions precede implementation. No new feature or pilot activity was performed in this documentation update.

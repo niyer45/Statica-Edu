@@ -2,7 +2,7 @@
 
 ## Overview
 
-Incremental, test-driven plan in TypeScript (strict) following design Milestones 0–3. All work happens in the existing Figma Make template at `Educational Tool UI Design/` (project root; every path below is relative to it) using pnpm. M0 adapts the template (exact pins, test tooling, self-hosted fonts, CSP, removal of prototype physics), adds CI, the zod schema, and documentation. M1 builds the pure domain (units, challenge, geometry, physics, applicability, evaluation, fixtures, import/export) and verifies Properties 1–27 plus fixtures E1–E6. M2 adds a minimal session skeleton, refactors the template's `App.tsx` / `Workspace.tsx` / `BeamScene.tsx` into the spec's `ui/` components while keeping the look, and builds the 3D/2D UI (viewport, palette, handles, numeric controls, SVG fallback). M3 completes the reducer and the learning loop (prediction, Run Test, results, history/compare/restore, reflection/submit, persistence, import/export UI, dialogs, live region) and verifies Properties 28–37 and the E2E scenarios. Milestone 4+ is out of scope.
+Incremental, test-driven plan in TypeScript (strict) following design Milestones 0–3. All work happens in the existing Figma Make template at `Educational Tool UI Design/` (project root; every path below is relative to it) using pnpm. M0 adapts the template (exact pins, test tooling, self-hosted fonts, CSP, removal of prototype physics), adds CI, the zod schema, and documentation. M1 builds the pure domain (units, challenge, geometry, physics, applicability, evaluation, fixtures, import/export) and verifies Properties 1–27 plus fixtures E1–E6. M2 adds a minimal session skeleton, refactors the template's `App.tsx` / `Workspace.tsx` / `BeamScene.tsx` into the spec's `ui/` components while keeping the look, and builds the 3D/2D UI (viewport, palette, handles, numeric controls, SVG fallback). M3 completes the reducer and the learning loop (prediction, Run Test, results, history/compare/restore, reflection/submit, persistence, import/export UI, dialogs, live region) and verifies Properties 28–37 and the E2E scenarios. Milestones 4–6 are now tracked below as a post-MVP roadmap; their feature-specific requirements are extensions to the completed MVP scope.
 
 Every property test uses fast-check through a shared helper that reads `PBT_RUNS` (default 200) and a fixed recorded seed, and carries the tag comment `// Feature: engineering-intuition-mvp, Property N: <title>`.
 
@@ -600,6 +600,101 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
   - Ensure Properties 28–37 and the happy-path, invalid-path, keyboard, and persistence E2E scenarios pass on Chromium desktop and Pixel 7 with no serious/critical axe violations; ask the user if questions arise.
   - _Requirements: 33.5, 33.9, 33.10_
 
+### Post-MVP roadmap: scope and execution
+
+Added at the user's request after Milestone 3 passed. Tasks 1–28 and their completion evidence remain unchanged. Requirements 1–35 and the existing design describe the completed M0–M3 baseline; their statements that M4+ is outside MVP implementation scope remain historical boundaries, not specifications for these new features. New feature requirements and acceptance criteria must be written as scoped extensions before implementation, without regenerating the completed MVP specifications or inventing requirement IDs.
+
+All tasks below are not started. This roadmap update schedules future work; it does not start development, recruit participants, publish the app, or enable network services. No new testing task is optional. Update supporting documentation after each completed task and push verified batches. Preserve the existing architecture, solver-backed results, D-26/D-27 and the complete MVP regression suite. Feature-specific backend, model, provider and challenge choices remain decisions to make in the tasks below.
+
+### Milestone 4: Engineer review and student pilot
+
+- [ ] 29. Prepare educational and engineering review
+  - [ ] 29.1 Create the Milestone 4 review plan
+    - Record intended learners, learning objectives, review checklist, roles, pilot access method and measurable success criteria in `MILESTONE4.md`; identify the engineer/reviewer and participant availability with the project owner.
+    - Define severity levels and what blocks a pilot or milestone closeout before gathering results. Depends on checkpoint 28.
+  - [ ] 29.2 Obtain and record an independent engineering review
+    - Review challenge constants, units, fixtures, formulas, applicability thresholds, boundary behavior, explanation wording and limitations against independent calculations/references.
+    - Record reviewer, date, evidence, discrepancies and disposition. An agent's self-review or passing tests cannot substitute for the independent review.
+
+- [ ] 30. Verify pilot readiness manually
+  - [ ] 30.1 Run manual usability and accessibility checks
+    - Exercise Guided/Parametric modes, keyboard-only navigation, screen reader labels/announcements, zoom, contrast, reduced motion, touch, 320 px layout and WebGL fallback on representative devices; document actual browser/device versions and results.
+    - Keep automated axe results separate from manual accessibility evidence; log reproducible issues with acceptance criteria.
+  - [ ] 30.2 Verify pilot delivery and recovery
+    - Test the agreed access method, offline/local-storage limitations, reset/reload, import/export, update compatibility and recovery instructions using the actual pilot build. Record the tested commit and access instructions; deployment/access decisions precede publishing.
+
+- [ ] 31. Conduct and analyze the student pilot
+  - [ ] 31.1 Prepare the pilot protocol and materials
+    - Define recruitment/consent appropriate to the setting, session script, facilitator prompts, pre/post questions, observation rubric and minimal feedback collection/retention. Use de-identified notes; do not add analytics or accounts for the pilot.
+    - Define how to measure completion, interpretation of constraints, prediction/reflection quality and confusion about idealized model limits.
+  - [ ] 31.2 Run sessions with actual students and summarize findings
+    - Record participant count, sessions completed, observations and results against the predefined criteria; distinguish reported feedback from inference. Do not fabricate participants, approvals or outcomes.
+    - Produce prioritized findings and limitations, including sample-size limitations, in `MILESTONE4.md`.
+
+- [ ] 32. Resolve pilot findings and close Milestone 4
+  - [ ] 32.1 Fix blocking findings and verify them
+    - Turn findings into reproducible tasks; resolve pilot-blocking correctness/accessibility/usability issues in the existing architecture. Add meaningful regression coverage and repeat affected manual checks; record deferred issues and rationale.
+  - [ ] 32.2 Milestone 4 checkpoint
+    - Confirm independent review and actual pilot evidence exist, agreed success criteria are met, no blocking finding remains, and lint/typecheck/unit/property/component/build/browser gates pass for the release candidate. Record reviewer/project-owner disposition and any deferred limitations before proceeding to M5.
+
+### Milestone 5: Second runnable challenge through configuration
+
+- [ ] 33. Define the second challenge
+  - [ ] 33.1 Select a challenge and document its scoped requirements
+    - Use pilot findings to choose the learning objective, initial flawed design, constraints, reference solution, prediction/reflection prompts and success criteria. Use a challenge supported by the existing validated beam model; do not activate a preview whose physics differs.
+    - Write a challenge-specific requirements/design extension and independent reference calculations. Challenges requiring a new model are deferred to task 37.2 rather than introducing an M5/M6 dependency cycle. Depends on checkpoint 32.2.
+  - [ ] 33.2 Review and validate the challenge configuration
+    - Add versioned configuration, explicit locked fields and section defaults; verify initial failure, reference acceptance, solvability, applicability, boundary cases and grounded explanation facts. Obtain engineering review of the new constants and wording.
+
+- [ ] 34. Integrate multiple runnable challenges
+  - [ ] 34.1 Generalize selection and isolate challenge sessions
+    - Route the selected available catalog entry to its validated configuration through the existing loader/store; replace single-challenge assumptions without duplicating solver or workbench components.
+    - Isolate draft/history/reflection/submission and versioned persistence by challenge; define and test switch/reload/reset behavior. Preserve existing Cantilever Beam I saves.
+  - [ ] 34.2 Connect the second challenge to the existing learning loop
+    - Reuse prediction, evaluation/results, compare/restore, reflection/submission, fallback and import/export. Reject cross-challenge imports and corrupt sessions; keep unavailable modes/challenges gated and My designs results correctly attributed.
+
+- [ ] 35. Verify and release Milestone 5
+  - [ ] 35.1 Add multi-challenge regression coverage
+    - Test configuration fixtures, challenge switching, storage/import isolation and migration behavior; complete both learning loops on desktop and Pixel 7, with keyboard/fallback and serious/critical axe gates. Retain all original challenge tests.
+  - [ ] 35.2 Milestone 5 checkpoint
+    - Confirm both challenges meet their reviewed criteria, no fabricated results or cross-session leakage exist, all relevant coverage/core/browser gates pass, and documentation explains supported models and limits. Record the verified commit and review evidence in `MILESTONE5.md`.
+
+### Milestone 6: Scoped platform extensions
+
+This milestone groups the previously named future areas: Freeform, advanced physics, accounts and AI. Their implementation scope is not yet specified. Task 36 defines feature boundaries and delivery order; each track requires its own requirements/design/test plan before implementation. A decision to defer a track must remain visible in the roadmap rather than being checked off as implemented.
+
+- [ ] 36. Define Milestone 6 scope and architecture
+  - [ ] 36.1 Prioritize the extension tracks and define acceptance criteria
+    - Use M4/M5 evidence to define concrete user stories, included/excluded capabilities, dependencies, measurable gates and delivery order in `MILESTONE6.md` and scoped specification extensions. Resolve the current browser-only/no-network boundary explicitly for any online capability. Depends on checkpoint 35.2.
+  - [ ] 36.2 Record shared technical and data decisions
+    - Specify model dispatch/versioning, geometry validation, save/import compatibility, local/offline behavior and any backend/auth/provider choices. Define data minimization, deletion/export, failure behavior, cost limits and rollback where applicable; keep pure domain modules independent of React and services.
+
+- [ ] 37. Extend geometry and analysis
+  - [ ] 37.1 Implement and verify the scoped Freeform capability
+    - Specify supported sketch/extrusion/edit operations, invalid or unsupported geometry, section-property computation and model compatibility before coding. Provide numeric/keyboard equivalents and truthful fallback behavior; validate properties against independent fixtures.
+    - Integrate valid geometry with the existing prediction/results/history/persistence loop. Keep Freeform marked Planned until its complete reviewed flow and accessibility/browser gates pass.
+  - [ ] 37.2 Implement and validate the selected advanced physics model
+    - Choose a bounded model from the scoped requirements; document equations, assumptions, applicability and independent benchmarks before implementation. Dispatch by explicit model identity/version and keep recorded results reproducible.
+    - Verify accuracy/tolerances, units, boundaries, failure states and runtime on target devices. Unsupported analyses must be rejected or clearly identified; preserve the validated Euler–Bernoulli path.
+
+- [ ] 38. Add accounts and saved-project synchronization
+  - [ ] 38.1 Specify account, storage and offline behavior
+    - Define provider/backend, identity, ownership/access rules, session lifecycle, data retention/export/deletion and sync/conflict handling. Document the migration from local-only use and necessary CSP/network changes before implementation.
+  - [ ] 38.2 Implement and verify the scoped account/sync flow
+    - Test authentication lifecycle, authorization isolation, project ownership, offline editing, conflicts, interrupted saves and recovery. Preserve local-only operation according to the agreed requirements; do not expose credentials or other users' projects in client state or logs.
+
+- [ ] 39. Add optional AI learning assistance
+  - [ ] 39.1 Specify the assistant's educational and data boundaries
+    - Define a bounded coaching use case, provider, consent/data flow, cost/rate limits and evaluation criteria. Keep deterministic solver results authoritative and reflection ungraded unless an explicit later requirement changes that policy.
+  - [ ] 39.2 Implement and evaluate the scoped coaching flow
+    - Test grounded explanations against stored design/results, unsupported claims, prompt injection, unavailable/rate-limited services and offline use. Keep secrets server-side; assess assistance quality with engineer/educator review and representative learners before release.
+
+- [ ] 40. Milestone 6 integration and release gate
+  - [ ] 40.1 Verify compatibility and cross-feature regressions
+    - Exercise the scoped Freeform/model/account/AI combinations, legacy saves/imports, model-result identity and failure recovery. Run core, independent numerical, authorization, accessibility, desktop/mobile and performance checks required by the new specifications.
+  - [ ] 40.2 Milestone 6 checkpoint
+    - Record each track's implemented/deferred status, acceptance evidence, known limitations, documentation and verified commit in `MILESTONE6.md`. Declare a track complete only when its own requirements and gates pass; future work outside the chosen release stays open or explicitly deferred.
+
 ## Notes
 
 - Tasks marked with `*` are optional and can be skipped for a faster MVP; Requirement 33 gates still expect them before a milestone is declared complete.
@@ -640,6 +735,86 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
     { "id": 19, "tasks": ["20.4", "22.3", "24.2", "25.2"] },
     { "id": 20, "tasks": ["22.4", "27.1"] },
     { "id": 21, "tasks": ["27.2", "27.3", "27.4", "27.5", "27.6", "27.7"] }
-  ]
+  ],
+  "postMvpDependencies": {
+    "29.1": [
+      "28"
+    ],
+    "29.2": [
+      "29.1"
+    ],
+    "30.1": [
+      "29.1"
+    ],
+    "30.2": [
+      "29.2",
+      "30.1"
+    ],
+    "31.1": [
+      "29.1"
+    ],
+    "31.2": [
+      "29.2",
+      "30.2",
+      "31.1"
+    ],
+    "32.1": [
+      "31.2"
+    ],
+    "32.2": [
+      "32.1"
+    ],
+    "33.1": [
+      "32.2"
+    ],
+    "33.2": [
+      "33.1"
+    ],
+    "34.1": [
+      "33.2"
+    ],
+    "34.2": [
+      "34.1"
+    ],
+    "35.1": [
+      "34.2"
+    ],
+    "35.2": [
+      "35.1"
+    ],
+    "36.1": [
+      "35.2"
+    ],
+    "36.2": [
+      "36.1"
+    ],
+    "37.1": [
+      "36.2"
+    ],
+    "37.2": [
+      "36.2"
+    ],
+    "38.1": [
+      "36.2"
+    ],
+    "38.2": [
+      "38.1"
+    ],
+    "39.1": [
+      "36.2"
+    ],
+    "39.2": [
+      "39.1"
+    ],
+    "40.1": [
+      "37.1",
+      "37.2",
+      "38.2",
+      "39.2"
+    ],
+    "40.2": [
+      "40.1"
+    ]
+  }
 }
 ```

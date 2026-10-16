@@ -1,6 +1,6 @@
 # Handoff: Statica MVP
 
-Last updated: 2026-10-16. **Milestone 3 complete:** tasks 19–27 (all 38 subtasks), pre-E2E checkpoint 26 and final checkpoint 28 are verified. No incomplete task remains in the current specification; await user direction for further work.
+Last updated: 2026-10-16. **Milestone 3 complete:** tasks 19–27 (all 38 subtasks), pre-E2E checkpoint 26 and final checkpoint 28 are verified. The post-MVP roadmap now includes Milestones 4–6 (tasks 29–40). Next planned task: 29.1, the Milestone 4 review plan. Only roadmap documentation was requested; implementation has not started.
 
 ## Implementation and verification
 
@@ -30,9 +30,11 @@ The final repair fixes workflow text extending to 332 px at a 320 px viewport, w
 ## Delivery and future work
 
 - Implementation is pushed at the verified commit above. This closeout updates only documentation/task markers; the final documentation commit is recorded in GitHub history. MILESTONE3.md preserves task-by-task evidence and earlier failed-run history.
-- No further implementation is authorized by this closeout. Await user direction; educational engineer review/student pilot are outside the current implementation scope.
+- The user requested a roadmap extension for M4 engineer review/student pilot, M5 a second runnable challenge, and M6 Freeform/advanced physics/accounts/AI. These are unchecked planning tasks 29–40, not changes to the completed MVP requirements. Start with 29.1 when directed; independent review and student sessions require actual human participation.
 - Active workflow is repository-root `../.github/workflows/ci.yml`, with app working directory, Node 22, frozen pnpm install, core gates, focused responsive regression and full E2E. The nested app workflow is historical.
 - Local Kiro has no `.git`; authorized pushes use GitHub tree/commit/ref APIs with expected-head leases, preserving remote-only root README and sibling .kiro/app layout. Generated output stays ignored.
 - Local sandbox denies server port binding and Chromium Mach-port startup; no local browser pass is claimed. Normal Terminal or CI can run Playwright with matching Chromium. The user prefers Safari for browser inspection; it successfully downloaded CI artifacts.
 
 Known historical spec differences remain: configured TypeScript is 5.9.3 versus the design's 5.7, local Node is 24.15.0 versus target/CI 22; exact floating-point boundary/large-distance tolerance notes remain in the historical docs. Do not change pinned versions or regenerate specifications to hide these differences. No browser/GPU/performance/CSP pass is inferred from component tests. The lazy viewport still produces the existing non-failing Vite chunk-size warning and dependencies emit THREE_CJS_DEPRECATED during tests.
+
+Post-MVP roadmap update (2026-10-16): tasks.md now tracks M4 review/pilot and remediation, M5 a reviewed second configuration and isolated multi-challenge flows, and scoped M6 extension tracks. All new tasks are unchecked; dependencies and milestone gates are explicit. Requirements/design for M0–M3 remain unchanged. Feature-specific specification extensions precede implementation. No new feature or pilot activity was performed in this documentation update.

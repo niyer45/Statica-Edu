@@ -7,7 +7,7 @@ template's visual design and platform shell are kept.
 
 Read `HANDOFF.md` first for the current status and the next task.
 
-Current task progress (2026-10-16): Milestone 3 complete, all 38 subtasks and checkpoint 28 verified. No incomplete task remains in the current specification. See HANDOFF.md for CI evidence. Update documentation after future tasks and push verified batches.
+Current task progress (2026-10-16): Milestone 3 complete, all 38 subtasks and checkpoint 28 verified. Post-MVP Milestones 4–6 are planned in tasks.md; next planned task is 29.1. See HANDOFF.md for CI evidence. Update documentation after future tasks and push verified batches.
 
 ## Specifications (source of truth)
 
@@ -15,7 +15,7 @@ The spec lives outside this folder, one level up:
 
 - `../.kiro/specs/engineering-intuition-mvp/requirements.md`: Requirements 1–35 with numbered acceptance criteria.
 - `../.kiro/specs/engineering-intuition-mvp/design.md`: architecture, decisions D-01…D-25, correctness Properties 1–37, fixtures, thresholds.
-- `../.kiro/specs/engineering-intuition-mvp/tasks.md`: the implementation plan (Milestones 0–3, tasks 1–28) with a JSON wave dependency graph at the end.
+- `../.kiro/specs/engineering-intuition-mvp/tasks.md`: the completed MVP plan (Milestones 0–3, tasks 1–28) and post-MVP roadmap (Milestones 4–6, tasks 29–40) with a JSON wave dependency graph at the end.
 
 Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuition-mvp/`.
 `DECISIONS.md` records D-01…D-27 and the 14 applicability thresholds. D-25 defines required `sectionDefaults`; D-26 records the user-directed uncluttered 3D presentation and overrides the original visible-overlay requirements.
@@ -127,4 +127,6 @@ Per the user's standing instruction, also update this file's current-task pointe
 
 ## Milestone 3 execution notes
 
-Milestone 3 is complete through checkpoint 28. CI run 38927191840 passed all core gates, 2 focused responsive cases and all 18 E2E cases on commit 48bfdd33a33632aa443ebae105f864645724b4c1. No further task is specified; await user direction. Root workflow is `../.github/workflows/ci.yml`; app servers use 4174 (dev state hook) and 4173 (production CSP/no hook). Complete browser flows have a 60-second budget, with 90 seconds for keyboard and multi-breakpoint scenarios. Preserve assertions and real Tab/native drag interactions. Local sandbox restrictions still prevent server/browser startup; Safari is the user's preferred browser for artifact inspection. Preserve synchronous reduce/persist ordering in StoreProvider.
+Milestone 3 is complete through checkpoint 28. CI run 38927191840 passed all core gates, 2 focused responsive cases and all 18 E2E cases on commit 48bfdd33a33632aa443ebae105f864645724b4c1. Post-MVP tasks 29–40 are planned; next planned task is 29.1. This planning update does not start implementation. Root workflow is `../.github/workflows/ci.yml`; app servers use 4174 (dev state hook) and 4173 (production CSP/no hook). Complete browser flows have a 60-second budget, with 90 seconds for keyboard and multi-breakpoint scenarios. Preserve assertions and real Tab/native drag interactions. Local sandbox restrictions still prevent server/browser startup; Safari is the user's preferred browser for artifact inspection. Preserve synchronous reduce/persist ordering in StoreProvider.
+
+Post-MVP roadmap update (2026-10-16): tasks.md now tracks M4 review/pilot and remediation, M5 a reviewed second configuration and isolated multi-challenge flows, and scoped M6 extension tracks. All new tasks are unchecked; dependencies and milestone gates are explicit. Requirements/design for M0–M3 remain unchanged. Feature-specific specification extensions precede implementation. No new feature or pilot activity was performed in this documentation update.
