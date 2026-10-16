@@ -25,7 +25,21 @@ test('responsive layout preserves state across breakpoints and has no horizontal
       if (width <= 1050) expect(bounds?.width).toBe(72)
       else expect(bounds!.width).toBeGreaterThan(72)
     }
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+    const layout = await page.evaluate(() => ({
+      width: window.innerWidth,
+      clientWidth: document.documentElement.clientWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+      overflowing: Array.from(document.querySelectorAll<HTMLElement>('body *')).filter((element) => {
+        const box = element.getBoundingClientRect()
+        return box.width > 0 && box.right > window.innerWidth
+      }).slice(0, 15).map((element) => ({
+        tag: element.tagName, class: element.getAttribute('class'),
+        right: element.getBoundingClientRect().right,
+        minWidth: getComputedStyle(element).minWidth,
+        columns: getComputedStyle(element).gridTemplateColumns,
+      })),
+    }))
+    expect(layout.scrollWidth, JSON.stringify(layout)).toBeLessThanOrEqual(layout.width)
     const design = await page.getByRole('region', { name: 'Design tools' }).boundingBox()
     const viewport = await page.getByRole('region', { name: 'Design view' }).boundingBox()
     const challenge = await page.getByRole('complementary', { name: 'The challenge' }).boundingBox()

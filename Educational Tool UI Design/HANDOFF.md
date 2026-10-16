@@ -1,26 +1,19 @@
 # Handoff: Statica MVP
 
-Last updated: 2026-10-16, completed 27.6; next 27.4. 36/38 Milestone 3 subtasks complete; next 27.4. Browser tasks verified: 27.2, 27.3, 27.5, 27.6. See the latest verification entries below.
+Last updated: 2026-10-16, completed 27.4; next 27.7. 37/38 Milestone 3 subtasks complete; next 27.7. Browser tasks verified: 27.2, 27.3, 27.4, 27.5, 27.6. See the latest verification entries below.
 
 ## Current implementation
 
-Milestones 0–2 are complete against their documented gates; `MILESTONE2.md` preserves the historical checkpoint. Milestone 3 now provides the full learning loop:
+Milestones 0–2 passed their documented gates. The complete learning-loop implementation is in place: pure reducer actions, immutable history and evaluation, prediction, results, history/compare/restore, reflection/submission, validated persistence and JSON import/export. The existing template architecture and platform shell remain. Preview challenges and Freeform remain unavailable.
 
-- Pure reducer actions for editing, prediction/cancellation, immutable recorded tests, comparison selection, isolated restore, reflection/submission, all-or-nothing import and reset. History, including Baseline, remains append-only even on reset.
-- Model-based tests and every tagged correctness Property 1–37. `test/state/model.ts` provides command generation and invariant hooks; `sequence.ts` provides shared recorded-test/restore setup.
-- Local persistence validates the entire session, migrates registered versions, validates every design and re-analyzes/re-evaluates history. Stored numeric results must agree within 1e-9 relative tolerance. Invalid saves are removed as a whole; storage errors keep the app usable in memory with a once-per-load notice.
-- Results panel, prediction/help dialogs, history/comparison/restore, reflection/submission and design JSON import/export are interactive. Run Test is enabled. Numerical results and marks always come from stored domain results.
-- Shared body-portal modal primitive with keyboard trapping, Escape, and opener/fallback focus restoration. Workbench owns the single live region and visual Toast; successful actions and errors use that channel.
-- The platform shell, palette, numeric controls, 3D drag handles and typed SVG fallback remain in the existing template architecture. Preview challenges and Freeform are still unavailable.
+## Current verification
 
-## Verification and task status
-
-- Latest full local checks: lint has zero errors (10 existing no-explicit-any warnings), typecheck passes, **873 Vitest tests across 107 files pass**, production build passes.
-- Pre-E2E coverage gate: state **97.62%**, geometry **99.05%**, evaluation **98.76%**, physics **100%** line coverage. Property tags cover all numbers 1–37.
-- `pnpm exec playwright test --list` discovers **18 scenarios across Chromium desktop and Pixel 7**. These cover happy path with a real height-handle drag, HTML5 section drop, keyboard/mouse state equivalence, invalid geometry, reload/import/export, breakpoints, fallback equivalence, production CSP/no third-party requests/no state hook, and preview gating. Each scenario checks serious/critical axe violations.
-- Actual local browser execution is blocked: `listen EPERM: operation not permitted 127.0.0.1:4174`. Earlier cached Chromium also mismatched the pinned Playwright version. Discovery/typechecking is not a browser pass.
-- The active CI workflow now lives at **repository root** `../.github/workflows/ci.yml`, with the application working directory and lockfile path. It installs matching Chromium and runs coverage/build/schema/E2E on Node 22. The older workflow nested inside this app is historical and is not discovered by GitHub. The root workflow executed; its browser step failed (details below).
-- Tasks 27.2–27.7 must remain in progress until their browser scenarios actually pass; task 28 remains unchecked until the final desktop/mobile/axe gate passes. Do not mark them complete merely because files exist.
+- Lint: zero errors, 10 existing warnings. Typecheck, all **873 tests across 107 files**, production build and schema drift pass.
+- Domain line coverage: state 97.62%, geometry 99.05%, evaluation 98.76%, physics 100%. All Properties 1–37 are tagged and pass.
+- [CI run 38890827051](https://github.com/niyer45/Statica-Edu/actions/runs/38890827051), code commit `bea662da65f5855dcf673cebc48f25fae7a64236`: **12/18 browser cases passed**. Happy path (27.2), native HTML5 drag/drop (27.3), invalid geometry (27.5), persistence (27.6), fallback equivalence and production CSP/network checks pass on desktop Chromium and Pixel 7, including axe checks for those scenarios.
+- Keyboard (27.4) exceeded the 30-second overall test budget; the multi-flow test now has 90 seconds. Responsive checks failed because collapsed navigation lost accessible names; fixed with explicit labels. Preview gating failed drawer-mode contrast; reported text colors darkened. Task 27.7 also now tests both sides of every breakpoint and typed-input/tab preservation.
+- Latest pushed repair batch: `888d6b92c71adf8f1e39bd178f539727dec584bf`. [Run 38891807513](https://github.com/niyer45/Statica-Edu/actions/runs/38891807513) must verify the two remaining tasks before marking them complete. Task completion records were pushed after the first three successes at `c6c8829f861059e3602937c5ebaa6f5c05df03d0`; 27.6 documentation is in the latest repair batch.
+- Local browser execution is blocked by sandbox permissions: Vite port bind returns EPERM, and launching cached Chromium directly fails MachPortRendezvousServer with Permission denied. The cached browser is older than pinned Playwright expects. A normal Terminal outside the sandbox can run the suite after `pnpm exec playwright install chromium`; CI installs matching Chromium. No local browser pass is claimed.
 
 ## Technical details for the next agent
 
@@ -34,54 +27,17 @@ Milestones 0–2 are complete against their documented gates; `MILESTONE2.md` pr
 - `src/ui/learningLoop.css` adds external styles for new tables/forms/responsive content without rewriting the template styles or adding inline styles. The existing CSP remains `default-src 'self'`.
 - Playwright uses development port 4174 for the read-only `window.__EI_STATE__` hook and production preview port 4173 for CSP/no-hook verification. The production bundle never exposes the hook. E2E helpers read challenge JSON via Node fs because native ESM JSON imports otherwise require an import attribute.
 
-## Outstanding work and constraints
+## Next steps and delivery
 
-1. Fix the observed browser failures described below, then rerun the scenarios and required checks. The suite has executed in CI and has no passing scenarios yet.
-2. Mark each browser task complete only after evidence, updating HANDOFF.md, AGENTS.md, tasks.md and MILESTONE3.md after every task. Push verified batches, as explicitly requested by the user.
-3. Complete task 28 only after all desktop/mobile scenarios and serious/critical axe checks pass. Record the final commit/workflow evidence.
-4. Preserve the sibling application/.kiro layout and repository-root README. The local Kiro folder has no `.git`; authorized uploads use GitHub tree/commit/ref APIs with expected-head leases and preserve remote-only files.
-
-## Completion audit — 2026-10-16
-
-All local application, spec/task and workflow files matched remote main `0eadb1425d2075aafa394968892ee26ba0dda747` before this documentation audit. No implementation work was left unpublished. The remote-only root README is intentionally preserved.
-
-[GitHub Actions run 38841912543](https://github.com/niyer45/Statica-Edu/actions/runs/38841912543) passed frozen dependency installation, lint, typecheck, coverage tests, production build, schema drift and Chromium installation. All 18 desktop/Pixel 7 browser scenarios failed, including retries; artifacts were uploaded. This is a failed browser gate, not merely pending execution.
-
-Observed failures to address next:
-
-- Happy path, keyboard, persistence and production flow use an ambiguous `getByRole('textbox')`: four read-only fields also match the reflection textarea. Scope the dialog or use an accessible label.
-- HTML5 drag/drop leaves the draft as `circle` instead of `iSection`; investigate the interaction and implementation before deciding the fix.
-- Invalid-path palette lookup uses case-sensitive `/Tube/`, which does not match the displayed label.
-- Responsive and WebGL-fallback audits report serious axe contrast failures, including `#7e9363` on `#f2f6eb` (3.06 versus required 4.5). Fix the actual reported elements and rerun axe.
-- Preview/Freeform gating uses an ambiguous Freeform button locator matching both the library card and drawer choice; scope the intended surface.
-
-Milestone 3 has **32 of 38 subtasks complete**. Tasks **27.2–27.7** remain in progress despite authored test files, followed by final checkpoint **28**. Task 26's unit/component/property coverage gate is complete; it does not certify browser behavior. No additional task is marked complete in this audit.
-
+1. Inspect run 38891807513 and its browser artifacts. Fix remaining observed issues; verify 27.4 and 27.7 on both viewports with no serious/critical axe violations. Do not mark a task complete just because its test exists.
+2. After each completed task update HANDOFF.md, AGENTS.md, sibling tasks.md, MILESTONE3.md and README status. Push verified batches, as requested. Mark parent 27 complete when all children pass. Task 28 remains the final milestone gate.
+3. Active CI workflow is the repository-root `../.github/workflows/ci.yml`, with application working directory, Node 22, frozen pnpm install, lint/typecheck/coverage/build/schema and matching Chromium/E2E artifacts. The old nested application workflow is historical.
+4. The local Kiro folder has no `.git`. Authorized pushes use GitHub tree/commit/ref APIs with expected-head leases. Preserve the sibling application/.kiro layout and remote-only root README. Do not upload generated reports, dependencies or build output.
 
 Known historical spec differences remain: configured TypeScript is 5.9.3 versus the design's 5.7, local Node is 24.15.0 versus target/CI 22; exact floating-point boundary/large-distance tolerance notes remain in the historical docs. Do not change pinned versions or regenerate specifications to hide these differences. No browser/GPU/performance/CSP pass is inferred from component tests. The lazy viewport still produces the existing non-failing Vite chunk-size warning and dependencies emit THREE_CJS_DEPRECATED during tests.
 
-## Browser repair batch in progress — 2026-10-16
+### Task 27.4 complete — 2026-10-16
 
-Scoped reflection inputs to the submission dialog and Freeform to the challenge drawer; corrected the Hollow tube lookup. Darkened pass-mark and challenge-paragraph text for the observed axe failures. Replaced single-step dragTo with repeated native mouse movement before release. No task completion is claimed until the updated CI browser scenarios pass. Local E2E startup still fails with port-bind EPERM. Next: inspect the CI result for this repair batch, starting with 27.2.
+Real Tab/Enter/Space traversal completes the flow, focus leaves the canvas, and normalized keyboard and mouse sessions are identical; axe passes for both flows. Both target viewports passed in [CI run 38891807513](https://github.com/niyer45/Statica-Edu/actions/runs/38891807513), including serious/critical axe checks. Lint, typecheck, all 873 unit/component/property tests, coverage, schema drift and build passed for the verified implementation. 37/38 Milestone 3 subtasks complete; next 27.7. Browser tasks verified: 27.2, 27.3, 27.4, 27.5, 27.6. Documentation is local until the next batch push. Earlier failed-run notes above are historical.
 
-The keyboard scenario now reaches controls using real Tab traversal (including opening the challenge), rather than programmatic focus. The native drag scenario keeps each project's viewport width while increasing height so source and target are simultaneously on screen in the stacked mobile layout, and asserts the active tile after drop. These changes still await CI; do not mark 27.3/27.4 complete yet.
-
-Further browser repairs: the palette's actual tube label is "Hollow circle" (not "Hollow tube"). Drag coordinates now project the beam midpoint and verify hover/clear plus active state. Happy path uses distinct tested heights and verifies restore leaves history unchanged. Invalid-path and persistence scenarios explicitly compare stored history. Platform checks cover both sides of 1050/870/620, preserve a typed uncommitted dimension and active tab, and assert sidebar width/visibility. A `workbench-open` shell class scopes required 1050/620 sidebar behavior in learningLoop.css, preserving the library's template rules. These additions await CI.
-
-### Task 27.2 complete — 2026-10-16
-
-Happy path verifies native height-handle drag, prediction, four distinct iterations, comparison, isolated restore, reflection and Accepted submission. Both target viewports passed in [CI run 38890827051](https://github.com/niyer45/Statica-Edu/actions/runs/38890827051), including serious/critical axe checks. Lint, typecheck, all 873 unit/component/property tests, coverage, schema drift and build passed for the verified implementation. 33/38 Milestone 3 subtasks complete; next 27.3. Browser tasks verified: 27.2. Documentation is local until the next batch push. Earlier failed-run notes above are historical.
-
-### Task 27.3 complete — 2026-10-16
-
-Native HTML5 drag reaches the projected beam, verifies hover/clear and active tile, and preserves result history at desktop and mobile widths. Both target viewports passed in [CI run 38890827051](https://github.com/niyer45/Statica-Edu/actions/runs/38890827051), including serious/critical axe checks. Lint, typecheck, all 873 unit/component/property tests, coverage, schema drift and build passed for the verified implementation. 34/38 Milestone 3 subtasks complete; next 27.4. Browser tasks verified: 27.2, 27.3. Documentation is local until the next batch push. Earlier failed-run notes above are historical.
-
-### Task 27.5 complete — 2026-10-16
-
-Invalid tube/flange input preserves draft and history; editing after a test leaves stored numerical results unchanged and displays Draft. Both target viewports passed in [CI run 38890827051](https://github.com/niyer45/Statica-Edu/actions/runs/38890827051), including serious/critical axe checks. Lint, typecheck, all 873 unit/component/property tests, coverage, schema drift and build passed for the verified implementation. 35/38 Milestone 3 subtasks complete; next 27.4. Browser tasks verified: 27.2, 27.3, 27.5. Documentation is local until the next batch push. Earlier failed-run notes above are historical.
-
-### Task 27.6 complete — 2026-10-16
-
-Reload restores reflection and submission; native JSON downloads round-trip through import without changing history, and corrupt storage restarts with a notice. Both target viewports passed in [CI run 38890827051](https://github.com/niyer45/Statica-Edu/actions/runs/38890827051), including serious/critical axe checks. Lint, typecheck, all 873 unit/component/property tests, coverage, schema drift and build passed for the verified implementation. 36/38 Milestone 3 subtasks complete; next 27.4. Browser tasks verified: 27.2, 27.3, 27.5, 27.6. Documentation is local until the next batch push. Earlier failed-run notes above are historical.
-
-Remaining repairs after run 38890827051: 12/18 browser cases passed. The six failures are keyboard timeouts during the second half of a two-flow scenario, unnamed collapsed sidebar navigation buttons, and low-contrast selected drawer-mode text. Added persistent accessible names to sidebar actions and darkened the reported drawer text. Keyboard and multi-breakpoint scenarios now have a 90-second total budget for their multiple flows/audits; individual assertions and Tab reachability limits remain unchanged. Local Chromium launch was also tested directly: the cached older executable exits with MachPortRendezvousServer Permission denied, in addition to the server-port EPERM. Serverless interception would not remove that process restriction; normal Terminal or CI can run Playwright. Next: verify 27.4 and 27.7 in CI.
+Latest result: run 38891807513 passed 17/18 scenarios, including both keyboard cases (40.9s desktop, 30.8s Pixel 7), all drawer/preview checks and Pixel 7 responsive checks. Only desktop responsive horizontal-overflow assertion fails. Added viewport size and overflowing-element diagnostics to that assertion to identify the exact layout source; artifact download is available through the connector but local download DNS is restricted. No overflow clipping workaround is added. Task 27.4 is complete; next 27.7.

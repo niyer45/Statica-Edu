@@ -567,7 +567,7 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
   - _Requirements: 33.1, 33.2, 33.4_
 
 - [ ] 27. End-to-end tests
-  - 2026-10-16 audit: 27.1 is complete; 27.2–27.7 are authored but all 18 browser cases failed in CI run 38841912543. Keep these in progress until verified. See application HANDOFF.md and MILESTONE3.md for failure details.
+  - 2026-10-16 progress: 27.2, 27.3, 27.5 and 27.6 passed on desktop and Pixel 7 in CI run 38890827051. Tasks 27.4 and 27.7 remain in progress; latest repairs await CI. See application HANDOFF.md and MILESTONE3.md.
   - [x] 27.1 Create E2E helpers
     - `e2e/helpers.ts`: read `window.__EI_STATE__`, normalize state (strip timestamps/ids), axe check failing on serious/critical violations, network request recorder
     - _Requirements: 23.10, 33.5_
@@ -580,7 +580,7 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
     - Drag I-section tile onto the beam; active tile and draft update
     - _Requirements: 26.2, 26.3, 26.6_
 
-  - [-]* 27.4 Write E2E keyboard scenario
+  - [x]* 27.4 Write E2E keyboard scenario
     - Full flow by keyboard; normalized state equals mouse flow; focus order and escape from canvas
     - _Requirements: 32.1, 32.8, 32.9, 33.9_
 
