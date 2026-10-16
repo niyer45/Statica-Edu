@@ -4,6 +4,7 @@ import path from 'node:path'
 import { audit, normalizeState, openWorkbench, readState, recordOtherOrigins, referenceDesign, runTest } from './helpers'
 
 test('responsive layout preserves state across breakpoints and has no horizontal overflow', async ({ page }) => {
+  test.setTimeout(90_000) // Both sides of every layout boundary plus five axe audits.
   await openWorkbench(page)
   await referenceDesign(page)
   await runTest(page)

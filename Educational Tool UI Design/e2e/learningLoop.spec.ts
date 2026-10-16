@@ -58,6 +58,7 @@ test('HTML5 palette drag-drop applies the section without recording a result', a
 })
 
 test('keyboard flow matches mouse state and focus can leave the canvas', async ({ page, context }) => {
+  test.setTimeout(90_000) // Two complete flows, real Tab traversal and two axe audits on software WebGL.
   await openWorkbench(page, true, true)
   await referenceDesign(page, true)
   await runTest(page, true)

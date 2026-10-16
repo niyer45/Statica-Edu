@@ -56,3 +56,5 @@ The browser repair batch also strengthens real Tab traversal, projected beam hov
 - **27.3 complete** — Native HTML5 drag reaches the projected beam, verifies hover/clear and active tile, and preserves result history at desktop and mobile widths. Desktop and Pixel 7 plus axe passed in [run 38890827051](https://github.com/niyer45/Statica-Edu/actions/runs/38890827051); core checks and 873 tests passed. Next: 27.4.
 
 - **27.5 complete** — Invalid tube/flange input preserves draft and history; editing after a test leaves stored numerical results unchanged and displays Draft. Desktop and Pixel 7 plus axe passed in [run 38890827051](https://github.com/niyer45/Statica-Edu/actions/runs/38890827051); core checks and 873 tests passed. Next: 27.4.
+
+- **27.6 complete** — Reload restores reflection and submission; native JSON downloads round-trip through import without changing history, and corrupt storage restarts with a notice. Desktop and Pixel 7 plus axe passed in [run 38890827051](https://github.com/niyer45/Statica-Edu/actions/runs/38890827051); core checks and 873 tests passed. Next: 27.4.

@@ -1,6 +1,6 @@
 # Handoff: Statica MVP
 
-Last updated: 2026-10-16, completed 27.5; next 27.4. 35/38 Milestone 3 subtasks complete; next 27.4. Browser tasks verified: 27.2, 27.3, 27.5. See the latest verification entries below.
+Last updated: 2026-10-16, completed 27.6; next 27.4. 36/38 Milestone 3 subtasks complete; next 27.4. Browser tasks verified: 27.2, 27.3, 27.5, 27.6. See the latest verification entries below.
 
 ## Current implementation
 
@@ -79,3 +79,9 @@ Native HTML5 drag reaches the projected beam, verifies hover/clear and active ti
 ### Task 27.5 complete — 2026-10-16
 
 Invalid tube/flange input preserves draft and history; editing after a test leaves stored numerical results unchanged and displays Draft. Both target viewports passed in [CI run 38890827051](https://github.com/niyer45/Statica-Edu/actions/runs/38890827051), including serious/critical axe checks. Lint, typecheck, all 873 unit/component/property tests, coverage, schema drift and build passed for the verified implementation. 35/38 Milestone 3 subtasks complete; next 27.4. Browser tasks verified: 27.2, 27.3, 27.5. Documentation is local until the next batch push. Earlier failed-run notes above are historical.
+
+### Task 27.6 complete — 2026-10-16
+
+Reload restores reflection and submission; native JSON downloads round-trip through import without changing history, and corrupt storage restarts with a notice. Both target viewports passed in [CI run 38890827051](https://github.com/niyer45/Statica-Edu/actions/runs/38890827051), including serious/critical axe checks. Lint, typecheck, all 873 unit/component/property tests, coverage, schema drift and build passed for the verified implementation. 36/38 Milestone 3 subtasks complete; next 27.4. Browser tasks verified: 27.2, 27.3, 27.5, 27.6. Documentation is local until the next batch push. Earlier failed-run notes above are historical.
+
+Remaining repairs after run 38890827051: 12/18 browser cases passed. The six failures are keyboard timeouts during the second half of a two-flow scenario, unnamed collapsed sidebar navigation buttons, and low-contrast selected drawer-mode text. Added persistent accessible names to sidebar actions and darkened the reported drawer text. Keyboard and multi-breakpoint scenarios now have a 90-second total budget for their multiple flows/audits; individual assertions and Tab reachability limits remain unchanged. Local Chromium launch was also tested directly: the cached older executable exits with MachPortRendezvousServer Permission denied, in addition to the server-port EPERM. Serverless interception would not remove that process restriction; normal Terminal or CI can run Playwright. Next: verify 27.4 and 27.7 in CI.

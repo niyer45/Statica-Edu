@@ -7,7 +7,7 @@ template's visual design and platform shell are kept.
 
 Read `HANDOFF.md` first for the current status and the next task.
 
-Current task progress (2026-10-16): 35/38 Milestone 3 subtasks complete; next 27.4. Browser tasks verified: 27.2, 27.3, 27.5. Update HANDOFF.md, AGENTS.md and tasks.md after each completed task; push verified batches.
+Current task progress (2026-10-16): 36/38 Milestone 3 subtasks complete; next 27.4. Browser tasks verified: 27.2, 27.3, 27.5, 27.6. Update HANDOFF.md, AGENTS.md and tasks.md after each completed task; push verified batches.
 
 ## Specifications (source of truth)
 

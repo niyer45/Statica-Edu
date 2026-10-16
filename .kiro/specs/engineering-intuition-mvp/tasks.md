@@ -588,7 +588,7 @@ Every property test uses fast-check through a shared helper that reads `PBT_RUNS
     - d ≥ D and overlapping flanges show errors with draft/history unchanged; edit after test shows "Draft" while tested numbers remain
     - _Requirements: 5.5, 5.7, 16.2, 16.5, 28.5, 33.9_
 
-  - [-]* 27.6 Write E2E persistence scenario
+  - [x]* 27.6 Write E2E persistence scenario
     - Reload restores session; import → export → import stable; corrupted storage shows notice
     - _Requirements: 21.3, 21.4, 22.3, 33.9_
 

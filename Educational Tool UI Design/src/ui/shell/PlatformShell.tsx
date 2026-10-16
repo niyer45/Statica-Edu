@@ -122,6 +122,7 @@ export default function PlatformShell() {
                 type="button"
                 key={label}
                 className={`nav-item ${active ? 'active' : ''}`}
+                aria-label={label}
                 aria-current={active ? 'page' : undefined}
                 onClick={() => go(label)}
               >
@@ -145,7 +146,7 @@ export default function PlatformShell() {
           <Icon name="arrow" size={14} />
         </button>
         <div className="platform-sidebar-bottom">
-          <button type="button" className="nav-item" onClick={() => setResource(ABOUT_TITLE)}>
+          <button type="button" className="nav-item" aria-label="Help & resources" onClick={() => setResource(ABOUT_TITLE)}>
             <Icon name="help" />
             <span>Help & resources</span>
           </button>
