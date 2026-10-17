@@ -54,7 +54,16 @@ export interface LibraryPageProps {
   onToggleSaved: (id: string) => void
   onOpenFeatured: () => void
   onShowDetail: (entry: CatalogEntry, mode?: InteractionMode) => void
+  /** Library entries; defaults to the bundled catalog. */
+  entries?: readonly CatalogEntry[]
+  /** Modes of a runnable entry's own challenge; defaults to `allowedModes`. */
+  modesFor?: (entry: CatalogEntry) => readonly InteractionMode[]
 }
+
+const modeList = (modes: readonly InteractionMode[]) =>
+  MODE_INFO.filter((m) => modes.includes(m.mode))
+    .map((m) => MODE_LABELS[m.mode])
+    .join(' · ')
 
 export default function LibraryPage({
   featured,
@@ -65,13 +74,12 @@ export default function LibraryPage({
   onToggleSaved,
   onOpenFeatured,
   onShowDetail,
+  entries = catalog,
+  modesFor = () => allowedModes,
 }: LibraryPageProps) {
   const [filters, setFilters] = useState<LibraryFilters>(DEFAULT_FILTERS)
   const set = (patch: Partial<LibraryFilters>) => setFilters((f) => ({ ...f, ...patch }))
-  const filtered = filterCatalog(catalog, filters, saved)
-  const supportedModes = MODE_INFO.filter((m) => allowedModes.includes(m.mode))
-    .map((m) => MODE_LABELS[m.mode])
-    .join(' · ')
+  const filtered = filterCatalog(entries, filters, saved)
 
   return (
     <>
@@ -121,7 +129,7 @@ export default function LibraryPage({
                 onClick={() => set({ view: t })}
               >
                 {t === 'Explore' ? 'Challenge library' : 'Saved for later'}
-                <span>{t === 'Explore' ? catalog.length : saved.length}</span>
+                <span>{t === 'Explore' ? entries.length : saved.length}</span>
               </button>
             ))}
           </div>
@@ -238,7 +246,7 @@ export default function LibraryPage({
                       <Icon name="clock" size={12} />
                       {c.time}
                     </span>
-                    <span>{runnable ? supportedModes : 'Planned challenge'}</span>
+                    <span>{runnable ? modeList(modesFor(c)) : 'Planned challenge'}</span>
                   </div>
                 </div>
               </article>

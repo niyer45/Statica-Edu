@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { catalog, type CatalogEntry } from '../../challenge/catalog'
 import type { InteractionMode } from '../../challenge/types'
-import { selectTestCount } from '../../state/selectors'
+import { selectTestCount, selectWorkspaceStarted } from '../../state/selectors'
 import Icon from '../icons/Icon'
 import { useChallenge, useSession, useStore } from '../state/store'
 import Workbench from '../workbench/Workbench'
@@ -26,6 +26,10 @@ import '../../platform.css'
 //   challenge's `allowedModes` and keeps the current mode (35.1, 35.4).
 // - Saved challenges and notebook text are React state only: in memory for this page
 //   session, never sent anywhere (34.8).
+// - Multiple runnable challenges (task 34.1 step 2; MM-16, MM-23): this shell renders inside
+//   the active challenge's StoreProvider. Other runnable challenges arrive as `others` with a
+//   read-only saved summary; opening one asks the host (CatalogHost) to switch stores. With no
+//   `others` the shell behaves exactly as the single-challenge shell.
 
 export const PRODUCT_NAME = 'Statica'
 
@@ -38,6 +42,30 @@ const PAGES: readonly [Page, string][] = [
   ['Notebook', 'book'],
 ]
 
+/** A runnable challenge other than the active one, summarized from its own saved session. */
+export interface OtherChallenge {
+  challengeId: string
+  title: string
+  allowedModes: readonly InteractionMode[]
+  /** Saved workspace summary, read without touching the active store. */
+  saved?: { mode: InteractionMode; started: boolean }
+}
+
+export interface PlatformShellProps {
+  /** Library entries; defaults to the bundled catalog. */
+  entries?: readonly CatalogEntry[]
+  others?: readonly OtherChallenge[]
+  /** Switch the host to another runnable challenge, entering in `mode` (chosen before entry, D-37). */
+  onOpenOther?: (challengeId: string, mode: InteractionMode) => void
+  /** Enter the workbench in this mode on mount (after a host switch); selectMode persists it. */
+  enterOnMount?: InteractionMode
+  /** Lifted page-session state, so it survives a store switch. Uncontrolled when omitted. */
+  saved?: readonly string[]
+  onSavedChange?: (saved: string[]) => void
+  notes?: string
+  onNotesChange?: (notes: string) => void
+}
+
 interface Detail {
   entry: CatalogEntry
   mode: InteractionMode
@@ -48,28 +76,52 @@ export function rejectedModeMessage(mode: InteractionMode): string {
   return `${MODE_LABELS[mode]} mode is not available for this challenge yet.`
 }
 
-export default function PlatformShell() {
+export default function PlatformShell({
+  entries = catalog,
+  others = [],
+  onOpenOther,
+  enterOnMount,
+  saved: savedProp,
+  onSavedChange,
+  notes: notesProp,
+  onNotesChange,
+}: PlatformShellProps = {}) {
   const { selectMode } = useStore()
   const session = useSession()
   const challenge = useChallenge()
 
   const [page, setPage] = useState<Page>('Challenges')
-  const [workspace, setWorkspace] = useState(false)
-  const [opened, setOpened] = useState(false)
+  const [workspace, setWorkspace] = useState(enterOnMount !== undefined)
+  const [opened, setOpened] = useState(enterOnMount !== undefined)
   const [detail, setDetail] = useState<Detail | null>(null)
-  const [saved, setSaved] = useState<string[]>([])
-  const [notes, setNotes] = useState('')
+  const [savedState, setSavedState] = useState<string[]>([])
+  const [notesState, setNotesState] = useState('')
   const [resource, setResource] = useState<string | null>(null)
+  const saved = savedProp ?? savedState
+  const setSaved = (update: (s: readonly string[]) => string[]) => {
+    const next = update(saved)
+    if (onSavedChange) onSavedChange(next)
+    else setSavedState(next)
+  }
+  const notes = notesProp ?? notesState
+  const setNotes = onNotesChange ?? setNotesState
 
   useEffect(() => {
     document.title = PRODUCT_NAME
   }, [])
+  // Mount-only: the host remounts this shell (new store key) for every switch.
+  useEffect(() => {
+    if (enterOnMount !== undefined && !selectMode(enterOnMount)) setWorkspace(false)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const isRunnable = (e: CatalogEntry) => e.available && e.challengeId === challenge.id
-  const featured = catalog.find(isRunnable) ?? catalog[0]
+  const otherFor = (e: CatalogEntry) => (e.available ? others.find((o) => o.challengeId === e.challengeId) : undefined)
+  const isActive = (e: CatalogEntry) => e.available && e.challengeId === challenge.id
+  const isRunnable = (e: CatalogEntry) => isActive(e) || (onOpenOther !== undefined && otherFor(e) !== undefined)
+  const modesFor = (e: CatalogEntry) => otherFor(e)?.allowedModes ?? challenge.allowedModes
+  const featured = entries.find(isActive) ?? entries[0]
   if (featured === undefined) throw new Error('The challenge catalog is empty.')
   const testCount = selectTestCount(session)
-  const started = opened || testCount > 0 || session.draftStatus === 'draft' || (session.deletedIterationIds?.length ?? 0) > 0 || session.reflectionAnswer.length > 0 || session.submission !== undefined
+  const started = opened || selectWorkspaceStarted(session)
 
   const go = (p: Page) => {
     setPage(p)
@@ -96,6 +148,13 @@ export default function PlatformShell() {
 
   const openFromDrawer = (mode: InteractionMode) => {
     if (detail === null || !isRunnable(detail.entry)) return
+    const other = otherFor(detail.entry)
+    if (other !== undefined && !isActive(detail.entry)) {
+      // Another challenge's store opens it; reject disallowed modes here, as selectMode would.
+      if (!other.allowedModes.includes(mode)) setDetail({ ...detail, error: rejectedModeMessage(mode) })
+      else onOpenOther?.(other.challengeId, mode)
+      return
+    }
     if (!openWorkbench(mode)) setDetail({ ...detail, error: rejectedModeMessage(mode) })
   }
 
@@ -129,7 +188,7 @@ export default function PlatformShell() {
                 <Icon name={icon} />
                 <span>{label}</span>
                 {label === 'Challenges' && (
-                  <span className="nav-count">{String(catalog.length).padStart(2, '0')}</span>
+                  <span className="nav-count">{String(entries.length).padStart(2, '0')}</span>
                 )}
               </button>
             )
@@ -201,6 +260,8 @@ export default function PlatformShell() {
                   onToggleSaved={toggleSaved}
                   onOpenFeatured={resume}
                   onShowDetail={showDetail}
+                  entries={entries}
+                  modesFor={modesFor}
                 />
               ) : page === 'Learning paths' ? (
                 <LearningPathsPage testCount={testCount} onStart={resume} onPreview={setResource} />
@@ -211,6 +272,11 @@ export default function PlatformShell() {
                   started={started}
                   onReturn={resume}
                   onFindChallenge={() => go('Challenges')}
+                  others={others.flatMap((o) =>
+                    o.saved?.started && onOpenOther
+                      ? [{ id: o.challengeId, title: o.title, mode: o.saved.mode, onReturn: () => onOpenOther(o.challengeId, o.saved!.mode) }]
+                      : [],
+                  )}
                 />
               ) : (
                 <NotebookPage notes={notes} onChange={setNotes} />
@@ -223,7 +289,7 @@ export default function PlatformShell() {
         <ChallengeDrawer
           entry={detail.entry}
           runnable={isRunnable(detail.entry)}
-          allowedModes={challenge.allowedModes}
+          allowedModes={modesFor(detail.entry)}
           mode={detail.mode}
           onModeChange={(mode) => setDetail({ ...detail, mode, error: null })}
           onOpen={openFromDrawer}

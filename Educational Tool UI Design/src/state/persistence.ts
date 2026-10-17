@@ -109,6 +109,21 @@ export function deserializeSession(raw: string, ch: Challenge): Result<SessionSt
   }
 }
 
+/**
+ * Read-only view of a challenge's saved session for shell summaries (task 34.1 step 2; MM-23).
+ * Never writes or removes storage and never throws; invalid or unreadable saves read as absent.
+ */
+export function peekSession(ch: Challenge, storage: SessionStorage): SessionState | undefined {
+  try {
+    const raw = storage.getItem(sessionKey(ch))
+    if (raw === null) return undefined
+    const restored = deserializeSession(raw, ch)
+    return restored.ok ? restored.value : undefined
+  } catch {
+    return undefined
+  }
+}
+
 export interface SessionStorage { getItem(key: string): string | null; setItem(key: string, value: string): void; removeItem(key: string): void }
 export const RESTORE_FAILURE = 'Saved session could not be restored'
 export const STORAGE_FAILURE = 'Progress will not be saved in this browser'

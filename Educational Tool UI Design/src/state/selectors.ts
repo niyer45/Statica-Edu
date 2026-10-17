@@ -37,6 +37,11 @@ export function selectTestCount(s: SessionState): number {
   return selectVisibleHistory(s).filter((r) => r.iteration >= 1).length
 }
 
+/** True when stored work exists beyond the untouched Baseline (shell resume / My designs). */
+export function selectWorkspaceStarted(s: SessionState): boolean {
+  return selectTestCount(s) > 0 || s.draftStatus === 'draft' || (s.deletedIterationIds?.length ?? 0) > 0 || s.reflectionAnswer.length > 0 || s.submission !== undefined
+}
+
 /** Iteration number the next Run Test would produce. */
 export function selectNextIteration(s: SessionState): number {
   return selectLatestResult(s).iteration + 1

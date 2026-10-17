@@ -2,7 +2,8 @@ import { cleanup, render, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 import { bundledChallengeResult, cantileverBeam1Json } from '../challenge/content'
 import { loadChallenge } from '../challenge/loader'
-import App from './App'
+import App, { bootCatalog } from './App'
+import { catalog } from '../challenge/catalog'
 
 // Task 13.2: bootstrap and full-page error (Req 3.3).
 
@@ -10,6 +11,25 @@ const clock = () => '2025-01-01T00:00:00.000Z'
 const newId = () => 'baseline-id'
 
 afterEach(cleanup)
+
+describe('bootCatalog (task 34.1 step 2; MM-06)', () => {
+  it('boots only available entries, in catalog order', () => {
+    const r = bootCatalog(catalog, clock, newId)
+    if (!r.ok) throw new Error(r.error.message)
+    expect(r.value.map((x) => x.challenge.id)).toEqual(['cantilever-beam-1'])
+  })
+
+  it('fails when an available entry has no loadable bundled challenge', () => {
+    const r = bootCatalog([{ ...catalog[0]!, available: true, challengeId: 'missing-challenge' }], clock, newId)
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.error.source).toBe('challenge')
+  })
+
+  it('fails when no entry is available', () => {
+    const r = bootCatalog(catalog.filter((e) => !e.available), clock, newId)
+    expect(r).toEqual({ ok: false, error: { source: 'challenge', message: 'No challenge is available.', issues: [] } })
+  })
+})
 
 describe('ui/App bootstrap', () => {
   it('renders a full-page error listing every loader issue and no controls', () => {

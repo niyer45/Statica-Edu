@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import PlatformShell from './shell/PlatformShell'
-import { bundledChallengeResult } from '../challenge/content'
+import CatalogHost, { type RunnableChallenge } from './shell/CatalogHost'
+import { bundledChallengeJson } from '../challenge/bundled'
+import { catalog, type CatalogEntry } from '../challenge/catalog'
+import { loadChallenge } from '../challenge/loader'
 import type { Challenge, Result, SchemaIssue } from '../challenge/types'
 import { bootstrap, randomIdFactory, systemClock, type BootFailure, type Clock, type IdFactory } from './state/bootstrap'
-import StoreProvider from './state/StoreProvider'
 import type { SessionStorage } from '../state/persistence'
 
 // Lazy browser access keeps storage exceptions inside the persistence controller.
@@ -13,13 +14,29 @@ const browserStorage: SessionStorage = {
   removeItem: (key) => window.localStorage.removeItem(key),
 }
 
-// App bootstrap (task 13.2; Req 3.3, 3.7, 35.1).
-// Loads the bundled challenge, builds the session, and either shows a full-page error that
-// lists every issue (no challenge content, controls, or simulation) or mounts the store and
-// the platform shell (ui/shell/PlatformShell, task 13.5).
+// App bootstrap (task 13.2; Req 3.3, 3.7, 35.1; task 34.1 step 2).
+// Loads every bundled challenge an available catalog entry links to (MM-06), builds each
+// session, and either shows a full-page error that lists every issue of the first failing
+// challenge (no challenge content, controls, or simulation) or mounts the challenge host,
+// which owns one store per active challenge (ui/shell/CatalogHost).
+
+/** Boots each available entry's bundled challenge, in catalog order. Stops at the first failure. */
+export function bootCatalog(entries: readonly CatalogEntry[], clock: Clock, newId: IdFactory): Result<RunnableChallenge[], BootFailure> {
+  const runnable: RunnableChallenge[] = []
+  for (const entry of entries) {
+    if (!entry.available) continue
+    const boot = bootstrap(loadChallenge(bundledChallengeJson(entry.challengeId)), clock, newId)
+    if (!boot.ok) return boot
+    runnable.push(boot.value)
+  }
+  if (runnable.length === 0) {
+    return { ok: false, error: { source: 'challenge', message: 'No challenge is available.', issues: [] } }
+  }
+  return { ok: true, value: runnable }
+}
 
 export interface AppProps {
-  /** Loader result to boot from; defaults to the bundled challenge. */
+  /** Loader result for a single challenge to boot from; defaults to every available bundled challenge. */
   loaded?: Result<Challenge, SchemaIssue[]>
   clock?: Clock
   newId?: IdFactory
@@ -51,13 +68,13 @@ export function BootErrorPage({ failure }: { failure: BootFailure }) {
   )
 }
 
-export default function App({ loaded = bundledChallengeResult, clock = systemClock, newId = randomIdFactory }: AppProps) {
+export default function App({ loaded, clock = systemClock, newId = randomIdFactory }: AppProps) {
   // Boot once per mount; the session id and timestamp come from the injected sources.
-  const [boot] = useState(() => bootstrap(loaded, clock, newId))
+  const [boot] = useState((): Result<RunnableChallenge[], BootFailure> => {
+    if (loaded === undefined) return bootCatalog(catalog, clock, newId)
+    const single = bootstrap(loaded, clock, newId)
+    return single.ok ? { ok: true, value: [single.value] } : single
+  })
   if (!boot.ok) return <BootErrorPage failure={boot.error} />
-  return (
-    <StoreProvider challenge={boot.value.challenge} initialSession={boot.value.session} storage={browserStorage} clock={clock} newId={newId}>
-      <PlatformShell />
-    </StoreProvider>
-  )
+  return <CatalogHost runnable={boot.value} storage={browserStorage} clock={clock} newId={newId} />
 }
