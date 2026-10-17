@@ -1,0 +1,69 @@
+{
+  "id": "braced-frame-1",
+  "version": 1,
+  "model": { "id": "pinJointedBracedFrame", "version": 1 },
+  "title": "Braced Frame I",
+  "difficulty": "advanced",
+  "allowedModes": ["guided", "parametric"],
+  "statement": "Sideways load pushes on a two-storey steel frame, and some of its members are overloaded. Choose which diagonals brace each storey and size every member so that the frame is stable, its roof drift stays within the limit, no member exceeds its capacity, and the mass stays within budget. The frame geometry, supports, loads and material are fixed. This frame is modeled as pin-jointed: every joint is a hinge, so members carry only tension or compression. Without a diagonal, a storey of this idealized frame cannot resist sideways load. Real frames with welded or bolted joints have some bending resistance that this model ignores.",
+  "material": {
+    "id": "steel-educational",
+    "name": "Steel (educational nominal)",
+    "elasticModulusPa": 200e9,
+    "yieldStressPa": 250e6,
+    "densityKgM3": 7850
+  },
+  "frame": { "template": "oneBayTwoStorey", "bayWidthM": 4.0, "storeyHeightM": 3.0 },
+  "supports": "pinnedBases",
+  "loads": [
+    { "jointId": "j3", "fxN": 20000, "fyN": 0 },
+    { "jointId": "j5", "fxN": 40000, "fyN": -40000 },
+    { "jointId": "j6", "fxN": 0, "fyN": -40000 }
+  ],
+  "sections": [
+    { "id": "CHS48.3x3.2", "label": "CHS 48.3 × 3.2", "outerDiameterM": 0.0483, "wallM": 0.0032 },
+    { "id": "CHS60.3x4.0", "label": "CHS 60.3 × 4.0", "outerDiameterM": 0.0603, "wallM": 0.004 },
+    { "id": "CHS76.1x4.0", "label": "CHS 76.1 × 4.0", "outerDiameterM": 0.0761, "wallM": 0.004 },
+    { "id": "CHS88.9x5.0", "label": "CHS 88.9 × 5.0", "outerDiameterM": 0.0889, "wallM": 0.005 }
+  ],
+  "initialDesign": {
+    "id": "baseline",
+    "materialId": "steel-educational",
+    "members": {
+      "col1L": { "sectionId": "CHS60.3x4.0" },
+      "col1R": { "sectionId": "CHS60.3x4.0" },
+      "col2L": { "sectionId": "CHS60.3x4.0" },
+      "col2R": { "sectionId": "CHS60.3x4.0" },
+      "beam1": { "sectionId": "CHS60.3x4.0" },
+      "beam2": { "sectionId": "CHS60.3x4.0" },
+      "diag1a": { "present": false, "sectionId": "CHS60.3x4.0" },
+      "diag1b": { "present": true, "sectionId": "CHS60.3x4.0" },
+      "diag2a": { "present": false, "sectionId": "CHS60.3x4.0" },
+      "diag2b": { "present": true, "sectionId": "CHS60.3x4.0" }
+    }
+  },
+  "referenceDesign": {
+    "id": "reference",
+    "materialId": "steel-educational",
+    "members": {
+      "col1L": { "sectionId": "CHS48.3x3.2" },
+      "col1R": { "sectionId": "CHS88.9x5.0" },
+      "col2L": { "sectionId": "CHS60.3x4.0" },
+      "col2R": { "sectionId": "CHS76.1x4.0" },
+      "beam1": { "sectionId": "CHS76.1x4.0" },
+      "beam2": { "sectionId": "CHS76.1x4.0" },
+      "diag1a": { "present": true, "sectionId": "CHS76.1x4.0" },
+      "diag1b": { "present": false, "sectionId": "CHS60.3x4.0" },
+      "diag2a": { "present": true, "sectionId": "CHS48.3x3.2" },
+      "diag2b": { "present": false, "sectionId": "CHS60.3x4.0" }
+    }
+  },
+  "lockedFields": ["frame", "supports", "loads", "materialId", "fixedMembers"],
+  "constraints": { "maxRoofDriftM": 0.012, "maxUtilization": 1.0, "maxMassKg": 200 },
+  "predictionPolicy": { "requiredOnIterations": [1, 3] },
+  "reflectionPrompt": {
+    "id": "braced-frame-1-reflection",
+    "text": "Using your tested designs, explain how the diagonals changed the path the sideways load took to the supports, and why you strengthened some members but not others."
+  },
+  "visualization": { "displacementExaggeration": 50, "maxVisualDisplacementM": 0.6 }
+}
