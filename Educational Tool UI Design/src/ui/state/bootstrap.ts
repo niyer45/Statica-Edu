@@ -1,4 +1,5 @@
 import type { Challenge, InteractionMode, Result, SchemaIssue } from '../../challenge/types'
+import { modelFor, modelOf } from '../../state/models'
 import { initSession, type SessionState } from '../../state/session'
 
 // App bootstrap (task 13.2; Req 3.3, 15.3, 35.1, 35.4).
@@ -67,6 +68,17 @@ export function bootstrap(
     }
   }
   const ch = loaded.value
+  const model = modelOf(ch)
+  if (modelFor(model) === undefined) {
+    return {
+      ok: false,
+      error: {
+        source: 'challenge',
+        message: 'The challenge uses an analysis model that is not available.',
+        issues: [{ path: 'model', rule: 'MODEL_NOT_REGISTERED', message: `Model "${model.id}" version ${model.version} is not registered.` }],
+      },
+    }
+  }
   const start = mode !== undefined && isModeAllowed(ch, mode) ? mode : undefined
   const r = initSession(ch, clock(), newId(), start)
   if (!r.ok) {

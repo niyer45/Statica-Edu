@@ -297,6 +297,24 @@
       ],
       "type": "object"
     },
+    "model": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "const": "eulerBernoulliCantileverTipForce",
+          "type": "string"
+        },
+        "version": {
+          "const": 1,
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "type": "object"
+    },
     "predictionPolicy": {
       "additionalProperties": false,
       "properties": {

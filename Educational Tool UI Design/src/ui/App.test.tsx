@@ -49,6 +49,16 @@ describe('ui/App bootstrap', () => {
     expect(screen.queryAllByRole('button')).toHaveLength(0)
   })
 
+  it('refuses a challenge whose analysis model is not registered (MM-07)', () => {
+    if (!bundledChallengeResult.ok) throw new Error('bundled challenge must load')
+    const other = { ...bundledChallengeResult.value, model: { id: 'circularShaftTorsion', version: 1 } }
+    render(<App loaded={{ ok: true, value: other }} clock={clock} newId={newId} />)
+    const alert = screen.getByRole('alert')
+    expect(alert.textContent).toContain('analysis model that is not available')
+    expect(alert.textContent).toContain('Model "circularShaftTorsion" version 1 is not registered.')
+    expect(screen.queryAllByRole('button')).toHaveLength(0)
+  })
+
   it('mounts the platform shell when the bundled challenge loads', () => {
     render(<App clock={clock} newId={newId} />)
     expect(screen.queryByRole('alert')).toBeNull()

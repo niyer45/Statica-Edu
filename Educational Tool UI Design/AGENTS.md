@@ -7,7 +7,7 @@ template's visual design and platform shell are kept.
 
 Read `HANDOFF.md` first for the current status and the next task.
 
-Current task progress (2026-10-17): 45.1 original-catalog scoping complete as specification (`../.kiro/specs/original-catalog/`, D-38: Torsion → Vibration → Heat Sink → Bracket → Frame; owner decisions HS-08/MB-07 open). 45.2 shared multi-model contracts complete as specification (`../.kiro/specs/multi-model-architecture/`, D-39: frozen beam v1 save shape, v2 envelopes for new models, registry/host-per-challenge). 47.1 Torsion Shaft I model specification and worksheet complete (`../.kiro/specs/torsion-shaft-1/`). Next software task 34.1 step 1 (registry with beam only, no visible change), then 47.2; 50.1 may be specified in parallel. Only Cantilever Beam I is runnable. Guided/Parametric distinction implemented and CI verified: choose mode before entry, no in-workbench switch (D-37). 44.3/parent 44 open only for owner manual release-mode evidence; next development is not blocked on human QA. Latest implementation baseline: 906 core tests, 2 responsive and all 24 E2E cases passed. Beam II integration deferred to 52 after 51. Read HANDOFF.md; historical notes moved to HANDOFF_HISTORY.md.
+Current task progress (2026-10-17): 45.1 original-catalog scoping complete as specification (`../.kiro/specs/original-catalog/`, D-38: Torsion → Vibration → Heat Sink → Bracket → Frame; owner decisions HS-08/MB-07 open). 45.2 shared multi-model contracts complete as specification (`../.kiro/specs/multi-model-architecture/`, D-39: frozen beam v1 save shape, v2 envelopes for new models, registry/host-per-challenge). 47.1 Torsion Shaft I model specification and worksheet complete (`../.kiro/specs/torsion-shaft-1/`). 34.1 step 1 (model registry, no visible change) implemented: 925 tests/115 files, 24/24 E2E locally. Next 34.1 step 2 (per-challenge hosts/isolation); 47.2, 49.1 and 50.1 run in parallel. Only Cantilever Beam I is runnable. Guided/Parametric distinction implemented and CI verified: choose mode before entry, no in-workbench switch (D-37). 44.3/parent 44 open only for owner manual release-mode evidence; next development is not blocked on human QA. CI-verified baseline: 906 core tests, 2 responsive and all 24 E2E cases (run 38970465802); spec batch run 39071816823 passed. Beam II integration deferred to 52 after 51. Read HANDOFF.md; historical notes moved to HANDOFF_HISTORY.md.
 
 ## Specifications (source of truth)
 
@@ -48,7 +48,8 @@ Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuiti
 - `src/geometry`: sections, validation, clamp/strict set, conversion, envelope, outline, handle descriptors.
 - `src/physics`: section properties, beam formulas, applicability checks, `analyze`.
 - `src/evaluation`: constraints, acceptance, efficiency, explanations (`explain.ts`), prediction scoring. Also holds the TestResult/Prediction types.
-- `src/state`: `session.ts` (types, `initSession`), `reducer.ts` (pure `sessionReducer`), `selectors.ts`, `importExport.ts`.
+- `src/state`: `session.ts` (types, `initSession`), `reducer.ts` (pure `sessionReducer`), `selectors.ts`, `importExport.ts`, `models.ts` (model registry; dispatch by explicit identity, MM-05).
+- `src/challenge/bundled.ts`: bundled challenge registry (only configs an available card links to).
 - `src/ui`: app, store, shell, workbench, palette, controls, mesh, viewport, dialogs, panels, history, a11y, icons.
   - `ui/App.tsx`: bootstrap.
   - `ui/state`: StoreProvider, hooks, dev snapshot.
@@ -135,7 +136,7 @@ Per the user's standing instruction, also update this file's current-task pointe
 - Accounts, saved user information and completed-challenge history are required future scope (38), not implemented. Current runtime has no backend/network/sync; scoped provider/ownership/data/CSP decisions precede those changes. Submission can record Not accepted; it is not a completion flag.
 - Node 22/pnpm 10.34.3 are target/CI versions. Local historical Node/sandbox differences are recorded in HANDOFF.md; do not assume they apply to a new Claude environment. Keep pinned dependencies/Figma plugins.
 - Use Safari for manual browser inspection if needed; retain Chromium/Pixel 7 automated gates. Never infer a browser pass from component tests or weaken regression assertions.
-- Push authorized verified batches; after triggering workflow stop continuous polling and await user feedback. Do not deploy/contact others without a specific instruction.
+- Push authorized verified batches. User update 2026-10-17: after pushing, continuously monitor the GitHub workflow yourself (public Actions API) without waiting for user confirmation; run independent tasks in parallel with agents. Do not deploy/contact others without a specific instruction.
 
 ## Repository and contributor entry points
 

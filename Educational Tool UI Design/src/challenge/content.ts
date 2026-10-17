@@ -1,4 +1,4 @@
-import bundledJson from './challenges/cantilever-beam-1.json'
+import { bundledChallengeJson } from './bundled'
 import { loadChallenge } from './loader'
 import type { Challenge, Result, SchemaIssue } from './types'
 
@@ -9,7 +9,7 @@ import type { Challenge, Result, SchemaIssue } from './types'
 export const CANTILEVER_BEAM_1_ID = 'cantilever-beam-1'
 
 /** Raw bundled JSON, typed `unknown` so nothing bypasses the loader. */
-export const cantileverBeam1Json: unknown = bundledJson
+export const cantileverBeam1Json: unknown = bundledChallengeJson(CANTILEVER_BEAM_1_ID)
 
 /** Loader result for the bundled challenge. Never throws; computed once at import. */
 export const bundledChallengeResult: Result<Challenge, SchemaIssue[]> =

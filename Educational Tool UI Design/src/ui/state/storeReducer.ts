@@ -1,4 +1,5 @@
 import type { Challenge, InteractionMode } from '../../challenge/types'
+import { requireModel } from '../../state/models'
 import { sessionReducer } from '../../state/reducer'
 import type { Action, SessionState } from '../../state/session'
 import { isModeAllowed } from './bootstrap'
@@ -10,6 +11,8 @@ import { isModeAllowed } from './bootstrap'
 export type StoreAction = Action | { type: 'selectMode'; mode: InteractionMode }
 
 export function makeStoreReducer(ch: Challenge): (s: SessionState, a: StoreAction) => SessionState {
+  // Refuse to bind a challenge whose model is not registered rather than substituting one (MM-07).
+  requireModel(ch)
   return (s, a) => {
     if (a.type === 'selectMode') {
       if (!isModeAllowed(ch, a.mode) || s.mode === a.mode) return s

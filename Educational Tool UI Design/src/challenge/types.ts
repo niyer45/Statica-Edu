@@ -42,9 +42,23 @@ export interface SectionDefaults {
   iSectionWebThicknessM: number
 }
 
+/** Explicit analysis-model identity (task 45.2, MM-01/MM-02). */
+export interface ModelRef {
+  id: string
+  version: number
+}
+
+/** The cantilever beam model identity; a beam config without `model` uses it (MM-02). */
+export const BEAM_MODEL_REF: Readonly<ModelRef> = Object.freeze({
+  id: 'eulerBernoulliCantileverTipForce',
+  version: 1,
+})
+
 export interface Challenge {
   id: string
   version: number
+  /** Optional for beam configs; absent means BEAM_MODEL_REF (MM-02). */
+  model?: ModelRef
   title: string
   /** Independent of mode; no code derives one from the other. */
   difficulty: Difficulty

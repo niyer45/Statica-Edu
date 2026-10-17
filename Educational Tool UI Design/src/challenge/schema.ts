@@ -58,6 +58,11 @@ export const challengeSchema = z
   .object({
     id: nonEmptyText,
     version: z.number().int().positive(),
+    // This schema describes beam configs only; other models get their own schemas (MM-02).
+    model: z
+      .object({ id: z.literal('eulerBernoulliCantileverTipForce'), version: z.literal(1) })
+      .strict()
+      .optional(),
     title: nonEmptyText,
     // difficulty and allowedModes are independent fields; neither constrains the other.
     difficulty: difficultySchema,

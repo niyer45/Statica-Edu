@@ -1,11 +1,9 @@
 import { z } from 'zod'
 import { deepFreeze } from '../challenge/deepFreeze'
 import type { Challenge, Result } from '../challenge/types'
-import { evaluate } from '../evaluation/evaluate'
-import { scorePrediction } from '../evaluation/prediction'
-import { analyze } from '../physics/analyze'
 import { importDesign } from './importExport'
 import { migrateEnvelope } from './migrations'
+import { requireModel } from './models'
 import { draftStatusOf, sameDesignIgnoringId, type SessionState, type TestResult } from './session'
 
 const status = z.enum(['accepted', 'notAccepted', 'modelNotApplicable'])
@@ -66,6 +64,9 @@ export function serializeSession(s: SessionState, savedAt = '1970-01-01T00:00:00
 /** Untrusted storage is accepted all-or-nothing, revalidated and reanalyzed; never throws. */
 export function deserializeSession(raw: string, ch: Challenge): Result<SessionState, string> {
   try {
+    // Dispatch on the challenge's explicit model; only v1 (beam) envelopes exist so far (MM-17).
+    const model = requireModel(ch)
+    if (model.envelopeVersion !== 1) throw new Error('Saved session format is not supported for this model')
     const value: unknown = JSON.parse(raw)
     rejectKeys(value)
     if (value === null || typeof value !== 'object' || Array.isArray(value)) throw new Error('Invalid saved session')
@@ -80,10 +81,10 @@ export function deserializeSession(raw: string, ch: Challenge): Result<SessionSt
       if (index === 0 && (!sameDesignIgnoringId(design, ch.initialDesign) || result.label !== 'Baseline' || result.prediction !== undefined || result.predictionOutcome !== undefined)) throw new Error('Invalid baseline')
       if (ch.predictionPolicy.requiredOnIterations.includes(index) && !result.prediction) throw new Error('Missing checkpoint prediction')
       if (result.prediction && result.prediction.iteration !== index) throw new Error('Prediction iteration mismatch')
-      const analysis = analyze(design, ch)
-      const evaluation = evaluate(design, analysis, ch)
+      const analysis = model.analyze(design, ch)
+      const evaluation = model.evaluate(design, analysis, ch)
       if (!agrees(result.analysis, analysis) || !agrees(result.evaluation, evaluation) || result.accepted !== evaluation.accepted || !agrees(result.failures, evaluation.failures)) throw new Error('Saved results differ from recomputed results')
-      const outcome = result.prediction && index > 0 ? scorePrediction(result.prediction, history[index - 1]!, analysis) : undefined
+      const outcome = result.prediction && index > 0 ? model.scorePrediction(result.prediction, history[index - 1]!, analysis) : undefined
       if (!agrees(result.predictionOutcome, outcome)) throw new Error('Invalid prediction outcome')
       history.push(deepFreeze({ ...result, designSnapshot: design }) as TestResult)
     }

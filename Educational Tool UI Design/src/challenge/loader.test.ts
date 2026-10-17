@@ -87,6 +87,24 @@ describe('loadChallenge: valid input', () => {
   })
 })
 
+describe('loadChallenge: explicit model identity (MM-02)', () => {
+  it('accepts the explicit beam model and treats its absence as the beam', () => {
+    const explicit = loadChallenge({ ...valid, model: { id: 'eulerBernoulliCantileverTipForce', version: 1 } })
+    expect(explicit.ok && explicit.value.model).toEqual({ id: 'eulerBernoulliCantileverTipForce', version: 1 })
+    const implicit = loadChallenge(valid)
+    expect(implicit.ok && implicit.value.model).toBeUndefined()
+  })
+
+  it.each([
+    ['another model id', { id: 'circularShaftTorsion', version: 1 }, 'model.id'],
+    ['another beam version', { id: 'eulerBernoulliCantileverTipForce', version: 2 }, 'model.version'],
+  ])('rejects %s with a schema issue instead of loading it as a beam', (_name, model, path) => {
+    const r = loadChallenge({ ...valid, model })
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.error.map((i) => i.path)).toContain(path)
+  })
+})
+
 describe('loadChallenge: parse and schema failures', () => {
   it('reports unparseable strings without throwing', () => {
     for (const bad of ['{', '', 'not json', '{"id": }']) {
