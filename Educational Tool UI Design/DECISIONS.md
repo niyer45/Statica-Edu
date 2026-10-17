@@ -161,3 +161,20 @@ Owner selections, resolving the open 45.1 items. Each was the recommended option
 - **MB-07(b):** The card copy stays as written ("Load paths, Stress concentrations"). Load paths are taught as the internal bending-moment path, with the critical section switching between root and step.
 
 These decisions scope specifications 48.1/46.1 only. They do not implement or activate either challenge, and they do not constitute engineering review of constants (29.2).
+
+## D-41: Mounting Bracket I open items K-1–K-5 resolved (2026-10-17)
+
+Owner selections, each the recommended option, recorded in `.kiro/specs/mounting-bracket-1/`.
+
+- **K-1:** Development proceeds on the stepped-flat-bar shoulder-fillet Kt table (Peterson via Roark Table 6-1, case III.1b, in-plane bending). The basis:
+  - two independent online copies that match exactly
+  - the coordinator's digit-by-digit re-check against the downloaded Roark text
+  - the EES worked example reproduced to 0.01%
+
+  The model limits must disclose that the coefficients come from secondary copies. Verification against a printed edition is required in owner QA (29.2) before customer release. A discrepancy found then would increase the model and challenge versions (MM-04).
+- **K-2:** The step location stands in conservatively for the source's shoulder length, and the step moment is taken at the shoulder.
+- **K-3:** `KT_STEP_RATIO` warns above 1.5 and is not applicable above 1.6.
+- **K-4:** Because the fit under-predicts stress for small steps (6.6–13.6% below the 1951 chart), a stepped bar needs D/d ≥ 1.1 (`KT_SMALL_STEP`, not applicable below; inclusive). This removed 620 of 30,963 accepted grid designs and changed no fixture outcome.
+- **K-5:** Constants, limits and "peak elastic stress ≤ allowable" wording approved; step and fillet controls stay editable for a uniform bar.
+
+46.2 is unblocked. This is not engineering sign-off of constants (29.2) and activates nothing.

@@ -1,6 +1,6 @@
 # Mounting Bracket I — scoped model requirements (task 46.1)
 
-Additive specification, 2026-10-17. Refines `../original-catalog/` MB-01–MB-07 under the shared contracts in `../multi-model-architecture/`. Fourth track in the D-38 delivery order. Status: specification and independently computed worksheet only. The model is not implemented, the card stays unavailable until 46.3, and owner engineering review (29.2) of constants, equations, thresholds and wording is pending. **The stress-concentration coefficients in design.md were transcribed from secondary copies. The owner must verify them against the printed Peterson/Roark edition before 46.2.**
+Additive specification, 2026-10-17. Refines `../original-catalog/` MB-01–MB-07 under the shared contracts in `../multi-model-architecture/`. Fourth track in the D-38 delivery order. Status: specification and independently computed worksheet only. The model is not implemented, the card stays unavailable until 46.3, and owner engineering review (29.2) of constants, equations, thresholds and wording is pending. **Owner decisions K-1–K-5 were recorded 2026-10-17 (D-41).** The stress-concentration coefficients come from secondary copies: two matching sources, digits re-checked against the downloaded Roark Table 6-1 case III.1b text. The owner accepted that cross-check for development with disclosure. Verification against a printed edition remains a pre-release owner-QA item (29.2), not a blocker for 46.2.
 
 ## Identity, owner decisions and learning objective
 
@@ -79,7 +79,8 @@ Additive specification, 2026-10-17. Refines `../original-catalog/` MB-01–MB-07
   | `KT_FIT_SHARP` | h/r | — | above 20 | Upper limit of the fit's range |
   | `KT_FIT_SHALLOW` | r/h | — | above 10 (h/r below 0.1) | Lower limit of the fit's range |
   | `KT_SHOULDER_LENGTH` | [2.0 − 2.05(r/d − 0.025)] / (a/D) | — | above 1.0 | The source's L/D validity condition, with L taken conservatively as a (design.md) |
-  | `KT_STEP_RATIO` | D/d | above 1.5 | above 1.6 | Developer-proposed fit-reliability limit, not stated by the source; owner review |
+  | `KT_STEP_RATIO` | D/d | above 1.5 | above 1.6 | Fit-reliability limit, not stated by the source; owner-approved (K-3) |
+  | `KT_SMALL_STEP` | 1.1 / (D/d) | — | above 1.0 (D/d below 1.1) | Owner decision K-4: for small steps the fit is 6.6–13.6% below the 1951 chart (unconservative), so a step needs D/d ≥ 1.1 (inclusive). D = d remains a valid uniform bar |
   | `PLASTICITY` | σ_peak/σ_yield | above 0.8 | above 1.0 | Plasticity |
   | `DEPTH_SPAN` | D/L | above 0.1 | above 0.2 | Shear deformation (beam convention) |
   | `RECT_ASPECT` | D/b | above 8 | above 20 | Lateral-torsional buckling (beam convention). The ranges cap D/b at 5, so this is defense in depth |
@@ -106,6 +107,7 @@ Additive specification, 2026-10-17. Refines `../original-catalog/` MB-01–MB-07
   - Implement every worksheet row in design.md at 1e-9 relative, plus the alternative-method, limiting, boundary and Kt spot checks listed there, at their stated tolerances.
   - Kt spot values against the transcribed polynomial are identical closed forms (1e-9). Comparisons with digitized chart readings use the looser stated tolerance.
   - Invalid geometry is rejected before analysis.
+  - K-4 fixtures `smallStepNA` (not applicable on `KT_SMALL_STEP` alone) and `smallStepBoundary` (D/d = 1.1 passes the screen inclusively) are required (design.md).
 - MBR-18 Presentation:
   - The primary visualization is a main-bundle 2D SVG elevation, independent of Three.js. It shows the wall, the stepped outline with fillets from a geometry outline function, the load arrow, and the root and step sections.
   - A moment-diagram strip shows M(x) with both checked sections marked. The governing section is identified by text and shape, never by color alone.
@@ -120,6 +122,6 @@ Additive specification, 2026-10-17. Refines `../original-catalog/` MB-01–MB-07
 
   Hints must not state reference dimensions or invent numbers.
 - MBR-20 Gating:
-  - 46.2 must not start implementing Kt until the owner records verification of the coefficient table, its validity conditions and branch rule against the printed source (design.md, open item K-1).
+  - K-1 resolved for development (D-41): 46.2 implements the cross-checked coefficient table in design.md. The model-limits text must disclose that the coefficients are transcribed from secondary copies of Peterson/Roark and are pending printed-edition verification. That verification is required in owner QA (29.2) before customer release.
   - The card stays unavailable until 46.3 verifies the integrated learning loop on desktop and Pixel 7, with keyboard, fallback and axe gates.
   - Customer release also requires owner engineering review and manual/student QA.

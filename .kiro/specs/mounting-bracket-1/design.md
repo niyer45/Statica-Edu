@@ -19,7 +19,7 @@ Deflection references to transcribe with edition and equation numbers in 46.2: G
 
 ## Stress-concentration factor: transcription record
 
-**Status: found and cross-checked. It still requires owner verification against the printed Peterson/Roark edition before 46.2 (open item K-1).** Neither printed book was available. Everything below was read from the copies listed here.
+**Status: found and cross-checked; owner accepted the cross-check for development (K-1, D-41, 2026-10-17).** Neither printed book was available. Everything below was read from the copies listed here. Coordinator re-check: every coefficient digit, both h/r ranges, the nominal stress 6M/(t·d²) and the L/D validity expression match the downloaded Roark text, Table 6-1, III. Fillets, case 1 "Opposite shoulder fillets in stepped flat bar", (b) in-plane bending. That chapter cites Pilkey's 1997 *Peterson's*, consistent with the 7th edition, though the edition is not printed in the copy. Signs are not recoverable from the extracted text. They follow AmesWeb (Pilkey 2005), which the EES worked example confirms to 0.01%. Printed-edition verification stays open under owner QA (29.2) before customer release.
 
 **Fit (stepped flat bar, opposite shoulder fillets, in-plane bending).**
 
@@ -162,7 +162,7 @@ Deflection, mass and outcome:
 | `rootToStep` | 0.00224139265350723 | 0.21276 | 2 (exact; lower branch); 1.16666666666667; 0.32378431372549 | Accepted; same geometry with sharp fillet, so the step governs (switch) |
 | `ratioWarning` | 0.00198757005774456 | 0.2106 | 2 (lower branch); 1.6; 0.372 | Accepted with KT_STEP_RATIO warning (D/d = 1.6, inclusive) and DEPTH_SPAN warning |
 | `ratioNA` | 0.00177905888547686 | 0.2187 | 2.33333333333333; 1.7; 0.39525 | Model not applicable (KT_STEP_RATIO); also fails mass; DEPTH_SPAN warning |
-| `fitShallowNA` | 0.00175037264086735 | 0.240975 | 0.05 (computed 0.0499999999999997); 1.01694915254237; 0.340758474576271 | Model not applicable (KT_FIT_SHALLOW); no Kt/peak; peakStress unevaluated; prediction not scorable |
+| `fitShallowNA` | 0.00175037264086735 | 0.240975 | 0.05 (computed 0.0499999999999997); 1.01694915254237; 0.340758474576271 | Model not applicable (KT_FIT_SHALLOW and KT_SMALL_STEP); no Kt/peak; peakStress unevaluated; prediction not scorable |
 | `shoulderNA` | 0.00124847826086957 | 0.2592 | 5; 1.33333333333333; 1.32194444444444 | Model not applicable (KT_SHOULDER_LENGTH); DEPTH_SPAN warning |
 | `plasticWarning` | 0.0022554347826087 | 0.2025 | 10; 1.5; 0.4 | Not accepted: peakStress; PLASTICITY warning |
 | `plasticNA` | 0.00440514605978261 | 0.162 | 8; 1.5; 0.31795 | Model not applicable (PLASTICITY); never Accepted |
@@ -183,11 +183,16 @@ Tests assert the lower-branch values.
 - Prediction fixture: baseline → reference gives r = 0.575171039733651, a decrease.
 
 **Solvability scan** (script only; tests need not reproduce the counts). It covered all 2,416,840 configured-step designs with d ≤ D:
-- 30,963 accepted, the lightest 0.19737 kg (D 29.5, d 18.5, a 160, r 3 mm).
+- 30,343 accepted, the lightest 0.19737 kg (D 29.5, d 18.5, a 160, r 3 mm).
 - 0 accepted uniform bars.
-- 698 accepted designs that keep r = 1 mm, by moving the step and resizing.
-- 8,212 accepted root-governed designs.
-- 1,292,350 not applicable, mostly D/d > 1.6 combinations.
+- 667 accepted designs that keep r = 1 mm, by moving the step and resizing.
+- 7,919 accepted root-governed designs.
+- 1,479,936 not applicable, mostly D/d > 1.6, plus the K-4 small-step band 1 < D/d < 1.1.
+- Before K-4, the scan gave 30,963 accepted and 1,292,350 not applicable; K-4 removed 620 accepted small-step designs. No worksheet fixture outcome changed. `fitShallowNA` (D/d 1.017) now also carries `KT_SMALL_STEP`. Recounts come from the coordinator's modified copy of the agent script (standalone, not application code).
+
+**K-4 fixtures** (coordinator, standalone script; D, d, a, r in mm):
+- `smallStepNA` 30, 28, 150, 1: D/d 1.07142857142857, h/r 1 (inside the fit range), Kt 1.86101007407407, peak 64090908.1632653 Pa, δ 0.00178912092787426 m, mass 0.2349 kg. Model not applicable for `KT_SMALL_STEP` only; it also fails mass and is never Accepted. Like `ratioNA`, the computed values are kept and the status is not applicable.
+- `smallStepBoundary` 33, 30, 150, 1: D/d = 1.1, inclusive under REL_TOL, so no `KT_SMALL_STEP` issue. Kt 2.0233540715698, peak 60700622.1470941 Pa; `DEPTH_SPAN` warning; Not accepted on mass only.
 
 ## Alternative-method and limiting checks
 
@@ -230,10 +235,10 @@ Tests assert the lower-branch values.
 - Explanation facts compare stored values only: the location change, the Kt ratio, the step nominal ratio (from a and d), the peak ratio and the mass delta. Guided wording ties the moment path to "why moving the step helps".
 - Visualization: the elevation and moment strip read the stored analysis and the geometry outline only, with no formulas in UI or state. Fillets with r > h are drawn as arcs tangent to the arm face and meeting the deep face.
 
-## Open items for owner review
+## Owner decisions (resolved 2026-10-17, D-41)
 
-- **K-1 (blocks 46.2 Kt code).** Verify the coefficient table, signs, ranges, the validity condition and its relation symbol against the printed *Peterson's Stress Concentration Factors* (Pilkey & Pilkey). Record the chart number and edition. Verify the same against the Roark table (record the edition) and decide whether the MechaniCalc variant reflects a different edition.
-- **K-2.** Approve the conservative use of a for the source's L, and the strict-moment-at-shoulder convention.
-- **K-3.** Approve the developer-proposed `KT_STEP_RATIO` thresholds (warning 1.5, not applicable 1.6) and the inclusive lower-branch rule at h/r = 2.
-- **K-4.** Decide how to treat the fit being 6.6–13.6% below the 1951 chart for D/d ≤ 1.05, and the reported general underestimation by Peterson's photoelastic charts: accept and disclose, add a small-step warning, or require D/d ≥ 1.1 when a step exists.
-- **K-5.** Approve the constants (F, L, b, aluminum record) and limits (120 MPa, 2.4 mm, 0.215 kg, 40 mm). Approve the peak-elastic-stress rule wording (MBR-16), and whether the a and r controls stay editable when D = d (recommended: editable, with "no step" shown).
+- **K-1 accepted for development.** The two-source cross-checked coefficient table (coordinator digit re-check above) is used in 46.2 with disclosure in the model limits. Printed-edition verification is owner QA before customer release (29.2). The MechaniCalc set is labelled as Roark 8th edition and may be a later revision; it is not used. If the printed check finds a discrepancy, the model version and challenge version increase (MM-04).
+- **K-2 approved.** The step location a stands in for the source's shoulder length L (conservative), and the step moment is taken at the shoulder plane.
+- **K-3 approved.** `KT_STEP_RATIO` warns above 1.5 and is not applicable above 1.6; the lower branch applies inclusively at h/r = 2.
+- **K-4: small steps not applicable.** With a step, D/d must be at least 1.1 (`KT_SMALL_STEP`, inclusive, no warning band), because the fit under-predicts stress for small steps. D = d remains a valid uniform bar.
+- **K-5 approved.** Constants and limits as specified. The rule wording is "peak elastic stress ≤ allowable". Step location and fillet radius stay editable when D = d, with "no step" shown.
