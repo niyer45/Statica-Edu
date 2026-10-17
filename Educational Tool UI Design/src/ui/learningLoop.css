@@ -170,6 +170,8 @@
 .guidance-steps { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
 .guidance-steps button { border: 1px solid #a4b496; border-radius: 5px; padding: 5px 9px; background: #fff; color: #345640; font: inherit; }
 .guidance-steps button[aria-pressed="true"] { background: #345640; color: #fff; border-color: #345640; }
+/* Pressed state changes instantly: the template button colour transition briefly shows low-contrast intermediate colours. */
+.guidance-steps button { transition: none; }
 .guided-instructions h2 { font-size: 12px; margin: 0 0 4px; }
 .guided-instructions p { margin: 4px 0; }
 .guided-instructions details { margin-top: 6px; }
