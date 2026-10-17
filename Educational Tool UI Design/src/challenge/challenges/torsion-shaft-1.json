@@ -1,0 +1,54 @@
+{
+  "id": "torsion-shaft-1",
+  "version": 1,
+  "model": { "id": "circularShaftTorsion", "version": 1 },
+  "title": "Torsion Shaft I",
+  "difficulty": "intermediate",
+  "allowedModes": ["guided", "parametric"],
+  "statement": "The steel drive shaft twists more than its allowable angle under a steady torque. Redesign its cross-section to meet the twist and shear stress limits while staying within the mass and packaging limits. The length, end support, material, and applied torque are fixed.",
+  "material": {
+    "id": "steel-educational",
+    "name": "Steel (educational nominal)",
+    "shearModulusPa": 79e9,
+    "densityKgM3": 7850,
+    "allowableShearStressPa": 80e6,
+    "yieldShearStressPa": 145e6
+  },
+  "lengthM": 0.8,
+  "torqueNm": 400,
+  "support": "fixedEnd",
+  "initialDesign": {
+    "id": "baseline",
+    "section": { "kind": "circle", "diameterM": 0.03 },
+    "lengthM": 0.8,
+    "materialId": "steel-educational"
+  },
+  "referenceDesign": {
+    "id": "reference",
+    "section": { "kind": "tube", "outerDiameterM": 0.05, "innerDiameterM": 0.044 },
+    "lengthM": 0.8,
+    "materialId": "steel-educational"
+  },
+  "lockedFields": ["lengthM", "materialId", "torqueNm", "support"],
+  "constraints": {
+    "maxTwistRad": 0.017453292519943295,
+    "maxShearStressPa": 80e6,
+    "maxMassKg": 4.5,
+    "maxOuterDiameterM": 0.05
+  },
+  "sectionLimits": {
+    "circle": { "diameterM": { "minM": 0.01, "maxM": 0.06, "stepM": 0.0005 } },
+    "tube": {
+      "outerDiameterM": { "minM": 0.015, "maxM": 0.06, "stepM": 0.0005 },
+      "minWallM": 0.002
+    }
+  },
+  "sectionDefaults": { "tubeWallM": 0.004 },
+  "allowedSections": ["circle", "tube"],
+  "predictionPolicy": { "requiredOnIterations": [1, 3] },
+  "reflectionPrompt": {
+    "id": "torsion-shaft-1-reflection",
+    "text": "Using your tested designs, explain how moving material away from the shaft's center changed its twist, shear stress and mass."
+  },
+  "visualization": { "twistExaggerationFactor": 10, "maxVisualTwistRad": 1.5707963267948966 }
+}
