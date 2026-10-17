@@ -130,3 +130,24 @@ Task 44 now has additive specifications under .kiro/specs/interaction-modes/. Gu
 ## D-37: Choose mode before entry; no in-workbench switching (2026-10-16)
 
 User corrected D-36: once inside Guided or Parametric, users must not switch to the other mode. Remove the native workbench selector and its callback/CSS. Mode remains selectable on the existing library/challenge-entry screen, before opening, and persists on reload/resume. Returning to the library permits a new entry choice; this does not create a permanent account/project lock, reset work or require separate saves. Preserve the distinct scaffolding/direct-edit experiences, shared solver, prediction rules and existing session persistence. Update task/spec/browser assertions to verify pre-entry selection and absence of in-workbench mode controls instead of live switching.
+
+## D-38: Bounded original-catalog models and delivery order (2026-10-17)
+
+Task 45.1 scopes the five preview challenges in additive `.kiro/specs/original-catalog/`. These are proposed developer choices, pending owner engineering review under 29.2.
+
+- **Models:** circular-shaft Saint-Venant torsion (Torsion Shaft I); single-DOF base-excited viscous isolation in steady-state frequency response (Vibration Isolation I); steady plate-fin conduction/convection with fin efficiency and a specified effective coefficient (Heat Sink I); stepped flat-bar nominal bending with a published shoulder-fillet stress-concentration fit (Mounting Bracket I); 2D pin-jointed braced frame by direct stiffness with mechanism detection and Euler/yield member checks (Braced Frame I).
+- **Delivery order:** Torsion (47) → Vibration (50) → Heat Sink (48) → Bracket (46) → Frame (49). Torsion goes first because it is closest to the validated beam and lowest risk. Vibration goes second to prove that the shared contracts are not beam-shaped. Bracket waits on owner decision MB-07. Frame carries the largest solver/UI effort.
+- **Open owner decisions:** HS-08 (effective coefficient with minimum-gap rule, versus a natural-convection spacing correlation) and MB-07 (stress-concentration approach and card concept copy). Each must be resolved before the corresponding 4x.1 closes.
+
+Task IDs and dependency edges are unchanged; the order is a default sequence, not a hard dependency, and the owner may reorder it. No model is implemented, no card is activated, and the beam solver is never used for these disciplines. Provisional constants were checked for solvability with a standalone calculation, not application code or human review.
+
+## D-39: Multi-model contracts preserve the frozen beam save format (2026-10-17)
+
+Task 45.2 specifies the shared contracts in additive `.kiro/specs/multi-model-architecture/`:
+
+- **Identity:** explicit model identity and version on each challenge config; a config without `model` is the beam, version 1.
+- **Dispatch:** a pure state-layer registry of model definitions. Per-model code goes in subfolders of the existing pure layers.
+- **Evaluation:** a shared evaluation envelope with extended SI units, a per-model primary prediction metric and a not-scorable outcome.
+- **Isolation:** a store/persistence host per challenge.
+
+Persistence validation compares stored beam results key-for-key against recomputation, so the beam Analysis/Evaluation/PredictionOutcome/TestResult shapes are frozen. Beam sessions keep reading and writing v1 envelopes; non-beam sessions use v2 with model identity. There is deliberately no v1 → v2 migration, so the current production release can still read beam saves after a rollback. Any model-output change requires a challenge version change (new key) rather than silent re-scoring. Implementation proceeds in 34.1 step 1 (registry with beam only, no visible change), 34.1 step 2 (per-challenge hosts/isolation using test-only registrations) and 34.2 (model UI slots/content, test-only model). Beam II stays unregistered until 52.

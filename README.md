@@ -47,7 +47,7 @@ The dotted deformation outline represents the **latest tested design**. Editing 
 
 ## In development and planned
 
-**Priority: complete the six challenges already displayed in the library before second editions.** Cantilever Beam I works today; Mounting Bracket I, Torsion Shaft I, Heat Sink I, Braced Frame I and Vibration Isolation I each need scoped, validated models and complete learning-loop integration. Next is task 45.1: define their requirements and delivery order. See the [catalog roadmap](Educational%20Tool%20UI%20Design/CATALOG_ROADMAP.md).
+**Priority: complete the six challenges already displayed in the library before second editions.** Cantilever Beam I works today; Mounting Bracket I, Torsion Shaft I, Heat Sink I, Braced Frame I and Vibration Isolation I each need scoped, validated models and complete learning-loop integration. Their scoped requirements, proposed models and delivery order (Torsion Shaft → Vibration Isolation → Heat Sink → Mounting Bracket → Braced Frame) are specified in `.kiro/specs/original-catalog/`; none is implemented yet. The shared multi-model architecture (task 45.2) is specified in `.kiro/specs/multi-model-architecture/`; next is task 34.1, implementing its registry and per-challenge integration. See the [catalog roadmap](Educational%20Tool%20UI%20Design/CATALOG_ROADMAP.md).
 
 | Area | Status |
 | --- | --- |

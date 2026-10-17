@@ -11,7 +11,17 @@ Owner direction, 2026-10-16 (D-35): complete the six existing library challenges
 | Braced Frame I | Preview only | Scope joint/member/support idealization, implement/benchmark frame/truss model and integrate (49) |
 | Vibration Isolation I | Preview only | Scope excitation/damping/response, implement/benchmark appropriate dynamics model and integrate (50) |
 
-Next is 45.1: additive requirements and delivery order for the five previews. Then 45.2 defines shared model/config/result versioning, model-specific metrics/controls, validation, evaluation, visualization/fallback and persistence/import contracts. The order of the five implementation tracks is to be selected during scoping; listing them in screen order does not claim equal complexity or choose numerical models in advance. Task 34 builds shared selection/session infrastructure against those contracts, preserving Cantilever Beam I saves and pure domain boundaries. Each model track has separate specification, numerical validation and integrated learning-loop gates; keep the card unavailable until its supported flow is real and verified.
+45.1 is complete as specification (2026-10-17): see [`.kiro/specs/original-catalog/`](../.kiro/specs/original-catalog/requirements.md) and D-38. Proposed models and delivery order:
+
+| Order | Card | Proposed bounded model | Open owner decision |
+| --- | --- | --- | --- |
+| 1 | Torsion Shaft I (47) | Circular solid/tube Saint-Venant torsion: twist, shear stress, mass, OD packaging; 47.1 specified with worksheet (`.kiro/specs/torsion-shaft-1/`) | — |
+| 2 | Vibration Isolation I (50) | Single-DOF base-excited spring/viscous damper, steady-state transmissibility, static sag, resonance peak | — |
+| 3 | Heat Sink I (48) | Steady plate-fin conduction/convection, fin and surface efficiency, specified effective h with minimum gap | HS-08 convection scope |
+| 4 | Mounting Bracket I (46) | Stepped flat-bar nominal bending with a published shoulder-fillet Kt fit; stepped-cantilever deflection | MB-07 Kt approach and copy |
+| 5 | Braced Frame I (49) | 2D pin-jointed frame by direct stiffness; mechanism detection; yield/Euler member checks | — |
+
+All choices await owner engineering review (29.2); none is implemented. 45.2 (complete as specification, `.kiro/specs/multi-model-architecture/`, D-39) defines shared model/config/result versioning, model-specific metrics/controls, validation, evaluation, visualization/fallback and persistence/import contracts. The order above is a default sequence chosen for implementation risk; it adds no hard dependency edges and the owner may reorder it. Task 34 builds shared selection/session infrastructure against those contracts, preserving Cantilever Beam I saves and pure domain boundaries. Each model track has separate specification, numerical validation and integrated learning-loop gates; keep the card unavailable until its supported flow is real and verified.
 
 The current beam solver supports none of the other five advertised disciplines as implemented challenges. Do not label a bracket, heat sink or vibration problem as analyzed by substituting cantilever metrics. Choose bounded educational models and disclose assumptions; if the advertised objective cannot be supported, resolve it in the scoped specification before implementation.
 
