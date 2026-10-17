@@ -53,10 +53,12 @@ Keep the existing Figma Make shell/plugins and external styling architecture. Pr
 
 Read [AGENTS.md](AGENTS.md) and [HANDOFF.md](HANDOFF.md) before editing. Update those files and the [task list](../.kiro/specs/engineering-intuition-mvp/tasks.md) after completed work; preserve numeric task IDs and truthful evidence.
 
-Next software task is **45.1: scope the five remaining original catalog challenges**, followed by full second-challenge integration/regression work. See [MILESTONE5.md](MILESTONE5.md). Nikhil is the nominated owner engineering reviewer; human engineering/manual/student QA remains required before customer deployment under D-34. [MILESTONE4.md](MILESTONE4.md) and [PILOT_PROTOCOL.md](PILOT_PROTOCOL.md) contain prepared materials, not completed review/pilot evidence.
+Next software task is **45.1: scope the five remaining original catalog challenges**, followed by shared multi-model contracts (45.2), task 34 infrastructure and original-catalog model tracks 46–50. See [MILESTONE5.md](MILESTONE5.md). Nikhil is the nominated owner engineering reviewer; human engineering/manual/student QA remains required before customer deployment under D-34. [MILESTONE4.md](MILESTONE4.md) and [PILOT_PROTOCOL.md](PILOT_PROTOCOL.md) contain prepared materials, not completed review/pilot evidence.
 
 The app remains browser-local with no backend, sign-in or cloud sync. Future account work must explicitly specify the required network/CSP changes and user ownership rules; do not describe current local storage as account-backed saving.
 
 Task 44 tracks the required pre-deployment Guided/Parametric distinction. Guided now includes short browsable instructions and optional hints; Parametric offers direct editing without the scaffolding. Choose the mode before opening the challenge. It stays fixed in the workbench and survives reload/resume, preserving the same session and numerical behavior. Browser verification passed run 38970465802; owner manual release verification remains pending under 44.3. This is separate from Freeform geometry work.
 
 Original-catalog priority (D-35): develop the six existing library challenges before second editions. See CATALOG_ROADMAP.md and tasks 45–52. Beam II configuration/tests are retained but further integration is deferred; the five original preview challenges remain unavailable until model-specific implementation and verification. Next is 45.1, then shared model architecture 45.2. Required mode distinction and human release gates are unchanged.
+
+For a fresh Claude Code session, start at repository-root CLAUDE.md and read the current HANDOFF.md/AGENTS.md. Superseded status logs are archived in HANDOFF_HISTORY.md.

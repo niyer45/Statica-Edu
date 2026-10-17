@@ -98,6 +98,8 @@ Verification includes Vitest, fast-check property tests, architecture checks and
 
 ## Project documentation
 
+New contributors and Claude Code should start with [CLAUDE.md](CLAUDE.md), then the current handoff and agent instructions below. Superseded status notes are archived separately.
+
 | Document | Purpose |
 | --- | --- |
 | [Handoff](Educational%20Tool%20UI%20Design/HANDOFF.md) | Current implementation, latest verification, next task and known limitations |

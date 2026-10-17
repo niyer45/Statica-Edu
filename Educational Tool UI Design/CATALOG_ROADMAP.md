@@ -4,7 +4,7 @@ Owner direction, 2026-10-16 (D-35): complete the six existing library challenges
 
 | Existing card | Current status | Development work |
 | --- | --- | --- |
-| Cantilever Beam I | Implemented learning loop | Preserve regressions; implement Guided/Parametric distinction before deployment (44) |
+| Cantilever Beam I | Implemented learning loop | Guided/Parametric distinction implemented and CI verified; preserve regressions and complete manual release-mode QA (44.3) |
 | Mounting Bracket I | Preview only | Scope supported geometry/load paths and stress assumptions; implement/benchmark appropriate model and integrate (46) |
 | Torsion Shaft I | Preview only | Scope torsional deformation/stress, implement/benchmark appropriate shaft model and integrate (47) |
 | Heat Sink I | Preview only | Scope thermal assumptions/boundaries, implement/benchmark heat-transfer model and integrate (48) |
