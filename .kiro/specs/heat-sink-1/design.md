@@ -157,7 +157,7 @@ N = 20, t = 0.002 (s = 0.00105263157894737 m) is valid and analyzable, and is no
   - Every Accepted design has 8 ≤ N ≤ 12, t ≤ 2.0 mm and H ≥ 22 mm.
   - No design with s ≥ 4 mm is not applicable.
 - **More short fins are not enough:** with N ≤ 7, no thickness reaches 55 °C at H = 35 mm. N = 7 reaches at best 56.115991901609 °C.
-- **Thick fins waste mass:** the 23 designs with t ≥ 2.5 mm that meet temperature, height and gap all weigh at least 144.585 g, so they fail mass.
+- **Thick fins waste mass:** the 27 designs with t ≥ 2.5 mm that meet temperature, height and the inclusive gap rule all weigh at least 144.585 g, so they fail mass. *(Corrected 2026-10-17: the original worksheet count of 23 compared the gap strictly. It omitted the four N = 8, t = 4 mm designs at exactly s = 4 mm, heights 32–35 mm, which pass the inclusive rule. The 48.2 implementation and an independent coordinator recount both give 27; the minimum mass is unchanged.)*
 - **Thicker is a poor trade:** going from 1.5 to 2.0 mm (reference → `thickerFins`) lowers T_base by 0.33170535 K but adds 28.35 g.
 - **Fin heat share:** 0.731859643896696 at the baseline and 0.936905404005661 at the reference.
 
