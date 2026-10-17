@@ -7,7 +7,7 @@ template's visual design and platform shell are kept.
 
 Read `HANDOFF.md` first for the current status and the next task.
 
-Current task progress (2026-10-17): 45.1 original-catalog scoping complete as specification (`../.kiro/specs/original-catalog/`, D-38: Torsion → Vibration → Heat Sink → Bracket → Frame; owner decisions HS-08/MB-07 open). 45.2 shared multi-model contracts complete as specification (`../.kiro/specs/multi-model-architecture/`, D-39: frozen beam v1 save shape, v2 envelopes for new models, registry/host-per-challenge). 47.1 Torsion Shaft I model specification and worksheet complete (`../.kiro/specs/torsion-shaft-1/`). 34.1 step 1 (model registry, no visible change) implemented: 925 tests/115 files, 24/24 E2E locally. Next 34.1 step 2 (per-challenge hosts/isolation); 47.2, 49.1 and 50.1 run in parallel. Only Cantilever Beam I is runnable. Guided/Parametric distinction implemented and CI verified: choose mode before entry, no in-workbench switch (D-37). 44.3/parent 44 open only for owner manual release-mode evidence; next development is not blocked on human QA. CI-verified baseline: 906 core tests, 2 responsive and all 24 E2E cases (run 38970465802); spec batch run 39071816823 passed. Beam II integration deferred to 52 after 51. Read HANDOFF.md; historical notes moved to HANDOFF_HISTORY.md.
+Current task progress (2026-10-17): 45.1 original-catalog scoping complete as specification (`../.kiro/specs/original-catalog/`, D-38: Torsion → Vibration → Heat Sink → Bracket → Frame; owner decisions HS-08/MB-07 open). 45.2 shared multi-model contracts complete as specification (`../.kiro/specs/multi-model-architecture/`, D-39: frozen beam v1 save shape, v2 envelopes for new models, registry/host-per-challenge). 47.1 Torsion Shaft I model specification and worksheet complete (`../.kiro/specs/torsion-shaft-1/`). 34.1 complete (model registry + CatalogHost per-challenge stores; 939 tests/117 files, 24/24 E2E locally). 48.1 heat sink and 50.1 vibration specified (`../.kiro/specs/heat-sink-1/`, `../.kiro/specs/vibration-isolation-1/`); D-40 records the HS-08/MB-07 owner decisions. Next 34.2; 47.2, 49.1 and 46.1 in progress via parallel agents. Only Cantilever Beam I is runnable. Guided/Parametric distinction implemented and CI verified: choose mode before entry, no in-workbench switch (D-37). 44.3/parent 44 open only for owner manual release-mode evidence; next development is not blocked on human QA. CI-verified baseline: 906 core tests, 2 responsive and all 24 E2E cases (run 38970465802); spec batch run 39071816823 passed. Beam II integration deferred to 52 after 51. Read HANDOFF.md; historical notes moved to HANDOFF_HISTORY.md.
 
 ## Specifications (source of truth)
 
@@ -16,10 +16,10 @@ The spec lives outside this folder, one level up:
 - `../.kiro/specs/engineering-intuition-mvp/requirements.md`: Requirements 1–35 with numbered acceptance criteria.
 - `../.kiro/specs/engineering-intuition-mvp/design.md`: architecture, decisions D-01…D-25, correctness Properties 1–37, fixtures, thresholds.
 - `../.kiro/specs/engineering-intuition-mvp/tasks.md`: the completed MVP plan (Milestones 0–3, tasks 1–28) and post-MVP roadmap/maintenance (tasks 29–53) with a JSON wave dependency graph at the end.
-- Additive specs: `../.kiro/specs/interaction-modes/` (task 44), `../.kiro/specs/original-catalog/` (task 45.1 scopes/models/benchmarks/delivery order for the five previews), `../.kiro/specs/multi-model-architecture/` (task 45.2 shared contracts for tasks 34 and 46–50), `../.kiro/specs/torsion-shaft-1/` (task 47.1) and dormant `../.kiro/specs/cantilever-beam-2/`.
+- Additive specs: `../.kiro/specs/interaction-modes/` (task 44), `../.kiro/specs/original-catalog/` (task 45.1 scopes/models/benchmarks/delivery order for the five previews), `../.kiro/specs/multi-model-architecture/` (task 45.2 shared contracts for tasks 34 and 46–50), `../.kiro/specs/torsion-shaft-1/` (47.1), `../.kiro/specs/heat-sink-1/` (48.1), `../.kiro/specs/vibration-isolation-1/` (50.1) and dormant `../.kiro/specs/cantilever-beam-2/`.
 
 Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuition-mvp/`.
-`DECISIONS.md` records D-01…D-39 and the 14 applicability thresholds. D-25 defines required `sectionDefaults`; D-26 records the user-directed uncluttered 3D presentation and overrides the original visible-overlay requirements.
+`DECISIONS.md` records D-01…D-40 and the 14 applicability thresholds. D-25 defines required `sectionDefaults`; D-26 records the user-directed uncluttered 3D presentation and overrides the original visible-overlay requirements.
 
 ## Rules for following the spec
 
@@ -53,7 +53,7 @@ Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuiti
 - `src/ui`: app, store, shell, workbench, palette, controls, mesh, viewport, dialogs, panels, history, a11y, icons.
   - `ui/App.tsx`: bootstrap.
   - `ui/state`: StoreProvider, hooks, dev snapshot.
-  - `ui/shell`: platform shell.
+  - `ui/shell`: platform shell; `CatalogHost` owns one store per active challenge (34.1).
   - `ui/workbench`: layout.
   - `ui/mesh`: three.js geometry.
   - `ui/viewport`: lazy R3F Canvas/`BeamView`, `DimensionHandles`/`handleDrag`, shared controls/summary/layout; main-bundle `ViewportBoundary`, `FallbackViewport`, typed `Fallback2D`, and pure `projection` helpers.
@@ -142,6 +142,6 @@ Per the user's standing instruction, also update this file's current-task pointe
 
 GitHub: https://github.com/niyer45/Statica-Edu, branch main. Root CLAUDE.md/AGENTS.md point here. The existing local Kiro mirror is not a git checkout; use a real separate clone for ordinary CLI git work after reconciling local files. Preserve root README, sibling .kiro specs and workflow layout, unrelated changes and remote-only files. Do not initialize unrelated history, force-push or silently delete files.
 
-Read HANDOFF.md for paths, exact verified implementation/run, next task and architectural edge cases. DECISIONS.md records D-01–D-39; D-35 and D-37 supersede earlier priority/mode choices; D-38 records proposed original-catalog models and delivery order; D-39 records the multi-model contracts and frozen beam save format. HANDOFF_HISTORY.md contains archived status only. Keep root product README and app developer README accurate when feature availability changes.
+Read HANDOFF.md for paths, exact verified implementation/run, next task and architectural edge cases. DECISIONS.md records D-01–D-40 (D-40: owner HS-08/MB-07 decisions); D-35 and D-37 supersede earlier priority/mode choices; D-38 records proposed original-catalog models and delivery order; D-39 records the multi-model contracts and frozen beam save format. HANDOFF_HISTORY.md contains archived status only. Keep root product README and app developer README accurate when feature availability changes.
 
 For documentation-only edits, validate task IDs/dependency graph, local Markdown links and factual capability/status claims; do not claim new runtime/browser testing. For source changes run all required core checks and affected/full browser gates. Never run concurrent Vitest coverage processes into the same report directory.

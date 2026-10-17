@@ -151,3 +151,13 @@ Task 45.2 specifies the shared contracts in additive `.kiro/specs/multi-model-ar
 - **Isolation:** a store/persistence host per challenge.
 
 Persistence validation compares stored beam results key-for-key against recomputation, so the beam Analysis/Evaluation/PredictionOutcome/TestResult shapes are frozen. Beam sessions keep reading and writing v1 envelopes; non-beam sessions use v2 with model identity. There is deliberately no v1 → v2 migration, so the current production release can still read beam saves after a rollback. Any model-output change requires a challenge version change (new key) rather than silent re-scoring. Implementation proceeds in 34.1 step 1 (registry with beam only, no visible change), 34.1 step 2 (per-challenge hosts/isolation using test-only registrations) and 34.2 (model UI slots/content, test-only model). Beam II stays unregistered until 52.
+
+## D-40: Owner decisions for Heat Sink I and Mounting Bracket I scope (2026-10-17)
+
+Owner selections, resolving the open 45.1 items. Each was the recommended option.
+
+- **HS-08:** Heat Sink I uses a specified uniform effective convection coefficient (fan-assisted, proposed 25 W/m²·K) with a minimum fin-gap constraint and applicability screen. A natural-convection spacing correlation is at most a later edition.
+- **MB-07(a):** Mounting Bracket I uses a stepped flat-bar cantilever: nominal bending stress multiplied by a published shoulder-fillet stress-concentration curve fit (Peterson), used only inside the fit's validity range. The fit's coefficients must be transcribed from cited sources and verified against the printed edition before 46.2.
+- **MB-07(b):** The card copy stays as written ("Load paths, Stress concentrations"). Load paths are taught as the internal bending-moment path, with the critical section switching between root and step.
+
+These decisions scope specifications 48.1/46.1 only. They do not implement or activate either challenge, and they do not constitute engineering review of constants (29.2).
