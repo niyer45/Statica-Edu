@@ -1,0 +1,55 @@
+{
+  "id": "mounting-bracket-1",
+  "version": 1,
+  "model": { "id": "steppedBarBracket", "version": 1 },
+  "title": "Mounting Bracket I",
+  "difficulty": "intermediate",
+  "allowedModes": ["guided", "parametric"],
+  "statement": "The aluminum mounting bracket carries more stress than it should under a static tip load. Find where its stress actually peaks and redesign the depths, the step location and the shoulder fillet to meet the peak stress limit while staying within the deflection, mass and envelope limits. The length, thickness, wall clamp, material and applied force are fixed.",
+  "material": {
+    "id": "al-educational",
+    "name": "Aluminum (educational nominal)",
+    "elasticModulusPa": 69e9,
+    "densityKgM3": 2700,
+    "allowableStressPa": 120e6,
+    "yieldStressPa": 240e6
+  },
+  "lengthM": 0.3,
+  "thicknessM": 0.01,
+  "support": "wallClamp",
+  "load": { "forceN": 300, "location": "freeEnd", "direction": "down" },
+  "initialDesign": {
+    "id": "baseline",
+    "rootDepthM": 0.03,
+    "armDepthM": 0.02,
+    "stepLocationM": 0.15,
+    "filletRadiusM": 0.001,
+    "materialId": "al-educational"
+  },
+  "referenceDesign": {
+    "id": "reference",
+    "rootDepthM": 0.03,
+    "armDepthM": 0.02,
+    "stepLocationM": 0.175,
+    "filletRadiusM": 0.003,
+    "materialId": "al-educational"
+  },
+  "lockedFields": ["lengthM", "thicknessM", "materialId", "forceN", "support"],
+  "constraints": {
+    "maxPeakStressPa": 120e6,
+    "maxTipDeflectionM": 0.0024,
+    "maxMassKg": 0.215,
+    "maxEnvelopeDepthM": 0.04
+  },
+  "designLimits": {
+    "rootDepthM": { "minM": 0.015, "maxM": 0.05, "stepM": 0.0005 },
+    "armDepthM": { "minM": 0.01, "maxM": 0.05, "stepM": 0.0005 },
+    "stepLocationM": { "minM": 0.06, "maxM": 0.24, "stepM": 0.005 },
+    "filletRadiusM": { "minM": 0.0005, "maxM": 0.01, "stepM": 0.0005 }
+  },
+  "predictionPolicy": { "requiredOnIterations": [1, 3] },
+  "reflectionPrompt": {
+    "id": "mounting-bracket-1-reflection",
+    "text": "Using your tested designs, explain where the peak stress occurred, how the fillet radius and the step location changed it, and why adding material everywhere was not the answer."
+  }
+}
