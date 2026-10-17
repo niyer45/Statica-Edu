@@ -19,12 +19,17 @@ import type { Clock, IdFactory } from './bootstrap'
 // Components never call Date or crypto directly; the clock and id factory are injected into
 // the provider so the reducer stays pure.
 
-export interface Store {
-  state: SessionState
+/**
+ * The active challenge's store. Defaults are the beam types; a model's own UI reads its typed
+ * store through `useModelStore` (task 34.2). Shared shell/workbench code reads only the
+ * model-independent session fields.
+ */
+export interface Store<S = SessionState, A = Action, Ch = StudentChallenge> {
+  state: S
   /** Last domain action for accessible event announcements; not persisted. */
-  lastAction?: Action
-  challenge: Readonly<StudentChallenge>
-  dispatch: (a: Action) => void
+  lastAction?: A
+  challenge: Readonly<Ch>
+  dispatch: (a: A) => void
   selectMode: (mode: InteractionMode) => boolean
   runTest: () => void
   submit: (testResultId: string) => void
@@ -32,12 +37,22 @@ export interface Store {
   newId: IdFactory
 }
 
-export const StoreContext = createContext<Store | null>(null)
+export const StoreContext = createContext<Store<unknown, never, unknown> | null>(null)
 
-export function useStore(): Store {
+function useAnyStore(): Store<unknown, never, unknown> {
   const store = useContext(StoreContext)
   if (store === null) throw new Error('useStore must be used inside <StoreProvider>.')
   return store
+}
+
+/** Beam-typed store. Beam components only mount under a beam challenge (ui/models registry). */
+export function useStore(): Store {
+  return useAnyStore() as unknown as Store
+}
+
+/** Typed store for a model's own UI; the model UI registry guarantees the active model matches. */
+export function useModelStore<S, A, Ch>(): Store<S, A, Ch> {
+  return useAnyStore() as unknown as Store<S, A, Ch>
 }
 
 export const useSession = (): SessionState => useStore().state

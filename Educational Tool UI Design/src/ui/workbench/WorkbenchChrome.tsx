@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import type { Difficulty, InteractionMode } from '../../challenge/types'
+import { catalog } from '../../challenge/catalog'
 import Icon from '../icons/Icon'
+import { useModelUi } from '../models/registry'
 import { useChallenge, useSession } from '../state/store'
 
 // Template Workbench chrome (task 13.3): `aside.sidebar`, `header.topbar`, `.page-heading`,
@@ -31,6 +33,10 @@ export default function WorkbenchChrome({ onExit, onOpenHelp, onShowDesigns, chi
   const ch = useChallenge()
   const mode = MODE_LABELS[useSession().mode]
   const difficulty = DIFFICULTY_LABELS[ch.difficulty]
+  const { copy } = useModelUi()
+  // Card metadata for the open challenge (number, discipline, time); defaults match the beam card.
+  const entry = catalog.find((e) => e.available && e.challengeId === ch.id)
+  const discipline = entry?.discipline ?? 'Mechanics'
   return (
     <div className="app-shell embedded-workspace">
       <aside className="sidebar">
@@ -63,7 +69,7 @@ export default function WorkbenchChrome({ onExit, onOpenHelp, onShowDesigns, chi
         <div className="current-challenge">
           <span className="tiny-dot" />
           {ch.title}
-          <span className="subtle">Mechanics · {difficulty}</span>
+          <span className="subtle">{discipline} · {difficulty}</span>
         </div>
         <div className="sidebar-bottom">
           <div className="practice-note">
@@ -101,7 +107,7 @@ export default function WorkbenchChrome({ onExit, onOpenHelp, onShowDesigns, chi
               Challenge library
             </button>
             <span>/</span>
-            <span>Mechanics</span>
+            <span>{discipline}</span>
             <span>/</span>
             <strong>{ch.title}</strong>
           </div>
@@ -117,15 +123,15 @@ export default function WorkbenchChrome({ onExit, onOpenHelp, onShowDesigns, chi
           <section className="page-heading">
             <div>
               <div className="eyebrow">
-                <span>CHALLENGE 001</span>
+                <span>CHALLENGE {entry?.id ?? '001'}</span>
                 <span className="tag">{difficulty}</span>
                 <span className="time">
                   <Icon name="clock" size={12} />
-                  15–20 min
+                  {entry?.time ?? '15–20 min'}
                 </span>
               </div>
               <h1>{ch.title}</h1>
-              <p>Reduce deflection within mass and stress limits.</p>
+              <p>{copy.tagline}</p>
             </div>
             <button type="button" className="secondary exit" onClick={onExit}>
               <Icon name="back" size={15} />
@@ -138,11 +144,9 @@ export default function WorkbenchChrome({ onExit, onOpenHelp, onShowDesigns, chi
               {mode} design
             </span>
             <span>
-              {mode === 'Guided'
-                ? 'Shape presets, dimension controls, and step-by-step prompts.'
-                : 'Precise parameter editing with the same validated beam model.'}
+              {mode === 'Guided' ? copy.guidedContext : copy.parametricContext}
             </span>
-            <span className="solver-label">Euler–Bernoulli · Beam solver</span>
+            <span className="solver-label">{copy.solverLabel}</span>
           </div>
           {children}
         </main>

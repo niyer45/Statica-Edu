@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import type { PredictionDirection } from '../../state/session'
 import Icon from '../icons/Icon'
+import { useModelUi } from '../models/registry'
 import { useSession, useStore } from '../state/store'
 import Dialog from './Dialog'
 
 function PredictionForm() {
   const store = useStore()
+  const { prediction } = useModelUi().copy
   const [direction, setDirection] = useState<PredictionDirection | ''>('')
   const [explanation, setExplanation] = useState('')
   const [error, setError] = useState('')
@@ -17,9 +19,9 @@ function PredictionForm() {
     store.dispatch({ type: 'setPrediction', direction, explanation, now: store.clock() })
     store.runTest()
   }
-  return <Dialog title="Predict deflection" icon="bulb" onClose={cancel}>
-    <p>Compared with {previous.iteration === 0 ? 'the Baseline' : `iteration ${previous.iteration}`}, how will your new section change tip deflection?</p>
-    <fieldset className="prediction-options"><legend>Predicted change in tip deflection</legend>
+  return <Dialog title={prediction.title} icon="bulb" onClose={cancel}>
+    <p>{prediction.question(previous.iteration === 0 ? 'the Baseline' : `iteration ${previous.iteration}`)}</p>
+    <fieldset className="prediction-options"><legend>{prediction.legend}</legend>
       {([['decrease', 'Decrease'], ['same', 'Stay the same'], ['increase', 'Increase']] as const).map(([value, label]) => <label key={value}>
         <input type="radio" name="prediction" value={value} checked={direction === value} onChange={() => { setDirection(value); setError('') }} /> {label}
       </label>)}

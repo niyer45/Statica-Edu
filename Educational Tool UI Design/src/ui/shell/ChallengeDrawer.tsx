@@ -60,7 +60,11 @@ export interface ChallengeDrawerProps {
   error: string | null
   /** Switches the drawer to the available challenge in Guided mode. */
   onFallback: () => void
+  /** Model-specific description for a runnable entry (task 34.2); defaults to the beam text. */
+  availableText?: string
 }
+
+const BEAM_AVAILABLE_TEXT = 'Available with an idealized beam solver. Length, load, material, and support remain fixed by the challenge.'
 
 export default function ChallengeDrawer({
   entry,
@@ -72,6 +76,7 @@ export default function ChallengeDrawer({
   onClose,
   error,
   onFallback,
+  availableText = BEAM_AVAILABLE_TEXT,
 }: ChallengeDrawerProps) {
   const modeAllowed = allowedModes.includes(mode)
   const canOpen = runnable && modeAllowed
@@ -149,7 +154,7 @@ export default function ChallengeDrawer({
                 ? 'This is a preview of the expanded challenge library. Its geometry tools and validated solver are not available yet.'
                 : !modeAllowed
                   ? `${MODE_LABELS[mode]} requires a geometry kernel and additional validated analyzers. This mode is a preview, not an active CAD tool.`
-                  : 'Available with an idealized beam solver. Length, load, material, and support remain fixed by the challenge.'}
+                  : availableText}
             </p>
           </div>
           {error !== null && (

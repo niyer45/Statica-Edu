@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useRef } from 'react'
-import { SECTION_KIND_NAMES } from '../../evaluation/explain'
+import { useModelUi } from '../models/registry'
 import { useStore } from '../state/store'
 import { STATUS_LABELS } from '../panels/resultPresentation'
 
@@ -8,6 +8,7 @@ export const useAnnounce = () => useContext(AnnounceContext)
 /** Mounted by App's Workbench, the owner of its single persistent live region and toast. */
 export function useAnnouncements(announce: (message: string) => void) {
   const { state, lastAction } = useStore()
+  const { announceEdit } = useModelUi()
   const previous = useRef(state)
   useEffect(() => {
     const before = previous.current
@@ -19,10 +20,10 @@ export function useAnnouncements(announce: (message: string) => void) {
     } else if (lastAction?.type === 'restore' && state !== before) {
       const result = state.history.find((r) => r.id === lastAction.testResultId)
       if (result) announce(`Restored ${result.iteration === 0 ? 'Baseline' : `iteration ${result.iteration}`}.`)
-    } else if (lastAction?.type === 'applySection' && state.draftErrors.length === 0 && state !== before) {
-      announce(`Section applied: ${SECTION_KIND_NAMES[state.draft.section.kind]}.`)
+    } else if (lastAction && announceEdit && state.draftErrors.length === 0 && state !== before && announceEdit(state, lastAction) !== undefined) {
+      announce(announceEdit(state, lastAction)!)
     } else if (lastAction?.type === 'runTest' && state.draftErrors.length) {
       announce(state.draftErrors.map((error) => error.message).join(' '))
     }
-  }, [state, lastAction, announce])
+  }, [state, lastAction, announce, announceEdit])
 }

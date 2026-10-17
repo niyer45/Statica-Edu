@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { catalog, type CatalogEntry } from '../../challenge/catalog'
-import type { InteractionMode } from '../../challenge/types'
+import type { InteractionMode, ModelRef } from '../../challenge/types'
 import { selectTestCount, selectWorkspaceStarted } from '../../state/selectors'
 import Icon from '../icons/Icon'
 import { useChallenge, useSession, useStore } from '../state/store'
+import { modelUiFor, ModelUiContext, useModelUi } from '../models/registry'
 import Workbench from '../workbench/Workbench'
 import { MODE_LABELS } from '../workbench/WorkbenchChrome'
 import ChallengeDrawer from './ChallengeDrawer'
@@ -46,6 +47,8 @@ const PAGES: readonly [Page, string][] = [
 export interface OtherChallenge {
   challengeId: string
   title: string
+  /** Explicit model identity, for model-specific drawer wording (task 34.2). */
+  model: Readonly<ModelRef>
   allowedModes: readonly InteractionMode[]
   /** Saved workspace summary, read without touching the active store. */
   saved?: { mode: InteractionMode; started: boolean }
@@ -89,6 +92,8 @@ export default function PlatformShell({
   const { selectMode } = useStore()
   const session = useSession()
   const challenge = useChallenge()
+  const activeUi = useModelUi()
+  const uiRegistry = useContext(ModelUiContext)
 
   const [page, setPage] = useState<Page>('Challenges')
   const [workspace, setWorkspace] = useState(enterOnMount !== undefined)
@@ -290,6 +295,10 @@ export default function PlatformShell({
           entry={detail.entry}
           runnable={isRunnable(detail.entry)}
           allowedModes={modesFor(detail.entry)}
+          availableText={(() => {
+            const other = otherFor(detail.entry)
+            return other ? modelUiFor(other.model, uiRegistry)?.copy.drawerAvailable : activeUi.copy.drawerAvailable
+          })()}
           mode={detail.mode}
           onModeChange={(mode) => setDetail({ ...detail, mode, error: null })}
           onOpen={openFromDrawer}

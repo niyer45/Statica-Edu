@@ -27,18 +27,24 @@ export function selectStatusBadge(s: SessionState): string {
   return s.draftStatus === 'draft' ? 'Draft' : `Tested #${selectLatestResult(s).iteration}`
 }
 
+/** The model-independent history fields these selectors read (any model's session fits). */
+interface HistoryView<R extends { id: string; iteration: number }> {
+  history: ReadonlyArray<R>
+  deletedIterationIds?: string[]
+}
+
 /** Student-visible history; archived tests still preserve analysis/prediction provenance. */
-export function selectVisibleHistory(s: SessionState): ReadonlyArray<TestResult> {
+export function selectVisibleHistory<R extends { id: string; iteration: number } = TestResult>(s: HistoryView<R>): ReadonlyArray<R> {
   return s.history.filter((r) => !s.deletedIterationIds?.includes(r.id))
 }
 
 /** Number of available non-baseline tests. */
-export function selectTestCount(s: SessionState): number {
+export function selectTestCount(s: HistoryView<{ id: string; iteration: number }>): number {
   return selectVisibleHistory(s).filter((r) => r.iteration >= 1).length
 }
 
 /** True when stored work exists beyond the untouched Baseline (shell resume / My designs). */
-export function selectWorkspaceStarted(s: SessionState): boolean {
+export function selectWorkspaceStarted(s: HistoryView<{ id: string; iteration: number }> & Pick<SessionState, 'draftStatus' | 'reflectionAnswer'> & { submission?: unknown }): boolean {
   return selectTestCount(s) > 0 || s.draftStatus === 'draft' || (s.deletedIterationIds?.length ?? 0) > 0 || s.reflectionAnswer.length > 0 || s.submission !== undefined
 }
 

@@ -7,8 +7,8 @@ import type { Challenge } from '../../challenge/types'
 import { serializeSession, sessionKey, type SessionStorage } from '../../state/persistence'
 import { sessionReducer } from '../../state/reducer'
 import type { SessionState } from '../../state/session'
-import { bootstrap } from '../state/bootstrap'
-import CatalogHost, { type RunnableChallenge } from './CatalogHost'
+import { bootstrap, type BootSuccess } from '../state/bootstrap'
+import CatalogHost from './CatalogHost'
 
 // Task 34.1 step 2 (MM-16, MM-23): per-challenge stores and saves. Uses a second beam-model
 // challenge registered in this test only; the bundled catalog still links one challenge.
@@ -31,7 +31,7 @@ function memory() {
   return { values, storage }
 }
 
-function boot(ch: Challenge): RunnableChallenge {
+function boot(ch: Challenge): BootSuccess {
   const b = bootstrap({ ok: true, value: ch }, clock, newId)
   if (!b.ok) throw new Error(b.error.message)
   return b.value

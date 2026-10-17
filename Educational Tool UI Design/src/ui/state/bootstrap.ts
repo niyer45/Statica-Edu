@@ -1,6 +1,7 @@
-import type { Challenge, InteractionMode, Result, SchemaIssue } from '../../challenge/types'
-import { beamModel, modelFor, modelOf } from '../../state/models'
-import { initSession, type SessionState } from '../../state/session'
+import type { Challenge, InteractionMode, ModelRef, Result, SchemaIssue } from '../../challenge/types'
+import { beamModel, modelOf } from '../../state/models'
+import { runtimeFor, type AnyRuntime, type LoopChallenge, type LoopSession } from '../../state/runtimes'
+import type { SessionState } from '../../state/session'
 
 // App bootstrap (task 13.2; Req 3.3, 15.3, 35.1, 35.4).
 // Turns the loader result for the bundled challenge into either a ready session or a
@@ -42,20 +43,40 @@ export interface BootSuccess {
 }
 
 /** True when `mode` is one of the challenge's allowed modes (Req 35.4). */
-export function isModeAllowed(ch: Pick<Challenge, 'allowedModes'>, mode: InteractionMode): boolean {
+export function isModeAllowed(ch: { allowedModes: readonly InteractionMode[] }, mode: InteractionMode): boolean {
   return ch.allowedModes.includes(mode)
 }
 
+/** Generic boot result: the challenge, its fresh session and the runtime that owns them. */
+export interface RuntimeBootSuccess {
+  challenge: LoopChallenge
+  session: LoopSession
+  runtime: AnyRuntime
+}
+
+function modelUnavailable(model: Readonly<ModelRef>, registered: boolean): BootFailure {
+  return {
+    source: 'challenge',
+    message: 'The challenge uses an analysis model that is not available.',
+    issues: [registered
+      ? { path: 'model', rule: 'MODEL_UI_UNAVAILABLE', message: `Model "${model.id}" version ${model.version} has no integrated workbench yet.` }
+      : { path: 'model', rule: 'MODEL_NOT_REGISTERED', message: `Model "${model.id}" version ${model.version} is not registered.` }],
+  }
+}
+
 /**
- * Builds the initial session for a loaded challenge. A requested mode outside
- * `allowedModes` falls back to the first allowed mode. Never throws.
+ * Builds the initial session for a loaded challenge of any registered model (task 34.2).
+ * Refuses a model without a runtime (never substitutes one) or without a workbench UI
+ * (`hasUi`, supplied by the UI layer). A requested mode outside `allowedModes` falls back to
+ * the first allowed mode. Never throws.
  */
-export function bootstrap(
-  loaded: Result<Challenge, SchemaIssue[]>,
+export function bootstrapWith(
+  loaded: Result<LoopChallenge, SchemaIssue[]>,
   clock: Clock,
   newId: IdFactory,
+  hasUi: (ref: Readonly<ModelRef>) => boolean,
   mode?: InteractionMode,
-): Result<BootSuccess, BootFailure> {
+): Result<RuntimeBootSuccess, BootFailure> {
   if (!loaded.ok) {
     const n = loaded.error.length
     return {
@@ -69,22 +90,10 @@ export function bootstrap(
   }
   const ch = loaded.value
   const model = modelOf(ch)
-  const def = modelFor(model)
-  // The workbench UI is beam-only until a model's UI slots are integrated (tasks 34.2, 47.3).
-  if (def !== beamModel) {
-    return {
-      ok: false,
-      error: {
-        source: 'challenge',
-        message: 'The challenge uses an analysis model that is not available.',
-        issues: [def === undefined
-          ? { path: 'model', rule: 'MODEL_NOT_REGISTERED', message: `Model "${model.id}" version ${model.version} is not registered.` }
-          : { path: 'model', rule: 'MODEL_UI_UNAVAILABLE', message: `Model "${model.id}" version ${model.version} has no integrated workbench yet.` }],
-      },
-    }
-  }
+  const runtime = runtimeFor(model)
+  if (runtime === undefined || !hasUi(model)) return { ok: false, error: modelUnavailable(model, runtime !== undefined) }
   const start = mode !== undefined && isModeAllowed(ch, mode) ? mode : undefined
-  const r = initSession(ch, clock(), newId(), start)
+  const r = runtime.init(ch, clock(), newId(), start)
   if (!r.ok) {
     return {
       ok: false,
@@ -95,5 +104,22 @@ export function bootstrap(
       },
     }
   }
-  return { ok: true, value: { challenge: ch, session: r.value } }
+  return { ok: true, value: { challenge: ch, session: r.value, runtime } }
+}
+
+/** True only for the beam: the default when no UI registry is consulted. */
+const beamUiOnly = (ref: Readonly<ModelRef>) => ref.id === beamModel.ref.id
+
+/**
+ * Builds the initial session for a loaded beam challenge. A requested mode outside
+ * `allowedModes` falls back to the first allowed mode. Never throws.
+ */
+export function bootstrap(
+  loaded: Result<Challenge, SchemaIssue[]>,
+  clock: Clock,
+  newId: IdFactory,
+  mode?: InteractionMode,
+): Result<BootSuccess, BootFailure> {
+  const r = bootstrapWith(loaded, clock, newId, beamUiOnly, mode)
+  return r.ok ? { ok: true, value: { challenge: r.value.challenge as Challenge, session: r.value.session as SessionState } } : r
 }

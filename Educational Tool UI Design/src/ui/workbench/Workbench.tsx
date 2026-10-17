@@ -1,22 +1,18 @@
-import { lazy, Suspense, useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
 import LiveRegion, { nextAnnouncement, type Announcement } from '../a11y/LiveRegion'
 import Toast from '../a11y/Toast'
 import { AnnounceContext, useAnnouncements } from '../a11y/useAnnouncements'
-import NumericControls from '../controls/NumericControls'
-import HelpDialog from '../dialogs/HelpDialog'
 import PredictionDialog from '../dialogs/PredictionDialog'
 import SubmitDialog from '../dialogs/SubmitDialog'
-import HistoryCompare from '../history/HistoryCompare'
 import Icon from '../icons/Icon'
-import SectionPalette from '../palette/SectionPalette'
-import RequirementsPanel from '../panels/RequirementsPanel'
+import { useModelUi } from '../models/registry'
 import { selectStatusBadge } from '../../state/selectors'
 import { useSession } from '../state/store'
 import PageFooter from './PageFooter'
 import WorkbenchChrome, { MODE_LABELS } from './WorkbenchChrome'
 import ModeExperience from './ModeExperience'
-import ViewportBoundary from '../viewport/ViewportBoundary'
+export { default as ViewportLoading, VIEWPORT_LOADING_TEXT } from '../viewport/ViewportLoading'
 
 // Workbench layout (task 13.3; Req 24.1–24.7, 24.9–24.11).
 //
@@ -25,22 +21,10 @@ import ViewportBoundary from '../viewport/ViewportBoundary'
 // challenge panel spanning; ≤ 620 single column viewport → design → challenge → results;
 // sidebar collapsed ≤ 1050 and hidden ≤ 620). Regions are filled by per-task components.
 //
-// The viewport scene is a separate lazy chunk (Req 24.5): panels render first and the
-// viewport shows a same-footprint "3D view is loading" placeholder until it resolves (24.6,
-// 24.7). ViewportBoundary recovers from lazy-load/context failure.
-
-const Viewport3D = lazy(() => import('../viewport/Viewport3D'))
-
-export const VIEWPORT_LOADING_TEXT = '3D view is loading'
-
-/** Same footprint as the scene: fills the `.viewport` flex column like `.beam-scene`. */
-export function ViewportLoading() {
-  return (
-    <div className="beam-scene viewport-loading grid place-items-center cursor-default!" role="status">
-      <span className="viewport-label">{VIEWPORT_LOADING_TEXT}</span>
-    </div>
-  )
-}
+// Regions are filled by the active model's UI (task 34.2; ui/models registry): design tools,
+// design view (with its own lazy chunk, loading placeholder and fallback boundary), challenge
+// panel, results and help. Chrome, toast, prediction/submit dialogs and the single live region
+// stay shared.
 
 type Modal = 'submit' | 'help' | null
 
@@ -51,6 +35,7 @@ export interface WorkbenchProps {
 // The shell selects the mode before entry; Workbench has no mode-changing control.
 export default function Workbench({ onExit }: WorkbenchProps) {
   const session = useSession()
+  const ui = useModelUi()
   const [modal, setModal] = useState<Modal>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [announcement, setAnnouncement] = useState<Announcement | null>(null)
@@ -82,8 +67,7 @@ export default function Workbench({ onExit }: WorkbenchProps) {
               <span className="guided">{MODE_LABELS[session.mode]}</span>
             </div>
             <div className="tools-body">
-              <SectionPalette />
-              <NumericControls onAnnounce={notify} />
+              <ui.Tools onAnnounce={notify} />
             </div>
           </section>
           <section className="viewport panel" aria-label="Design view">
@@ -93,25 +77,21 @@ export default function Workbench({ onExit }: WorkbenchProps) {
                 <span className="draft-badge" aria-label="Test status">{selectStatusBadge(session)}</span>
               </div>
             </div>
-            <ViewportBoundary onUnavailable={notify}>
-              <Suspense fallback={<ViewportLoading />}>
-                <Viewport3D onUnavailable={notify} />
-              </Suspense>
-            </ViewportBoundary>
+            <ui.View onUnavailable={notify} />
           </section>
           <aside className="challenge-panel panel" aria-label="The challenge">
-            <RequirementsPanel onOpenHelp={openHelp} />
+            <ui.ChallengePanel onOpenHelp={openHelp} />
           </aside>
         </div>
         <section className="results-panel panel" aria-label="Results">
-          <HistoryCompare />
+          <ui.Results />
         </section>
         <PageFooter onExplainSubmit={() => setModal('submit')} />
         <Toast message={notice} onDismiss={dismissNotice} />
       </WorkbenchChrome>
       <PredictionDialog />
       <SubmitDialog open={modal === 'submit'} onClose={() => setModal(null)} />
-      <HelpDialog open={modal === 'help'} onClose={() => setModal(null)} />
+      <ui.Help open={modal === 'help'} onClose={() => setModal(null)} />
       {/* Portaled to <body> so it stays present and unhidden while the template shell hides
           the Workbench during page navigation (Req 30.6). */}
       {createPortal(<LiveRegion announcement={announcement} />, document.body)}

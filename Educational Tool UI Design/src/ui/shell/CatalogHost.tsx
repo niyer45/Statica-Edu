@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react'
 import type { CatalogEntry } from '../../challenge/catalog'
-import type { Challenge, InteractionMode } from '../../challenge/types'
-import { peekSession, type SessionStorage } from '../../state/persistence'
+import type { InteractionMode } from '../../challenge/types'
+import { modelOf } from '../../state/models'
+import { peekSessionWith, type SessionStorage } from '../../state/persistence'
+import { runtimeFor, type AnyRuntime, type LoopChallenge, type LoopSession } from '../../state/runtimes'
 import { selectWorkspaceStarted } from '../../state/selectors'
-import type { SessionState } from '../../state/session'
 import type { Clock, IdFactory } from '../state/bootstrap'
 import StoreProvider from '../state/StoreProvider'
 import PlatformShell, { type OtherChallenge } from './PlatformShell'
@@ -20,9 +21,11 @@ import PlatformShell, { type OtherChallenge } from './PlatformShell'
 // for the page session.
 
 export interface RunnableChallenge {
-  challenge: Challenge
+  challenge: LoopChallenge
   /** Fresh session from bootstrap; persisted work replaces it on load. */
-  session: SessionState
+  session: LoopSession
+  /** The challenge's model runtime; defaults to the registered runtime for its model. */
+  runtime?: AnyRuntime
 }
 
 export interface CatalogHostProps {
@@ -62,10 +65,12 @@ export default function CatalogHost({ runnable, entries, storage = null, clock, 
       runnable
         .filter((r) => r.challenge.id !== current.challenge.id)
         .map((r) => {
-          const s = peekSession(r.challenge, store)
+          const runtime = r.runtime ?? runtimeFor(modelOf(r.challenge))
+          const s = runtime ? peekSessionWith(runtime, r.challenge, store) : undefined
           return {
             challengeId: r.challenge.id,
             title: r.challenge.title,
+            model: modelOf(r.challenge),
             allowedModes: r.challenge.allowedModes,
             ...(s ? { saved: { mode: s.mode, started: selectWorkspaceStarted(s) } } : {}),
           }
@@ -78,6 +83,7 @@ export default function CatalogHost({ runnable, entries, storage = null, clock, 
       key={current.challenge.id}
       challenge={current.challenge}
       initialSession={current.session}
+      runtime={current.runtime}
       storage={store}
       clock={clock}
       newId={newId}

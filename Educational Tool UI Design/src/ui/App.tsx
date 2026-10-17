@@ -2,9 +2,10 @@ import { useState } from 'react'
 import CatalogHost, { type RunnableChallenge } from './shell/CatalogHost'
 import { bundledChallengeJson } from '../challenge/bundled'
 import { catalog, type CatalogEntry } from '../challenge/catalog'
-import { loadChallenge } from '../challenge/loader'
 import type { Challenge, Result, SchemaIssue } from '../challenge/types'
-import { bootstrap, randomIdFactory, systemClock, type BootFailure, type Clock, type IdFactory } from './state/bootstrap'
+import { runtimeForJson } from '../state/runtimes'
+import { modelUiFor } from './models/registry'
+import { bootstrap, bootstrapWith, randomIdFactory, systemClock, type BootFailure, type Clock, type IdFactory } from './state/bootstrap'
 import type { SessionStorage } from '../state/persistence'
 
 // Lazy browser access keeps storage exceptions inside the persistence controller.
@@ -25,7 +26,13 @@ export function bootCatalog(entries: readonly CatalogEntry[], clock: Clock, newI
   const runnable: RunnableChallenge[] = []
   for (const entry of entries) {
     if (!entry.available) continue
-    const boot = bootstrap(loadChallenge(bundledChallengeJson(entry.challengeId)), clock, newId)
+    const json = bundledChallengeJson(entry.challengeId)
+    // The config's declared model selects its loader and runtime; never a substitute (MM-02, MM-07).
+    const runtime = runtimeForJson(json)
+    if (runtime === undefined) {
+      return { ok: false, error: { source: 'challenge', message: 'The challenge uses an analysis model that is not available.', issues: [{ path: 'model', rule: 'MODEL_NOT_REGISTERED', message: `Challenge "${entry.challengeId}" declares an unregistered model.` }] } }
+    }
+    const boot = bootstrapWith(runtime.load(json), clock, newId, (ref) => modelUiFor(ref) !== undefined)
     if (!boot.ok) return boot
     runnable.push(boot.value)
   }

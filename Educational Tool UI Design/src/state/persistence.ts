@@ -206,42 +206,59 @@ export function deserializeSessionV2<Ch extends ChallengeBase<D>, D extends Desi
   }
 }
 
+/** How one model's sessions map to storage (task 34.2): the beam codec below, or a model runtime. */
+export interface SessionCodec<S, Ch> {
+  key(ch: Ch): string
+  serialize(s: S, savedAt: string): string
+  deserialize(raw: string, ch: Ch): Result<S, string>
+}
+
+const beamCodec: SessionCodec<SessionState, Challenge> = { key: sessionKey, serialize: serializeSession, deserialize: deserializeSession }
+
 /**
  * Read-only view of a challenge's saved session for shell summaries (task 34.1 step 2; MM-23).
  * Never writes or removes storage and never throws; invalid or unreadable saves read as absent.
  */
-export function peekSession(ch: Challenge, storage: SessionStorage): SessionState | undefined {
+export function peekSessionWith<S, Ch>(codec: SessionCodec<S, Ch>, ch: Ch, storage: SessionStorage): S | undefined {
   try {
-    const raw = storage.getItem(sessionKey(ch))
+    const raw = storage.getItem(codec.key(ch))
     if (raw === null) return undefined
-    const restored = deserializeSession(raw, ch)
+    const restored = codec.deserialize(raw, ch)
     return restored.ok ? restored.value : undefined
   } catch {
     return undefined
   }
 }
 
+export function peekSession(ch: Challenge, storage: SessionStorage): SessionState | undefined {
+  return peekSessionWith(beamCodec, ch, storage)
+}
+
 export interface SessionStorage { getItem(key: string): string | null; setItem(key: string, value: string): void; removeItem(key: string): void }
 export const RESTORE_FAILURE = 'Saved session could not be restored'
 export const STORAGE_FAILURE = 'Progress will not be saved in this browser'
 /** One controller per provider/page load; storage exceptions are announced at most once. */
-export function createPersistence(ch: Challenge, storage: SessionStorage, notice: (message: string) => void) {
+export function createPersistenceWith<S, Ch>(codec: SessionCodec<S, Ch>, ch: Ch, storage: SessionStorage, notice: (message: string) => void) {
   let warned = false
   const storageFailure = () => { if (!warned) { warned = true; notice(STORAGE_FAILURE) } }
   return {
-    load(fresh: SessionState): SessionState {
+    load(fresh: S): S {
       try {
-        const raw = storage.getItem(sessionKey(ch))
+        const raw = storage.getItem(codec.key(ch))
         if (raw === null) return fresh
-        const restored = deserializeSession(raw, ch)
+        const restored = codec.deserialize(raw, ch)
         if (restored.ok) return restored.value
         notice(RESTORE_FAILURE)
-        storage.removeItem(sessionKey(ch))
+        storage.removeItem(codec.key(ch))
       } catch { storageFailure() }
       return fresh
     },
-    save(state: SessionState, now: string): void {
-      try { storage.setItem(sessionKey(ch), serializeSession(state, now)) } catch { storageFailure() }
+    save(state: S, now: string): void {
+      try { storage.setItem(codec.key(ch), codec.serialize(state, now)) } catch { storageFailure() }
     },
   }
+}
+
+export function createPersistence(ch: Challenge, storage: SessionStorage, notice: (message: string) => void) {
+  return createPersistenceWith(beamCodec, ch, storage, notice)
 }
