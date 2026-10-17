@@ -178,3 +178,16 @@
 .guided-instructions summary { cursor: pointer; font-weight: 600; }
 
 .parametric-context { margin: 0 0 12px; color: #46583b; font-size: 11px; }
+
+/* Torsion Shaft I (task 47.3): display-only SVG shaft view and torsion field details. */
+.torsion-view { display: flex; flex-direction: column; flex: 1; justify-content: center; padding: 0 12px 12px; }
+.torsion-view svg { width: 100%; height: auto; min-height: 0; cursor: default; }
+.shaft-section, .shaft-body { fill: #a8b49a; stroke: #4f653e; stroke-width: 1; }
+.shaft-bore { fill: #f4f6ef; stroke: #4f653e; stroke-width: 1; }
+.shaft-wall { fill: #62685c; }
+.shaft-twist-line { stroke: #34543c; stroke-width: 2; stroke-dasharray: 5 3; }
+.torsion-summary { margin: 8px 0 0; letter-spacing: 0; text-transform: none; font-weight: 500; }
+.field-error { grid-column: 1 / -1; margin: 0; font-size: 10px; color: #8a4b1c; }
+.locked-features dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; margin: 8px 0 0; font-size: 10px; }
+.locked-features dt { color: #5c6a55; }
+.locked-features dd { margin: 0; }

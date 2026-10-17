@@ -3,6 +3,7 @@ import type { ModelRef } from '../../challenge/types'
 import { modelOf } from '../../state/models'
 import { useModelStore } from '../state/store'
 import { beamUi } from './beam'
+import { torsionUi } from './torsion'
 import type { ModelUi } from './types'
 
 // Model UI registry (task 34.2; MM-20). Maps an explicit model id to its workbench UI. A model
@@ -18,7 +19,10 @@ let defaults: ReadonlyMap<string, ModelUi> | undefined
 
 /** The production registry. */
 export function defaultModelUis(): ReadonlyMap<string, ModelUi> {
-  defaults ??= new Map([['eulerBernoulliCantileverTipForce', beamUi]])
+  defaults ??= new Map([
+    ['eulerBernoulliCantileverTipForce', beamUi],
+    ['circularShaftTorsion', torsionUi],
+  ])
   return defaults
 }
 

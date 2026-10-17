@@ -16,6 +16,9 @@ export const m4ToMm4 = (m4: number): number => m4 * 1e12;
 /** m² -> mm² (×10⁶). */
 export const m2ToMm2 = (m2: number): number => m2 * 1e6;
 
+/** Radians to degrees, for displaying stored angles such as shaft twist (task 47.3). */
+export const radToDeg = (rad: number): number => (rad * 180) / Math.PI;
+
 /**
  * Plain decimal: optional sign (+ or -), digits, optional single decimal
  * point. At least one digit is required, so "12", "-3.5", ".5", and "5." are

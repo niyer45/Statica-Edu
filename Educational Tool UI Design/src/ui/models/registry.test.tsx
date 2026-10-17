@@ -79,9 +79,9 @@ function renderTorsion(mode: 'guided' | 'parametric' = 'guided', registry: Reado
 afterEach(cleanup)
 
 describe('model UI registry', () => {
-  it('keeps the beam wording unchanged and holds only the beam in production', () => {
+  it('keeps the beam wording unchanged and registers no UI for models without one', () => {
     expect(modelUiFor({ id: 'eulerBernoulliCantileverTipForce', version: 1 })).toBe(beamUi)
-    expect(modelUiFor(tch.model)).toBeUndefined()
+    expect(modelUiFor({ id: 'sdofBaseIsolation', version: 1 })).toBeUndefined()
     expect(beamUi.copy.limitsNotice).toBe('Idealized beam approximation, not a structural certification')
     expect(beamUi.copy.prediction.title).toBe('Predict deflection')
     expect(beamUi.copy.prediction.question('the Baseline')).toBe('Compared with the Baseline, how will your new section change tip deflection?')
@@ -119,7 +119,7 @@ describe('model UI registry', () => {
   })
 
   it('refuses to render a model that has no registered UI', () => {
-    expect(() => renderTorsion('guided', null)).toThrow('No workbench is available for analysis model "circularShaftTorsion".')
+    expect(() => renderTorsion('guided', new Map())).toThrow('No workbench is available for analysis model "circularShaftTorsion".')
   })
 })
 
