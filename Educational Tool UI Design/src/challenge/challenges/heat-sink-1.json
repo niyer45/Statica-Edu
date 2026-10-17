@@ -1,0 +1,56 @@
+{
+  "id": "heat-sink-1",
+  "version": 1,
+  "model": { "id": "plateFinHeatSink", "version": 1 },
+  "title": "Heat Sink I",
+  "difficulty": "intermediate",
+  "allowedModes": ["guided", "parametric"],
+  "statement": "The aluminum heat sink under an electronic component runs too hot. Redesign its fins (how many, how thick and how tall) to keep the base temperature within its limit while staying within the mass, fin height and fin gap limits. The base, material, heat load and air temperature are fixed, and the convection coefficient is a given value for low-speed fan-assisted airflow, not computed by the model.",
+  "material": {
+    "id": "aluminum-educational",
+    "name": "Aluminum (educational nominal)",
+    "thermalConductivityWPerMK": 200,
+    "densityKgM3": 2700
+  },
+  "base": { "widthM": 0.06, "depthM": 0.06, "thicknessM": 0.004 },
+  "heatLoadW": 25,
+  "ambientTemperatureK": 298.15,
+  "convection": {
+    "coefficientWPerM2K": 25,
+    "kind": "specifiedEffective",
+    "description": "low-speed fan-assisted airflow, assumed uniform"
+  },
+  "initialDesign": {
+    "id": "baseline",
+    "finCount": 4,
+    "finThicknessM": 0.003,
+    "finHeightM": 0.015,
+    "materialId": "aluminum-educational"
+  },
+  "referenceDesign": {
+    "id": "reference",
+    "finCount": 10,
+    "finThicknessM": 0.0015,
+    "finHeightM": 0.035,
+    "materialId": "aluminum-educational"
+  },
+  "lockedFields": ["base", "materialId", "heatLoadW", "ambientTemperatureK", "convection"],
+  "constraints": {
+    "maxBaseTemperatureK": 328.15,
+    "maxMassKg": 0.13,
+    "maxFinHeightM": 0.035,
+    "minFinGapM": 0.004
+  },
+  "designLimits": {
+    "finCount": { "min": 2, "max": 20, "step": 1 },
+    "finThicknessM": { "minM": 0.001, "maxM": 0.005, "stepM": 0.0005 },
+    "finHeightM": { "minM": 0.005, "maxM": 0.045, "stepM": 0.001 },
+    "minGeometricGapM": 0.001
+  },
+  "predictionPolicy": { "requiredOnIterations": [1, 3] },
+  "reflectionPrompt": {
+    "id": "heat-sink-1-reflection",
+    "text": "Using your tested designs, explain how changing the number, thickness and height of the fins changed the base temperature, the fin efficiency and the mass."
+  },
+  "visualization": { "profileSamplesXOverH": [0, 0.25, 0.5, 0.75, 1] }
+}
