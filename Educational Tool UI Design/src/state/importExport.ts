@@ -72,11 +72,11 @@ const COVERED_PATHS: ReadonlySet<string> = new Set([
   'design.materialId',
 ])
 
-function isPlainRecord(v: unknown): v is Record<string, unknown> {
+export function isPlainRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null && !Array.isArray(v)
 }
 
-function show(v: unknown): string {
+export function show(v: unknown): string {
   if (v === undefined) return 'missing'
   try {
     const s = JSON.stringify(v) ?? String(v)
@@ -123,14 +123,14 @@ export function exportDesign(d: BeamDesign, ch: Pick<Challenge, 'id'>): string {
 }
 
 /** UTF-8 byte length, stopping early once the limit is clearly exceeded. */
-function exceedsByteLimit(text: string): boolean {
+export function exceedsByteLimit(text: string): boolean {
   // Every UTF-16 code unit encodes to at least one UTF-8 byte.
   if (text.length > MAX_IMPORT_BYTES) return true
   return new TextEncoder().encode(text).length > MAX_IMPORT_BYTES
 }
 
 /** Iterative own-key scan (cycle-safe, no recursion depth limit). */
-function findForbiddenKeys(root: unknown): string[] {
+export function findForbiddenKeys(root: unknown): string[] {
   const reasons: string[] = []
   const seen = new Set<object>()
   const stack: { value: unknown; path: string[] }[] = [{ value: root, path: [] }]

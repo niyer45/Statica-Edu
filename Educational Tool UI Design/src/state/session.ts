@@ -24,13 +24,16 @@ export type { Prediction, PredictionDirection, PredictionOutcome, TestResult }
 /** 'tested' iff the draft deep-equals the latest snapshot, ignoring the design id (Req 16.1). */
 export type DraftStatus = 'draft' | 'tested'
 
-export interface Submission {
+/** A submitted design: its stored status and model-specific margins (`efficiency`). */
+export interface SubmissionOf<Eff> {
   testResultId: string
   status: EvaluationStatus
   reflection: string
-  efficiency: Evaluation['efficiency']
+  efficiency: Eff
   submittedAt: string
 }
+
+export type Submission = SubmissionOf<Evaluation['efficiency']>
 
 /** Transient student-facing message (toast + live region). Set by task 19 actions. */
 export interface Notice {
@@ -38,25 +41,32 @@ export interface Notice {
   message: string
 }
 
-export interface SessionState {
+/**
+ * Learning-loop session for any model (task 34.2; MM-15): D design, R test result, Err draft
+ * error, Eff submission margins. The beam `SessionState` below is this shape with beam types,
+ * so the persisted v1 beam session is unchanged (MM-17).
+ */
+export interface SessionStateOf<D, R, Err, Eff> {
   schemaVersion: 1
   challengeId: string
   challengeVersion: number
   mode: InteractionMode
-  draft: BeamDesign
+  draft: D
   draftStatus: DraftStatus
-  draftErrors: GeometryError[]
+  draftErrors: Err[]
   /** Append-only; index 0 is always the Baseline. */
-  history: ReadonlyArray<TestResult>
+  history: ReadonlyArray<R>
   /** Deleted history entries remain archived so recorded predictions and numbering stay immutable. */
   deletedIterationIds?: string[]
   pendingPrediction?: Prediction
   /** TestResult ids; the baseline is always available. */
   compareSelection: string[]
   reflectionAnswer: string
-  submission?: Submission
+  submission?: SubmissionOf<Eff>
   ui: { predictionDialogOpen: boolean; notice?: Notice }
 }
+
+export type SessionState = SessionStateOf<BeamDesign, TestResult, GeometryError, Evaluation['efficiency']>
 
 export type Action =
   | { type: 'applySection'; kind: SectionKind }

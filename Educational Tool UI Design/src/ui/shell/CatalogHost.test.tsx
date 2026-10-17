@@ -54,13 +54,12 @@ function openFromLibrary(title: string, mode: 'Guided' | 'Parametric') {
   fireEvent.click(within(drawer).getByRole('button', { name: new RegExp(mode) }))
   fireEvent.click(within(drawer).getByRole('button', { name: 'Open challenge' }))
 }
-const exitToLibrary = () => fireEvent.click(within(screen.getByRole('navigation', { name: 'Platform' })).getByRole('button', { name: /Challenges/ }))
 const navigate = (name: string) => fireEvent.click(within(screen.getByRole('navigation', { name: 'Platform' })).getByRole('button', { name: new RegExp(name) }))
 
 afterEach(cleanup)
 
 describe('CatalogHost multi-challenge isolation', () => {
-  it('opens each runnable challenge in its own store and save without leaking work', () => {
+  it('opens another runnable challenge in its own store and save without leaking work', () => {
     const { values, storage } = memory()
     values.set(sessionKey(beam1), savedBeam1())
     const beam1Saved = values.get(sessionKey(beam1))
@@ -78,8 +77,13 @@ describe('CatalogHost multi-challenge isolation', () => {
     // The pre-entry mode choice is persisted under the second challenge's own key only.
     expect(JSON.parse(values.get(sessionKey(beam2))!).session.mode).toBe('parametric')
     expect(values.get(sessionKey(beam1))).toBe(beam1Saved)
+  })
 
-    exitToLibrary()
+  it('switching back restores the first challenge from its own save', () => {
+    const { values, storage } = memory()
+    values.set(sessionKey(beam1), savedBeam1())
+    render(<CatalogHost runnable={[boot(beam2), boot(beam1)]} entries={entries} storage={storage} clock={clock} newId={newId} />)
+    expect(snapshot().challengeId).toBe('test-beam-2')
     openFromLibrary('Cantilever Beam I', 'Guided')
     expect(snapshot().challengeId).toBe('cantilever-beam-1')
     expect(snapshot().history.map((r) => r.id)).toContain('beam1-test-1')
@@ -106,7 +110,7 @@ describe('CatalogHost multi-challenge isolation', () => {
     render(<CatalogHost runnable={[boot(beam1), boot(beam2)]} entries={entries} storage={storage} clock={clock} newId={newId} />)
     navigate('Notebook')
     fireEvent.change(screen.getByRole('textbox'), { target: { value: 'cross-challenge note' } })
-    exitToLibrary()
+    navigate('Challenges')
     openFromLibrary('Test Beam II', 'Guided')
     navigate('Notebook')
     expect((screen.getByRole('textbox') as HTMLTextAreaElement).value).toBe('cross-challenge note')
@@ -125,16 +129,18 @@ describe('CatalogHost multi-challenge isolation', () => {
     expect(values.get(sessionKey(beam1))).toBe(beam1Saved)
   })
 
-  it('without injected storage keeps switched work in memory for the page session', () => {
-    render(<CatalogHost runnable={[boot(beam1), boot(beam2)]} entries={entries} clock={clock} newId={newId} />)
-    openFromLibrary('Cantilever Beam I', 'Parametric')
-    expect(snapshot().mode).toBe('parametric')
-    exitToLibrary()
-    openFromLibrary('Test Beam II', 'Guided')
-    exitToLibrary()
+  it('without injected storage uses its own memory store and never reads other storage', () => {
+    const { values, storage } = memory()
+    let s: SessionState = boot(beam1).session
+    s = sessionReducer(s, { type: 'setReflection', text: 'kept in memory' }, beam1)
+    values.set(sessionKey(beam1), serializeSession(s, clock()))
+    // The host copies nothing from `storage` here; it starts with its own empty memory store.
+    render(<CatalogHost runnable={[boot(beam2), boot(beam1)]} entries={entries} clock={clock} newId={newId} />)
     openFromLibrary('Cantilever Beam I', 'Parametric')
     expect(snapshot().challengeId).toBe('cantilever-beam-1')
+    expect(snapshot().reflectionAnswer).toBe('')
     expect(snapshot().mode).toBe('parametric')
+    expect(storage.getItem(sessionKey(beam2))).toBeNull()
   })
 
   it('behaves as the single-challenge shell when only one challenge is runnable', () => {

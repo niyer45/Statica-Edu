@@ -86,6 +86,15 @@ export interface PredictionOutcome {
   matched: boolean
 }
 
+/**
+ * Prediction outcome for non-beam models (task 34.2; MM-13). Names the primary metric it was
+ * scored on and is explicitly not scorable when either side lacks a finite positive metric.
+ * The beam keeps the original PredictionOutcome shape (frozen v1 saves, MM-17).
+ */
+export type PredictionOutcomeV2 =
+  | { metric: string; scorable: true; predicted: PredictionDirection; actual: PredictionDirection; ratio: number; matched: boolean }
+  | { metric: string; scorable: false; predicted: PredictionDirection; reason: 'noFiniteMetric' }
+
 export interface TestResult {
   id: string
   /** 0 = baseline. */

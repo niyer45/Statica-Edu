@@ -72,7 +72,12 @@ describe('recorded v1 Cantilever Beam I save', () => {
   })
 
   it('rejects the same save for a challenge bound to an unregistered model', () => {
+    const restored = deserializeSession(raw, { ...ch, model: { id: 'sdofBaseIsolation', version: 1 } })
+    expect(restored).toEqual({ ok: false, error: 'Analysis model "sdofBaseIsolation" version 1 is not available.' })
+  })
+
+  it('never reads a v1 beam save through another registered model', () => {
     const restored = deserializeSession(raw, { ...ch, model: { id: 'circularShaftTorsion', version: 1 } })
-    expect(restored).toEqual({ ok: false, error: 'Analysis model "circularShaftTorsion" version 1 is not available.' })
+    expect(restored).toEqual({ ok: false, error: 'Saved session format is not supported for this model' })
   })
 })

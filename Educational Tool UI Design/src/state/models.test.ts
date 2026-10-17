@@ -15,17 +15,18 @@ import { cloneDesign, sameDesignIgnoringId } from './session'
 const ch = bundledChallenge()
 
 describe('model registry', () => {
-  it('registers only the beam model, whose identity matches the analysis modelId', () => {
-    expect(REGISTERED_MODEL_IDS).toEqual(['eulerBernoulliCantileverTipForce'])
+  it('registers the beam and torsion models; the beam identity matches the analysis modelId', () => {
+    expect(REGISTERED_MODEL_IDS).toEqual(['eulerBernoulliCantileverTipForce', 'circularShaftTorsion'])
     expect(beamModel.ref).toEqual({ id: MODEL_ID, version: 1 })
     expect(beamModel.ref).toBe(BEAM_MODEL_REF)
     expect(beamModel.envelopeVersion).toBe(1)
   })
 
-  it('wraps the existing beam functions by reference', () => {
+  it('wraps the existing beam functions', () => {
     expect(beamModel.validateDesign).toBe(validateDesign)
-    expect(beamModel.analyze).toBe(analyze)
-    expect(beamModel.evaluate).toBe(evaluate)
+    const analysis = analyze(ch.initialDesign, ch)
+    expect(beamModel.analyze(ch.initialDesign, ch)).toEqual(analysis)
+    expect(beamModel.evaluate(ch.initialDesign, analysis, ch)).toEqual(evaluate(ch.initialDesign, analysis, ch))
     expect(beamModel.scorePrediction).toBe(scorePrediction)
     expect(beamModel.importDesign).toBe(importDesign)
     expect(beamModel.exportDesign).toBe(exportDesign)
@@ -47,7 +48,8 @@ describe('model registry', () => {
   })
 
   it.each([
-    ['unknown id', { id: 'circularShaftTorsion', version: 1 }],
+    ['unknown id', { id: 'sdofBaseIsolation', version: 1 }],
+    ['other torsion version', { id: 'circularShaftTorsion', version: 2 }],
     ['other beam version', { id: MODEL_ID, version: 2 }],
   ])('never substitutes another model for an %s', (_name, ref) => {
     expect(modelFor(ref)).toBeUndefined()

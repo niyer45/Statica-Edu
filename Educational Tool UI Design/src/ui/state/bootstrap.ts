@@ -1,5 +1,5 @@
 import type { Challenge, InteractionMode, Result, SchemaIssue } from '../../challenge/types'
-import { modelFor, modelOf } from '../../state/models'
+import { beamModel, modelFor, modelOf } from '../../state/models'
 import { initSession, type SessionState } from '../../state/session'
 
 // App bootstrap (task 13.2; Req 3.3, 15.3, 35.1, 35.4).
@@ -69,13 +69,17 @@ export function bootstrap(
   }
   const ch = loaded.value
   const model = modelOf(ch)
-  if (modelFor(model) === undefined) {
+  const def = modelFor(model)
+  // The workbench UI is beam-only until a model's UI slots are integrated (tasks 34.2, 47.3).
+  if (def !== beamModel) {
     return {
       ok: false,
       error: {
         source: 'challenge',
         message: 'The challenge uses an analysis model that is not available.',
-        issues: [{ path: 'model', rule: 'MODEL_NOT_REGISTERED', message: `Model "${model.id}" version ${model.version} is not registered.` }],
+        issues: [def === undefined
+          ? { path: 'model', rule: 'MODEL_NOT_REGISTERED', message: `Model "${model.id}" version ${model.version} is not registered.` }
+          : { path: 'model', rule: 'MODEL_UI_UNAVAILABLE', message: `Model "${model.id}" version ${model.version} has no integrated workbench yet.` }],
       },
     }
   }

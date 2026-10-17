@@ -20,4 +20,8 @@ describe('makeStoreReducer model binding', () => {
   it('refuses a challenge whose model is not registered', () => {
     expect(() => makeStoreReducer({ ...ch, model: { id: 'sdofBaseIsolation', version: 1 } })).toThrow(UnregisteredModelError)
   })
+
+  it('refuses a registered model without an integrated workbench', () => {
+    expect(() => makeStoreReducer({ ...ch, model: { id: 'circularShaftTorsion', version: 1 } })).toThrow('beam model only')
+  })
 })
