@@ -50,7 +50,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     if (mode === 'Parametric') {
       await page.addInitScript(() => { Object.defineProperty(window, 'WebGL2RenderingContext', { configurable: true, value: undefined }) })
     }
-    await page.goto('/')
+    await page.goto('/#challenges')
     await openTorsion(page, mode, mode === 'Guided')
     const shaftSvg = page.getByRole('img', { name: /cross-section and side view/ })
     if (mode === 'Guided') {

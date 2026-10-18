@@ -182,7 +182,7 @@ describe('platform shell component suite (13.6)', () => {
       submission: { testResultId: stored.id, status: stored.evaluation.status, reflection: 'A stored reflection.', efficiency: stored.evaluation.efficiency, submittedAt: clock() },
     }
     renderShell(seeded)
-    openMode('Guided')
+    openMode('Parametric') // free editing; Guided locks parameters by step (task 58)
     // The baseline is an I-section (task 59): edit its height.
     act(() => dispatch({ type: 'setParam', param: 'heightM', valueM: 0.06, mode: 'strict' }))
     const before = latest
@@ -204,7 +204,7 @@ describe('platform shell component suite (13.6)', () => {
     if (!boot.ok) throw new Error(boot.error.message)
     const baseline = boot.value.session.history[0]!
     renderShell({ ...boot.value.session, history: [baseline, { ...baseline, id: 'stored-1', iteration: 1, label: undefined }] })
-    openMode('Guided')
+    openMode('Parametric') // free editing; Guided locks parameters by step (task 58)
     act(() => dispatch({ type: 'setParam', param: 'heightM', valueM: 0.08, mode: 'strict' }))
     navigate('My designs')
     const saved = latest

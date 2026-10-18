@@ -6,20 +6,19 @@ import type { Challenge, Result, SchemaIssue } from '../challenge/types'
 import { runtimeForJson } from '../state/runtimes'
 import { modelUiFor } from './models/registry'
 import { bootstrap, bootstrapWith, randomIdFactory, systemClock, type BootFailure, type Clock, type IdFactory } from './state/bootstrap'
-import type { SessionStorage } from '../state/persistence'
-
-// Lazy browser access keeps storage exceptions inside the persistence controller.
-const browserStorage: SessionStorage = {
-  getItem: (key) => window.localStorage.getItem(key),
-  setItem: (key, value) => window.localStorage.setItem(key, value),
-  removeItem: (key) => window.localStorage.removeItem(key),
-}
+import type { AccountProvider } from '../account/types'
+import AccountHost from './account/AccountContext'
+import { createBrowserAccountProvider } from './account/browser'
+import { replaceRoute } from './shell/routes'
 
 // App bootstrap (task 13.2; Req 3.3, 3.7, 35.1; task 34.1 step 2).
 // Loads every bundled challenge an available catalog entry links to (MM-06), builds each
 // session, and either shows a full-page error that lists every issue of the first failing
 // challenge (no challenge content, controls, or simulation) or mounts the challenge host,
 // which owns one store per active challenge (ui/shell/CatalogHost).
+// Task 38: an AccountHost wraps the challenge host. Guests keep the original `ei:session:...`
+// keys; a signed-in user's host reads and writes the same keys under `ei:user:<id>:` and is
+// remounted on every sign-in/sign-out, so no store state crosses accounts.
 
 /** Boots each available entry's bundled challenge, in catalog order. Stops at the first failure. */
 export function bootCatalog(entries: readonly CatalogEntry[], clock: Clock, newId: IdFactory): Result<RunnableChallenge[], BootFailure> {
@@ -47,7 +46,11 @@ export interface AppProps {
   loaded?: Result<Challenge, SchemaIssue[]>
   clock?: Clock
   newId?: IdFactory
+  /** Account provider; defaults to the browser-local provider (localStorage + WebCrypto). */
+  accounts?: AccountProvider
 }
+
+const landOnHome = () => replaceRoute('Home')
 
 export function BootErrorPage({ failure }: { failure: BootFailure }) {
   return (
@@ -75,7 +78,8 @@ export function BootErrorPage({ failure }: { failure: BootFailure }) {
   )
 }
 
-export default function App({ loaded, clock = systemClock, newId = randomIdFactory }: AppProps) {
+export default function App({ loaded, clock = systemClock, newId = randomIdFactory, accounts }: AppProps) {
+  const [provider] = useState(() => accounts ?? createBrowserAccountProvider())
   // Boot once per mount; the session id and timestamp come from the injected sources.
   const [boot] = useState((): Result<RunnableChallenge[], BootFailure> => {
     if (loaded === undefined) return bootCatalog(catalog, clock, newId)
@@ -83,5 +87,9 @@ export default function App({ loaded, clock = systemClock, newId = randomIdFacto
     return single.ok ? { ok: true, value: [single.value] } : single
   })
   if (!boot.ok) return <BootErrorPage failure={boot.error} />
-  return <CatalogHost runnable={boot.value} storage={browserStorage} clock={clock} newId={newId} />
+  return (
+    <AccountHost provider={provider} onSessionChange={landOnHome}>
+      {(storage, workspaceKey) => <CatalogHost key={workspaceKey} runnable={boot.value} storage={storage} clock={clock} newId={newId} routed />}
+    </AccountHost>
+  )
 }

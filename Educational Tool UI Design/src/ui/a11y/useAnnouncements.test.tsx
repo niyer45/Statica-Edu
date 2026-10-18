@@ -29,9 +29,9 @@ it('adds Guided step completion to the test announcement (task 58)', () => {
   let store: Store
   function Probe() { store = useStore(); useAnnouncements(announce); return null }
   render(<StoreProvider challenge={bundledChallenge()} initialSession={{ ...createHarness(bundledChallenge()).real.state, mode: 'guided' }}><Probe /></StoreProvider>)
-  act(() => store!.dispatch({ type: 'applySection', kind: 'iSection' }))
-  expect(announce).toHaveBeenLastCalledWith('Section shape is locked in this Guided step. Editable now: Depth (diameter or height).')
-  act(() => store!.dispatch({ type: 'setParam', param: 'diameterM', valueM: 0.04, mode: 'strict' }))
+  act(() => store!.dispatch({ type: 'applySection', kind: 'rectangle' }))
+  expect(announce).toHaveBeenLastCalledWith('Section shape is locked in this Guided step. Editable now: Section orientation.')
+  act(() => store!.dispatch({ type: 'setOrientation', orientationDeg: 0 }))
   act(() => { store!.dispatch({ type: 'setPrediction', direction: 'decrease', now: 't' }); store!.runTest() })
-  expect(announce.mock.lastCall![0]).toMatch(/^Test 1: .*failed constraints\. Guided step 1 complete: Make it deeper\. Next: Try another shape\.$/)
+  expect(announce.mock.lastCall![0]).toMatch(/^Test 1: .*failed constraints\. Guided step 1 complete: Stand it upright\. Next: Tune one dimension\.$/)
 })

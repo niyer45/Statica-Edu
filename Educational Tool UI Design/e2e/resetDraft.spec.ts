@@ -75,7 +75,7 @@ const resetButton = (page: Page) => page.getByRole('button', { name: 'Reset to b
 test('Reset to baseline restores every challenge baseline and keeps tested history', async ({ page }, info) => {
   test.setTimeout(360_000) // Six workbenches, six tests, six resets, a reload and six restores (software WebGL).
   expect(catalog.filter((e) => e.available).map((e) => e.title).sort()).toEqual(ENTRIES.map((e) => e.title).sort())
-  await page.goto('/')
+  await page.goto('/#challenges')
   const histories = new Map<string, unknown>()
   for (const [i, entry] of ENTRIES.entries()) {
     await open(page, entry)
@@ -130,7 +130,7 @@ test('Reset to baseline restores every challenge baseline and keeps tested histo
 
 test('Reset to baseline works by keyboard, can be cancelled and fits 320 px', async ({ page }, info) => {
   test.setTimeout(90_000)
-  await page.goto('/')
+  await page.goto('/#challenges')
   await open(page, ENTRIES[3]!)
   await editDesign(page, 0)
   const edited = await state(page)

@@ -163,18 +163,19 @@ describe('Heat Sink I workbench', () => {
 
   it('Guided locks all but the step parameter; Parametric is open design; both disclose the given coefficient (task 58)', () => {
     renderHeatSink('guided')
-    expect(within(screen.getByRole('region', { name: 'Guided experiments' })).getByRole('heading', { name: 'Taller fins' })).toBeTruthy()
-    expect((screen.getByLabelText('Fin height') as HTMLInputElement).readOnly).toBe(false)
-    expect((screen.getByLabelText('Fin count') as HTMLInputElement).readOnly).toBe(true)
+    expect(within(screen.getByRole('region', { name: 'Guided experiments' })).getByRole('heading', { name: 'More fins' })).toBeTruthy()
+    expect((screen.getByLabelText('Fin count') as HTMLInputElement).readOnly).toBe(false)
+    expect((screen.getByRole('button', { name: 'Add a fin' }) as HTMLButtonElement).disabled).toBe(false)
+    expect((screen.getByLabelText('Fin height') as HTMLInputElement).readOnly).toBe(true)
     expect((screen.getByLabelText('Fin thickness') as HTMLInputElement).readOnly).toBe(true)
-    expect((screen.getByRole('button', { name: 'Add a fin' }) as HTMLButtonElement).disabled).toBe(true)
+    expect((screen.getByRole('slider', { name: 'Fin height slider' }) as HTMLInputElement).disabled).toBe(true)
     expect(screen.getByText(/convection coefficient is a given fan-assisted value/)).toBeTruthy()
     cleanup()
     renderHeatSink('parametric')
     expect(screen.getByText(/Every parameter is editable from the start/)).toBeTruthy()
     expect(screen.getByText(/convection coefficient is a given fan-assisted value/)).toBeTruthy()
     expect(screen.queryByRole('region', { name: 'Guided experiments' })).toBeNull()
-    expect((screen.getByRole('button', { name: 'Add a fin' }) as HTMLButtonElement).disabled).toBe(false)
+    expect((screen.getByLabelText('Fin height') as HTMLInputElement).readOnly).toBe(false)
   })
 
   it('persists the tested workspace under its own key in the v2 envelope', () => {

@@ -78,7 +78,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     if (mode === 'Parametric') {
       await page.addInitScript(() => { Object.defineProperty(window, 'WebGL2RenderingContext', { configurable: true, value: undefined }) })
     }
-    await page.goto('/')
+    await page.goto('/#challenges')
     await openFrame(page, mode, keyboard)
     const initial = await readState(page)
     expect(initial.challengeId).toBe('braced-frame-1')
@@ -154,7 +154,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       // The bracing experiment is complete; now only member sections are editable.
       await expectGuidedStep(page, 'Resize members')
       await expect(page.getByRole('button', { name: 'Storey 1 diagonal, bottom left to top right', exact: true })).toBeDisabled()
-      await setSection(page, /^Lower left column/, 'CHS48.3x3.2')
+      await setSection(page, /^Lower left column/, 'CHS60.3x4.0')
       await page.getByRole('button', { name: 'Run Test', exact: true }).click()
       await expect.poll(async () => (await readState(page)).history.length).toBe(3)
       await expectGuidedStep(page, 'Meet every check')

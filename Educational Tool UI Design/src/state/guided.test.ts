@@ -58,6 +58,7 @@ const CASES: Case[] = [
     experiment: (step, d, ch) => {
       const section = beamSection(d)
       if (step.id === 'shape') return [{ type: 'applySection', kind: (ch.allowedSections as string[]).find((k) => k !== section.kind)! }]
+      if (step.id === 'upright') return [{ type: 'setOrientation', orientationDeg: d.orientationDeg === 0 ? 90 : 0 }]
       const param = step.id === 'tune' ? SECTION_PARAMS[section.kind as keyof typeof SECTION_PARAMS][0] : target(step, section)
       return [{ type: 'setParam', param, valueM: (section[param] as number) + 0.005, mode: 'clamp' }]
     },
@@ -66,7 +67,7 @@ const CASES: Case[] = [
       const params = Object.entries(ref.section).filter(([k]) => k !== 'kind')
       return [{ type: 'applySection', kind: ref.section.kind }, ...params.map(([param, v]) => ({ type: 'setParam', param, valueM: v, mode: 'strict' })), { type: 'setOrientation', orientationDeg: ref.orientationDeg }]
     },
-    lockedAtStart: () => ({ type: 'applySection', kind: 'iSection' }),
+    lockedAtStart: (d) => ({ type: 'applySection', kind: beamSection(d).kind === 'circle' ? 'rectangle' : 'circle' }),
   },
   {
     name: 'Torsion Shaft I',
@@ -109,7 +110,7 @@ const CASES: Case[] = [
       return [edit({ type: 'setParam', param, value: (d[param] as number) + sign(step) * delta, mode: param === 'finCount' ? 'strict' : 'clamp' })]
     },
     toReference: (_d, ch) => ['finThicknessM', 'finHeightM', 'finCount'].map((param) => edit({ type: 'setParam', param, value: ch.referenceDesign[param], mode: 'strict' })),
-    lockedAtStart: (d) => edit({ type: 'setParam', param: 'finCount', value: (d.finCount as number) + 1, mode: 'strict' }),
+    lockedAtStart: (d) => edit({ type: 'setParam', param: 'finHeightM', value: (d.finHeightM as number) - 0.001, mode: 'strict' }),
   },
   {
     name: 'Mounting Bracket I',
@@ -126,7 +127,10 @@ const CASES: Case[] = [
     lockedAtStart: (d, ch) => {
       const step = BRACKET_GUIDED_PLAN.steps[0]!
       const param = Object.keys(BRACKET_GUIDED_PLAN.params(d as never)).find((p) => !(step.unlocks as readonly string[]).includes(p))!
-      return edit({ type: 'setParam', param, valueM: (d[param] as number) + (ch.designLimits as Record<string, { stepM: number }>)[param]!.stepM, mode: 'clamp' })
+      const limits = (ch.designLimits as Record<string, { minM: number; maxM: number; stepM: number }>)[param]!
+      // Nudge one grid step toward the interior so a parameter at a bound still changes.
+      const value = (d[param] as number) + limits.stepM <= limits.maxM ? (d[param] as number) + limits.stepM : (d[param] as number) - limits.stepM
+      return edit({ type: 'setParam', param, valueM: value, mode: 'clamp' })
     },
   },
   {
