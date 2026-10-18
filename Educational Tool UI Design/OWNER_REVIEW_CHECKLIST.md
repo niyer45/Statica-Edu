@@ -207,6 +207,7 @@ Sources: [requirements][bf-r] and [design][bf-d] (§Integration notes, owner que
 
 **3D-view decisions (task 54, [tasks][tasks])**
 - [ ] 54.1 bracket, 54.2 torsion and 54.3 frame are implemented as 3D views with 2D fallbacks (D-45). Open each in Safari with and without WebGL and confirm the views are clear. Automated browser checks do not count as this visual review.
+- [ ] **Import refusal wording.** Importing another challenge's design file lists every mismatch (format/version, challenge, model and each design field), so "belongs to a different challenge" is one reason among several. This is the same in all six challenges. Decide whether a challenge mismatch should be shown alone. It is left as is because it changes completed import behaviour.
 - [ ] Heat sink and vibration are outside task 54. Heat sink ships SVG where HSK-14 specified 3D. Vibration is SVG by design (VIB-14). Confirm both.
 
 **Content placement**

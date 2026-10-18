@@ -100,3 +100,42 @@ test('all six original challenges keep separate saved work in one browser profil
     await toLibrary(page)
   }
 })
+
+async function exportDesign(page: Page): Promise<string> {
+  const download = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Export design', exact: true }).click()
+  const path = await (await download).path()
+  if (!path) throw new Error('Design download not available')
+  return path
+}
+
+test("a design file opens only in its own challenge's workbench", async ({ page }) => {
+  test.setTimeout(180_000) // Six exports, six own-challenge imports and six cross-challenge refusals.
+  await page.goto('/')
+  const files = new Map<string, string>()
+  for (const entry of ENTRIES) {
+    await open(page, entry)
+    await entry.edit(page)
+    const draft = (await readState(page)).draft
+    const file = await exportDesign(page)
+    files.set(entry.id, file)
+    // Own challenge: the exported design imports back to the same draft.
+    await page.getByLabel('Import design', { exact: true }).setInputFiles(file)
+    await expect.poll(async () => (await readState(page)).draft).toEqual(draft)
+    await toLibrary(page)
+  }
+  for (const [i, entry] of ENTRIES.entries()) {
+    const other = ENTRIES[(i + 1) % ENTRIES.length]!
+    await open(page, entry)
+    const before = await readState(page)
+    await page.getByLabel('Import design', { exact: true }).setInputFiles(files.get(other.id)!)
+    const refusal = page.getByRole('dialog', { name: 'Design could not be imported' })
+    await expect(refusal.getByText(/belongs to a different challenge/)).toBeVisible()
+    await refusal.getByRole('button', { name: /Back to design/ }).click()
+    await expect(refusal).toBeHidden()
+    const after = await readState(page)
+    expect(after.draft).toEqual(before.draft)
+    expect(after.history).toEqual(before.history)
+    await toLibrary(page)
+  }
+})
