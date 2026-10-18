@@ -2,9 +2,9 @@ import { deepFreeze } from './deepFreeze'
 import type { Difficulty } from './types'
 
 // Static challenge-library metadata for the platform shell, moved from the template App.tsx.
-// Available entries link to a bundled challenge JSON (`challenge/bundled.ts`): Cantilever
-// Beam I and, since task 47.3 (owner-approved activation), Torsion Shaft I. The other entries
-// are concept previews and carry no physics or challenge data until their track is verified.
+// Available entries link to a bundled challenge JSON (`challenge/bundled.ts`). All six original
+// challenges are available (owner-approved activations D-42–D-44). An unavailable entry would be
+// a concept preview with no physics or challenge data until its track is verified.
 
 export type Discipline = 'Mechanics' | 'Structures' | 'Thermal' | 'Dynamics'
 export type ArtKind = 'beam' | 'bracket' | 'shaft' | 'thermal' | 'frame' | 'spring'

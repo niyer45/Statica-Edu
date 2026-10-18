@@ -1,6 +1,6 @@
 # Milestone 5: Original six-challenge catalog
 
-Current status, 2026-10-17: all six original challenges are runnable (D-42, D-43, D-44). Gate 51 and human QA remain. User priority D-35 is to implement the five existing preview cards before second editions. See CATALOG_ROADMAP.md and task graph. Mode distinction is implemented/browser-verified (D-37); owner manual release QA remains open under 44.3/30.1.
+Current status, 2026-10-18: all six original challenges are runnable (D-42, D-43, D-44), with 3D views for the bracket, torsion shaft and frame (D-45). Gate 51's automated audit is recorded below; its owner/manual part and human QA remain. User priority D-35 is to implement the five existing preview cards before second editions. See CATALOG_ROADMAP.md and task graph. Mode distinction is implemented/browser-verified (D-37); owner manual release QA remains open under 44.3/30.1.
 
 Task 45.1 (2026-10-17) scoped objectives, bounded models, units/metrics/constraints, benchmark plans and delivery order for the five previews in `../.kiro/specs/original-catalog/` (D-38: Torsion → Vibration → Heat Sink → Bracket → Frame). These are proposed developer choices with standalone feasibility checks; owner review, model implementation and executed benchmarks remain open. Owner decisions HS-08 and MB-07 are pending. Task 45.2 (2026-10-17) specified the shared multi-model contracts in `../.kiro/specs/multi-model-architecture/` (D-39), including the frozen beam v1 save format. Task 47.1 specified Torsion Shaft I and its worksheet in `../.kiro/specs/torsion-shaft-1/`. Task 34.1 (model registry and per-challenge stores) is complete; 48.1 and 50.1 specifications are complete; owner decisions D-40 resolved HS-08/MB-07. All five track specifications (46.1–50.1) are complete, the torsion model (47.2) is implemented and registered, and 34.2's state layer is done. The owner resolved bracket items K-1–K-5 (D-41), so 46.2 is unblocked. Task 34 (shared integration, UI slots) is complete, and models 48.2/49.2/50.2 are implemented. All five models are implemented and Torsion Shaft I is runnable (47 complete). Next: 50.3, then 48.3, 46.3, 49.3. Task 45.2 defines shared multi-model contracts; task 34 integrates challenge selection/session isolation; tracks 46–50 specify, implement, numerically verify and integrate each model. Gate 51 verifies the original catalog. Checkpoint 35.2 retains human-QA gate 32.2; no deployment is claimed.
 
@@ -11,3 +11,21 @@ Historical tasks 33.1–33.2 completed additive specs at `../.kiro/specs/cantile
 ## Verification and remaining release work
 
 Current implementation run 38970465802 on 878fb87bbf514e746f2ecd477a473b22a6b0bf75 passed 906 core tests/111 files, coverage/core/build/schema gates, 2 responsive cases and all 24 browser cases. This verifies today's Cantilever Beam I and dormant configuration tests, not any future multi-model integration. Nikhil is owner engineering reviewer; human model/manual/student evidence remains required before customer release and has not been recorded. See HANDOFF.md for exact links and next-task directives.
+
+## Gate 51 automated audit (2026-10-18)
+
+Task 51 stays open (`[-]`): it depends on 44.3 and needs the owner engineering/manual QA (29.2, 30) recorded before customer release. Below is the automated evidence only. Clickable cards are not counted as completion.
+
+| Challenge | Numerically validated (pure layers) | Integrated loop in the browser | Saves attributed and isolated | Model limits shown |
+| --- | --- | --- | --- | --- |
+| Cantilever Beam I | `test/fixtures/e1e2…e5` fixtures, properties 1–37 | `e2e/learningLoop.spec.ts`, `modes.spec.ts`, `platform.spec.ts` | v1 envelope (`persistence.spec.ts`), frozen fixture | Help/limits (MVP) |
+| Torsion Shaft I | `torsion.worksheet` + `torsion.alternative` (quadrature) | `e2e/torsion.spec.ts` Guided/Parametric | v2 envelope; isolation vs beam in spec | `TORSION_LIMITS_NOTICE` |
+| Vibration Isolation I | `vibration.worksheet` + `vibration.alternative` | `e2e/vibration.spec.ts` | v2; isolation vs beam | `VIBRATION_LIMITS_NOTICE` |
+| Heat Sink I | `heatSink.worksheet` + `heatSink.alternative` (numeric fin) | `e2e/heatSink.spec.ts` | v2; isolation vs beam | `HEAT_SINK_LIMITS_NOTICE` |
+| Mounting Bracket I | `bracket.worksheet` + `bracket.alternative`; Kt source disclosed (D-41) | `e2e/bracket.spec.ts` (3D and 2D paths) | v2; isolation vs beam | `BRACKET_LIMITS_NOTICE` incl. secondary-source Kt |
+| Braced Frame I | `bracedFrame.worksheet` + `bracedFrame.independent` (statics) | `e2e/bracedFrame.spec.ts` (mechanism, Accepted; 3D and 2D) | v2; isolation vs beam | `BRACED_FRAME_LIMITS_NOTICE` |
+
+- **All six together:** `e2e/catalog.spec.ts` (new). In one browser profile, each challenge runs a test from its own edited draft. Exactly six `ei:session:<id>:v1` keys exist, and after a reload each challenge restores its own draft, tested records and entry mode, equal to what it saved. It passed on desktop and Pixel 7.
+- **No placeholder results:** a source scan finds no placeholder numbers or TODO results. Unavailable quantities render as words or `—` (`UNAVAILABLE_PLACEHOLDER` for non-finite values) and evaluation readers return `undefined` rather than a stand-in. `e2e/platform.spec.ts` asserts six runnable cards and no concept preview.
+- **Regressions retained:** the beam's original browser and core suites run unchanged in CI.
+- **Still required before release (not claimed):** owner verification of constants and the printed Kt edition (29.2, `OWNER_REVIEW_CHECKLIST.md`), owner visual review of the 3D views, screen-reader/touch checks (30, 44.3), and student sessions (31.2).

@@ -802,8 +802,9 @@ Priority update (2026-10-16, D-35): implement the six existing catalog entries b
     - In progress 2026-10-17 (da32094): vibration runtime/model/UI registered (schematic + frequency-response chart with table); 12 component tests; `e2e/vibration.spec.ts` skips until card 006 is activated.
     - Completed 2026-10-17 after owner-approved activation (D-43, 8fbb61f): card 006 available; `e2e/vibration.spec.ts` ran unskipped for the first time and passed on desktop and Pixel 7 (Guided keyboard and Parametric, prediction → Accepted, axe, 320 px, reload persistence, isolation). Owner engineering/manual QA (29.2/30) still gates customer release.
 
-- [ ] 51. Verify original six-challenge catalog completion
+- [-] 51. Verify original six-challenge catalog completion
   - Confirm Cantilever Beam I and all five original preview challenges have implemented, numerically validated and integrated learning loops, correctly attributed/isolation-tested saves, truthful model limits and no placeholder results. Retain original regressions and record owner engineering/manual QA before customer release. Depends on 46.3–50.3 and 44.3. Do not mark complete merely because cards are clickable.
+  - Automated audit recorded 2026-10-18 in `Educational Tool UI Design/MILESTONE5.md` (per-challenge validation, browser loop, isolation and limits evidence; new `e2e/catalog.spec.ts` checks all six saves together). Open: 44.3 and owner engineering/manual QA (29.2, 30) before this can be marked complete.
 
 - [ ] 52. Revisit second-edition challenges after the original catalog
   - Review dormant Cantilever Beam II assets against the current architecture and findings only after 51. Keep its existing configuration/tests as retained work, not a runnable challenge or first-priority integration target. Specify any needed updates, then integrate and verify if still desired; do not activate it just because its configuration exists.
