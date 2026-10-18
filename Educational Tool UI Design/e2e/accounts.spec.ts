@@ -87,13 +87,13 @@ test('sign up, work, sign out, guest sees none of it, sign in restores it', asyn
   await audit(page)
 
   const session = JSON.parse((await page.evaluate(() => window.localStorage.getItem('ei:account-session:v1')))!) as { userId: string }
-  const userKey = `ei:user:${session.userId}:session:${BEAM}:v1`
+  const userKey = `ei:user:${session.userId}:session:${BEAM}:v2` // content version 2 since task 59
   // The password is never stored in plain text.
   const stored = await page.evaluate(() => Object.values(window.localStorage).join('\n'))
   expect(stored).not.toContain(ANA.password)
 
   await page.getByRole('button', { name: 'Browse challenges' }).click()
-  await openWorkbench(page, false)
+  await openWorkbench(page, false, false, 'Parametric') // free editing (Guided locks by step, task 58)
   await referenceDesign(page)
   await runTest(page)
   const work = await readState(page)
@@ -147,7 +147,7 @@ test('guest work can move into a new account, and deleting the account removes i
   await referenceDesign(page)
   await runTest(page)
   const work = await readState(page)
-  expect(await storageKeys(page)).toContain(`ei:session:${BEAM}:v1`)
+  expect(await storageKeys(page)).toContain(`ei:session:${BEAM}:v2`)
 
   await navigate(page, 'Home')
   await expect(row(page, 'Cantilever Beam I')).toContainText('In progress')
@@ -160,7 +160,7 @@ test('guest work can move into a new account, and deleting the account removes i
   await expect(row(page, 'Cantilever Beam I')).toContainText('In progress')
   const keys = await storageKeys(page)
   expect(keys.filter((k) => k.startsWith('ei:session:'))).toEqual([])
-  expect(keys.some((k) => /^ei:user:[^:]+:session:cantilever-beam-1:v1$/.test(k))).toBe(true)
+  expect(keys.some((k) => /^ei:user:[^:]+:session:cantilever-beam-1:v2$/.test(k))).toBe(true)
   await page.getByRole('button', { name: 'Continue Cantilever Beam I' }).click()
   expect((await readState(page)).history).toEqual(work.history)
 
