@@ -16,8 +16,8 @@ import { deserializeSession, deserializeSessionV2, serializeSessionV2 } from './
 import { torsionModel } from './torsionModel'
 
 // Heat sink through the model-generic engine (task 48.2; MM-10, MM-13, MM-15, MM-18, MM-19).
-// The definition is complete but not yet registered or linked by any catalog entry: registration
-// and the card gate belong to 48.3 (HSK-16).
+// The definition is registered for dispatch (48.3); the catalog card stays unavailable until
+// owner-approved activation (HSK-16).
 
 const ch = heatSinkChallenge()
 const T0 = '2026-10-17T10:00:00.000Z'
@@ -54,9 +54,10 @@ describe('heat sink learning loop through the engine', () => {
     expect(Object.isFrozen(heatSinkModel)).toBe(true)
   })
 
-  it('is not registered or dispatchable before 48.3 (HSK-16)', () => {
-    expect(REGISTERED_MODEL_IDS).not.toContain('plateFinHeatSink')
-    expect(modelFor(ch.model)).toBeUndefined()
+  it('is registered and dispatchable by its exact identity only (48.3, MM-05, MM-07)', () => {
+    expect(REGISTERED_MODEL_IDS).toContain('plateFinHeatSink')
+    expect(modelFor(ch.model)).toBe(heatSinkModel)
+    expect(modelFor({ id: 'plateFinHeatSink', version: 2 })).toBeUndefined()
   })
 
   it('stores the worksheet baseline and fails baseTemperature only', () => {

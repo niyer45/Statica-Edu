@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import { bundledChallenge } from '../../test/arbitraries'
+import { heatSinkChallenge } from '../../test/fixtures/heatSink'
 import { torsionChallenge } from '../../test/fixtures/torsion'
 import { cantileverBeam1Json } from '../challenge/content'
 import { initSessionWith } from './engine'
+import { heatSinkModel } from './heatSinkModel'
 import { beamModel } from './models'
 import { sessionKey } from './persistence'
-import { beamRuntime, runtimeFor, runtimeForJson, torsionRuntime, vibrationRuntime } from './runtimes'
+import { beamRuntime, heatSinkRuntime, runtimeFor, runtimeForJson, torsionRuntime, vibrationRuntime } from './runtimes'
 import { torsionModel } from './torsionModel'
 import { vibrationModel } from './vibrationModel'
 import { vibrationChallenge } from '../../test/fixtures/vibration'
@@ -19,10 +21,12 @@ describe('runtime dispatch', () => {
   it('resolves exact registered identities only', () => {
     expect(runtimeFor(beamModel.ref)).toBe(beamRuntime)
     expect(runtimeFor(torsionModel.ref)).toBe(torsionRuntime)
+    expect(runtimeFor(heatSinkModel.ref)).toBe(heatSinkRuntime)
     expect(runtimeFor({ id: 'circularShaftTorsion', version: 2 })).toBeUndefined()
     expect(runtimeFor(vibrationModel.ref)).toBe(vibrationRuntime)
     expect(runtimeFor({ id: 'sdofBaseIsolation', version: 2 })).toBeUndefined()
     expect(runtimeFor({ id: 'notARegisteredModel', version: 1 })).toBeUndefined()
+    expect(runtimeFor({ id: 'plateFinHeatSink', version: 2 })).toBeUndefined()
   })
 
   it.each([
@@ -31,6 +35,7 @@ describe('runtime dispatch', () => {
     ['an explicit vibration model', { model: { id: 'sdofBaseIsolation', version: 1 } }, vibrationRuntime],
     ['an unregistered model', { model: { id: 'notARegisteredModel', version: 1 } }, undefined],
     ['an unregistered model version', { model: { id: 'sdofBaseIsolation', version: 2 } }, undefined],
+    ['an explicit heat sink model', { model: { id: 'plateFinHeatSink', version: 1 } }, heatSinkRuntime],
     ['a malformed model', { model: 'circularShaftTorsion' }, undefined],
     ['a model with a non-numeric version', { model: { id: 'circularShaftTorsion', version: '1' } }, undefined],
     ['a non-object config', [1, 2], beamRuntime],
@@ -62,6 +67,24 @@ describe('runtime persistence', () => {
     if (!back.ok) throw new Error(back.error)
     expect(back.value).toEqual(s.value)
     expect(torsionRuntime.load(JSON.parse(JSON.stringify(ch))).ok).toBe(true)
+  })
+
+  it('heat sink runtime round-trips a v2 envelope under its own key and refuses another model', () => {
+    const ch = heatSinkChallenge()
+    const s = heatSinkRuntime.init(ch, T0, 'h0', 'guided')
+    if (!s.ok) throw new Error(s.error.message)
+    expect(s.value.mode).toBe('guided')
+    expect(heatSinkRuntime.key(ch)).toBe('ei:session:heat-sink-1:v1')
+    const raw = heatSinkRuntime.serialize(s.value, T0)
+    expect(JSON.parse(raw)).toMatchObject({ schemaVersion: 2, model: heatSinkModel.ref })
+    const back = heatSinkRuntime.deserialize(raw, ch)
+    if (!back.ok) throw new Error(back.error)
+    expect(back.value).toEqual(s.value)
+    expect(heatSinkRuntime.load(JSON.parse(JSON.stringify(ch))).ok).toBe(true)
+    // A torsion envelope is never read as a heat sink session (MM-07).
+    const t = torsionRuntime.init(torsionChallenge(), T0, 't0')
+    if (!t.ok) throw new Error(t.error.message)
+    expect(heatSinkRuntime.deserialize(torsionRuntime.serialize(t.value, T0), ch).ok).toBe(false)
   })
 })
 

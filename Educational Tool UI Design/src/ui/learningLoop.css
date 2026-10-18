@@ -230,3 +230,21 @@
 .vibration-table th, .vibration-table td { text-align: left; padding: 4px 6px; border-bottom: 1px solid #e0e5d9; vertical-align: top; }
 .vibration-table thead th { color: #5c6a55; font-weight: 600; }
 .vibration-table tbody th { font-weight: 500; }
+/* Heat Sink I (task 48.3): display-only SVG fin array, stored-profile shading and fin tools. */
+.tools-body > .heat-sink-tools { grid-column: 1 / -1; }
+.heat-sink-tools .tool-copy { white-space: normal; }
+.fin-stepper { grid-column: 1 / -1; display: flex; gap: 6px; }
+.fin-stepper button { flex: 1; border: 1px solid #e1e6d7; border-radius: 4px; padding: 5px 4px; font-size: 9px; color: #5c6a55; background: #fcfcf9; }
+.heat-sink-view { display: flex; flex-direction: column; flex: 1; justify-content: center; gap: 8px; padding: 0 12px 12px; min-width: 0; }
+.heat-sink-scene { width: 100%; height: auto; max-height: 340px; }
+.fin-untested, .heat-sink-base { fill: #a8b49a; stroke: #4f653e; stroke-width: 0.5; }
+.fin-tested { stroke: #4f653e; stroke-width: 0.5; }
+.heat-sink-source { fill: #62685c; }
+.heat-sink-summary { margin: 0; letter-spacing: 0; text-transform: none; font-weight: 500; }
+.heat-sink-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 9px; color: #5c6a55; }
+.heat-sink-legend svg { width: 80px; height: 8px; }
+.fin-profile-details { font-size: 9px; color: #5c6a55; }
+.fin-profile-details summary { cursor: pointer; font-weight: 600; }
+.fin-profile { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 9px; color: #46583b; }
+.fin-profile caption { text-align: left; color: #5c6a55; margin-bottom: 4px; }
+.fin-profile th, .fin-profile td { text-align: left; padding: 3px 6px 3px 0; border-bottom: 1px solid #e6eadf; }

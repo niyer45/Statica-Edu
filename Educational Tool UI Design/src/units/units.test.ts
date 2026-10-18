@@ -12,6 +12,9 @@ import {
   formatPercent,
   formatSignificant,
   knPerMToNPerM,
+  kelvinToCelsius,
+  kgToG,
+  m2ToCm2,
   m2ToMm2,
   m4ToMm4,
   mToMm,
@@ -84,6 +87,17 @@ describe("conversions (Req 2.2)", () => {
       expect(paToMpa(v)).toBe(v / 1e6);
       expect(m4ToMm4(v)).toBe(v * 1e12);
       expect(m2ToMm2(v)).toBe(v * 1e6);
+    }
+  });
+
+  it("converts heat sink display units (task 48.3): K -> °C, kg -> g, m² -> cm²", () => {
+    expect(kelvinToCelsius(298.15)).toBe(25);
+    expect(kelvinToCelsius(328.15)).toBe(55);
+    expect(kelvinToCelsius(273.15)).toBe(0);
+    for (const v of [0.13, 0.0456, -2.5, 1e-9]) {
+      expect(kgToG(v)).toBe(v * 1e3);
+      expect(m2ToCm2(v)).toBe(v * 1e4);
+      expect(kelvinToCelsius(v)).toBe(v - 273.15);
     }
   });
 

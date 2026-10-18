@@ -18,9 +18,9 @@ import type { V2Persistence } from './persistence'
 
 // Heat Sink I model definition (task 48.2; heat-sink-1, MM-05, MM-13, MM-18, MM-19). Binds the
 // pure heat sink modules to the learning-loop engine: v2 persistence, v2 design files and a
-// base-temperature-rise prediction that is not scorable without a finite metric. Not yet in the
-// registry (state/models.ts) and linked by no catalog entry; registration and card gating belong
-// to 48.3 (HSK-16).
+// base-temperature-rise prediction that is not scorable without a finite metric. Registered for
+// dispatch in state/models.ts (48.3); the catalog card stays unavailable until owner-approved
+// activation (HSK-16).
 
 export type HeatSinkModelDefinition = ModelDefinition<
   HeatSinkChallenge,

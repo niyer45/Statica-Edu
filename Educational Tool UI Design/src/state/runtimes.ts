@@ -1,3 +1,5 @@
+import { loadHeatSinkChallenge } from '../challenge/heatSink/loader'
+import type { HeatSinkChallenge } from '../challenge/heatSink/types'
 import { loadChallenge } from '../challenge/loader'
 import { loadTorsionChallenge } from '../challenge/torsion/loader'
 import type { TorsionChallenge } from '../challenge/torsion/types'
@@ -5,6 +7,7 @@ import { loadVibrationChallenge } from '../challenge/vibration/loader'
 import type { VibrationChallenge } from '../challenge/vibration/types'
 import type { Challenge, InteractionMode, ModelRef, Result, SchemaIssue } from '../challenge/types'
 import { initSessionWith } from './engine'
+import { heatSinkModel, heatSinkPersistence, heatSinkReducer, type HeatSinkAction, type HeatSinkSession } from './heatSinkModel'
 import { beamModel, modelFor, modelOf } from './models'
 import { deserializeSession, deserializeSessionV2, serializeSession, serializeSessionV2, sessionKey } from './persistence'
 import { sessionReducer } from './reducer'
@@ -81,6 +84,16 @@ export const vibrationRuntime: ModelRuntime<VibrationSession, VibrationAction, V
   deserialize: (raw: string, ch: VibrationChallenge) => deserializeSessionV2(vibrationModel, vibrationPersistence, raw, ch),
 })
 
+export const heatSinkRuntime: ModelRuntime<HeatSinkSession, HeatSinkAction, HeatSinkChallenge> = Object.freeze({
+  ref: heatSinkModel.ref,
+  load: loadHeatSinkChallenge,
+  init: (ch: HeatSinkChallenge, now: string, id: string, mode?: InteractionMode) => initSessionWith(heatSinkModel, ch, now, id, mode),
+  reduce: heatSinkReducer,
+  key: sessionKey,
+  serialize: (s: HeatSinkSession, savedAt: string) => serializeSessionV2(heatSinkModel.ref, s, savedAt),
+  deserialize: (raw: string, ch: HeatSinkChallenge) => deserializeSessionV2(heatSinkModel, heatSinkPersistence, raw, ch),
+})
+
 /** Erased runtime type for dispatch; callers only pass values the same runtime produced. */
 export type AnyRuntime = ModelRuntime<LoopSession, { type: string }, LoopChallenge>
 
@@ -88,6 +101,7 @@ const RUNTIMES: ReadonlyMap<string, AnyRuntime> = new Map<string, AnyRuntime>([
   [beamRuntime.ref.id, beamRuntime as unknown as AnyRuntime],
   [torsionRuntime.ref.id, torsionRuntime as unknown as AnyRuntime],
   [vibrationRuntime.ref.id, vibrationRuntime as unknown as AnyRuntime],
+  [heatSinkRuntime.ref.id, heatSinkRuntime as unknown as AnyRuntime],
 ])
 
 /** Runtime for an exact registered model identity, or undefined (never a substitute, MM-07). */

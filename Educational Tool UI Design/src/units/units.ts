@@ -23,6 +23,12 @@ export const radToDeg = (rad: number): number => (rad * 180) / Math.PI;
 export const nPerMToKnPerM = (nPerM: number): number => nPerM / 1e3;
 /** kN/m -> N/m (×10³), for converting stiffness input to SI (task 50.3). */
 export const knPerMToNPerM = (knPerM: number): number => knPerM * 1e3;
+/** Kelvin to degrees Celsius, for displaying stored absolute temperatures (task 48.3). */
+export const kelvinToCelsius = (k: number): number => k - 273.15;
+/** kg -> g (×10³). */
+export const kgToG = (kg: number): number => kg * 1e3;
+/** m² -> cm² (×10⁴). */
+export const m2ToCm2 = (m2: number): number => m2 * 1e4;
 
 /**
  * Plain decimal: optional sign (+ or -), digits, optional single decimal

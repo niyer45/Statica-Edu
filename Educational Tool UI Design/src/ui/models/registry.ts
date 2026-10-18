@@ -3,6 +3,7 @@ import type { ModelRef } from '../../challenge/types'
 import { modelOf } from '../../state/models'
 import { useModelStore } from '../state/store'
 import { beamUi } from './beam'
+import { heatSinkUi } from './heatSink'
 import { torsionUi } from './torsion'
 import type { ModelUi } from './types'
 import { vibrationUi } from './vibration'
@@ -24,6 +25,7 @@ export function defaultModelUis(): ReadonlyMap<string, ModelUi> {
     ['eulerBernoulliCantileverTipForce', beamUi],
     ['circularShaftTorsion', torsionUi],
     ['sdofBaseIsolation', vibrationUi],
+    ['plateFinHeatSink', heatSinkUi],
   ])
   return defaults
 }
