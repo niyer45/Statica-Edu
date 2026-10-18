@@ -1,7 +1,7 @@
 // Feature: mounting-bracket-1, Property 7: Bracket explanation facts are grounded
-// **Validates: MBR-19, MM-14**
+// **Validates: task 55 L-bracket, MM-14**
 //
-// For any two valid tested brackets (stepped, uniform or outside the Kt fit), every number in every
+// For any two valid tested brackets, every number in every
 // single-result and change fact equals formatBasis(v, FACT_DIGITS) for some finite value v in that
 // fact's basis, and the model-limitation fact appears exactly once, last.
 import fc from 'fast-check'

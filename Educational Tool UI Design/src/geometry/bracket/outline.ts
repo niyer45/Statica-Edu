@@ -1,58 +1,75 @@
-import { isUniformBar, type BracketDesign } from './design'
+import type { BracketDesign } from './design'
 
-// Display-only elevation outline of the stepped bracket (task 46.2; MBR-18, design.md
-// "Integration notes"). No physics: the fillet arcs are drawn for the elevation SVG only and
-// their material and stiffness are neglected by the model. Coordinates are elevation metres:
-// x from the wall clamp (0) to the tip (L), y from the bar centreline (+ up).
-//
-// Each opposite shoulder fillet is a quarter-circle-type arc of radius r tangent to the arm face
-// at (a + r, ±d/2), centred at (a + r, ±(d/2 + r)). When r ≤ h = (D − d)/2 the arc starts on the
-// shoulder face at (a, ±(d/2 + r)), so the outline runs along the shoulder face from the deep
-// face down to it. When r > h the arc meets the deep face directly, at the point where it
-// reaches y = ±D/2 (design.md: "arcs tangent to the arm face and meeting the deep face").
-// A uniform bar (d = D) is a plain rectangle.
+// Display geometry of the L-bracket side view (task 55). No physics. Coordinates are elevation
+// metres: x from the wall face (0) outward along the arm, y up from the underside of the arm (0).
+// The outer face of the flange lies on the wall (x = 0) from the top of the flange (y = H) down to
+// the start of the bend (y = r_o). The bend is a quarter annulus centred at (r_o, r_o) with inner
+// radius r_i and outer radius r_o = r_i + t, so it is tangent to the wall face, the underside of
+// the arm, the inner flange face (x = t) and the top of the arm (y = t). The arm runs to the tip at
+// x = a + tip overhang.
 
 export interface ElevationPoint {
   x: number
   y: number
 }
 
-/** Arc segments per fillet in the polyline. */
-export const FILLET_ARC_SEGMENTS = 12
+/** Arc segments per bend arc in the polyline. */
+export const BEND_ARC_SEGMENTS = 12
 
-/** The upper edge from the wall (0, D/2) to the tip (L, d/2), fillet sampled as a polyline. */
-function upperEdge(d: BracketDesign, lengthM: number, segments: number): ElevationPoint[] {
-  const D = d.rootDepthM
-  const dArm = d.armDepthM
-  const a = d.stepLocationM
-  const r = d.filletRadiusM
-  if (isUniformBar(d)) return [{ x: 0, y: D / 2 }, { x: lengthM, y: D / 2 }]
-  const h = (D - dArm) / 2
-  const cx = a + r
-  const cy = dArm / 2 + r
-  // Start angle: π on the shoulder face (r ≤ h), otherwise where the arc meets y = D/2.
-  const alpha = r > h ? Math.asin((r - h) / r) : 0
-  const start = Math.PI + alpha
-  const end = 1.5 * Math.PI
-  const pts: ElevationPoint[] = [{ x: 0, y: D / 2 }]
+/** Outer arm length from the wall face to the tip: load offset plus overhang, m. */
+export function bracketArmLengthM(ch: { loadOffsetM: number; tipOverhangM: number }): number {
+  return ch.loadOffsetM + ch.tipOverhangM
+}
+
+/** Height of the bolt row above the underside of the arm: H − bolt edge distance, m. */
+export function bracketBoltRowHeightM(d: Pick<BracketDesign, 'flangeHeightM'>, ch: { bolts: { edgeDistanceM: number } }): number {
+  return d.flangeHeightM - ch.bolts.edgeDistanceM
+}
+
+/** Outer bend radius r_o = r_i + t, m. The flange leaves the wall below y = r_o (the heel). */
+export function bracketOuterRadiusM(d: Pick<BracketDesign, 'innerRadiusM' | 'thicknessM'>): number {
+  return d.innerRadiusM + d.thicknessM
+}
+
+function arc(cx: number, cy: number, r: number, from: number, to: number, segments: number): ElevationPoint[] {
+  const pts: ElevationPoint[] = []
   for (let i = 0; i <= segments; i++) {
-    const t = start + ((end - start) * i) / segments
-    // For r ≥ h the first arc point lies on the deep face: pin y to avoid rounding drift.
-    const y = i === 0 && r >= h ? D / 2 : cy + r * Math.sin(t)
-    pts.push({ x: i === segments ? cx : cx + r * Math.cos(t), y: i === segments ? dArm / 2 : y })
+    const t = from + ((to - from) * i) / segments
+    pts.push({ x: cx + r * Math.cos(t), y: cy + r * Math.sin(t) })
   }
-  if (r < h) pts.splice(1, 0, { x: a, y: D / 2 })
-  pts.push({ x: lengthM, y: dArm / 2 })
   return pts
 }
 
 /**
- * Closed elevation outline, clockwise (y up) from the wall top: upper edge to the tip, down the
- * tip face, then the mirrored lower edge back to the wall. Precondition: the design is valid and
- * a + r < L. The last point is not repeated.
+ * Closed side-view outline, counter-clockwise (y up): from the top of the flange at the wall down
+ * the outer face, around the outer bend arc, along the underside of the arm to the tip, up the
+ * tip face, back along the top of the arm, around the inner bend arc and up the inner flange face.
+ * The last point is not repeated. Arc end points are pinned to their tangent points.
  */
-export function bracketOutline(d: BracketDesign, lengthM: number, segments: number = FILLET_ARC_SEGMENTS): ElevationPoint[] {
-  const upper = upperEdge(d, lengthM, Math.max(1, Math.floor(segments)))
-  const lower = upper.map((p) => ({ x: p.x, y: -p.y })).reverse()
-  return [...upper, ...lower]
+export function bracketOutline(d: BracketDesign, armLengthM: number, segments: number = BEND_ARC_SEGMENTS): ElevationPoint[] {
+  const n = Math.max(1, Math.floor(segments))
+  const t = d.thicknessM
+  const H = d.flangeHeightM
+  const ri = d.innerRadiusM
+  const ro = ri + t
+  const outer = arc(ro, ro, ro, Math.PI, 1.5 * Math.PI, n)
+  outer[0] = { x: 0, y: ro }
+  outer[n] = { x: ro, y: 0 }
+  const inner = arc(ro, ro, ri, 1.5 * Math.PI, Math.PI, n)
+  inner[0] = { x: ro, y: t }
+  inner[n] = { x: t, y: ro }
+  return [{ x: 0, y: H }, ...outer, { x: armLengthM, y: 0 }, { x: armLengthM, y: t }, ...inner, { x: t, y: H }]
+}
+
+/**
+ * End points of the radial line across the middle of the bend (at 45°), from the inner fibre to
+ * the outer fibre: where the display marks the critical section.
+ */
+export function bracketBendSection(d: Pick<BracketDesign, 'innerRadiusM' | 'thicknessM'>): { inner: ElevationPoint; outer: ElevationPoint } {
+  const ro = d.innerRadiusM + d.thicknessM
+  const c = Math.SQRT1_2
+  return {
+    inner: { x: ro - d.innerRadiusM * c, y: ro - d.innerRadiusM * c },
+    outer: { x: ro - ro * c, y: ro - ro * c },
+  }
 }

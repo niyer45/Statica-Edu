@@ -1,63 +1,71 @@
-import { bracketOutline } from '../../../geometry/bracket/outline'
+import { bracketArmLengthM, bracketBendSection, bracketBoltRowHeightM, bracketOutline } from '../../../geometry/bracket/outline'
 import { useBracketStore } from './shared'
 
-// Bracket 2D side view (tasks 46.3, 54.1; MBR-18, OC-12). Main bundle, no Three.js, so it is the
-// view on devices without WebGL and the fallback if the 3D chunk fails. Owner feedback: the first
-// version did not show what the part is, so the drawing now carries its real-world context:
-//   - a hatched wall on the left with the bracket's mounting plate and two bolt heads;
-//   - the DRAFT stepped bar to scale (outline from the pure geometry/bracket/outline.ts), with a
-//     receding top edge so it reads as a flat plate of fixed thickness rather than a line drawing;
-//   - dashed lines at the two checked sections (root and step);
-//   - a load hanging from the tip on a short cable, with a downward arrow.
+// Bracket 2D side view (task 55 L-bracket; OC-12). Main bundle, no Three.js, so it is the view on
+// devices without WebGL and the fallback if the 3D chunk fails. It shows the DRAFT to scale:
+//   - a hatched wall on the left;
+//   - the L outline (pure geometry/bracket/outline.ts: flange on the wall, the bend with its inner
+//     radius, the arm), with a receding copy offset in proportion to the width so the plate reads
+//     as a solid of that width;
+//   - the two bolts of the row (heads on the inside of the flange, shanks into the wall);
+//   - a dashed line across the bend, the checked section;
+//   - the load hanging from the arm at the load offset on a cable, with a downward arrow.
 // No text is drawn on the model (D-26); BracketDetails carries the words, values and markers.
 
-const X0 = 46
-const PX_PER_M = 1150
-const CENTRE_Y = 74
-/** Receding offset that shows the plate thickness (oblique projection, display only). */
-const DEPTH_DX = 7
-const DEPTH_DY = -7
+const X0 = 64
+const Y0 = 170
+const PX_PER_M = 800
+/** Oblique receding factor for the width (display only). */
+const RECEDE = 0.3
 
 export const ELEVATION_LABEL =
-  'Side view of the wall-mounted bracket: the mounting plate is bolted to the wall on the left, and the load hangs from the tip on the right'
+  'Side view of the L-bracket: its vertical flange is bolted flat to the wall on the left, and the load hangs from the horizontal arm on the right'
 
 export default function BracketElevation() {
   const { state, challenge: ch } = useBracketStore()
   const draft = state.draft
-  const L = ch.lengthM
   const sx = (m: number) => X0 + m * PX_PER_M
-  const sy = (m: number) => CENTRE_Y - m * PX_PER_M
-  const pts = bracketOutline(draft, L)
+  const sy = (m: number) => Y0 - m * PX_PER_M
+  const depth = draft.widthM * PX_PER_M * RECEDE
+  const pts = bracketOutline(draft, bracketArmLengthM(ch))
   const front = pts.map((p) => `${sx(p.x).toFixed(2)},${sy(p.y).toFixed(2)}`).join(' ')
-  const back = pts.map((p) => `${(sx(p.x) + DEPTH_DX).toFixed(2)},${(sy(p.y) + DEPTH_DY).toFixed(2)}`).join(' ')
-  const halfRoot = (draft.rootDepthM / 2) * PX_PER_M
-  const plateHalf = halfRoot + 16
-  const tipX = sx(L)
-  const tipBottom = sy(-draft.armDepthM / 2)
-  const hasStep = draft.armDepthM !== draft.rootDepthM
+  const back = pts.map((p) => `${(sx(p.x) + depth).toFixed(2)},${(sy(p.y) - depth).toFixed(2)}`).join(' ')
+  const t = draft.thicknessM * PX_PER_M
+  const boltY = sy(bracketBoltRowHeightM(draft, ch))
+  const section = bracketBendSection(draft)
+  const loadX = sx(ch.loadOffsetM) + depth / 2
+  const loadTop = Y0 - depth / 2
+  // Bolt heads at a quarter and three quarters of the width (two bolts across the row).
+  const bolts = [0.75, 0.25].map((f) => f * depth)
   return (
-    <svg viewBox="0 0 460 190" role="img" aria-label={ELEVATION_LABEL} className="beam-scene bracket-elevation">
+    <svg viewBox="0 0 260 250" role="img" aria-label={ELEVATION_LABEL} className="beam-scene bracket-elevation">
       <defs>
         <pattern id="bracket-wall-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
           <line x1="0" y1="0" x2="0" y2="8" className="bracket-hatch-line" />
         </pattern>
       </defs>
-      <rect x={0} y={8} width={X0 - 8} height={170} className="bracket-wall" />
-      <rect x={0} y={8} width={X0 - 8} height={170} fill="url(#bracket-wall-hatch)" />
-      <line x1={X0 - 8} y1={8} x2={X0 - 8} y2={178} className="bracket-wall-face" />
-      <rect x={X0 - 8} y={CENTRE_Y - plateHalf} width={8} height={2 * plateHalf} className="bracket-plate" />
-      <rect x={X0 - 5} y={CENTRE_Y - plateHalf + 4} width={9} height={6} rx={1} className="bracket-bolt" />
-      <rect x={X0 - 5} y={CENTRE_Y + plateHalf - 10} width={9} height={6} rx={1} className="bracket-bolt" />
+      <rect x={0} y={4} width={X0} height={232} className="bracket-wall" />
+      <rect x={0} y={4} width={X0} height={232} fill="url(#bracket-wall-hatch)" />
+      <line x1={X0} y1={4} x2={X0} y2={236} className="bracket-wall-face" />
       <polygon points={back} className="bracket-body-back" />
+      {bolts.map((o, i) => (
+        <line key={`shank-back-${i}`} x1={X0 - 16} y1={boltY - o} x2={X0 + o} y2={boltY - o} className="bracket-bolt-shank" />
+      ))}
       <polygon points={front} className="bracket-body" />
-      <line x1={sx(0) + 1} y1={CENTRE_Y - halfRoot - 5} x2={sx(0) + 1} y2={CENTRE_Y + halfRoot + 5} className="bracket-section-line" />
-      {hasStep && (
-        <line x1={sx(draft.stepLocationM)} y1={CENTRE_Y - halfRoot - 5} x2={sx(draft.stepLocationM)} y2={CENTRE_Y + halfRoot + 5} className="bracket-section-line" />
-      )}
-      <line x1={tipX - 4} y1={tipBottom} x2={tipX - 4} y2={tipBottom + 26} className="bracket-cable" />
-      <rect x={tipX - 18} y={tipBottom + 26} width={28} height={22} rx={2} className="bracket-weight" />
-      <line x1={tipX - 4} y1={tipBottom + 52} x2={tipX - 4} y2={tipBottom + 66} className="bracket-load" />
-      <polygon points={`${tipX - 8},${tipBottom + 64} ${tipX},${tipBottom + 64} ${tipX - 4},${tipBottom + 72}`} className="bracket-load-head" />
+      {bolts.map((o, i) => (
+        <rect key={`head-${i}`} x={X0 + t + o} y={boltY - o - 5} width={4} height={10} rx={1} className="bracket-bolt" />
+      ))}
+      <line
+        x1={sx(section.inner.x)}
+        y1={sy(section.inner.y)}
+        x2={sx(section.outer.x)}
+        y2={sy(section.outer.y)}
+        className="bracket-section-line"
+      />
+      <line x1={loadX} y1={loadTop} x2={loadX} y2={loadTop + 24} className="bracket-cable" />
+      <rect x={loadX - 13} y={loadTop + 24} width={26} height={20} rx={2} className="bracket-weight" />
+      <line x1={loadX} y1={loadTop + 48} x2={loadX} y2={loadTop + 62} className="bracket-load" />
+      <polygon points={`${loadX - 4},${loadTop + 60} ${loadX + 4},${loadTop + 60} ${loadX},${loadTop + 68}`} className="bracket-load-head" />
     </svg>
   )
 }
