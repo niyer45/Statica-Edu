@@ -76,11 +76,11 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     const initial = await readState(page)
     expect(initial.challengeId).toBe('vibration-isolation-1')
     expect(initial.mode).toBe(mode.toLowerCase())
-    // Task 56: the goal card at the top of the design view states the goal and the four checks.
-    const goal = page.getByRole('region', { name: 'Goal', exact: true })
-    await expect(goal.getByText('Choose a mount that passes every check.', { exact: true })).toBeVisible()
-    await expect(goal.getByText(/^[0-4] of 4 pass$/)).toBeVisible()
-    const requirements = goal.getByRole('list', { name: 'Design requirements' })
+    // Task 56 follow-up: the challenge panel matches Cantilever Beam I: the visible statement
+    // followed by the value/limit checks.
+    const challenge = page.getByRole('complementary', { name: 'The challenge', exact: true })
+    await expect(challenge.getByText(/it does not simulate motion over time/)).toBeVisible()
+    const requirements = challenge.getByRole('list', { name: 'Design requirements' })
     await expect(requirements.getByText('10.1', { exact: true })).toHaveCount(2)
     await expect(page.getByText('Idealized steady-state vibration isolation, not an engineering certification')).toBeVisible()
     await expect(page.getByRole('img', { name: /Steady-state frequency response/ })).toBeVisible()

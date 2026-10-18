@@ -83,11 +83,11 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     const initial = await readState(page)
     expect(initial.challengeId).toBe('braced-frame-1')
     expect(initial.mode).toBe(mode.toLowerCase())
-    // Task 56: the goal card at the top of the design view states the goal and the four checks.
-    const goal = page.getByRole('region', { name: 'Goal', exact: true })
-    await expect(goal.getByText('Brace and size the frame so every check passes.', { exact: true })).toBeVisible()
-    await expect(goal.getByText('1 of 4 pass', { exact: true })).toBeVisible()
-    const requirements = goal.getByRole('list', { name: 'Design requirements' })
+    // Task 56 follow-up: the challenge panel matches Cantilever Beam I: the visible statement (with
+    // the pin-jointed idealization, BFR-01) followed by the value/limit checks.
+    const challenge = page.getByRole('complementary', { name: 'The challenge', exact: true })
+    await expect(challenge.getByText(/This frame is modeled as pin-jointed: every joint is a hinge/)).toBeVisible()
+    const requirements = challenge.getByRole('list', { name: 'Design requirements' })
     // The baseline fails roof drift, member utilization and mass (task 59).
     await expect(requirements.getByText('12.61 mm', { exact: true })).toBeVisible()
     await expect(requirements.getByText('819.9%', { exact: true })).toBeVisible()
@@ -134,7 +134,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     await runWithPrediction(page, 'Decrease')
     await expect(requirements.getByText('Unstable mechanism', { exact: true })).toBeVisible()
     await expect(requirements.getByText('Not applicable', { exact: true })).toHaveCount(2)
-    await expect(page.getByText(/Unstable: storey 2 has no diagonal/).first()).toBeVisible()
+    await expect(challenge.getByText(/Unstable: storey 2 has no diagonal/)).toBeVisible()
     await expect(page.getByRole('table', { name: 'Latest tested member forces' })).toHaveCount(0)
     if (mode === 'Guided') {
       // The 3D frame stays drawn for a mechanism, with no force patterns.
