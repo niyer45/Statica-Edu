@@ -11,15 +11,15 @@ import { useFrameStore } from './shared'
 // chosen catalog section, and every force pattern from the latest stored test (see
 // frameSceneLayout). Tension, compression and ≈ 0 differ in SHAPE, not only color: solid tube,
 // striped tube (raised dark bands on a pale core) and a thin beaded core. A member with no
-// tested force (a mechanism, or a diagonal added since the latest test) is a pale plain tube;
-// an absent candidate diagonal is a thin dashed line. D-26: no text or annotation on the model;
+// tested force (a mechanism, or a diagonal added since the latest test) is an open wire-mesh
+// tube, so it differs from the solid tension tube by shape as well as shade; an absent candidate diagonal is a thin dashed line. D-26: no text or annotation on the model;
 // the summary, pattern key and member force table outside the Canvas are the text equivalent.
 
 const TENSION = '#2f5a3d'
 const BAND = '#22301f'
 const CORE = '#eef1e6'
 const BEAD = '#4f653e'
-const PLAIN = '#c2c9b7'
+const PLAIN = '#7d8a72'
 const ABSENT = '#7d8873'
 const JOINT = '#3b4a3e'
 const SUPPORT = '#8c9a80'
@@ -94,15 +94,18 @@ function MemberTube({ member }: { member: SceneMember }) {
         ))}
       </>
     )
-  } else {
+  } else if (member.pattern === 'tension') {
     body = (
       <mesh>
         <cylinderGeometry args={[r, r, length, 24]} />
-        <meshStandardMaterial
-          color={member.pattern === 'tension' ? TENSION : PLAIN}
-          roughness={member.pattern === 'tension' ? 0.45 : 0.85}
-          metalness={member.pattern === 'tension' ? 0.25 : 0}
-        />
+        <meshStandardMaterial color={TENSION} roughness={0.45} metalness={0.25} />
+      </mesh>
+    )
+  } else {
+    body = (
+      <mesh>
+        <cylinderGeometry args={[r, r, length, 8, Math.max(4, Math.round(length / (4 * r))), true]} />
+        <meshBasicMaterial color={PLAIN} wireframe />
       </mesh>
     )
   }

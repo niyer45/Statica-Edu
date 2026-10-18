@@ -333,7 +333,7 @@
 .frame-glyph-core { stroke: #eef1e6; }
 .frame-glyph-bands { stroke: #22301f; stroke-dasharray: 3 3; }
 .frame-glyph-beads { stroke: #4f653e; stroke-linecap: round; stroke-dasharray: 0 5; }
-.frame-glyph-plain { stroke: #c2c9b7; stroke-linecap: round; }
+.frame-glyph-plain { fill: none; stroke: #7d8a72; stroke-width: 1; stroke-dasharray: 2 1.5; }
 @media (max-width: 620px) {
   .frame-view .frame-scene-3d { height: 280px; }
   .tools-body > .frame-tools { grid-column: 1 / -1; }

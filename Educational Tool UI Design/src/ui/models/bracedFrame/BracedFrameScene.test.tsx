@@ -2,7 +2,7 @@ import { act, createRoot, extend, type RootStore } from '@react-three/fiber'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   AmbientLight, BoxGeometry, ConeGeometry, CylinderGeometry, DirectionalLight, Group, Mesh,
-  MeshStandardMaterial, SphereGeometry, type Object3D, type WebGLRenderer,
+  MeshBasicMaterial, MeshStandardMaterial, SphereGeometry, type Object3D, type WebGLRenderer,
 } from 'three'
 import { bracedFrameChallenge } from '../../../../test/fixtures/bracedFrame'
 import type { BracedFrameChallenge } from '../../../challenge/bracedFrame/types'
@@ -18,7 +18,7 @@ import { frameSceneLayout, TUBE_DIAMETER_EXAGGERATION } from './frameSceneLayout
 // renderer (as BeamView.test does). Geometry comes from the template, diameters from the draft
 // sections, and force patterns from the latest stored test; a mechanism has no force pattern.
 
-extend({ AmbientLight, BoxGeometry, ConeGeometry, CylinderGeometry, DirectionalLight, Group, Mesh, MeshStandardMaterial, SphereGeometry })
+extend({ AmbientLight, BoxGeometry, ConeGeometry, CylinderGeometry, DirectionalLight, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial, SphereGeometry })
 
 let state: BracedFrameSession
 let dispatch: (a: BracedFrameAction) => void
@@ -71,6 +71,7 @@ const named = (store: RootStore, prefix: string) => {
   return found
 }
 const meshCount = (o: Object3D) => o.children.filter((c) => c instanceof Mesh).length
+const wireframe = (o: Object3D) => o.children.every((c) => c instanceof Mesh && (c.material as MeshBasicMaterial).wireframe === true)
 const radiusOf = (ch: BracedFrameChallenge, sectionId: string) => (ch.sections.find((s) => s.id === sectionId)!.outerDiameterM * TUBE_DIAMETER_EXAGGERATION) / 2
 
 describe('Braced Frame I 3D scene (task 54.3)', () => {
@@ -115,6 +116,8 @@ describe('Braced Frame I 3D scene (task 54.3)', () => {
     const added = store.getState().scene.getObjectByName('member-diag1a')!
     expect(added.userData.pattern).toBe('plain')
     expect(meshCount(added)).toBe(1)
+    // Untested differs from the solid tension tube by shape: an open wire-mesh tube.
+    expect(wireframe(added)).toBe(true)
     expect(store.getState().scene.getObjectByName('absent-diag1a')).toBeUndefined()
     expect(store.getState().scene.getObjectByName('member-col1L')!.userData.radiusM).toBeCloseTo(radiusOf(ch, 'CHS88.9x5.0'), 12)
     // Editing changes only the draft; the stored results that drive patterns are unchanged.
@@ -132,7 +135,7 @@ describe('Braced Frame I 3D scene (task 54.3)', () => {
     expect(state.history.at(-1)!.analysis.status).toBe('mechanism')
     const members = named(store, 'member-')
     expect(members).toHaveLength(7)
-    expect(members.every((m) => m.userData.pattern === 'plain' && meshCount(m) === 1)).toBe(true)
+    expect(members.every((m) => m.userData.pattern === 'plain' && meshCount(m) === 1 && wireframe(m))).toBe(true)
     expect(named(store, 'absent-')).toHaveLength(3)
   })
 

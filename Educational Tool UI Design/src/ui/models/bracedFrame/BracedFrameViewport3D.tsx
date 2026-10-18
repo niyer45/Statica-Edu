@@ -30,7 +30,7 @@ function SceneDescription() {
   const forces =
     tested.status === 'mechanism'
       ? `The latest test is an ${MECHANISM_TEXT.toLowerCase()}, so no force patterns are drawn.`
-      : 'Patterns show the latest tested forces: solid tubes in tension, striped tubes in compression, beaded tubes near zero force, and pale plain tubes for members without a tested force.'
+      : 'Patterns show the latest tested forces: solid tubes in tension, striped tubes in compression, beaded tubes near zero force, and open wire-mesh tubes for members without a tested force.'
   return (
     <p id={FRAME_SCENE_DESCRIPTION_ID} className="sr-only">
       Two-storey, one-bay steel frame of round tubes on pinned base supports standing on a ground slab, with arrows at the loaded joints. Tube widths follow
@@ -64,9 +64,9 @@ function PatternKey() {
       </li>
       <li>
         <svg viewBox="0 0 24 8" aria-hidden="true">
-          <line x1={1} y1={4} x2={23} y2={4} className="frame-glyph-plain" strokeWidth={4} />
+          <rect x={1} y={1.5} width={22} height={5} className="frame-glyph-plain" />
         </svg>
-        Pale plain tube: no tested force
+        Open mesh tube: no tested force
       </li>
       <li>
         <svg viewBox="0 0 24 8" aria-hidden="true">

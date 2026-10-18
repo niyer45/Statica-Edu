@@ -83,7 +83,7 @@ describe('Braced Frame I 3D view slot (task 54.3)', () => {
     expect(document.getElementById(FRAME_SUMMARY_ID)!.textContent).toContain('Latest test (Baseline): stable')
     // Pattern key states every pattern in words (never color alone); no SVG fallback in 3D.
     const key = screen.getByRole('list', { name: '3D pattern key' })
-    for (const text of ['Solid tube: tension', 'Striped tube: compression', 'Beaded: ≈ 0', 'Pale plain tube: no tested force', 'Dashed: not present', 'Tube widths ×4'])
+    for (const text of ['Solid tube: tension', 'Striped tube: compression', 'Beaded: ≈ 0', 'Open mesh tube: no tested force', 'Dashed: not present', 'Tube widths ×4'])
       expect(key.textContent).toContain(text)
     expect(screen.queryByRole('img', { name: /Two-storey braced frame elevation/ })).toBeNull()
     expect(screen.queryByText(FRAME_FALLBACK_NOTICE)).toBeNull()
