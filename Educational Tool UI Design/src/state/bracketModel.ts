@@ -16,11 +16,11 @@ import { exportDesignV2, importDesignV2 } from './importV2'
 import type { ModelDefinition } from './models'
 import type { V2Persistence } from './persistence'
 
-// Mounting Bracket I model definition (task 46.2; mounting-bracket-1, MM-05, MM-13, MM-18,
-// MM-19). Binds the pure bracket modules to the learning-loop engine: v2 persistence, v2 design
-// files and a peak-stress prediction that is not scorable when either result has no peak stress
-// (Kt fit undefined). Registered for dispatch in 46.3 (state/models.ts, state/runtimes.ts); no
-// catalog entry links a bracket challenge until its owner-approved activation.
+// Mounting Bracket I model definition (task 55 L-bracket, model `boltedLBracket` v1; MM-05,
+// MM-13, MM-18, MM-19). Binds the pure bracket modules to the learning-loop engine: v2
+// persistence, v2 design files and a bend-stress prediction. Saved stepped-bracket sessions live
+// under the challenge's previous version key (`…:v1`) and are never read; old stepped-bar design
+// files name another model and are rejected on import (MM-04, MM-19).
 
 export type BracketModelDefinition = ModelDefinition<
   BracketChallenge,
@@ -35,10 +35,10 @@ export type BracketModelDefinition = ModelDefinition<
 function cloneBracket(d: Readonly<BracketDesign>): BracketDesign {
   return {
     id: d.id,
-    rootDepthM: d.rootDepthM,
-    armDepthM: d.armDepthM,
-    stepLocationM: d.stepLocationM,
-    filletRadiusM: d.filletRadiusM,
+    thicknessM: d.thicknessM,
+    widthM: d.widthM,
+    flangeHeightM: d.flangeHeightM,
+    innerRadiusM: d.innerRadiusM,
     materialId: d.materialId,
   }
 }
@@ -46,10 +46,10 @@ function cloneBracket(d: Readonly<BracketDesign>): BracketDesign {
 /** Deep equality ignoring only `id` (Req 16.1 semantics). */
 function sameBracketIgnoringId(a: Readonly<BracketDesign>, b: Readonly<BracketDesign>): boolean {
   return (
-    Object.is(a.rootDepthM, b.rootDepthM) &&
-    Object.is(a.armDepthM, b.armDepthM) &&
-    Object.is(a.stepLocationM, b.stepLocationM) &&
-    Object.is(a.filletRadiusM, b.filletRadiusM) &&
+    Object.is(a.thicknessM, b.thicknessM) &&
+    Object.is(a.widthM, b.widthM) &&
+    Object.is(a.flangeHeightM, b.flangeHeightM) &&
+    Object.is(a.innerRadiusM, b.innerRadiusM) &&
     a.materialId === b.materialId
   )
 }

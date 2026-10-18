@@ -5,8 +5,8 @@ import type { ParamRange, Result, SchemaIssue } from '../types'
 import { bracketChallengeSchema } from './schema'
 import { BRACKET_LOCKED_FIELDS, type BracketChallenge } from './types'
 
-// Mounting Bracket I challenge loader (task 46.2; MBR-01–MBR-10, MM-02). Same pipeline as the
-// beam and torsion loaders, which are unchanged:
+// Mounting Bracket I challenge loader (task 55 L-bracket; MM-02). Same pipeline as the beam and
+// torsion loaders, which are unchanged:
 // 1. Strings are parsed with JSON.parse; a parse failure is a single JSON_PARSE issue.
 // 2. The zod schema runs; every zod issue is reported (unknown keys: one issue per key). A
 //    missing or different model identity fails here, never falling back to another model.
@@ -18,13 +18,19 @@ import { BRACKET_LOCKED_FIELDS, type BracketChallenge } from './types'
 export const BRACKET_CROSS_FIELD_RULES = {
   /** A ParamRange has minM > maxM. */
   RANGE_MIN_GT_MAX: 'RANGE_MIN_GT_MAX',
-  /** The largest step location does not leave an arm before the tip (a_max ≥ L). */
-  STEP_BEYOND_LENGTH: 'STEP_BEYOND_LENGTH',
+  /**
+   * The bolt row could sit in or below the bend: the shortest flange minus the bolt edge distance
+   * does not clear the largest outer bend radius (r_i,max + t_max), so the bolt lever arm about
+   * the heel would not be positive for every design in range.
+   */
+  BOLT_ROW_IN_BEND: 'BOLT_ROW_IN_BEND',
+  /** The thinnest width is below the thickest thickness, so bending would not be about the thin axis. */
+  WIDTH_BELOW_THICKNESS: 'WIDTH_BELOW_THICKNESS',
   /** A design's materialId differs from material.id. */
   DESIGN_MATERIAL_MISMATCH: 'DESIGN_MATERIAL_MISMATCH',
   /** A design fails the bracket dimension validator for the configured limits. */
   DESIGN_INVALID: 'DESIGN_INVALID',
-  /** lockedFields omits one of lengthM, thicknessM, materialId, forceN, support (MBR-04). */
+  /** lockedFields omits one of loadOffsetM, materialId, forceN, bolts, support. */
   LOCKED_FIELD_MISSING: 'LOCKED_FIELD_MISSING',
 } as const
 
@@ -83,10 +89,10 @@ export function bracketCrossFieldIssues(ch: BracketChallenge): SchemaIssue[] {
   const lim = ch.designLimits
 
   const ranges: [string, ParamRange][] = [
-    ['designLimits.rootDepthM', lim.rootDepthM],
-    ['designLimits.armDepthM', lim.armDepthM],
-    ['designLimits.stepLocationM', lim.stepLocationM],
-    ['designLimits.filletRadiusM', lim.filletRadiusM],
+    ['designLimits.thicknessM', lim.thicknessM],
+    ['designLimits.widthM', lim.widthM],
+    ['designLimits.flangeHeightM', lim.flangeHeightM],
+    ['designLimits.innerRadiusM', lim.innerRadiusM],
   ]
   for (const [path, r] of ranges) {
     if (r.minM > r.maxM + TOL) {
@@ -94,9 +100,15 @@ export function bracketCrossFieldIssues(ch: BracketChallenge): SchemaIssue[] {
     }
   }
 
-  if (lim.stepLocationM.maxM >= ch.lengthM - TOL) {
-    add('designLimits.stepLocationM', R.STEP_BEYOND_LENGTH,
-      `Step location maximum ${lim.stepLocationM.maxM} m must be less than the length ${ch.lengthM} m.`)
+  const worstLeverM = lim.flangeHeightM.minM - ch.bolts.edgeDistanceM - (lim.innerRadiusM.maxM + lim.thicknessM.maxM)
+  if (!(worstLeverM > TOL)) {
+    add('designLimits.flangeHeightM', R.BOLT_ROW_IN_BEND,
+      `The shortest flange (${lim.flangeHeightM.minM} m) minus the bolt edge distance (${ch.bolts.edgeDistanceM} m) must clear the largest outer bend radius (${lim.innerRadiusM.maxM + lim.thicknessM.maxM} m).`)
+  }
+
+  if (lim.widthM.minM < lim.thicknessM.maxM - TOL) {
+    add('designLimits.widthM', R.WIDTH_BELOW_THICKNESS,
+      `Width minimum ${lim.widthM.minM} m must be at least the thickness maximum ${lim.thicknessM.maxM} m.`)
   }
 
   const designs = [['initialDesign', ch.initialDesign], ['referenceDesign', ch.referenceDesign]] as const

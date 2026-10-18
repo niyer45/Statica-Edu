@@ -2,11 +2,10 @@ import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
 import { audit, readState, tabTo } from './helpers'
 
-// Mounting Bracket I (task 46.3; MBR-18–MBR-20, MM-16, MM-22): chosen before entry from the
-// library, full prediction/test loop to the Accepted spec reference, saved under its own key,
-// isolated from Cantilever Beam I, keyboard-reachable, axe-clean and free of 320 px overflow.
-// The whole file is skipped until catalog card 002 is activated with owner approval; it then
-// runs unchanged on desktop and Pixel 7.
+// Mounting Bracket I (tasks 46.3, 55; MM-16, MM-22): the bolted L-bracket, chosen before entry
+// from the library, full prediction/test loop from a baseline that fails all four checks to the
+// Accepted internal reference, saved under its own version-2 key, isolated from Cantilever Beam I,
+// keyboard-reachable, axe-clean and free of 320 px overflow, on desktop and Pixel 7.
 
 test.skip(!catalog.find((e) => e.id === '002')?.available, 'Mounting Bracket I awaits owner-approved activation')
 
@@ -68,33 +67,40 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     expect(initial.challengeId).toBe('mounting-bracket-1')
     expect(initial.mode).toBe(mode.toLowerCase())
     const requirements = page.getByRole('list', { name: 'Design requirements' })
-    await expect(requirements.getByText('157.9 MPa', { exact: true })).toBeVisible()
+    // The baseline fails bend stress, deflection, bolt tension and mass.
+    await expect(requirements.getByText('231.0 MPa', { exact: true })).toBeVisible()
+    await expect(requirements.getByText('8.04 mm', { exact: true })).toBeVisible()
+    await expect(requirements.getByText('333 N', { exact: true })).toBeVisible()
+    await expect(requirements.getByText('180.7 g', { exact: true })).toBeVisible()
+    await expect(requirements.getByText('✗ Fail')).toHaveCount(4)
     if (mode === 'Guided') {
       // Lazy chunk plus software WebGL can exceed the default 5 s when workers run in parallel.
-      await expect(page.getByRole('img', { name: /^3D view of the wall-mounted bracket/ })).toBeVisible({ timeout: 20_000 })
-      await expect(page.getByRole('img', { name: /^Side view of the wall-mounted bracket/ })).toHaveCount(0)
+      await expect(page.getByRole('img', { name: /^3D view of the L-bracket/ })).toBeVisible({ timeout: 20_000 })
+      await expect(page.getByRole('img', { name: /^Side view of the L-bracket/ })).toHaveCount(0)
       await page.getByRole('button', { name: 'Zoom in', exact: true }).click()
       await page.getByRole('button', { name: 'Reset view', exact: true }).click()
     } else {
-      await expect(page.getByRole('img', { name: /^Side view of the wall-mounted bracket/ })).toBeVisible()
+      await expect(page.getByRole('img', { name: /^Side view of the L-bracket/ })).toBeVisible()
       await expect(page.getByText('3D view is unavailable. Showing the 2D side view of the bracket instead.').first()).toBeVisible()
       await expect(page.locator('canvas')).toHaveCount(0)
     }
-    await expect(page.getByRole('img', { name: /^Bending-moment strip of the latest tested design/ })).toBeVisible()
-    await expect(page.getByText(/fillet Kt coefficients from secondary copies, pending printed-edition verification/)).toBeVisible()
+    await expect(page.getByRole('img', { name: /^Bending-moment path of the latest tested design/ })).toBeVisible()
+    await expect(page.getByText(/Idealized bolted L-bracket: statics, Winkler–Bach curved-beam bend stress/)).toBeVisible()
     if (mode === 'Guided') {
       await expect(page.getByRole('region', { name: 'Guided instructions' }).getByRole('heading', { name: 'Inspect', exact: true })).toBeVisible()
     } else {
       await expect(page.getByRole('region', { name: 'Guided instructions' })).toHaveCount(0)
-      await expect(page.getByText('Direct depth, step and fillet editing')).toBeVisible()
+      await expect(page.getByText('Direct thickness, width, flange and bend radius editing')).toBeVisible()
     }
     await audit(page)
 
-    // The internal spec reference (30/20/175/3 mm): only the step location and fillet change.
-    await setDimension(page, 'Step location', '175', keyboard)
-    await setDimension(page, 'Fillet radius', '3', keyboard)
+    // The internal reference (t 7, w 40, flange 80, r 6 mm): every dimension changes.
+    await setDimension(page, 'Thickness', '7', keyboard)
+    await setDimension(page, 'Width', '40', keyboard)
+    await setDimension(page, 'Flange height', '80', keyboard)
+    await setDimension(page, 'Inner bend radius', '6', keyboard)
     await page.getByRole('button', { name: 'Run Test', exact: true }).click()
-    const prediction = page.getByRole('dialog', { name: 'Predict peak stress' })
+    const prediction = page.getByRole('dialog', { name: 'Predict bend stress' })
     await expect(prediction).toBeVisible()
     await prediction.getByLabel('Decrease', { exact: true }).check()
     await prediction.getByRole('button', { name: 'Run structural test' }).click()
@@ -102,7 +108,10 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     const tested = await readState(page)
     expect(tested.history).toHaveLength(2)
     expect(tested.history[1].evaluation.status).toBe('accepted')
-    await expect(requirements.getByText('90.8 MPa', { exact: true })).toBeVisible()
+    await expect(requirements.getByText('97.7 MPa', { exact: true })).toBeVisible()
+    await expect(requirements.getByText('✗ Fail')).toHaveCount(0)
+    const keys = await page.evaluate(() => Object.keys(window.localStorage).filter((k) => k.startsWith('ei:session:mounting-bracket-1')))
+    expect(keys).toEqual(['ei:session:mounting-bracket-1:v2'])
     await audit(page)
     await noHorizontalOverflow(page)
 

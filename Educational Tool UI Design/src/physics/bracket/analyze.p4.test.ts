@@ -1,10 +1,11 @@
 // Feature: mounting-bracket-1, Property 4: Bracket scaling laws
-// **Validates: MBR-17 (scaling)**
+// **Validates: task 55 L-bracket (scaling)**
 //
-// Stresses and δ are linear in F; δ ∝ 1/E; mass is independent of F and E; Kt and the peak
-// location are independent of F, E and b; σ ∝ 1/b, δ ∝ 1/b and m ∝ b. Each case scales one input by
-// k with every other input unchanged (relative 1e-12, or bitwise identical where the quantity does
-// not depend on the input).
+// Stresses, deflections and the bolt tension are linear in P; deflections ∝ 1/E; mass is
+// independent of P and E; the curved-beam factor, the lever arm and R/c are independent of P, E
+// and w; stresses and deflections ∝ 1/w, mass ∝ w, the bolt tension is independent of w. Each case
+// scales one input by k with every other input unchanged (relative 1e-12, or bitwise identical
+// where the quantity does not depend on the input).
 import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
 import { arbBracketDesign, bracketChallenge, relClose } from '../../../test/fixtures/bracket'
@@ -19,56 +20,51 @@ const arbK = fc.double({ min: 0.25, max: 4, noNaN: true })
 
 const withForce = (k: number): BracketChallenge => ({ ...ch, load: { ...ch.load, forceN: ch.load.forceN * k } })
 const withModulus = (k: number): BracketChallenge => ({ ...ch, material: { ...ch.material, elasticModulusPa: ch.material.elasticModulusPa * k } })
-const withThickness = (k: number): BracketChallenge => ({ ...ch, thicknessM: ch.thicknessM * k })
 
-const STRESSES = ['rootStressPa', 'stepNominalStressPa', 'stepPeakStressPa', 'peakStressPa'] as const
+const STRESSES = ['nominalBendStressPa', 'bendStressPa'] as const
+const DEFLECTIONS = ['armDeflectionM', 'flangeRotationDeflectionM', 'deflectionM'] as const
+const GEOMETRIC = ['curvedBeamFactor', 'bendRadiusRatio', 'boltLeverArmM'] as const
 
 function expectScaled(a: BracketAnalysis, b: BracketAnalysis, keys: readonly (keyof BracketAnalysis)[], factor: number): void {
-  for (const k of keys) {
-    const x = a[k]
-    const y = b[k]
-    expect(typeof y, k).toBe(typeof x)
-    if (typeof x === 'number') expect(relClose(y as number, factor * x, REL), k).toBe(true)
-  }
+  for (const k of keys) expect(relClose(b[k] as number, factor * (a[k] as number), REL), k).toBe(true)
+}
+function expectSame(a: BracketAnalysis, b: BracketAnalysis, keys: readonly (keyof BracketAnalysis)[]): void {
+  for (const k of keys) expect(Object.is(b[k], a[k]), k).toBe(true)
 }
 
 describe('Property 4: scaling laws', () => {
-  it('stresses and δ are linear in F; m, Kt and the location are independent of F', () => {
+  it('stresses, deflections, moment and bolt tension are linear in P; mass and geometry are independent of P', () => {
     assertProperty(
       fc.property(arbBracketDesign(ch), arbK, (d, k) => {
         const a = analyzeBracket(d, ch)
         const b = analyzeBracket(d, withForce(k))
-        expectScaled(a, b, [...STRESSES, 'tipDeflectionM', 'rootMomentNm', 'stepMomentNm'], k)
-        expect(Object.is(b.massKg, a.massKg)).toBe(true)
-        expect(b.ktStep).toBe(a.ktStep)
-        expect(b.peakLocation).toBe(a.peakLocation)
+        expectScaled(a, b, [...STRESSES, ...DEFLECTIONS, 'bendMomentNm', 'boltTensionN'], k)
+        expectSame(a, b, ['massKg', 'bendRadiusRatio', 'boltLeverArmM'])
+        expect(relClose(b.curvedBeamFactor, a.curvedBeamFactor, REL)).toBe(true)
       }),
     )
   })
 
-  it('δ ∝ 1/E; stresses, m, Kt and the location are independent of E', () => {
+  it('deflections ∝ 1/E; stresses, bolt tension, mass and geometry are independent of E', () => {
     assertProperty(
       fc.property(arbBracketDesign(ch), arbK, (d, k) => {
         const a = analyzeBracket(d, ch)
         const b = analyzeBracket(d, withModulus(k))
-        expectScaled(a, b, ['tipDeflectionM'], 1 / k)
-        for (const s of STRESSES) expect(Object.is(b[s], a[s]), s).toBe(true)
-        expect(Object.is(b.massKg, a.massKg)).toBe(true)
-        expect(b.ktStep).toBe(a.ktStep)
-        expect(b.peakLocation).toBe(a.peakLocation)
+        expectScaled(a, b, DEFLECTIONS, 1 / k)
+        expectSame(a, b, [...STRESSES, ...GEOMETRIC, 'boltTensionN', 'massKg'])
       }),
     )
   })
 
-  it('σ ∝ 1/b, δ ∝ 1/b, m ∝ b; Kt and the location are independent of b', () => {
+  it('stresses and deflections ∝ 1/w and mass ∝ w; bolt tension and geometry are independent of w', () => {
     assertProperty(
       fc.property(arbBracketDesign(ch), arbK, (d, k) => {
         const a = analyzeBracket(d, ch)
-        const b = analyzeBracket(d, withThickness(k))
-        expectScaled(a, b, [...STRESSES, 'tipDeflectionM'], 1 / k)
+        const b = analyzeBracket({ ...d, widthM: d.widthM * k }, ch)
+        expectScaled(a, b, [...STRESSES, ...DEFLECTIONS], 1 / k)
         expectScaled(a, b, ['massKg'], k)
-        expect(b.ktStep).toBe(a.ktStep)
-        expect(b.peakLocation).toBe(a.peakLocation)
+        expectSame(a, b, ['boltTensionN', 'bendRadiusRatio', 'boltLeverArmM', 'bendMomentNm'])
+        expect(relClose(b.curvedBeamFactor, a.curvedBeamFactor, REL)).toBe(true)
       }),
     )
   })

@@ -12,7 +12,7 @@ import { loadTorsionChallenge } from '../torsion/loader'
 import { BRACKET_CROSS_FIELD_RULES, bracketCrossFieldIssues, loadBracketChallenge } from './loader'
 import { BRACKET_LOCKED_FIELDS, BRACKET_MODEL_REF, type BracketChallenge } from './types'
 
-// Mounting Bracket I config loader (task 46.2; MBR-01–MBR-10, MBR-13, MM-02, MM-06).
+// Mounting Bracket I config loader (task 55 L-bracket; MM-02, MM-04, MM-06).
 
 type Json = Record<string, unknown>
 const clone = (): Json => structuredClone(bracketJson) as Json
@@ -37,25 +37,25 @@ describe('loadBracketChallenge: bundled-format config', () => {
   if (!r.ok) throw new Error(JSON.stringify(r.error))
   const ch = r.value
 
-  it('defines the identity and learning settings (MBR-01, MBR-09, MBR-10)', () => {
+  it('defines the identity and learning settings; version 2 replaces the stepped-bar version 1 (MM-04)', () => {
     expect(ch.id).toBe('mounting-bracket-1')
-    expect(ch.version).toBe(1)
+    expect(ch.version).toBe(2)
     expect(ch.title).toBe('Mounting Bracket I')
     expect(ch.model).toEqual(BRACKET_MODEL_REF)
-    expect(ch.model).toEqual({ id: 'steppedBarBracket', version: 1 })
+    expect(ch.model).toEqual({ id: 'boltedLBracket', version: 1 })
     expect(ch.difficulty).toBe('intermediate')
     expect(ch.allowedModes).toEqual(['guided', 'parametric'])
     expect(ch.predictionPolicy.requiredOnIterations).toEqual([1, 3])
-    expect(ch.reflectionPrompt.text).toBe(
-      'Using your tested designs, explain where the peak stress occurred, how the fillet radius and the step location changed it, and why adding material everywhere was not the answer.',
-    )
+    expect(ch.reflectionPrompt.text).toMatch(/why the bend is the critical section/)
+    expect(ch.statement).toMatch(/L-bracket/)
   })
 
-  it('defines the fixed values and locked fields (MBR-04)', () => {
-    expect(ch.lengthM).toBe(0.3)
-    expect(ch.thicknessM).toBe(0.01)
-    expect(ch.support).toBe('wallClamp')
-    expect(ch.load).toEqual({ forceN: 300, location: 'freeEnd', direction: 'down' })
+  it('defines the fixed values and locked fields', () => {
+    expect(ch.loadOffsetM).toBe(0.12)
+    expect(ch.tipOverhangM).toBe(0.015)
+    expect(ch.bolts).toEqual({ count: 2, edgeDistanceM: 0.015 })
+    expect(ch.support).toBe('boltedWall')
+    expect(ch.load).toEqual({ forceN: 200, location: 'loadLine', direction: 'down' })
     expect(ch.material).toEqual({
       id: 'al-educational',
       name: 'Aluminum (educational nominal)',
@@ -67,31 +67,32 @@ describe('loadBracketChallenge: bundled-format config', () => {
     expect(ch.lockedFields).toEqual([...BRACKET_LOCKED_FIELDS])
   })
 
-  it('defines the adjustable ranges and designs (MBR-05, MBR-06)', () => {
+  it('defines the adjustable ranges and designs', () => {
     expect(ch.designLimits).toEqual({
-      rootDepthM: { minM: 0.015, maxM: 0.05, stepM: 0.0005 },
-      armDepthM: { minM: 0.01, maxM: 0.05, stepM: 0.0005 },
-      stepLocationM: { minM: 0.06, maxM: 0.24, stepM: 0.005 },
-      filletRadiusM: { minM: 0.0005, maxM: 0.01, stepM: 0.0005 },
+      thicknessM: { minM: 0.003, maxM: 0.01, stepM: 0.0005 },
+      widthM: { minM: 0.04, maxM: 0.12, stepM: 0.001 },
+      flangeHeightM: { minM: 0.05, maxM: 0.15, stepM: 0.005 },
+      innerRadiusM: { minM: 0.001, maxM: 0.012, stepM: 0.0005 },
     })
-    expect(ch.initialDesign).toEqual({ id: 'baseline', rootDepthM: 0.03, armDepthM: 0.02, stepLocationM: 0.15, filletRadiusM: 0.001, materialId: 'al-educational' })
-    expect(ch.referenceDesign).toEqual({ id: 'reference', rootDepthM: 0.03, armDepthM: 0.02, stepLocationM: 0.175, filletRadiusM: 0.003, materialId: 'al-educational' })
+    expect(ch.initialDesign).toEqual({ id: 'baseline', thicknessM: 0.003, widthM: 0.12, flangeHeightM: 0.055, innerRadiusM: 0.001, materialId: 'al-educational' })
+    expect(ch.referenceDesign).toEqual({ id: 'reference', thicknessM: 0.007, widthM: 0.04, flangeHeightM: 0.08, innerRadiusM: 0.006, materialId: 'al-educational' })
   })
 
-  it('defines the constraints in SI units (MBR-08)', () => {
-    expect(ch.constraints).toEqual({ maxPeakStressPa: 120e6, maxTipDeflectionM: 0.0024, maxMassKg: 0.215, maxEnvelopeDepthM: 0.04 })
+  it('defines the constraints in SI units', () => {
+    expect(ch.constraints).toEqual({ maxBendStressPa: 120e6, maxDeflectionM: 0.0024, maxBoltTensionN: 300, maxMassKg: 0.175 })
   })
 
-  it('has no Kt coefficients, branch rule or screen thresholds in the configuration (MBR-13)', () => {
+  it('keeps the curved-beam limit and the screen thresholds out of the configuration', () => {
     const text = JSON.stringify(bracketJson)
-    for (const word of ['kt', 'coefficient', 'threshold', 'branch', 'warning']) expect(text.toLowerCase()).not.toContain(word)
-    expect(rules((c) => (c.ktCoefficients = []))).toEqual(['ktCoefficients unrecognized_keys'])
+    for (const word of ['coefficient', 'threshold', 'warning', 'winkler']) expect(text.toLowerCase()).not.toContain(word)
+    expect(rules((c) => (c.curvedBeamMinROverC = 1.2))).toEqual(['curvedBeamMinROverC unrecognized_keys'])
   })
 
   it('returns a deep-frozen fresh object', () => {
     expect(Object.isFrozen(ch)).toBe(true)
     expect(Object.isFrozen(ch.initialDesign)).toBe(true)
-    expect(Object.isFrozen(ch.designLimits.rootDepthM)).toBe(true)
+    expect(Object.isFrozen(ch.designLimits.thicknessM)).toBe(true)
+    expect(Object.isFrozen(ch.bolts)).toBe(true)
     expect(Object.isFrozen(ch.lockedFields)).toBe(true)
     expect(ch).not.toBe(bracketJson)
     expect(Object.isFrozen(bracketJson)).toBe(false)
@@ -158,7 +159,9 @@ describe('loadBracketChallenge: structural rejection', () => {
 
   it('rejects another model id or version, never falling back (MM-02)', () => {
     expect(rules((c) => (c.model = { id: 'circularShaftTorsion', version: 1 }))).toEqual(['model.id invalid_literal'])
-    expect(rules((c) => (c.model = { id: 'steppedBarBracket', version: 2 }))).toEqual(['model.version invalid_literal'])
+    expect(rules((c) => (c.model = { id: 'boltedLBracket', version: 2 }))).toEqual(['model.version invalid_literal'])
+    // The retired stepped-bar formulation never loads as this challenge (MM-01).
+    expect(rules((c) => (c.model = { id: 'steppedBarBracket', version: 1 }))).toEqual(['model.id invalid_literal'])
   })
 
   it('reports one issue per unknown key at any depth', () => {
@@ -166,16 +169,18 @@ describe('loadBracketChallenge: structural rejection', () => {
       rules((c) => {
         c.extra = 1
         at(c, 'material').shearModulusPa = 26e9
-        at(c, 'initialDesign').lengthM = 0.3
+        at(c, 'initialDesign').rootDepthM = 0.03
+        at(c, 'bolts').diameterM = 0.006
       }).sort(),
-    ).toEqual(['extra unrecognized_keys', 'initialDesign.lengthM unrecognized_keys', 'material.shearModulusPa unrecognized_keys'])
+    ).toEqual(['bolts.diameterM unrecognized_keys', 'extra unrecognized_keys', 'initialDesign.rootDepthM unrecognized_keys', 'material.shearModulusPa unrecognized_keys'])
   })
 
   it('rejects non-positive and non-finite numbers', () => {
-    expect(rules((c) => (c.thicknessM = 0))).toEqual(['thicknessM too_small'])
+    expect(rules((c) => (c.loadOffsetM = 0))).toEqual(['loadOffsetM too_small'])
     expect(rules((c) => (at(c, 'load').forceN = -1))).toEqual(['load.forceN too_small'])
-    expect(rules((c) => (at(c, 'constraints').maxPeakStressPa = Number.POSITIVE_INFINITY))).toEqual(['constraints.maxPeakStressPa not_finite'])
-    expect(rules((c) => (at(c, 'initialDesign').filletRadiusM = 0))).toEqual(['initialDesign.filletRadiusM too_small'])
+    expect(rules((c) => (at(c, 'constraints').maxBoltTensionN = Number.POSITIVE_INFINITY))).toEqual(['constraints.maxBoltTensionN not_finite'])
+    expect(rules((c) => (at(c, 'initialDesign').innerRadiusM = 0))).toEqual(['initialDesign.innerRadiusM too_small'])
+    expect(rules((c) => (at(c, 'bolts').count = 1.5))).toEqual(['bolts.count invalid_type'])
   })
 
   it('treats referenceDesign as optional', () => {
@@ -184,9 +189,9 @@ describe('loadBracketChallenge: structural rejection', () => {
   })
 
   it('rejects other supports, load placements and unknown locked fields', () => {
-    expect(rules((c) => (c.support = 'fixedRoot'))).toEqual(['support invalid_literal'])
-    expect(rules((c) => (at(c, 'load').location = 'midspan'))).toEqual(['load.location invalid_literal'])
-    expect(rules((c) => (c.lockedFields = ['lengthM', 'thicknessM', 'materialId', 'forceN', 'support', 'torqueNm']))).toEqual([
+    expect(rules((c) => (c.support = 'wallClamp'))).toEqual(['support invalid_literal'])
+    expect(rules((c) => (at(c, 'load').location = 'freeEnd'))).toEqual(['load.location invalid_literal'])
+    expect(rules((c) => (c.lockedFields = ['loadOffsetM', 'materialId', 'forceN', 'bolts', 'support', 'lengthM']))).toEqual([
       'lockedFields.5 invalid_enum_value',
     ])
   })
@@ -221,31 +226,35 @@ describe('loadBracketChallenge: cross-field rules', () => {
   const R = BRACKET_CROSS_FIELD_RULES
 
   it('rejects inverted ranges', () => {
-    expect(rules((c) => (at(c, 'designLimits.filletRadiusM').minM = 0.02))).toEqual([
-      `designLimits.filletRadiusM ${R.RANGE_MIN_GT_MAX}`,
-      // Both designs' radii are now below the inverted minimum.
-      `initialDesign.filletRadiusM ${R.DESIGN_INVALID}`,
-      `referenceDesign.filletRadiusM ${R.DESIGN_INVALID}`,
+    expect(rules((c) => (at(c, 'designLimits.widthM').minM = 0.13))).toEqual([
+      `designLimits.widthM ${R.RANGE_MIN_GT_MAX}`,
+      // Both designs' widths are now below the inverted minimum.
+      `initialDesign.widthM ${R.DESIGN_INVALID}`,
+      `referenceDesign.widthM ${R.DESIGN_INVALID}`,
     ])
   })
 
-  it('requires the step range to leave an arm before the tip', () => {
-    expect(rules((c) => (at(c, 'designLimits.stepLocationM').maxM = 0.3))).toEqual([`designLimits.stepLocationM ${R.STEP_BEYOND_LENGTH}`])
-    expect(rules((c) => (c.lengthM = 0.2))).toEqual([`designLimits.stepLocationM ${R.STEP_BEYOND_LENGTH}`])
+  it('requires the bolt row to clear the bend for every design in range', () => {
+    // 50 − 15 − (12 + 10) = 13 mm today; 37 mm of edge distance leaves nothing.
+    expect(rules((c) => (at(c, 'bolts').edgeDistanceM = 0.028))).toEqual([`designLimits.flangeHeightM ${R.BOLT_ROW_IN_BEND}`])
+    expect(load((c) => (at(c, 'bolts').edgeDistanceM = 0.027)).ok).toBe(true)
+    expect(rules((c) => (at(c, 'designLimits.innerRadiusM').maxM = 0.03))).toEqual([`designLimits.flangeHeightM ${R.BOLT_ROW_IN_BEND}`])
+  })
+
+  it('requires bending about the thin axis (width never below thickness)', () => {
+    expect(rules((c) => (at(c, 'designLimits.thicknessM').maxM = 0.045))).toEqual([
+      `designLimits.flangeHeightM ${R.BOLT_ROW_IN_BEND}`,
+      `designLimits.widthM ${R.WIDTH_BELOW_THICKNESS}`,
+    ])
   })
 
   it('requires designs to match the locked material and the dimension rules', () => {
     expect(rules((c) => (at(c, 'referenceDesign').materialId = 'steel'))).toEqual([`referenceDesign.materialId ${R.DESIGN_MATERIAL_MISMATCH}`])
-    expect(rules((c) => (at(c, 'initialDesign').armDepthM = 0.035))).toEqual([`initialDesign.armDepthM ${R.DESIGN_INVALID}`])
-    expect(rules((c) => (at(c, 'initialDesign').stepLocationM = 0.25))).toEqual([`initialDesign.stepLocationM ${R.DESIGN_INVALID}`])
+    expect(rules((c) => (at(c, 'initialDesign').flangeHeightM = 0.2))).toEqual([`initialDesign.flangeHeightM ${R.DESIGN_INVALID}`])
   })
 
-  it('accepts a uniform-bar initial design (d = D)', () => {
-    expect(load((c) => (at(c, 'initialDesign').armDepthM = 0.03)).ok).toBe(true)
-  })
-
-  it('requires every locked field (MBR-04)', () => {
-    expect(rules((c) => (c.lockedFields = ['lengthM', 'materialId', 'support']))).toEqual([
+  it('requires every locked field', () => {
+    expect(rules((c) => (c.lockedFields = ['loadOffsetM', 'materialId', 'support']))).toEqual([
       `lockedFields ${R.LOCKED_FIELD_MISSING}`,
       `lockedFields ${R.LOCKED_FIELD_MISSING}`,
     ])

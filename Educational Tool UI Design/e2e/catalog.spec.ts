@@ -20,7 +20,7 @@ async function fill(page: Page, label: string, value: string) {
 
 const ENTRIES: Entry[] = [
   { title: 'Cantilever Beam I', id: 'cantilever-beam-1', edit: (page) => referenceDesign(page) },
-  { title: 'Mounting Bracket I', id: 'mounting-bracket-1', edit: (page) => fill(page, 'Step location', '175') },
+  { title: 'Mounting Bracket I', id: 'mounting-bracket-1', edit: (page) => fill(page, 'Flange height', '85') },
   {
     title: 'Torsion Shaft I',
     id: 'torsion-shaft-1',
@@ -73,6 +73,7 @@ test('all six original challenges keep separate saved work in one browser profil
   expect(catalog.filter((e) => e.available).map((e) => e.title).sort()).toEqual(ENTRIES.map((e) => e.title).sort())
   await page.goto('/')
   const saved = new Map<string, { draft: unknown; history: unknown }>()
+  const versions = new Map<string, number>()
   for (const entry of ENTRIES) {
     await open(page, entry)
     await entry.edit(page)
@@ -82,11 +83,14 @@ test('all six original challenges keep separate saved work in one browser profil
     expect(state.mode).toBe('parametric')
     expect(state.history).toHaveLength(2)
     saved.set(entry.id, { draft: state.draft, history: state.history })
+    versions.set(entry.id, state.challengeVersion)
     await toLibrary(page)
   }
 
   const keys = await page.evaluate(() => Object.keys(window.localStorage).filter((k) => k.startsWith('ei:session:')).sort())
-  expect(keys).toEqual(ENTRIES.map((e) => `ei:session:${e.id}:v1`).sort())
+  // Each key carries its own challenge's current version (Mounting Bracket I is version 2, task 55).
+  expect(keys).toEqual(ENTRIES.map((e) => `ei:session:${e.id}:v${versions.get(e.id)}`).sort())
+  expect(versions.get('mounting-bracket-1')).toBe(2)
 
   await page.reload()
   for (const entry of ENTRIES) {

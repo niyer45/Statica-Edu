@@ -1,29 +1,37 @@
 import type { BracketDesign } from '../../geometry/bracket/design'
 import type { Difficulty, InteractionMode, ParamRange } from '../types'
 
-// Mounting Bracket I challenge configuration types (task 46.2; mounting-bracket-1 MBR-01–MBR-10,
-// multi-model-architecture MM-01/MM-02). Independent of the beam `Challenge` type, which is
-// unchanged. Shared value types (Difficulty, InteractionMode, ParamRange, SchemaIssue, Result)
-// are reused from ../types. The Kt coefficient table, its validity condition, the branch rule and
-// the screen thresholds are model constants (physics/bracket/constants.ts), never configuration
-// (MBR-13).
+// Mounting Bracket I challenge configuration types (task 55 L-bracket rebuild; replaces the
+// task 46.2 stepped-bar configuration; multi-model-architecture MM-01/MM-02/MM-04). Independent
+// of the beam `Challenge` type, which is unchanged. Shared value types (Difficulty,
+// InteractionMode, ParamRange, SchemaIssue, Result) are reused from ../types. The curved-beam
+// validity limit and the screen thresholds are model constants (physics/bracket/constants.ts),
+// never configuration.
+//
+// The bracket is a bolted L (angle) bracket: a vertical flange lies flat against the wall and is
+// held by one row of bolts across its width; a horizontal arm leaves the bend at the bottom of
+// the flange and carries a hanging load at a fixed distance from the wall.
 
-/** The bracket model identity; every bracket config declares it explicitly (MM-02). */
-export const BRACKET_MODEL_REF = Object.freeze({ id: 'steppedBarBracket', version: 1 } as const)
+/**
+ * The bracket model identity; every bracket config declares it explicitly (MM-02). A new id, not
+ * a new version of `steppedBarBracket`, because ids are never reused for a different formulation
+ * (MM-01).
+ */
+export const BRACKET_MODEL_REF = Object.freeze({ id: 'boltedLBracket', version: 1 } as const)
 
 export type BracketModelId = (typeof BRACKET_MODEL_REF)['id']
 
 /**
- * Fields the student can never change (MBR-04). `materialId` is a design field; length,
- * thickness, force and support are challenge constants, so no design can change them.
+ * Fields the student can never change. `materialId` is a design field; the load offset, force,
+ * bolts and support are challenge constants, so no design can change them.
  */
-export type BracketLockedField = 'lengthM' | 'thicknessM' | 'materialId' | 'forceN' | 'support'
+export type BracketLockedField = 'loadOffsetM' | 'materialId' | 'forceN' | 'bolts' | 'support'
 
 export const BRACKET_LOCKED_FIELDS: readonly BracketLockedField[] = Object.freeze([
-  'lengthM',
-  'thicknessM',
+  'loadOffsetM',
   'materialId',
   'forceN',
+  'bolts',
   'support',
 ] as const)
 
@@ -38,12 +46,12 @@ export interface BracketMaterial {
   yieldStressPa: number
 }
 
-/** Ranges of the four adjustable dimensions (MBR-05). `stepM` is the control grid. */
+/** Ranges of the four adjustable dimensions. `stepM` is the control grid. */
 export interface BracketDesignLimits {
-  rootDepthM: ParamRange
-  armDepthM: ParamRange
-  stepLocationM: ParamRange
-  filletRadiusM: ParamRange
+  thicknessM: ParamRange
+  widthM: ParamRange
+  flangeHeightM: ParamRange
+  innerRadiusM: ParamRange
 }
 
 export interface BracketChallenge {
@@ -56,23 +64,29 @@ export interface BracketChallenge {
   allowedModes: InteractionMode[]
   statement: string
   material: BracketMaterial
-  /** Cantilever length L from the wall clamp to the tip force, m. */
-  lengthM: number
-  /** Out-of-plane thickness b, m. */
-  thicknessM: number
-  /** Rigid wall clamp at x = 0. */
-  support: 'wallClamp'
-  /** Static tip force at the free end, in the plane of the depth. */
-  load: { forceN: number; location: 'freeEnd'; direction: 'down' }
+  /** Horizontal distance a from the wall face to the load line, m. */
+  loadOffsetM: number
+  /** Arm length beyond the load line, m. Adds mass; no other effect. */
+  tipOverhangM: number
+  /**
+   * One row of `count` bolts across the flange width, at `edgeDistanceM` below the top of the
+   * flange. The bolts share the overturning tension equally.
+   */
+  bolts: { count: number; edgeDistanceM: number }
+  /** The flange is bolted flat to a rigid wall; it bears on the wall at its heel. */
+  support: 'boltedWall'
+  /** Static vertical force hanging from the arm at the load line, spread across the arm width. */
+  load: { forceN: number; location: 'loadLine'; direction: 'down' }
   initialDesign: BracketDesign
-  /** Test fixture / instructor demo only, never shown to students (MBR-06). */
+  /** Test fixture / instructor demo only, never shown to students. */
   referenceDesign?: BracketDesign
   lockedFields: BracketLockedField[]
   constraints: {
-    maxPeakStressPa: number
-    maxTipDeflectionM: number
+    maxBendStressPa: number
+    maxDeflectionM: number
+    /** Allowable tension per bolt, N. */
+    maxBoltTensionN: number
     maxMassKg: number
-    maxEnvelopeDepthM: number
   }
   designLimits: BracketDesignLimits
   /** 1-based, non-baseline iteration numbers. */

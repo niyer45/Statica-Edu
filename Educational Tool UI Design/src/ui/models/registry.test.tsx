@@ -91,11 +91,11 @@ describe('model UI registry', () => {
       ['circularShaftTorsion', torsionUi],
       ['sdofBaseIsolation', vibrationUi],
       ['plateFinHeatSink', heatSinkUi],
-      ['steppedBarBracket', bracketUi],
+      ['boltedLBracket', bracketUi],
       ['pinJointedBracedFrame', bracedFrameUi],
     ])
-    expect(modelUiFor({ id: 'steppedBarBracket', version: 1 })).toBe(bracketUi)
-    expect(bracketUi.copy.prediction.title).toBe('Predict peak stress')
+    expect(modelUiFor({ id: 'boltedLBracket', version: 1 })).toBe(bracketUi)
+    expect(bracketUi.copy.prediction.title).toBe('Predict bend stress')
   })
 
   it('keeps the beam wording unchanged and registers no UI for models without one', () => {

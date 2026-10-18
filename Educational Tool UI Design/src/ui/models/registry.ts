@@ -28,7 +28,7 @@ export function defaultModelUis(): ReadonlyMap<string, ModelUi> {
     ['circularShaftTorsion', torsionUi],
     ['sdofBaseIsolation', vibrationUi],
     ['plateFinHeatSink', heatSinkUi],
-    ['steppedBarBracket', bracketUi],
+    ['boltedLBracket', bracketUi],
     ['pinJointedBracedFrame', bracedFrameUi],
   ])
   return defaults
