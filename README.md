@@ -47,24 +47,26 @@ The dotted deformation outline represents the **latest tested design**. Editing 
 
 ## In development and planned
 
-**Priority: complete the six challenges already displayed in the library before second editions.** Cantilever Beam I works today; Mounting Bracket I, Torsion Shaft I, Heat Sink I, Braced Frame I and Vibration Isolation I each need scoped, validated models and complete learning-loop integration. Their scoped requirements, proposed models and delivery order (Torsion Shaft → Vibration Isolation → Heat Sink → Mounting Bracket → Braced Frame) are specified in `.kiro/specs/original-catalog/`; none is implemented yet. The shared multi-model architecture (task 45.2) is specified in `.kiro/specs/multi-model-architecture/`; next is task 34.1, implementing its registry and per-challenge integration. See the [catalog roadmap](Educational%20Tool%20UI%20Design/CATALOG_ROADMAP.md).
+**Priority: complete the six challenges already displayed in the library before second editions.** Cantilever Beam I and Torsion Shaft I work today. Mounting Bracket I, Heat Sink I, Braced Frame I and Vibration Isolation I have implemented, numerically verified models, but their workbenches are not integrated yet. Their scoped requirements, proposed models and delivery order (Torsion Shaft → Vibration Isolation → Heat Sink → Mounting Bracket → Braced Frame) are specified in `.kiro/specs/original-catalog/`; none is implemented yet. The shared multi-model architecture (task 45.2) is specified in `.kiro/specs/multi-model-architecture/`; next is task 34.1, implementing its registry and per-challenge integration. See the [catalog roadmap](Educational%20Tool%20UI%20Design/CATALOG_ROADMAP.md).
 
 | Area | Status |
 | --- | --- |
 | Cantilever Beam II | Configuration and domain tests are retained, but further development is **deferred until the original six catalog challenges are implemented**. It is not available in the UI. |
 | Engineering and student QA | Review plan and pilot materials are prepared. Owner engineering review, manual accessibility/readiness checks and actual student sessions remain open before customer deployment. |
 | Guided / Parametric distinction | Implemented and browser-verified: staged Guided instructions/optional hints versus direct Parametric editing, sharing controls, predictions and results. Owner manual release QA remains open under 44.3. |
-| Multiple challenge workspaces | Planned integration with separate saved sessions and correctly attributed results for each challenge |
+| Multiple challenge workspaces | Implemented: each challenge has its own saved session, mode and history, and My designs attributes each workspace to its challenge |
 | User accounts and saved information | Planned authentication, minimal profile information, owned projects and cross-device resume |
 | Challenge completion history | Planned per-user, per-challenge progress with explicit completion rules and versioned evidence |
 | Freeform design and advanced physics | Future scoped extensions requiring their own specifications, benchmarks and validation |
 | Optional AI learning assistance | Future coaching capability; deterministic numerical analysis remains authoritative |
 
-Bracket, torsion, thermal, frame and vibration cards are concept previews. Their presence in the library does not mean their physics or challenges are implemented. Freeform mode is also unavailable.
+The bracket, heat-sink, frame and vibration cards are still previews: their models exist in code but cannot be opened until each workbench is integrated and verified. Freeform mode is also unavailable.
 
 ## Model and storage limits
 
-The current solver uses an idealized **Euler–Bernoulli cantilever beam with a downward point load at its free end**, a rigid fixed root and an educational nominal aluminum material. Span, material, load and support are fixed by the challenge; students redesign the cross-section.
+Torsion Shaft I uses an idealized **linear-elastic torsion model of a solid or hollow circular shaft** (fixed end, steady torque). It does not model rotating dynamics, fatigue, combined loading, stress concentrations at keyways or shoulders, or thin-wall torsional buckling beyond a screen.
+
+Cantilever Beam I uses an idealized **Euler–Bernoulli cantilever beam with a downward point load at its free end**, a rigid fixed root and an educational nominal aluminum material. Span, material, load and support are fixed by the challenge; students redesign the cross-section.
 
 The model does not account for effects such as shear deformation, local or lateral-torsional buckling, plasticity, root stress concentrations, joint compliance or self-weight. Applicability checks flag unsupported regimes. **Accepted means the design meets this educational model's constraints; it is not approval for real-world construction.**
 

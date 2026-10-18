@@ -46,7 +46,12 @@ export default function StoreProvider({
     const notices: string[] = []
     const persistence = storage ? createPersistenceWith(runtime, challenge, storage, (message) => notices.push(message)) : undefined
     let state = persistence?.load(initialSession) ?? initialSession
-    if (initialMode !== undefined && isModeAllowed(challenge, initialMode)) state = { ...state, mode: initialMode }
+    if (initialMode !== undefined && isModeAllowed(challenge, initialMode) && state.mode !== initialMode) {
+      // A pre-entry mode choice applies from the first render and is saved at once, so a reload
+      // keeps it even before any other action (D-37, MODE-06).
+      state = { ...state, mode: initialMode }
+      persistence?.save(state, clock())
+    }
     const message = notices.pop()
     notices.length = 0
     if (message) state = { ...state, ui: { ...state.ui, notice: { kind: 'error', message } } }

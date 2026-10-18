@@ -125,10 +125,11 @@ describe('toStudentChallenge (Req 3.7)', () => {
 })
 
 describe('catalog', () => {
-  it('lists the six template challenges with only cantilever-beam-1 available', () => {
+  it('lists the six template challenges with Cantilever Beam I and Torsion Shaft I available', () => {
     expect(catalog.map((c) => c.id)).toEqual(['001', '002', '003', '004', '005', '006'])
     const available = catalog.filter((c) => c.available)
-    expect(available).toHaveLength(1)
+    expect(available).toHaveLength(2)
+    expect(available[1]).toMatchObject({ id: '003', title: 'Torsion Shaft I', challengeId: 'torsion-shaft-1', difficulty: 'intermediate' })
     expect(available[0]).toMatchObject({ title: 'Cantilever Beam I', challengeId: CANTILEVER_BEAM_1_ID })
     expect(available[0].title).toBe(bundled().title)
     expect(available[0].difficulty).toBe(bundled().difficulty)

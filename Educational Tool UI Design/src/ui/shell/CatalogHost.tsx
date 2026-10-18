@@ -83,6 +83,7 @@ export default function CatalogHost({ runnable, entries, storage = null, clock, 
       key={current.challenge.id}
       challenge={current.challenge}
       initialSession={current.session}
+      initialMode={active.mode}
       runtime={current.runtime}
       storage={store}
       clock={clock}

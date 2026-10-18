@@ -46,8 +46,10 @@ describe('PlatformShell', () => {
     expect(document.title).toBe('Statica')
     expect(screen.getAllByRole('button', { name: 'Statica home' }).length).toBeGreaterThan(0)
     for (const c of catalog) expect(screen.getByRole('button', { name: `View ${c.title}` })).toBeTruthy()
-    const previews = catalog.filter((c) => !c.available).length
-    expect(screen.getAllByText('Planned challenge')).toHaveLength(previews)
+    // This harness mounts one store without the host's other challenges, so only its own
+    // available entry is runnable; CatalogHost supplies the others in the app.
+    const notRunnableHere = catalog.filter((c) => !(c.available && c.challengeId === 'cantilever-beam-1')).length
+    expect(screen.getAllByText('Planned challenge')).toHaveLength(notRunnableHere)
     // Workbench is mounted but hidden on the library page.
     expect(host().hidden).toBe(true)
     expect(host().querySelector('.workbench')).not.toBeNull()

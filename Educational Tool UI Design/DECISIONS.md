@@ -178,3 +178,9 @@ Owner selections, each the recommended option, recorded in `.kiro/specs/mounting
 - **K-5:** Constants, limits and "peak elastic stress ≤ allowable" wording approved; step and fillet controls stay editable for a uniform bar.
 
 46.2 is unblocked. This is not engineering sign-off of constants (29.2) and activates nothing.
+
+## D-42: Torsion Shaft I activated in the library (2026-10-17)
+
+The owner explicitly approved activation after the permission system flagged it. Torsion Shaft I (catalog card 003, `torsion-shaft-1`, model `circularShaftTorsion` v1) is bundled and openable from the library through its own runtime and UI registry entry. This supersedes D-20's "only Cantilever Beam I is runnable" for this card. The completed MVP design text of D-20 is left unchanged as history.
+
+Activation followed the integrated gates: component tests through the production registry, and desktop/Pixel 7 browser cases for Guided keyboard entry and Parametric, covering prediction-to-Accepted, axe, 320 px, reload persistence and challenge isolation. The primary view is a main-bundle SVG shaft elevation rather than the 3D shaft TSH-14 suggested. This is repository/local availability, not customer deployment. Owner engineering review of the torsion constants, wording and references (29.2) and manual/student QA remain required before release. The other four preview cards stay unavailable until their own 4x.3.

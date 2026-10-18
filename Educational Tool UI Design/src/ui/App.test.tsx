@@ -16,7 +16,7 @@ describe('bootCatalog (task 34.1 step 2; MM-06)', () => {
   it('boots only available entries, in catalog order', () => {
     const r = bootCatalog(catalog, clock, newId)
     if (!r.ok) throw new Error(r.error.message)
-    expect(r.value.map((x) => x.challenge.id)).toEqual(['cantilever-beam-1'])
+    expect(r.value.map((x) => x.challenge.id)).toEqual(['cantilever-beam-1', 'torsion-shaft-1'])
   })
 
   it('fails when an available entry has no loadable bundled challenge', () => {

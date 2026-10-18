@@ -1,12 +1,12 @@
 # Original catalog development priority
 
-Owner direction, 2026-10-16 (D-35): complete the six existing library challenges before second editions. Only Cantilever Beam I is currently runnable. No additional card is activated by this planning update.
+Owner direction, 2026-10-16 (D-35): complete the six existing library challenges before second editions. Cantilever Beam I and, since 2026-10-17 (D-42), Torsion Shaft I are runnable; the other four cards stay unavailable until their own integration track is verified and the owner approves activation.
 
 | Existing card | Current status | Development work |
 | --- | --- | --- |
 | Cantilever Beam I | Implemented learning loop | Guided/Parametric distinction implemented and CI verified; preserve regressions and complete manual release-mode QA (44.3) |
 | Mounting Bracket I | Preview only | Scope supported geometry/load paths and stress assumptions; implement/benchmark appropriate model and integrate (46) |
-| Torsion Shaft I | Preview only | Scope torsional deformation/stress, implement/benchmark appropriate shaft model and integrate (47) |
+| Torsion Shaft I | **Runnable (D-42)** | Scope torsional deformation/stress, implement/benchmark appropriate shaft model and integrate (47) |
 | Heat Sink I | Preview only | Scope thermal assumptions/boundaries, implement/benchmark heat-transfer model and integrate (48) |
 | Braced Frame I | Preview only | Scope joint/member/support idealization, implement/benchmark frame/truss model and integrate (49) |
 | Vibration Isolation I | Preview only | Scope excitation/damping/response, implement/benchmark appropriate dynamics model and integrate (50) |
@@ -15,7 +15,7 @@ Owner direction, 2026-10-16 (D-35): complete the six existing library challenges
 
 | Order | Card | Proposed bounded model | Open owner decision |
 | --- | --- | --- | --- |
-| 1 | Torsion Shaft I (47) | Circular solid/tube Saint-Venant torsion: twist, shear stress, mass, OD packaging; 47.1–47.2 done; 47.3 workbench UI built, activation awaiting owner approval | — |
+| 1 | Torsion Shaft I (47) | Circular solid/tube Saint-Venant torsion: twist, shear stress, mass, OD packaging; 47 complete; **runnable** (owner-approved activation, D-42) | — |
 | 2 | Vibration Isolation I (50) | Single-DOF base-excited spring/viscous damper, steady-state transmissibility, static sag, resonance peak; 50.1 specified; 50.2 model implemented | — |
 | 3 | Heat Sink I (48) | Steady plate-fin conduction/convection, fin and surface efficiency, specified effective h with minimum gap; 48.1 specified; 48.2 model implemented | Resolved: D-40 |
 | 4 | Mounting Bracket I (46) | Stepped flat-bar nominal bending with a published shoulder-fillet Kt fit; stepped-cantilever deflection 46.1 specified; 46.2 model implemented | Resolved: D-40, D-41 (printed-source Kt check deferred to owner QA) |
