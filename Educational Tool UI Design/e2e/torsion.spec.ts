@@ -4,6 +4,8 @@ import { audit, readState, tabTo } from './helpers'
 // Torsion Shaft I (task 47.3; TSH-14–TSH-16, MM-16, MM-22): chosen before entry from the
 // library, full prediction/test loop to an Accepted hollow shaft, saved under its own key,
 // isolated from Cantilever Beam I, keyboard-reachable, axe-clean and free of 320 px overflow.
+// Task 54.2: Guided runs with WebGL and shows the lazy 3D shaft; Parametric runs with WebGL
+// disabled and shows the main-bundle SVG fallback with no canvas.
 
 async function openTorsion(page: Page, mode: 'Guided' | 'Parametric', keyboard: boolean) {
   const view = page.getByRole('button', { name: 'View Torsion Shaft I', exact: true })
@@ -44,8 +46,24 @@ async function noHorizontalOverflow(page: Page) {
 for (const mode of ['Guided', 'Parametric'] as const) {
   test(`Torsion Shaft I ${mode}: test an Accepted hollow shaft, persist it and keep it isolated`, async ({ page }) => {
     test.setTimeout(90_000) // Keyboard entry, prediction, reload, cross-challenge check and axe.
+    if (mode === 'Parametric') {
+      await page.addInitScript(() => { Object.defineProperty(window, 'WebGL2RenderingContext', { configurable: true, value: undefined }) })
+    }
     await page.goto('/')
     await openTorsion(page, mode, mode === 'Guided')
+    const shaftSvg = page.getByRole('img', { name: /cross-section and side view/ })
+    if (mode === 'Guided') {
+      // The lazy chunk loads, then software WebGL creates the renderer and names the canvas. Like
+      // the beam helpers, scrolling to the named canvas waits for that before asserting it.
+      const canvas = page.getByRole('img', { name: '3D shaft view', exact: true })
+      await canvas.scrollIntoViewIfNeeded()
+      await expect(canvas).toBeVisible()
+      await expect(page.locator('canvas')).toHaveCount(1)
+      await expect(shaftSvg).toHaveCount(0)
+    } else {
+      await expect(shaftSvg).toBeVisible()
+      await expect(page.locator('canvas')).toHaveCount(0)
+    }
     const initial = await readState(page)
     expect(initial.challengeId).toBe('torsion-shaft-1')
     expect(initial.mode).toBe(mode.toLowerCase())

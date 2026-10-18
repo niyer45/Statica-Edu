@@ -28,3 +28,17 @@ export const SHAFT_PARAM_LABELS: Readonly<Record<string, string>> = {
   outerDiameterM: 'Outer diameter',
   innerDiameterM: 'Inner diameter',
 }
+
+/**
+ * Display-only twist (TSH-14): the stored, latest tested angle × the configured exaggeration,
+ * capped at `maxVisualTwistRad`. Shared by the SVG fallback and the 3D shaft (task 54.2) so
+ * both draw the same angle. `capped` reports whether the cap was applied.
+ */
+export function displayedTwist(
+  testedRad: number,
+  visualization: Readonly<StudentTorsionChallenge['visualization']>,
+): { shownRad: number; capped: boolean } {
+  const scaled = testedRad * visualization.twistExaggerationFactor
+  const shownRad = Math.min(scaled, visualization.maxVisualTwistRad)
+  return { shownRad, capped: shownRad < scaled }
+}
