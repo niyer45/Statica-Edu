@@ -24,7 +24,7 @@ it('restore copies known snapshots without changing history and reproduces analy
           deepStrictEqual(after.history[after.history.length - 1]!.analysis, restoredAnalysis)
           restoredAnalysis = undefined
         }
-      } else if (['applySection', 'setParam', 'setOrientation', 'importDesign', 'reset'].includes(action.type)) {
+      } else if (['applySection', 'setParam', 'setOrientation', 'importDesign', 'reset', 'resetDraft'].includes(action.type)) {
         restoredAnalysis = undefined
       }
     }

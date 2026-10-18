@@ -3,6 +3,9 @@ import { useModelUi } from '../models/registry'
 import { useStore } from '../state/store'
 import { STATUS_LABELS } from '../panels/resultPresentation'
 
+/** Task 60: spoken and shown once after Reset to baseline replaces the draft. */
+export const RESET_DRAFT_ANNOUNCEMENT = 'Design reset to the baseline. Tested history is unchanged.'
+
 export const AnnounceContext = createContext<(message: string) => void>(() => {})
 export const useAnnounce = () => useContext(AnnounceContext)
 /** Mounted by App's Workbench, the owner of its single persistent live region and toast. */
@@ -20,6 +23,8 @@ export function useAnnouncements(announce: (message: string) => void) {
     } else if (lastAction?.type === 'restore' && state !== before) {
       const result = state.history.find((r) => r.id === lastAction.testResultId)
       if (result) announce(`Restored ${result.iteration === 0 ? 'Baseline' : `iteration ${result.iteration}`}.`)
+    } else if (lastAction?.type === 'resetDraft' && state !== before) {
+      announce(RESET_DRAFT_ANNOUNCEMENT)
     } else if (lastAction && announceEdit && state.draftErrors.length === 0 && state !== before && announceEdit(state, lastAction) !== undefined) {
       announce(announceEdit(state, lastAction)!)
     } else if (lastAction?.type === 'runTest' && state.draftErrors.length) {

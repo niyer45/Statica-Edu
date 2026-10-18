@@ -344,3 +344,8 @@
   .frame-tools .dimensions-heading { margin: 16px 0 10px; }
   .frame-metrics .metric { flex: 1 1 40%; }
 }
+/* Reset to baseline (task 60): one shared row under the Design tools title for every model. */
+.reset-baseline { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding: 10px 15px; border-bottom: 1px solid var(--line); }
+.reset-baseline .reset-baseline-button { color: #345640; border-color: #8a977d; font-size: 10px; padding: 6px 10px; }
+.reset-baseline .reset-baseline-button[aria-disabled='true'] { cursor: not-allowed; color: #5f6a56; border-color: #dce1d4; }
+.reset-baseline-note { font-size: 9px; color: #5f6a56; }
