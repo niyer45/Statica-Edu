@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
+import { readFileSync } from 'node:fs'
 import { catalog } from '../src/challenge/catalog'
 import { readState, referenceDesign } from './helpers'
 
@@ -20,7 +21,7 @@ async function fill(page: Page, label: string, value: string) {
 
 const ENTRIES: Entry[] = [
   { title: 'Cantilever Beam I', id: 'cantilever-beam-1', edit: (page) => referenceDesign(page) },
-  { title: 'Mounting Bracket I', id: 'mounting-bracket-1', edit: (page) => fill(page, 'Step location', '175') },
+  { title: 'Mounting Bracket I', id: 'mounting-bracket-1', edit: (page) => fill(page, 'Flange height', '85') },
   {
     title: 'Torsion Shaft I',
     id: 'torsion-shaft-1',
@@ -73,6 +74,7 @@ test('all six original challenges keep separate saved work in one browser profil
   expect(catalog.filter((e) => e.available).map((e) => e.title).sort()).toEqual(ENTRIES.map((e) => e.title).sort())
   await page.goto('/')
   const saved = new Map<string, { draft: unknown; history: unknown }>()
+  const versions = new Map<string, number>()
   for (const entry of ENTRIES) {
     await open(page, entry)
     await entry.edit(page)
@@ -82,11 +84,16 @@ test('all six original challenges keep separate saved work in one browser profil
     expect(state.mode).toBe('parametric')
     expect(state.history).toHaveLength(2)
     saved.set(entry.id, { draft: state.draft, history: state.history })
+    versions.set(entry.id, state.challengeVersion)
     await toLibrary(page)
   }
 
   const keys = await page.evaluate(() => Object.keys(window.localStorage).filter((k) => k.startsWith('ei:session:')).sort())
-  expect(keys).toEqual(ENTRIES.map((e) => `ei:session:${e.id}:v1`).sort())
+  // Each key carries that challenge's own content version (a content change bumps it, MM-04),
+  // and the live session reports the same version.
+  const version = (id: string) => (JSON.parse(readFileSync(new URL(`../src/challenge/challenges/${id}.json`, import.meta.url), 'utf8')) as { version: number }).version
+  for (const e of ENTRIES) expect(versions.get(e.id)).toBe(version(e.id))
+  expect(keys).toEqual(ENTRIES.map((e) => `ei:session:${e.id}:v${version(e.id)}`).sort())
 
   await page.reload()
   for (const entry of ENTRIES) {

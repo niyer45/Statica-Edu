@@ -34,7 +34,8 @@ describe('loadTorsionChallenge: bundled-format config', () => {
 
   it('defines the identity and learning settings (TSH-01, TSH-08, TSH-09)', () => {
     expect(ch.id).toBe('torsion-shaft-1')
-    expect(ch.version).toBe(1)
+    // Version 2 (task 59): the baseline changed, so saves move to a new storage key (MM-04).
+    expect(ch.version).toBe(2)
     expect(ch.title).toBe('Torsion Shaft I')
     expect(ch.model).toEqual(TORSION_MODEL_REF)
     expect(ch.difficulty).toBe('intermediate')
@@ -67,7 +68,7 @@ describe('loadTorsionChallenge: bundled-format config', () => {
       tube: { outerDiameterM: { minM: 0.015, maxM: 0.06, stepM: 0.0005 }, minWallM: 0.002 },
     })
     expect(ch.sectionDefaults).toEqual({ tubeWallM: 0.004 })
-    expect(ch.initialDesign.section).toEqual({ kind: 'circle', diameterM: 0.03 })
+    expect(ch.initialDesign.section).toEqual({ kind: 'circle', diameterM: 0.0265 })
     expect(ch.referenceDesign?.section).toEqual({ kind: 'tube', outerDiameterM: 0.05, innerDiameterM: 0.044 })
   })
 
@@ -212,7 +213,7 @@ describe('loadTorsionChallenge: cross-field rules', () => {
   it('rejects inverted ranges', () => {
     expect(rules((c) => (at(c, 'sectionLimits.circle.diameterM').minM = 0.07))).toEqual([
       `sectionLimits.circle.diameterM ${R.RANGE_MIN_GT_MAX}`,
-      // The baseline (D = 30 mm) is now below the inverted minimum.
+      // The baseline (D = 26.5 mm) is now below the inverted minimum.
       `initialDesign.section.diameterM ${R.DESIGN_INVALID}`,
     ])
     expect(rules((c) => (at(c, 'sectionLimits.tube.outerDiameterM').minM = 0.07))).toEqual([

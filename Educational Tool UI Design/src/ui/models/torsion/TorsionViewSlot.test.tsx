@@ -57,7 +57,7 @@ describe('Torsion design view slot (task 54.2)', () => {
     expect(screen.queryByText(VIEWPORT_LOADING_TEXT)).toBeNull()
     expect(screen.queryByTestId('mock-3d')).toBeNull()
     expect(document.querySelector('canvas')).toBeNull()
-    expect(screen.getByText(/latest tested twist 2\.92°/)).toBeTruthy()
+    expect(screen.getByText(/latest tested twist 4\.79°/)).toBeTruthy()
     expect(notify.mock.calls).toEqual([[FALLBACK_NOTICE]])
     expect(store.state).toBe(before)
   })
@@ -78,7 +78,7 @@ describe('Torsion design view slot (task 54.2)', () => {
     expect(canvas.tabIndex).toBe(0)
     // The description is the visible text summary below the canvas, not on the model (D-26).
     const summary = document.getElementById(TORSION_SUMMARY_ID)!
-    expect(summary.textContent).toMatch(/^Solid shaft · outer 30\.0 mm · latest tested twist 2\.92° \(shown ×10, 29\.2° drawn\)$/)
+    expect(summary.textContent).toMatch(/^Solid shaft · outer 26\.5 mm · latest tested twist 4\.79° \(shown ×10, 47\.9° drawn\)$/)
     expect(screen.getByTestId('mock-3d').contains(summary)).toBe(false)
     expect(notify).not.toHaveBeenCalled()
   })

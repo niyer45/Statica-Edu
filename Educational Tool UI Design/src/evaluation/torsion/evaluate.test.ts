@@ -72,11 +72,19 @@ describe('evaluateShaft', () => {
     expect(Object.isFrozen(e.constraints[0])).toBe(true)
   })
 
-  it('gives the baseline a negative twist margin and twist as its only failure', () => {
-    const { e } = run('baseline')
+  it('gives the Ø30 solid a negative twist margin and twist as its only failure', () => {
+    const { e } = run('solid30')
     expect(e.failures).toEqual(['twist'])
     expect(e.efficiency.twistMargin).toBeLessThan(0)
     expect(e.efficiency.stressMargin).toBeGreaterThan(0)
+  })
+
+  it('gives the baseline negative twist and stress margins, failing both', () => {
+    const { e } = run('baseline')
+    expect(e.status).toBe('notAccepted')
+    expect(e.failures).toEqual(['twist', 'shearStress'])
+    expect(e.efficiency.twistMargin).toBeLessThan(0)
+    expect(e.efficiency.stressMargin).toBeLessThan(0)
   })
 
   it('is modelNotApplicable, never Accepted, when the model does not apply', () => {

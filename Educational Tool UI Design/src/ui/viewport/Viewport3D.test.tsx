@@ -15,9 +15,9 @@ function Probe() {
   return (
     <>
       <button
-        onClick={() => dispatch({ type: 'applySection', kind: 'iSection' })}
+        onClick={() => dispatch({ type: 'applySection', kind: 'rectangle' })}
       >
-        Apply I-section
+        Apply rectangle
       </button>
       <button
         onClick={() =>
@@ -32,7 +32,7 @@ function Probe() {
         Set web
       </button>
       <button
-        onClick={() => dispatch({ type: 'setOrientation', orientationDeg: 90 })}
+        onClick={() => dispatch({ type: 'setOrientation', orientationDeg: 0 })}
       >
         Rotate
       </button>
@@ -60,17 +60,24 @@ describe('viewport presentation (task 14.3)', () => {
   it('keeps the summary synchronized with typed geometry, orientation and stored results', () => {
     setup()
     const summary = () => screen.getByTestId('scene-summary').textContent
-    expect(summary()).toContain('Circle, orientation 0°')
-    expect(summary()).toContain('Diameter 30.00 mm')
+    // The baseline is an I-section turned 90° (task 59).
+    expect(summary()).toContain('I-section, orientation 90°')
+    expect(summary()).toContain('Width 36.50 mm')
+    expect(summary()).toContain('Height 84.00 mm')
+    expect(summary()).toContain('Flange thickness 3.00 mm')
+    expect(summary()).toContain('Web thickness 7.00 mm')
     expect(summary()).toContain('600 mm')
     expect(summary()).toContain('300 N downward')
     const storedShape = summary()!.split('Deformed shape shows')[1]
-    fireEvent.click(screen.getByText('Apply I-section'))
     fireEvent.click(screen.getByText('Set web'))
     fireEvent.click(screen.getByText('Rotate'))
-    expect(summary()).toContain('I-section, orientation 90°')
-    expect(summary()).toContain('Flange thickness 4.00 mm')
+    expect(summary()).toContain('I-section, orientation 0°')
+    expect(summary()).toContain('Flange thickness 3.00 mm')
     expect(summary()).toContain('Web thickness 6.00 mm')
+    fireEvent.click(screen.getByText('Apply rectangle'))
+    expect(summary()).toContain('Rectangle, orientation 0°')
+    expect(summary()).toContain('Width 36.50 mm')
+    expect(summary()).toContain('Height 84.00 mm')
     expect(summary()!.split('Deformed shape shows')[1]).toBe(storedShape)
   })
 

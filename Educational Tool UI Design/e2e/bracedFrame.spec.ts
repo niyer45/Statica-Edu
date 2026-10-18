@@ -83,8 +83,15 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     const initial = await readState(page)
     expect(initial.challengeId).toBe('braced-frame-1')
     expect(initial.mode).toBe(mode.toLowerCase())
-    const requirements = page.getByRole('list', { name: 'Design requirements' })
-    await expect(requirements.getByText('337.2%', { exact: true })).toBeVisible()
+    // Task 56: the goal card at the top of the design view states the goal and the four checks.
+    const goal = page.getByRole('region', { name: 'Goal', exact: true })
+    await expect(goal.getByText('Brace and size the frame so every check passes.', { exact: true })).toBeVisible()
+    await expect(goal.getByText('1 of 4 pass', { exact: true })).toBeVisible()
+    const requirements = goal.getByRole('list', { name: 'Design requirements' })
+    // The baseline fails roof drift, member utilization and mass (task 59).
+    await expect(requirements.getByText('12.61 mm', { exact: true })).toBeVisible()
+    await expect(requirements.getByText('819.9%', { exact: true })).toBeVisible()
+    await expect(requirements.getByText('201.8 kg', { exact: true })).toBeVisible()
     await expect(page.getByText('Idealized pin-jointed frame, not a structural certification')).toBeVisible()
     const canvas = page.getByRole('img', { name: '3D braced frame view', exact: true })
     const elevation = page.getByRole('img', { name: /Two-storey braced frame elevation/ })
@@ -95,6 +102,9 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       const box = (await canvas.boundingBox())!
       expect(box.width).toBeGreaterThan(200)
       expect(box.height).toBeGreaterThan(200)
+      // The pattern key is collapsed by default (task 56).
+      await expect(page.getByRole('list', { name: '3D pattern key' })).toBeHidden()
+      await page.getByText('Drawing key', { exact: true }).click()
       await expect(page.getByRole('list', { name: '3D pattern key' })).toContainText('Striped tube: compression')
       await expect(elevation).toHaveCount(0)
     } else {
@@ -102,6 +112,9 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await expect(page.getByText('3D view is unavailable. Use the 2D elevation and the member force table instead.', { exact: true }).first()).toBeVisible()
       await expect(page.locator('canvas')).toHaveCount(0)
     }
+    // Member forces are collapsed by default (task 56); open them to read the table.
+    await expect(page.getByRole('table', { name: 'Latest tested member forces' })).toBeHidden()
+    await page.getByText('Member forces and reactions', { exact: true }).click()
     await expect(page.getByRole('table', { name: 'Latest tested member forces' })).toBeVisible()
     const lowerLeft = page.getByLabel(/^Lower left column/)
     if (mode === 'Guided') {
@@ -154,6 +167,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     await toggleDiagonal(page, 'Storey 2 diagonal, bottom left to top right', keyboard)
     await setSection(page, /^Lower left column/, 'CHS48.3x3.2')
     await setSection(page, /^Lower right column/, 'CHS88.9x5.0')
+    await setSection(page, /^Upper left column/, 'CHS60.3x4.0')
     await setSection(page, /^Upper right column/, 'CHS76.1x4.0')
     await setSection(page, /^Floor beam/, 'CHS76.1x4.0')
     await setSection(page, /^Roof beam/, 'CHS76.1x4.0')

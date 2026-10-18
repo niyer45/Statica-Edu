@@ -49,9 +49,9 @@ function solved(f: BracedFrameFixture, c: BracedFrameChallenge = ch): BracedFram
 }
 
 describe('Braced Frame I worksheet (BFR-15)', () => {
-  it('covers all thirteen worksheet rows', () => {
+  it('covers all fourteen worksheet rows', () => {
     expect(BRACED_FRAME_WORKSHEET.map((f) => f.name)).toEqual([
-      'baseline', 'reference', 'uniformS3Tension', 'bucklingBeam', 'lightLowerDiagonal', 'xBracedLight',
+      'baseline', 'uniform60', 'reference', 'uniformS3Tension', 'bucklingBeam', 'lightLowerDiagonal', 'xBracedLight',
       'lowerXUpperSingle', 'mixedLight', 'bruteForce', 'upperUnbraced', 'unbraced', 'lowerXOnly', 'upperXOnly',
     ])
   })
@@ -126,8 +126,8 @@ describe('Braced Frame I worksheet (BFR-15)', () => {
     }
   })
 
-  it('classifies the zero-force beam2 of baseline and mixedLight as ≈ 0 with utilization ≈ 0 (BFR-14)', () => {
-    for (const name of ['baseline', 'mixedLight']) {
+  it('classifies the zero-force beam2 of baseline, uniform60 and mixedLight as ≈ 0 with utilization ≈ 0 (BFR-14)', () => {
+    for (const name of ['baseline', 'uniform60', 'mixedLight']) {
       const m = solved(worksheetFixture(name)).members.beam2!
       expect(m.sense).toBe('zero')
       expect(m.mode).toBe('tensionYield')
@@ -232,14 +232,14 @@ describe('screen fixtures (test-only constructed configs)', () => {
     expect(evaluation.failures).toEqual(['mass', 'applicability'])
   })
 
-  it('baseline with E = 20 GPa warns LARGE_DRIFT; with E = 10 GPa it is not applicable', () => {
-    const warn = solved(worksheetFixture('baseline'), withE(SCREEN_FIXTURES.baselineE20.elasticModulusPa))
-    expectRel(warn.maxStoreyDriftRatio, SCREEN_FIXTURES.baselineE20.maxStoreyDriftRatio, 'θ E20')
+  it('uniform60 with E = 20 GPa warns LARGE_DRIFT; with E = 10 GPa it is not applicable', () => {
+    const warn = solved(worksheetFixture('uniform60'), withE(SCREEN_FIXTURES.uniform60E20.elasticModulusPa))
+    expectRel(warn.maxStoreyDriftRatio, SCREEN_FIXTURES.uniform60E20.maxStoreyDriftRatio, 'θ E20')
     expect(warn.warnings.map((i) => i.code)).toEqual(['LARGE_DRIFT'])
     expect(warn.applicable).toBe(true)
-    const na = run(worksheetFixture('baseline'), withE(SCREEN_FIXTURES.baselineE10.elasticModulusPa))
+    const na = run(worksheetFixture('uniform60'), withE(SCREEN_FIXTURES.uniform60E10.elasticModulusPa))
     if (na.analysis.status !== 'solved') throw new Error('expected solved')
-    expectRel(na.analysis.maxStoreyDriftRatio, SCREEN_FIXTURES.baselineE10.maxStoreyDriftRatio, 'θ E10')
+    expectRel(na.analysis.maxStoreyDriftRatio, SCREEN_FIXTURES.uniform60E10.maxStoreyDriftRatio, 'θ E10')
     expect(na.analysis.notApplicableReasons.map((i) => i.code)).toEqual(['LARGE_DRIFT'])
     expect(na.evaluation.status).toBe('modelNotApplicable')
   })

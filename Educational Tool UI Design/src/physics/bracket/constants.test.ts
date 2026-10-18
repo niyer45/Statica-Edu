@@ -2,107 +2,56 @@ import { describe, expect, it } from 'vitest'
 import {
   BRACKET_APPLICABILITY_CODES,
   BRACKET_ASSUMPTIONS,
-  BRACKET_KT_SOURCE_NOTE,
-  BRACKET_STEP_CODES,
+  BRACKET_SOURCE_NOTE,
   BRACKET_THRESHOLDS,
   BRACKET_UNSUPPORTED_EFFECTS,
-  KT_BRANCH_H_OVER_R,
-  KT_H_OVER_R_MAX,
-  KT_LOWER_BRANCH,
-  KT_R_OVER_H_MAX,
-  KT_SHOULDER_CONDITION,
-  KT_SMALL_STEP_MIN_RATIO,
-  KT_UPPER_BRANCH,
+  CURVED_BEAM_MIN_R_OVER_C,
 } from './constants'
 
-// Bracket model constants (task 46.2; MBR-13–MBR-15, D-41 K-1–K-5). The full coefficient table is
-// also checked against an independent test-side transcription in test/fixtures/bracket.alternative.
+// Bracket model constants (task 55, `boltedLBracket` v1).
 
-describe('bracket Kt constants', () => {
-  it('holds the design.md coefficient table: C1 of each branch and the branch/range rules', () => {
-    expect(KT_LOWER_BRANCH[0]).toEqual({ alpha: 1.006, beta: 0.967, gamma: 0.013 })
-    expect(KT_LOWER_BRANCH[3]).toEqual({ alpha: -0.405, beta: 0.249, gamma: -0.2 })
-    expect(KT_UPPER_BRANCH[0]).toEqual({ alpha: 1.058, beta: 1.002, gamma: -0.038 })
-    expect(KT_UPPER_BRANCH[3]).toEqual({ alpha: -2.558, beta: 3.046, gamma: -0.701 })
-    expect(KT_H_OVER_R_MAX).toBe(20)
-    expect(KT_R_OVER_H_MAX).toBe(10)
-    expect(KT_BRANCH_H_OVER_R).toBe(2)
-    expect(KT_SHOULDER_CONDITION).toEqual({ intercept: 2.0, slope: 2.05, rOverDOffset: 0.025 })
-    expect(KT_SMALL_STEP_MIN_RATIO).toBe(1.1)
+describe('bracket curved-beam constants', () => {
+  it('limits the curved-beam formula to the tabulated range R/c ≥ 1.2', () => {
+    expect(CURVED_BEAM_MIN_R_OVER_C).toBe(1.2)
   })
 
-  it('discloses the secondary-copy source pending printed-edition verification, with no digits (MBR-20)', () => {
-    expect(BRACKET_KT_SOURCE_NOTE).toMatch(/secondary copies/)
-    expect(BRACKET_KT_SOURCE_NOTE).toMatch(/Peterson/)
-    expect(BRACKET_KT_SOURCE_NOTE).toMatch(/Roark/)
-    expect(BRACKET_KT_SOURCE_NOTE).toMatch(/pending printed-edition verification/)
-    expect(BRACKET_KT_SOURCE_NOTE).not.toMatch(/\d/)
-    expect(BRACKET_ASSUMPTIONS).toContain(BRACKET_KT_SOURCE_NOTE)
+  it('discloses the formula, the sources and the pending review, with no digits', () => {
+    expect(BRACKET_SOURCE_NOTE).toMatch(/Winkler–Bach/)
+    expect(BRACKET_SOURCE_NOTE).toMatch(/Shigley/)
+    expect(BRACKET_SOURCE_NOTE).toMatch(/Roark/)
+    expect(BRACKET_SOURCE_NOTE).toMatch(/pending engineering review/)
+    expect(BRACKET_SOURCE_NOTE).not.toMatch(/\d/)
+    expect(BRACKET_ASSUMPTIONS).toContain(BRACKET_SOURCE_NOTE)
   })
 })
 
-describe('bracket applicability constants (MBR-14)', () => {
-  it('defines the nine screens in table order with their warning / not-applicable levels', () => {
-    expect(BRACKET_APPLICABILITY_CODES).toEqual([
-      'KT_FIT_SHARP',
-      'KT_FIT_SHALLOW',
-      'KT_SHOULDER_LENGTH',
-      'KT_STEP_RATIO',
-      'KT_SMALL_STEP',
-      'PLASTICITY',
-      'DEPTH_SPAN',
-      'RECT_ASPECT',
-      'LARGE_DEFLECTION',
-    ])
+describe('bracket applicability constants', () => {
+  it('defines the four screens in order with their warning / not-applicable levels', () => {
+    expect(BRACKET_APPLICABILITY_CODES).toEqual(['CURVED_BEAM_RANGE', 'PLASTICITY', 'LARGE_DEFLECTION', 'LEG_SPAN'])
     const levels = Object.fromEntries(BRACKET_APPLICABILITY_CODES.map((c) => [c, [BRACKET_THRESHOLDS[c].warning, BRACKET_THRESHOLDS[c].notApplicable]]))
     expect(levels).toEqual({
-      KT_FIT_SHARP: [20, 20],
-      KT_FIT_SHALLOW: [10, 10],
-      KT_SHOULDER_LENGTH: [1, 1],
-      KT_STEP_RATIO: [1.5, 1.6],
-      KT_SMALL_STEP: [1, 1],
-      PLASTICITY: [0.8, 1.0],
-      DEPTH_SPAN: [0.1, 0.2],
-      RECT_ASPECT: [8, 20],
+      CURVED_BEAM_RANGE: [1, 1],
+      PLASTICITY: [0.8, 1],
       LARGE_DEFLECTION: [0.02, 0.1],
+      LEG_SPAN: [0.2, 0.5],
     })
-    for (const code of BRACKET_APPLICABILITY_CODES) {
-      expect(BRACKET_THRESHOLDS[code].warning).toBeLessThanOrEqual(BRACKET_THRESHOLDS[code].notApplicable)
-    }
-    expect(BRACKET_STEP_CODES).toEqual(BRACKET_APPLICABILITY_CODES.filter((c) => c.startsWith('KT_')))
+    for (const c of BRACKET_APPLICABILITY_CODES) expect(BRACKET_THRESHOLDS[c].warning).toBeLessThanOrEqual(BRACKET_THRESHOLDS[c].notApplicable)
   })
 
-  it('lists every MBR-15 unsupported effect', () => {
-    expect(BRACKET_UNSUPPORTED_EFFECTS).toEqual([
-      'wall-clamp and bolt-hole stress concentrations',
-      'fastener and joint compliance',
-      'fatigue and notch sensitivity (Kt is the theoretical elastic factor; no Kf)',
-      'local yielding and stress redistribution (screened only)',
-      '3D and out-of-plane loading, and torsion',
-      'lateral-torsional buckling (screened only)',
-      'shear deformation (screened only)',
-      'fillet–wall interaction (screened only)',
-      "the fillet's stiffness and mass (neglected)",
-      'one-sided steps',
-      'contact, self-weight, residual and manufacturing stresses',
-    ])
-    expect(BRACKET_ASSUMPTIONS).toContain('linear elastic material')
+  it('LEG_SPAN levels correspond to about 3 % and 20 % extra flange rotation from shear (Timoshenko, κ = 5/6, ν = 0.33)', () => {
+    const nu = 0.33
+    const kappa = 5 / 6
+    // 3EI/(κGA h²) for a rectangle = E/(4κG) (t/h)², with E/G = 2(1 + ν).
+    const extra = (ratio: number) => ((2 * (1 + nu)) / (4 * kappa)) * ratio ** 2
+    expect(extra(BRACKET_THRESHOLDS.LEG_SPAN.warning)).toBeCloseTo(0.032, 3)
+    expect(extra(BRACKET_THRESHOLDS.LEG_SPAN.notApplicable)).toBeCloseTo(0.1995, 3)
   })
 
-  it('is frozen', () => {
-    for (const v of [
-      KT_LOWER_BRANCH,
-      KT_LOWER_BRANCH[0],
-      KT_UPPER_BRANCH,
-      KT_SHOULDER_CONDITION,
-      BRACKET_APPLICABILITY_CODES,
-      BRACKET_STEP_CODES,
-      BRACKET_THRESHOLDS,
-      BRACKET_THRESHOLDS.KT_STEP_RATIO,
-      BRACKET_UNSUPPORTED_EFFECTS,
-      BRACKET_ASSUMPTIONS,
-    ]) {
-      expect(Object.isFrozen(v)).toBe(true)
-    }
+  it('lists the unsupported effects, including bolt preload and prying, and the assumptions', () => {
+    expect(BRACKET_UNSUPPORTED_EFFECTS.join(' ')).toMatch(/preload/)
+    expect(BRACKET_UNSUPPORTED_EFFECTS.join(' ')).toMatch(/prying/)
+    expect(BRACKET_UNSUPPORTED_EFFECTS.join(' ')).toMatch(/fatigue/)
+    expect(BRACKET_ASSUMPTIONS.join(' ')).toMatch(/heel/)
+    expect(Object.isFrozen(BRACKET_UNSUPPORTED_EFFECTS) && Object.isFrozen(BRACKET_ASSUMPTIONS) && Object.isFrozen(BRACKET_THRESHOLDS)).toBe(true)
   })
 })

@@ -16,7 +16,7 @@ function ok<T>(r: { ok: true; value: T } | { ok: false; error: unknown }): T {
 describe('toggleDiagonal', () => {
   it('flips presence and keeps the section choice, so re-enabling restores it', () => {
     const off = ok(applyBracedFrameEdit(baseline, { type: 'toggleDiagonal', memberId: 'diag2b' }, ch))
-    expect(off.members.diag2b).toEqual({ present: false, sectionId: 'CHS60.3x4.0' })
+    expect(off.members.diag2b).toEqual({ present: false, sectionId: 'CHS48.3x3.2' })
     const resized = ok(applyBracedFrameEdit(off, { type: 'setMemberSection', memberId: 'diag2b', sectionId: 'CHS88.9x5.0' }, ch))
     expect(resized.members.diag2b).toEqual({ present: false, sectionId: 'CHS88.9x5.0' })
     const on = ok(applyBracedFrameEdit(resized, { type: 'toggleDiagonal', memberId: 'diag2b' }, ch))

@@ -57,11 +57,12 @@ describe('Torsion Shaft I workbench', () => {
     expect(modelUiFor(ch.model)).toBe(torsionUi)
   })
 
-  it('shows the baseline twist failure with torsion wording and no beam wording', () => {
+  it('shows the baseline twist and shear stress failures with torsion wording and no beam wording', () => {
     renderShaft()
     const requirements = screen.getByRole('list', { name: 'Design requirements' })
-    expect(within(requirements).getByText('2.92°')).toBeTruthy()
-    expect(within(requirements).getAllByText('✗ Fail')).toHaveLength(1)
+    expect(within(requirements).getByText('4.79°')).toBeTruthy()
+    expect(within(requirements).getByText('109.5 MPa')).toBeTruthy()
+    expect(within(requirements).getAllByText('✗ Fail')).toHaveLength(2)
     expect(screen.getByText(TORSION_LIMITS_NOTICE)).toBeTruthy()
     expect(screen.getByRole('img', { name: /Solid shaft cross-section and side view/ })).toBeTruthy()
     expect(screen.queryByText(/beam/i)).toBeNull()
@@ -86,10 +87,10 @@ describe('Torsion Shaft I workbench', () => {
     const input = screen.getByLabelText('Inner diameter')
     expect(input.getAttribute('aria-invalid')).toBe('true')
     expect(document.getElementById(input.getAttribute('aria-describedby')!)!.textContent).toMatch(/^Inner diameter:/)
-    // The rejected edit keeps the converted draft: outer 30 mm, default 4 mm wall (inner 22 mm).
-    expect((screen.getByLabelText('Outer diameter') as HTMLInputElement).value).toBe('30.0')
+    // The rejected edit keeps the converted draft: outer 26.5 mm, default 4 mm wall (inner 18.5 mm).
+    expect((screen.getByLabelText('Outer diameter') as HTMLInputElement).value).toBe('26.5')
     fireEvent.keyDown(input, { key: 'Escape' })
-    expect((screen.getByLabelText('Inner diameter') as HTMLInputElement).value).toBe('22.0')
+    expect((screen.getByLabelText('Inner diameter') as HTMLInputElement).value).toBe('18.5')
   })
 
   it('compares, restores and deletes with the shared semantics', () => {
@@ -101,7 +102,7 @@ describe('Torsion Shaft I workbench', () => {
     expect(within(table).getAllByText(/^−/).length).toBeGreaterThan(0)
     fireEvent.click(screen.getByRole('tab', { name: 'Design history' }))
     fireEvent.click(screen.getByRole('button', { name: 'Restore Baseline' }))
-    expect((screen.getByLabelText('Diameter') as HTMLInputElement).value).toBe('30.0')
+    expect((screen.getByLabelText('Diameter') as HTMLInputElement).value).toBe('26.5')
     fireEvent.click(screen.getByRole('button', { name: 'Delete Iteration 1' }))
     fireEvent.click(within(screen.getByRole('dialog', { name: 'Delete Iteration 1?' })).getByRole('button', { name: 'Delete iteration' }))
     expect(screen.queryByRole('button', { name: /^Iteration 1/ })).toBeNull()
@@ -136,7 +137,7 @@ describe('Torsion Shaft I workbench', () => {
     const { values, storage } = memory()
     renderShaft('parametric', storage)
     testReference()
-    const saved = JSON.parse(values.get('ei:session:torsion-shaft-1:v1')!)
+    const saved = JSON.parse(values.get('ei:session:torsion-shaft-1:v2')!)
     expect(saved).toMatchObject({ schemaVersion: 2, model: { id: 'circularShaftTorsion', version: 1 } })
     cleanup()
     renderShaft('parametric', storage)

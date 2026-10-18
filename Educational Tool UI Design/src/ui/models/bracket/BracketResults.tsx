@@ -2,38 +2,35 @@ import { useId, useState, type KeyboardEvent } from 'react'
 import type { BracketChallenge } from '../../../challenge/bracket/types'
 import { explainBracketChange } from '../../../evaluation/bracket/explain'
 import { BRACKET_COMPARISON_METRICS, type BracketMetricId } from '../../../evaluation/bracket/metrics'
-import { isUniformBar, type BracketDesign } from '../../../geometry/bracket/design'
 import { bracketModel } from '../../../state/bracketModel'
 import { selectVisibleHistory } from '../../../state/selectors'
 import { useAnnounce } from '../../a11y/useAnnouncements'
 import Dialog from '../../dialogs/Dialog'
 import Icon from '../../icons/Icon'
 import { STATUS_LABELS } from '../../panels/resultPresentation'
-import { designLabel, formatBracket, formatOptional, LOCATION_LABELS, NOT_APPLICABLE, useBracketStore, type BracketDisplayUnit } from './shared'
+import { designLabel, formatBracket, useBracketStore, type BracketDisplayUnit } from './shared'
 
-// Bracket history and comparison (task 46.3; MBR-07, MBR-09, MBR-18, MM-13, MM-14, MM-19). Same
-// list/detail layout, compare limit, restore and confirmed deletion as the beam and torsion
-// (D-29–D-31), with the model's stored metrics and grounded change facts. Absent stored values
-// (no step, Kt fit undefined) are words, never numbers. Design files use the v2 format.
+// Bracket history and comparison (tasks 46.3, 55; MM-13, MM-14, MM-19). Same list/detail layout,
+// compare limit, restore and confirmed deletion as the beam and torsion (D-29–D-31), with the
+// model's stored metrics and grounded change facts. Design files use the v2 format.
 
 const METRIC_UNITS: Readonly<Record<BracketMetricId, BracketDisplayUnit>> = {
-  peakStressPa: 'Pa',
-  ktStep: 'ratio',
-  rootStressPa: 'Pa',
-  stepNominalStressPa: 'Pa',
-  stepPeakStressPa: 'Pa',
-  tipDeflectionM: 'm',
+  bendStressPa: 'Pa',
+  curvedBeamFactor: 'ratio',
+  nominalBendStressPa: 'Pa',
+  deflectionM: 'm',
+  boltTensionN: 'N',
+  boltLeverArmM: 'm',
   massKg: 'kg',
-  envelopeDepthM: 'm',
 }
 
 const label = (iteration: number) => (iteration === 0 ? 'Baseline' : `Iteration ${iteration}`)
 
-/** Decorative stepped-bar glyph for history rows. */
-function BracketGlyph({ design }: { design: Readonly<BracketDesign> }) {
+/** Decorative L-bracket glyph for history rows: wall line, flange and arm. */
+function BracketGlyph() {
   return (
     <svg viewBox="0 0 24 24" width={18} height={18} aria-hidden="true" focusable="false" className="bracket-glyph">
-      <path d={isUniformBar(design) ? 'M3 4v16M3 9h18v6H3' : 'M3 4v16M3 7h9v3h9v4h-9v3H3'} fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinejoin="round" />
+      <path d="M3 3v18M5 4v14q0 2 2 2h14v-3H9q-1 0-1-1V4z" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinejoin="round" />
     </svg>
   )
 }
@@ -151,7 +148,7 @@ export default function BracketResults() {
           {visible.map((r) => (
             <div className={`iteration ${r.id === selected.id ? 'active' : ''}`} key={r.id}>
               <span className="iteration-symbol">
-                <BracketGlyph design={r.designSnapshot} />
+                <BracketGlyph />
               </span>
               <div className="iteration-copy">
                 <button type="button" className="iteration-select" aria-pressed={r.id === selected.id} onClick={() => setSelectedId(r.id)}>
@@ -191,10 +188,10 @@ export default function BracketResults() {
               .map((c) => (
                 <div className="metric" key={c.id}>
                   <div>{c.label}</div>
-                  <strong>{c.value !== undefined ? formatBracket(c.value, c.unit) : NOT_APPLICABLE}</strong>
+                  <strong>{formatBracket(c.value, c.unit)}</strong>
                   <small>
                     {c.passed ? 'Pass' : 'Fail'} · Limit: {formatBracket(c.limit, c.unit)}
-                    {c.id === 'peakStress' && selected.analysis.peakLocation !== undefined && ` · At the ${selected.analysis.peakLocation}`}
+                    {c.id === 'bendStress' && ' · Inside of the bend'}
                     {selected.evaluation.status === 'modelNotApplicable' && ' · Outside model assumptions'}
                   </small>
                 </div>
@@ -206,7 +203,7 @@ export default function BracketResults() {
               <p>
                 {outcome.scorable
                   ? `Prediction: ${outcome.predicted} · Actual: ${outcome.actual} · ${outcome.matched ? 'Matched' : 'Did not match'}`
-                  : `Prediction: ${outcome.predicted} · Not scorable: no peak stress to compare`}
+                  : `Prediction: ${outcome.predicted} · Not scorable: no bend stress to compare`}
               </p>
             )}
             <div className="result-explanation">
@@ -225,7 +222,7 @@ export default function BracketResults() {
           {compared.map((r) => (
             <div className={`iteration ${r.id === active.id ? 'active' : ''}`} key={r.id}>
               <span className="iteration-symbol">
-                <BracketGlyph design={r.designSnapshot} />
+                <BracketGlyph />
               </span>
               <div className="iteration-copy">
                 <button type="button" className="iteration-select" aria-pressed={r.id === active.id} onClick={() => setCompareId(r.id)}>
@@ -257,19 +254,13 @@ export default function BracketResults() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <th scope="row">peak location</th>
-                      <td className="comparison-value">{r.analysis.peakLocation !== undefined ? LOCATION_LABELS[r.analysis.peakLocation] : NOT_APPLICABLE}</td>
-                      <td>—</td>
-                      <td>—</td>
-                    </tr>
                     {BRACKET_COMPARISON_METRICS.map((m) => {
                       const unit = METRIC_UNITS[m.id]
                       const v = m.read(r.analysis)
                       return (
                         <tr key={m.id}>
                           <th scope="row">{m.label}</th>
-                          <td className="comparison-value">{formatOptional(v, unit, r.designSnapshot)}</td>
+                          <td className="comparison-value">{v !== undefined ? formatBracket(v, unit) : '—'}</td>
                           <td>{r.iteration > 0 ? delta(v, m.read(base.analysis), unit) : '—'}</td>
                           <td>{prev ? delta(v, m.read(prev.analysis), unit) : '—'}</td>
                         </tr>

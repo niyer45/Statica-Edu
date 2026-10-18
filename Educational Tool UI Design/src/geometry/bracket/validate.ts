@@ -2,30 +2,26 @@ import type { BracketChallenge, BracketDesignLimits } from '../../challenge/brac
 import { GEOM_TOL } from '../sections'
 import { BRACKET_PARAMS, type BracketDesign, type BracketParam } from './design'
 
-// Stepped-bar bracket geometry validator (task 46.2; MBR-05, MBR-17, MM-09). Pure: never mutates
-// or throws. Total over untrusted input: a missing or non-number dimension counts as NON_FINITE.
-// Codes reuse the beam/torsion GeometryError vocabulary where the meaning is the same; the bracket
-// adds ARM_DEEPER_THAN_ROOT (design.md `armDeeperThanRoot`) and UNKNOWN_PARAM (edits only). The
-// design.md names map as: rootDepthOutOfRange / armDepthOutOfRange / stepLocationOutOfRange /
-// filletRadiusOutOfRange → BELOW_MIN | ABOVE_MAX with that `param`; nonFinite → NON_FINITE;
-// lockedField → LOCKED_FIELD_CHANGED.
+// L-bracket geometry validator (task 55; MM-09). Pure: never mutates or throws. Total over
+// untrusted input: a missing or non-number dimension counts as NON_FINITE. Codes reuse the
+// beam/torsion GeometryError vocabulary; UNKNOWN_PARAM is produced by edits only.
 //
 // Error order (deterministic):
-//   1. Per parameter, in BRACKET_PARAMS order (rootDepthM, armDepthM, stepLocationM,
-//      filletRadiusM), at most one of NON_FINITE | NON_POSITIVE | BELOW_MIN | ABOVE_MAX
-//   2. ARM_DEEPER_THAN_ROOT when d > D (only when both are finite and positive)
-//   3. LOCKED_FIELD_CHANGED for materialId
+//   1. Per parameter, in BRACKET_PARAMS order (thicknessM, widthM, flangeHeightM, innerRadiusM),
+//      at most one of NON_FINITE | NON_POSITIVE | BELOW_MIN | ABOVE_MAX
+//   2. LOCKED_FIELD_CHANGED for materialId
 //
-// Tolerances: range bounds use GEOM_TOL, as for the other models; d > D is exact, so d = D (as
-// stored values) is the valid uniform bar (MBR-12). The control grid (`stepM`) is not enforced:
-// the existing clamp/strict rules accept any in-range value, and the bracket keeps them.
+// There is no coupled rule between parameters: the loader guarantees that every in-range design
+// keeps the bolt row above the bend (BOLT_ROW_IN_BEND) and bends about the thin axis
+// (WIDTH_BELOW_THICKNESS). Tolerances: range bounds use GEOM_TOL, as for the other models. The
+// control grid (`stepM`) is not enforced: the existing clamp/strict rules accept any in-range
+// value.
 
 export type BracketErrorCode =
   | 'NON_FINITE'
   | 'NON_POSITIVE'
   | 'BELOW_MIN'
   | 'ABOVE_MAX'
-  | 'ARM_DEEPER_THAN_ROOT'
   | 'UNKNOWN_PARAM'
   | 'LOCKED_FIELD_CHANGED'
 
@@ -35,7 +31,6 @@ export const BRACKET_ERROR_CODES: readonly [BracketErrorCode, ...BracketErrorCod
   'NON_POSITIVE',
   'BELOW_MIN',
   'ABOVE_MAX',
-  'ARM_DEEPER_THAN_ROOT',
   'UNKNOWN_PARAM',
   'LOCKED_FIELD_CHANGED',
 ] as const) as unknown as readonly [BracketErrorCode, ...BracketErrorCode[]]
@@ -48,10 +43,10 @@ export interface BracketDesignError {
 }
 
 export const BRACKET_PARAM_LABELS: Readonly<Record<BracketParam, string>> = Object.freeze({
-  rootDepthM: 'Root depth',
-  armDepthM: 'Arm depth',
-  stepLocationM: 'Step location',
-  filletRadiusM: 'Fillet radius',
+  thicknessM: 'Thickness',
+  widthM: 'Width',
+  flangeHeightM: 'Flange height',
+  innerRadiusM: 'Inner bend radius',
 })
 
 /** Metres → plain millimetre text for messages ("30 mm", "2.5 mm"). Local: domain code does not import units/. */
@@ -96,27 +91,14 @@ function checkParam(param: BracketParam, value: unknown, limits: BracketDesignLi
 /** The challenge fields validateBracketDesign reads. */
 export type BracketValidationContext = Pick<BracketChallenge, 'initialDesign' | 'designLimits'>
 
-/** Validates the four dimensions and d ≤ D (steps 1–2 of the header order). */
+/** Validates the four dimensions (step 1 of the header order). */
 export function validateBracketDimensions(d: BracketDesign, limits: BracketDesignLimits): BracketDesignError[] {
   const raw: unknown = d
   const design: Record<string, unknown> = isRecord(raw) ? raw : {}
   const errors: BracketDesignError[] = []
-  /** Parameters that passed NON_FINITE / NON_POSITIVE (finite positive numbers, usable by d ≤ D). */
-  const ok = new Map<BracketParam, number>()
   for (const param of BRACKET_PARAMS) {
-    const value = design[param]
-    const err = checkParam(param, value, limits)
+    const err = checkParam(param, design[param], limits)
     if (err) errors.push(err)
-    if (!err || err.code === 'BELOW_MIN' || err.code === 'ABOVE_MAX') ok.set(param, value as number)
-  }
-  const D = ok.get('rootDepthM')
-  const dArm = ok.get('armDepthM')
-  if (D !== undefined && dArm !== undefined && dArm > D) {
-    errors.push({
-      code: 'ARM_DEEPER_THAN_ROOT',
-      param: 'armDepthM',
-      message: `Arm depth must not exceed the root depth (arm ${mm(dArm)}, root ${mm(D)}). Equal depths make a uniform bar.`,
-    })
   }
   return errors
 }

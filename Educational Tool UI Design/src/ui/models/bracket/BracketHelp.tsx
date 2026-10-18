@@ -1,37 +1,42 @@
-import { BRACKET_UNSUPPORTED_EFFECTS } from '../../../physics/bracket/constants'
+import { BRACKET_ASSUMPTIONS, BRACKET_SOURCE_NOTE, BRACKET_UNSUPPORTED_EFFECTS } from '../../../physics/bracket/constants'
 import Dialog from '../../dialogs/Dialog'
-import { BRACKET_KT_DISCLOSURE } from './shared'
+import { BRACKET_SOURCE_DISCLOSURE } from './shared'
 
-// Bracket reference (task 46.3; MBR-03, MBR-15, MBR-16, MBR-20, D-41). Static explanatory text
-// only, no computed numbers. Discloses the secondary-copy source of the Kt coefficients.
+// Bracket reference (task 55 L-bracket). Static explanatory text only, no computed numbers. Lists
+// the model assumptions, the sources and the effects the model leaves out.
 
 export default function BracketHelp({ open, onClose }: { open: boolean; onClose: () => void }) {
   if (!open) return null
   return (
-    <Dialog title="Stress concentration" icon="book" onClose={onClose}>
+    <Dialog title="Bend stress and bolt loads" icon="book" onClose={onClose}>
       <p>
-        The tip force bends the bracket. The bending moment is largest at the wall and falls to zero at the tip, so the deep root
-        and the thinner arm each carry a different share of it. Stress is checked at two sections: the root, and the step where the
-        arm begins.
+        The hanging load P acts at a distance a from the wall, so it tries to turn the bracket away from the wall with a moment
+        M = P·a. That moment passes through the arm, around the bend and into the flange, so the bend carries the largest bending
+        moment in the bracket.
       </p>
       <div className="formula">
-        σ = 6M / (b·h²) <span>Nominal bending stress in a section of depth h</span>
-      </div>
-      <div className="formula">
-        σ_step = Kt · σ_nominal <span>A sharp shoulder fillet raises the local stress at the step</span>
+        σ = k · 6M / (w·t²) <span>Bend stress at the inner fibre; k is the curved-beam factor</span>
       </div>
       <p>
-        Kt is a local elastic peak at the fillet. It does not change the moment, the deflection or the root stress. A larger fillet
-        radius lowers Kt; moving the step toward the tip puts it where the moment is lower. The peak stress is the larger of the root
-        and step values, and it is compared with the allowable stress. Kt is only defined inside the range of its published curve
-        fit; outside it the model is not applicable and no peak stress is reported.
+        A tight inner radius crowds the stress toward the inside of the bend, so the inner fibre carries more than the straight-beam
+        value. The curved-beam factor k grows as the inner radius gets small compared with the thickness, and falls toward one for a
+        gentle bend. Thickness is the strongest lever on stress and stiffness, but it also adds mass.
       </p>
-      <p>{BRACKET_KT_DISCLOSURE}</p>
+      <div className="formula">
+        T = P·a / (n·h) <span>Tension in each of the n bolts; h is the height of the bolt row above the heel</span>
+      </div>
+      <p>
+        The bracket pivots about its heel, where the flange leaves the wall at the start of the bend, and the bolt row holds it back.
+        A taller flange gives the bolts a longer lever arm and less tension, but the longer flange span also lets the bracket rotate
+        more, which adds to the deflection at the load, and it adds mass. A larger bend radius raises the heel and shortens that lever
+        arm.
+      </p>
+      <p>Assumptions: {BRACKET_ASSUMPTIONS.filter((a) => a !== BRACKET_SOURCE_NOTE).join('; ')}.</p>
+      <p>{BRACKET_SOURCE_DISCLOSURE}</p>
       <p>This idealized model does not include: {BRACKET_UNSUPPORTED_EFFECTS.join(', ')}.</p>
       <div className="help-limits">
-        Accepted means the design meets this challenge&apos;s educational limits (peak elastic stress within the allowable), not a
-        real-world approval. Warnings and model applicability are shown for the latest tested design. These are educational screening
-        checks, not certification rules.
+        Accepted means the design meets this challenge&apos;s educational limits, not a real-world approval. Warnings and model
+        applicability are shown for the latest tested design. These are educational screening checks, not certification rules.
       </div>
     </Dialog>
   )

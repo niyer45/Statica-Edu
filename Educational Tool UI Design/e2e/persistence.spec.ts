@@ -33,7 +33,8 @@ test('reload restores reflection/submission; import/export round-trips; corrupt 
   await expect(page.getByTestId('live-region')).toContainText('Design imported')
   expect((await readState(page)).draft).toEqual(afterImport.draft)
   await audit(page)
-  await page.evaluate(() => localStorage.setItem('ei:session:cantilever-beam-1:v1', '{invalid'))
+  // Version 2 content (task 59) saves under the :v2 key.
+  await page.evaluate(() => localStorage.setItem('ei:session:cantilever-beam-1:v2', '{invalid'))
   await page.reload()
   await openWorkbench(page, false)
   await expect(page.getByTestId('live-region')).toContainText('Saved session could not be restored')
@@ -41,6 +42,20 @@ test('reload restores reflection/submission; import/export round-trips; corrupt 
   await audit(page)
 })
 
+
+test('a save under the previous content version key is ignored without a notice and left in place', async ({ page }) => {
+  // Task 59 moved Cantilever Beam I to content version 2 (new baseline), so saves use the :v2 key.
+  // A version 1 save is never re-scored against the new content; a rollback can still read it.
+  await page.goto('/')
+  await page.evaluate(() => localStorage.setItem('ei:session:cantilever-beam-1:v1', '{"schemaVersion":1}'))
+  await openWorkbench(page)
+  const state = await readState(page)
+  expect(state.challengeVersion).toBe(2)
+  expect(state.history).toHaveLength(1)
+  expect(state.draft.section.kind).toBe('iSection')
+  await expect(page.getByTestId('live-region')).not.toContainText('Saved session could not be restored')
+  expect(await page.evaluate(() => localStorage.getItem('ei:session:cantilever-beam-1:v1'))).toBe('{"schemaVersion":1}')
+})
 
 test('deleting an iteration confirms, persists after reload and removes comparison membership', async ({ page }) => {
   await openWorkbench(page)

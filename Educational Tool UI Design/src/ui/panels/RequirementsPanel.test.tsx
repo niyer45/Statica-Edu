@@ -47,7 +47,8 @@ it('leaves displayed numbers unchanged during edits and records a new result aft
   const store = mount()
   fireEvent.click(screen.getByText('Test details'))
   const table = screen.getByRole('table').textContent
-  act(() => store().dispatch({ type: 'applySection', kind: 'iSection' }))
+  // The baseline is an I-section, so a tube is a real change of section.
+  act(() => store().dispatch({ type: 'applySection', kind: 'tube' }))
   expect(screen.getByRole('table').textContent).toBe(table)
   expect(store().state.draftStatus).toBe('draft')
   fireEvent.click(screen.getByRole('button', { name: 'Run Test' }))

@@ -1,90 +1,81 @@
-import { formatMm } from '../../../units/units'
-import { formatBracket, NOT_APPLICABLE, peakSummary, useBracketStore } from './shared'
+import type { BracketAnalysis } from '../../../physics/bracket/types'
+import { formatBracket, useBracketStore } from './shared'
 
-// Bracket result details shown under the 3D or 2D view (tasks 46.3, 54.1; MBR-18, MM-22).
-//   Moment strip: M(x) of the LATEST TESTED design from its stored root and step moments (zero at
-//   the free end, where the load acts), with both checked sections marked. The section that
-//   governs the peak stress is a filled triangle and the other an open circle, so the critical
-//   location never relies on color; the summary and table say the same in words.
+// Bracket result details shown under the 3D or 2D view (task 55 L-bracket; MM-22).
+//   Moment path: the bending moment of the LATEST TESTED design along its load path, drawn
+//   developed flat: from the bolt row (zero moment) down the flange to the heel and bend (the
+//   peak, M = P a), then out along the arm to the load line (zero). Lengths come from the stored
+//   bolt lever arm and the configured load offset; the peak from the stored bend moment. The bend
+//   is a filled triangle and the bolt row an open circle, so the critical section never relies
+//   on color; the summary and table say the same in words.
 
 export const SUMMARY_ID = 'bracket-view-summary'
-export const STRIP_LABEL = 'Bending-moment strip of the latest tested design, from the wall (left) to the tip (right); the triangle marks the governing section'
+export const STRIP_LABEL =
+  'Bending-moment path of the latest tested design: from the bolt row on the left, down the flange to the bend, then out along the arm to the load on the right; the triangle marks the bend, where the moment and the stress peak'
 
-const X0 = 46
-const PX_PER_M = 1150
-const BASE = 74
-const HEIGHT = 58
+const X0 = 40
+const PX_PER_M = 1500
+const BASE = 70
+const HEIGHT = 54
 
-const fmtMoment = (nm: number) => `${nm.toFixed(1)} N·m`
+/** One-line description of the stored bend stress and bolt tension. */
+export function bendSummary(a: Pick<BracketAnalysis, 'bendStressPa' | 'curvedBeamFactor' | 'boltTensionN'>): string {
+  return `Bend stress ${formatBracket(a.bendStressPa, 'Pa')} at the inside of the bend (curved-beam factor ${formatBracket(a.curvedBeamFactor, 'ratio')}) · ${formatBracket(a.boltTensionN, 'N')} per bolt`
+}
 
 export default function BracketDetails() {
   const { state, challenge: ch } = useBracketStore()
-  const L = ch.lengthM
-  const sx = (m: number) => X0 + m * PX_PER_M
   const latest = state.history[state.history.length - 1]!
   const a = latest.analysis
-  const tested = latest.designSnapshot
-  const testedStep = a.stepMomentNm !== undefined
-  const momentY = (nm: number) => BASE - (nm / a.rootMomentNm) * HEIGHT
-  const rootPt = { x: sx(0), y: momentY(a.rootMomentNm) }
-  const stepPt = testedStep ? { x: sx(tested.stepLocationM), y: momentY(a.stepMomentNm!) } : undefined
-  const strip = [`${sx(0)},${BASE}`, `${rootPt.x},${rootPt.y}`, ...(stepPt ? [`${stepPt.x},${stepPt.y}`] : []), `${sx(L)},${BASE}`].join(' ')
-  const governs = a.peakLocation
-  const marker = (pt: { x: number; y: number }, isGoverning: boolean) =>
-    isGoverning ? (
-      <polygon className="governing-marker" points={`${pt.x - 6},${pt.y + 5} ${pt.x + 6},${pt.y + 5} ${pt.x},${pt.y - 6}`} />
-    ) : (
-      <circle className="section-marker" cx={pt.x} cy={pt.y} r={4.5} />
-    )
+  const passed = (id: string) => latest.evaluation.constraints.find((c) => c.id === id)?.passed === true
+  const limit = (id: string) => latest.evaluation.constraints.find((c) => c.id === id)!.limit
+  const boltX = X0
+  const bendX = X0 + a.boltLeverArmM * PX_PER_M
+  const loadX = bendX + ch.loadOffsetM * PX_PER_M
+  const peakY = BASE - HEIGHT
+  const strip = `${boltX},${BASE} ${bendX},${peakY} ${loadX},${BASE}`
+  const width = Math.max(460, Math.ceil(loadX + X0))
+  const result = (ok: boolean) => (ok ? '✓ Pass' : '✗ Fail')
   return (
     <>
       <p id={SUMMARY_ID} className="viewport-label bracket-summary" aria-live="off">
-        A flat bracket bolted to a wall carries a load hanging from its tip; its deeper root steps down to a thinner arm through a rounded fillet.
-        {' '}Latest tested: {peakSummary(a)}
-        {governs !== undefined && ' · the triangle in the moment strip marks the governing section'}
+        An L-bracket: its vertical flange is bolted flat to the wall and its horizontal arm carries a load hanging near the tip.
+        {' '}Latest tested: {bendSummary(a)} · the triangle in the moment path marks the bend
         {state.draftStatus === 'draft' && ' · draft changed since this test'}
       </p>
-      <svg viewBox="0 0 460 84" role="img" aria-label={STRIP_LABEL} className="bracket-moment">
-        <line x1={sx(0)} y1={BASE} x2={sx(L)} y2={BASE} className="moment-axis" />
+      <svg viewBox={`0 0 ${width} 84`} role="img" aria-label={STRIP_LABEL} className="bracket-moment">
+        <line x1={boltX} y1={BASE} x2={loadX} y2={BASE} className="moment-axis" />
+        <line x1={bendX} y1={BASE + 4} x2={bendX} y2={BASE + 10} className="moment-axis" />
         <polygon points={strip} className="moment-strip" />
-        {marker(rootPt, governs === 'root')}
-        {stepPt && marker(stepPt, governs === 'step')}
+        <polygon className="governing-marker" points={`${bendX - 6},${peakY + 5} ${bendX + 6},${peakY + 5} ${bendX},${peakY - 6}`} />
+        <circle className="section-marker" cx={boltX} cy={BASE} r={4.5} />
       </svg>
       <details className="bracket-sections">
         <summary>Checked sections</summary>
         <table aria-label="Checked sections of the latest tested design">
           <thead>
             <tr>
-              <th scope="col">Section</th>
-              <th scope="col">From wall</th>
+              <th scope="col">Location</th>
               <th scope="col">Moment</th>
-              <th scope="col">Nominal stress</th>
-              <th scope="col">Kt</th>
-              <th scope="col">Governs</th>
+              <th scope="col">Value</th>
+              <th scope="col">Limit</th>
+              <th scope="col">Result</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <th scope="row">Root</th>
-              <td>0 mm</td>
-              <td>{fmtMoment(a.rootMomentNm)}</td>
-              <td>{formatBracket(a.rootStressPa, 'Pa')}</td>
-              <td>Not applied</td>
-              <td>{governs === undefined ? NOT_APPLICABLE : governs === 'root' ? 'Yes (triangle)' : 'No'}</td>
+              <th scope="row">Bend, inner fibre (triangle)</th>
+              <td>{formatBracket(a.bendMomentNm, 'Nm')}</td>
+              <td>{formatBracket(a.bendStressPa, 'Pa')}</td>
+              <td>{formatBracket(limit('bendStress'), 'Pa')}</td>
+              <td>{result(passed('bendStress'))}</td>
             </tr>
             <tr>
-              <th scope="row">Step</th>
-              {testedStep ? (
-                <>
-                  <td>{formatMm(tested.stepLocationM, 0)} mm</td>
-                  <td>{fmtMoment(a.stepMomentNm!)}</td>
-                  <td>{formatBracket(a.stepNominalStressPa!, 'Pa')}</td>
-                  <td>{a.ktStep !== undefined ? formatBracket(a.ktStep, 'ratio') : NOT_APPLICABLE}</td>
-                  <td>{governs === undefined ? NOT_APPLICABLE : governs === 'step' ? 'Yes (triangle)' : 'No'}</td>
-                </>
-              ) : (
-                <td colSpan={5}>No step: stress concentration not applied</td>
-              )}
+              <th scope="row">Bolt row, {formatBracket(a.boltLeverArmM, 'm')} above the heel (circle)</th>
+              <td>None</td>
+              <td>{formatBracket(a.boltTensionN, 'N')} per bolt</td>
+              <td>{formatBracket(limit('boltTension'), 'N')}</td>
+              <td>{result(passed('boltTension'))}</td>
             </tr>
           </tbody>
         </table>

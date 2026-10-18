@@ -68,19 +68,19 @@ describe('3D torsion shaft (task 54.2)', () => {
     const shaft = scene().getObjectByName('torsion-shaft') as Mesh
     const box = shaft.geometry.boundingBox!
     expect(box.max.x - box.min.x).toBeCloseTo(ch.lengthM, 6)
-    expect(box.max.y - box.min.y).toBeCloseTo(0.03, 6)
-    expect(box.max.z - box.min.z).toBeCloseTo(0.03, 6)
+    expect(box.max.y - box.min.y).toBeCloseTo(0.0265, 6)
+    expect(box.max.z - box.min.z).toBeCloseTo(0.0265, 6)
     // Fixed end at x = 0: the wall lies behind it, the clamp grips the root.
     const wall = new Box3().setFromObject(scene().getObjectByName('fixed-wall')!)
     expect(wall.max.x).toBeCloseTo(0, 6)
     const clamp = new Box3().setFromObject(scene().getObjectByName('fixed-clamp')!)
     expect(clamp.min.x).toBeCloseTo(0, 6)
-    expect(clamp.max.y).toBeGreaterThan(0.015)
+    expect(clamp.max.y).toBeGreaterThan(0.01325)
     // The curved torque arrow sits beyond the free end, around the axis.
     const arrow = new Box3().setFromObject(scene().getObjectByName('torque-arrow')!)
     expect(arrow.min.x).toBeGreaterThan(ch.lengthM)
-    expect(arrow.max.y).toBeGreaterThan(0.015)
-    expect(arrow.min.y).toBeLessThan(-0.015)
+    expect(arrow.max.y).toBeGreaterThan(0.01325)
+    expect(arrow.min.y).toBeLessThan(-0.01325)
     const { shownRad } = displayedTwist(store.state.history[0]!.analysis.twistRad, ch.visualization)
     expect(shownRad).toBeGreaterThan(0)
     expect(freeEndAngle(scene())).toBeCloseTo(TWIST_LINE_START_RAD + shownRad, 6)

@@ -2,7 +2,7 @@ import { act, createRoot, extend, type RootStore, type ThreeEvent } from '@react
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Group, Mesh, MeshBasicMaterial, SphereGeometry, Ray, Vector3, type WebGLRenderer } from 'three'
 extend({ Group, Mesh, MeshBasicMaterial, SphereGeometry })
-import { bundledChallengeResult } from '../../challenge/content'
+import { circleStartChallenge } from '../../../test/arbitraries'
 import { bootstrap } from '../state/bootstrap'
 import StoreProvider from '../state/StoreProvider'
 import { useDispatch, useSession } from '../state/store'
@@ -34,7 +34,8 @@ async function setup(mode: 'guided' | 'parametric' = 'parametric') {
   const renderer = { domElement: canvas, render: vi.fn(), setSize: vi.fn(), setPixelRatio: vi.fn(), getPixelRatio: () => 1, xr: { isPresenting: false, addEventListener: vi.fn(), removeEventListener: vi.fn(), setAnimationLoop: vi.fn() }, shadowMap: { enabled: false } }
   root = createRoot(canvas)
   await root.configure({ gl: renderer as unknown as WebGLRenderer, frameloop: 'never', size: { width: 500, height: 400, top: 0, left: 0 } })
-  const boot = bootstrap(bundledChallengeResult, () => '2026-10-15T00:00:00.000Z', () => 'baseline', mode)
+  // These drags exercise the circle diameter handle, so start from a Ø30 mm circle at 0°.
+  const boot = bootstrap({ ok: true, value: circleStartChallenge() }, () => '2026-10-15T00:00:00.000Z', () => 'baseline', mode)
   if (!boot.ok) throw new Error('Invalid session')
   const dragActive = vi.fn()
   const feedback = vi.fn()
@@ -104,15 +105,15 @@ describe('dimension handle/store integration (16.1/16.2)', () => {
 
   it('shows no handle for a parameter the current Guided step locks (task 58)', async () => {
     const t = await setup('guided')
-    // Step 1 unlocks the depth: the diameter handle is present.
-    expect(t.handle('diameterM')).toBeTruthy()
+    // Step 1 unlocks only the orientation: no dimension handle is shown.
+    expect(t.handle('diameterM')).toBeUndefined()
     await act(async () => {
-      dispatch({ type: 'setParam', param: 'diameterM', valueM: 0.04, mode: 'strict' })
+      dispatch({ type: 'setOrientation', orientationDeg: 90 })
       dispatch({ type: 'setPrediction', direction: 'decrease', now: 't' })
       dispatch({ type: 'runTest', now: 't', id: 'r1' })
     })
-    // Step 2 locks every dimension (only the shape is editable): no handles remain.
+    // Step 2 unlocks the dimensions: the diameter handle appears.
     expect(session.history).toHaveLength(2)
-    expect(t.handle('diameterM')).toBeUndefined()
+    expect(t.handle('diameterM')).toBeTruthy()
   })
 })

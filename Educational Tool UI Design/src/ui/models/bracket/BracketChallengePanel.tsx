@@ -1,27 +1,29 @@
 import { STATUS_LABELS } from '../../panels/resultPresentation'
 import Icon from '../../icons/Icon'
-import { formatBracket, formatOptional, NOT_APPLICABLE, peakSummary, useBracketStore } from './shared'
+import { bendSummary } from './BracketDetails'
+import { formatBracket, useBracketStore } from './shared'
 
-// Bracket challenge panel (task 46.3; MBR-07, MBR-08, MBR-12, MBR-13, MBR-14). Mirrors the beam
-// and torsion panels: the statement, stored value/limit summary of the latest test with the peak
-// location and Kt, applicability reasons/warnings, a table-only Test details disclosure (D-30)
-// including h/r and D/d, draft errors and Run Test. When the Kt fit does not cover the step the
-// peak stress is shown as "Not applicable" with the reasons, never as a number.
+// Bracket challenge panel (task 55 L-bracket). Mirrors the beam and torsion panels: the
+// statement, stored value/limit summary of the latest test, applicability reasons/warnings, a
+// table-only Test details disclosure (D-30) with the stored bend and bolt quantities, draft
+// errors and Run Test.
 
 export default function BracketChallengePanel({ onOpenHelp }: { onOpenHelp: () => void }) {
   const { state, challenge: ch, runTest } = useBracketStore()
   const latest = state.history[state.history.length - 1]!
-  const { analysis: a, evaluation, designSnapshot } = latest
+  const { analysis: a, evaluation } = latest
   const outside = evaluation.status === 'modelNotApplicable'
   const shown = evaluation.constraints.filter((c) => c.unit !== 'bool')
   const details: [string, string][] = [
-    ['Peak stress', a.peakStressPa !== undefined ? `${formatBracket(a.peakStressPa, 'Pa')} at the ${a.peakLocation}` : NOT_APPLICABLE],
-    ['Nominal root stress', formatBracket(a.rootStressPa, 'Pa')],
-    ['Nominal step stress', formatOptional(a.stepNominalStressPa, 'Pa', designSnapshot)],
-    ['Kt at the step', formatOptional(a.ktStep, 'ratio', designSnapshot)],
-    ['Step peak stress', formatOptional(a.stepPeakStressPa, 'Pa', designSnapshot)],
-    ['h / r', formatOptional(a.heightToRadiusRatio, 'ratio', designSnapshot)],
-    ['D / d', formatOptional(a.stepRatio, 'ratio', designSnapshot)],
+    ['Moment at the bend', formatBracket(a.bendMomentNm, 'Nm')],
+    ['Straight-beam stress', formatBracket(a.nominalBendStressPa, 'Pa')],
+    ['Curved-beam factor', formatBracket(a.curvedBeamFactor, 'ratio')],
+    ['Bend stress (inner fibre)', formatBracket(a.bendStressPa, 'Pa')],
+    ['R / c', formatBracket(a.bendRadiusRatio, 'ratio')],
+    ['Arm bending deflection', formatBracket(a.armDeflectionM, 'm')],
+    ['Flange rotation deflection', formatBracket(a.flangeRotationDeflectionM, 'm')],
+    ['Bolt lever arm', formatBracket(a.boltLeverArmM, 'm')],
+    ['Tension per bolt', formatBracket(a.boltTensionN, 'N')],
   ]
   return (
     <>
@@ -39,14 +41,14 @@ export default function BracketChallengePanel({ onOpenHelp }: { onOpenHelp: () =
             <li className="requirement" key={c.id}>
               <span>{c.label}</span>
               <strong>
-                <span>{c.value !== undefined ? formatBracket(c.value, c.unit) : NOT_APPLICABLE}</span> / <span>{formatBracket(c.limit, c.unit)}</span>
+                <span>{formatBracket(c.value, c.unit)}</span> / <span>{formatBracket(c.limit, c.unit)}</span>
                 {outside && <small>Outside model assumptions</small>}
               </strong>
               <span className={c.passed ? 'pass-mark' : 'fail-mark'}>{c.passed ? '✓ Pass' : '✗ Fail'}</span>
             </li>
           ))}
         </ul>
-        <p className="bracket-peak">{peakSummary(a)}</p>
+        <p className="bracket-peak">{bendSummary(a)}</p>
         {outside && (
           <ul aria-label="Model applicability reasons">
             {a.notApplicableReasons.map((r) => (
@@ -74,14 +76,14 @@ export default function BracketChallengePanel({ onOpenHelp }: { onOpenHelp: () =
               {evaluation.constraints.map((c) => (
                 <tr key={c.id}>
                   <th scope="row">{c.label}</th>
-                  <td>{c.unit === 'bool' ? '' : c.value !== undefined ? formatBracket(c.value, c.unit) : NOT_APPLICABLE}</td>
+                  <td>{c.unit === 'bool' ? '' : formatBracket(c.value, c.unit)}</td>
                   <td>{c.unit === 'bool' ? '' : formatBracket(c.limit, c.unit)}</td>
                   <td>{c.passed ? '✓ Pass' : '✗ Fail'}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <table aria-label="Latest tested stresses">
+          <table aria-label="Latest tested bend and bolt values">
             <tbody>
               {details.map(([label, value]) => (
                 <tr key={label}>
@@ -104,7 +106,7 @@ export default function BracketChallengePanel({ onOpenHelp }: { onOpenHelp: () =
         <div className="insight">
           <Icon name="bulb" size={18} />
           <button type="button" onClick={onOpenHelp}>
-            Stress concentration reference <Icon name="arrow" size={12} />
+            Bend stress and bolt load reference <Icon name="arrow" size={12} />
           </button>
         </div>
       </div>

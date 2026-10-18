@@ -69,7 +69,8 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     expect(initial.challengeId).toBe('torsion-shaft-1')
     expect(initial.mode).toBe(mode.toLowerCase())
     const requirements = page.getByRole('list', { name: 'Design requirements' })
-    await expect(requirements.getByText('2.92°', { exact: true })).toBeVisible()
+    await expect(requirements.getByText('4.79°', { exact: true })).toBeVisible()
+    await expect(requirements.getByText('109.5 MPa', { exact: true })).toBeVisible()
     await expect(page.getByText('Idealized circular-shaft torsion, not a structural certification')).toBeVisible()
     const hollow = page.getByRole('button', { name: 'Hollow tube', exact: true })
     if (mode === 'Guided') {

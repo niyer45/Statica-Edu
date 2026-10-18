@@ -19,7 +19,7 @@ const ids = (facts: readonly { id: string }[]) => facts.map((f) => f.id)
 
 describe('explainBracedFrameSingle', () => {
   it('solved: utilization facts for roof drift, member utilization and mass, the governing member, then the model fact', () => {
-    const r = named('baseline')
+    const r = named('uniform60')
     expect(ids(r.evaluation.facts)).toEqual([
       'single.utilization.roofDrift',
       'single.utilization.utilization',
@@ -36,6 +36,14 @@ describe('explainBracedFrameSingle', () => {
     })
     expect(r.evaluation.facts[1].text).toContain('(over its limit)')
     expect(r.evaluation.facts[0].text).toContain('(within its limit)')
+  })
+
+  it('the baseline is over its limit on roof drift, member utilization and mass', () => {
+    const facts = named('baseline').evaluation.facts
+    for (const id of ['single.utilization.roofDrift', 'single.utilization.utilization', 'single.utilization.mass']) {
+      expect(facts.find((f) => f.id === id)?.text, id).toContain('(over its limit)')
+    }
+    expect(facts.find((f) => f.id === 'single.governingMember')?.text).toContain('lower diagonal (bottom right to top left), in compression and limited by Euler buckling')
   })
 
   it('names tension and near-zero governing members accurately', () => {
@@ -85,8 +93,19 @@ describe('explainBracedFrameSingle', () => {
 })
 
 describe('explainBracedFrameChange', () => {
-  it('baseline → reference: drift and mass ratios, governing member change and pass changes', () => {
-    const prev = named('baseline')
+  it('baseline → reference: every failed limit changes to pass', () => {
+    const facts = explainBracedFrameChange(named('baseline'), named('reference'))
+    expect(ids(facts)).toEqual([
+      'change.roofDrift', 'change.mass', 'change.governingMember',
+      'change.constraint.roofDrift', 'change.constraint.utilization', 'change.constraint.mass', BRACED_FRAME_MODEL_LIMITS_FACT_ID,
+    ])
+    expect(facts.filter((f) => f.id.startsWith('change.constraint.')).map((f) => f.text)).toEqual([
+      'Roof drift: fail → pass.', 'Maximum member utilization: fail → pass.', 'Mass: fail → pass.',
+    ])
+  })
+
+  it('uniform60 → reference: drift and mass ratios, governing member change and pass changes', () => {
+    const prev = named('uniform60')
     const next = named('reference')
     const facts = explainBracedFrameChange(prev, next)
     expect(ids(facts)).toEqual(['change.roofDrift', 'change.mass', 'change.governingMember', 'change.constraint.utilization', BRACED_FRAME_MODEL_LIMITS_FACT_ID])

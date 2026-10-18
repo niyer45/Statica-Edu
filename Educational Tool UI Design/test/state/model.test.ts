@@ -38,7 +38,8 @@ describe('model-based harness infrastructure (task 19.3)', () => {
       literal({ type: 'applySection', kind: 'rectangle' }),
       { kind: 'setCurrentParam', value: 0.06, mode: 'strict' },
       literal({ type: 'setParam', param: 'lengthM', valueM: -1, mode: 'strict' }),
-      literal({ type: 'setOrientation', orientationDeg: 90 }),
+      // The baseline is turned 90° (task 59), so 0° is a real orientation change.
+      literal({ type: 'setOrientation', orientationDeg: 0 }),
       { kind: 'runTest' }, // checkpoint opens but does not append
       literal({ type: 'cancelPrediction' }),
       literal({ type: 'setPrediction', direction: 'decrease', now: 'prediction' }),

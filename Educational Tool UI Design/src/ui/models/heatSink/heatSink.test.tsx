@@ -59,16 +59,18 @@ describe('Heat Sink I workbench', () => {
     expect(modelUiFor(ch.model)).toBe(heatSinkUi)
   })
 
-  it('shows the baseline temperature failure in °C with heat sink wording and no beam or torsion wording', () => {
+  it('shows the baseline temperature, mass and fin height failures with heat sink wording and no beam or torsion wording', () => {
     renderHeatSink()
     const requirements = screen.getByRole('list', { name: 'Design requirements' })
-    expect(within(requirements).getByText('118.2 °C')).toBeTruthy()
+    expect(within(requirements).getByText('82.1 °C')).toBeTruthy()
+    expect(within(requirements).getByText('136.1 g')).toBeTruthy()
+    expect(within(requirements).getByText('40.0 mm')).toBeTruthy()
     expect(within(requirements).getByText('max 55.0 °C')).toBeTruthy()
     // The fin gap is a lower bound: shown as a minimum, and the baseline passes it.
     expect(within(requirements).getByText('min 4.00 mm')).toBeTruthy()
-    expect(within(requirements).getAllByText('✗ Fail')).toHaveLength(1)
+    expect(within(requirements).getAllByText('✗ Fail')).toHaveLength(3)
     expect(screen.getByText(HEAT_SINK_LIMITS_NOTICE)).toBeTruthy()
-    expect(screen.getByRole('img', { name: /Front view across the heat sink: 4 fins on the base, drawn to scale, shaded/ })).toBeTruthy()
+    expect(screen.getByRole('img', { name: /Front view across the heat sink: 3 fins on the base, drawn to scale, shaded/ })).toBeTruthy()
     for (const word of [/beam/i, /deflection/i, /torsion/i, /twist/i, /shaft/i]) expect(screen.queryByText(word)).toBeNull()
   })
 
@@ -82,8 +84,8 @@ describe('Heat Sink I workbench', () => {
     expect(within(rows[5]!).getByRole('rowheader').textContent).toBe('Tip')
     expect(screen.getByText(/Fin color scale: 25\.0 °C \(air\)/)).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Add a fin' }))
-    expect(fieldValue('Fin count')).toBe('5')
-    expect(screen.getByRole('img', { name: 'Front view across the heat sink: 5 fins on the base, drawn to scale' })).toBeTruthy()
+    expect(fieldValue('Fin count')).toBe('4')
+    expect(screen.getByRole('img', { name: 'Front view across the heat sink: 4 fins on the base, drawn to scale' })).toBeTruthy()
     expect(screen.getByText(/shading appears after you test this design/)).toBeTruthy()
     expect(screen.queryByText(/Fin color scale/)).toBeNull()
   })
@@ -107,13 +109,13 @@ describe('Heat Sink I workbench', () => {
 
   it('rejects invalid fin input inline without changing the draft', () => {
     renderHeatSink()
-    // 20 fins of 3 mm cannot fit across the 60 mm base.
+    // 20 fins of 5 mm cannot fit across the 60 mm base.
     setField('Fin count', '20')
     const count = screen.getByLabelText('Fin count')
     expect(count.getAttribute('aria-invalid')).toBe('true')
     expect(document.getElementById(count.getAttribute('aria-describedby')!)!.textContent).toMatch(/^Fin count: Fins overlap/)
     fireEvent.keyDown(count, { key: 'Escape' })
-    expect(fieldValue('Fin count')).toBe('4')
+    expect(fieldValue('Fin count')).toBe('3')
     // Off the 0.5 mm thickness grid: rejected by the model, draft unchanged.
     setField('Fin thickness', '1.2')
     const thickness = screen.getByLabelText('Fin thickness')
@@ -123,7 +125,7 @@ describe('Heat Sink I workbench', () => {
     expect(screen.getByLabelText('Test status').textContent).toBe('Tested #0')
     expect(fieldValue('Fin thickness')).toBe('1.2')
     fireEvent.keyDown(thickness, { key: 'Escape' })
-    expect(fieldValue('Fin thickness')).toBe('3.0')
+    expect(fieldValue('Fin thickness')).toBe('5.0')
     // A slider edit snaps to the grid (clamp mode).
     fireEvent.change(screen.getByLabelText('Fin thickness slider'), { target: { value: '2.2' } })
     expect(fieldValue('Fin thickness')).toBe('2.0')
@@ -138,8 +140,8 @@ describe('Heat Sink I workbench', () => {
     expect(within(table).getAllByText(/^−/).length).toBeGreaterThan(0)
     fireEvent.click(screen.getByRole('tab', { name: 'Design history' }))
     fireEvent.click(screen.getByRole('button', { name: 'Restore Baseline' }))
-    expect(fieldValue('Fin count')).toBe('4')
-    expect(fieldValue('Fin thickness')).toBe('3.0')
+    expect(fieldValue('Fin count')).toBe('3')
+    expect(fieldValue('Fin thickness')).toBe('5.0')
     fireEvent.click(screen.getByRole('button', { name: 'Delete Iteration 1' }))
     fireEvent.click(within(screen.getByRole('dialog', { name: 'Delete Iteration 1?' })).getByRole('button', { name: 'Delete iteration' }))
     expect(screen.queryByRole('button', { name: /^Iteration 1/ })).toBeNull()
@@ -179,7 +181,7 @@ describe('Heat Sink I workbench', () => {
     const { values, storage } = memory()
     renderHeatSink('parametric', storage)
     testReference()
-    const saved = JSON.parse(values.get('ei:session:heat-sink-1:v1')!)
+    const saved = JSON.parse(values.get('ei:session:heat-sink-1:v2')!)
     expect(saved).toMatchObject({ schemaVersion: 2, model: { id: 'plateFinHeatSink', version: 1 } })
     cleanup()
     renderHeatSink('parametric', storage)

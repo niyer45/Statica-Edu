@@ -5,10 +5,10 @@ import type { GuidedPlan } from './plan'
 
 // Cantilever Beam I guided experiments (task 58). Step data only: swap this file to change the
 // sequence. Parameter ids are the section kind ('section'), 'orientationDeg' and the section's
-// own dimension keys, so a step stays valid whatever shape the Baseline uses.
+// own dimension keys. The sequence starts from the task 59 Baseline, an I-section lying on its
+// side (90°), so the first experiment stands it upright.
 
-const DEPTH = ['diameterM', 'outerDiameterM', 'heightM'] as const
-const DIMENSIONS = ['diameterM', 'outerDiameterM', 'innerDiameterM', 'widthM', 'heightM', 'flangeThicknessM', 'webThicknessM', 'orientationDeg'] as const
+const DIMENSIONS = ['diameterM', 'outerDiameterM', 'innerDiameterM', 'widthM', 'heightM', 'flangeThicknessM', 'webThicknessM'] as const
 
 export const BEAM_GUIDED_PLAN: GuidedPlan<BeamDesign, { analysis: Analysis }> = Object.freeze({
   params: (d: Readonly<BeamDesign>) => ({ ...(d.section as unknown as Record<string, number>), section: d.section.kind, orientationDeg: d.orientationDeg }),
@@ -23,34 +23,34 @@ export const BEAM_GUIDED_PLAN: GuidedPlan<BeamDesign, { analysis: Analysis }> = 
   },
   steps: [
     {
-      id: 'depth',
-      title: 'Make it deeper',
-      instruction: 'Increase only the depth of the section (its diameter or height). Predict how tip deflection will change, then Run Test.',
-      hint: 'Bending stiffness grows very quickly with depth, but mass grows too. Compare both numbers with the Baseline.',
-      focus: 'Depth (diameter or height)',
-      unlocks: DEPTH,
-      objective: { kind: 'change', params: DEPTH, direction: 'increase', single: true },
-      observe: ['tipDeflectionM', 'massKg'],
-    },
-    {
-      id: 'shape',
-      title: 'Try another shape',
-      instruction: 'Switch to a different section shape without touching any dimension. Predict, then test: does the new shape use its material better?',
-      hint: 'Shapes that place material far from the centre, such as a tube or an I-section, usually stiffen more per kilogram.',
-      focus: 'Section shape',
-      unlocks: ['section'],
-      objective: { kind: 'change', params: ['section'], direction: 'any' },
-      observe: ['tipDeflectionM', 'massKg'],
+      id: 'upright',
+      title: 'Stand it upright',
+      instruction: 'Change only the section orientation, keeping every dimension. Predict how tip deflection will change, then Run Test.',
+      hint: 'The same material resists bending far better when the tall side of the section lines up with the load. Mass does not change.',
+      focus: 'Section orientation',
+      unlocks: ['orientationDeg'],
+      objective: { kind: 'change', params: ['orientationDeg'], direction: 'any' },
+      observe: ['tipDeflectionM', 'nominalMaxStressPa', 'massKg'],
     },
     {
       id: 'tune',
       title: 'Tune one dimension',
-      instruction: 'Change exactly one dimension of your section (or its orientation). Predict the effect on deflection and mass, then Run Test.',
-      hint: 'One change per test keeps cause and effect clear. A rectangle or I-section stood on its edge is much stiffer than one lying flat.',
-      focus: 'Any one dimension or the orientation',
+      instruction: 'Change exactly one dimension of the section. Predict the effect on deflection and mass, then Run Test.',
+      hint: 'One change per test keeps cause and effect clear. Material far from the centre (flanges, height) adds stiffness fastest; check the envelope limit too.',
+      focus: 'Any one dimension',
       unlocks: DIMENSIONS,
       objective: { kind: 'change', params: DIMENSIONS, direction: 'any', single: true },
       observe: ['tipDeflectionM', 'massKg', 'nominalMaxStressPa'],
+    },
+    {
+      id: 'shape',
+      title: 'Try another shape',
+      instruction: 'Switch to a different section shape. Predict, then test: does the new shape use its material better or worse?',
+      hint: 'Shapes that place material far from the centre, such as a tube or an I-section, usually stiffen more per kilogram than solid ones.',
+      focus: 'Section shape',
+      unlocks: ['section'],
+      objective: { kind: 'change', params: ['section'], direction: 'any' },
+      observe: ['tipDeflectionM', 'massKg'],
     },
     {
       id: 'open',

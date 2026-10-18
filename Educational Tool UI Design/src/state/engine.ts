@@ -86,8 +86,14 @@ export type SharedAction =
   | { type: 'submit'; testResultId: string; now: string }
   | { type: 'importDesign'; json: unknown }
   | { type: 'reset' }
+  /**
+   * Task 60: replace the draft with a fresh copy of the challenge's baseline design. History,
+   * deletions, comparison, reflection and submission are kept; a no-op when the draft already
+   * equals the baseline (ignoring id).
+   */
+  | { type: 'resetDraft' }
 
-const SHARED_TYPES: ReadonlySet<string> = new Set(['setPrediction', 'cancelPrediction', 'runTest', 'deleteIteration', 'restore', 'toggleCompare', 'setReflection', 'submit', 'importDesign', 'reset'])
+const SHARED_TYPES: ReadonlySet<string> = new Set(['setPrediction', 'cancelPrediction', 'runTest', 'deleteIteration', 'restore', 'toggleCompare', 'setReflection', 'submit', 'importDesign', 'reset', 'resetDraft'])
 
 /** True for an action the engine handles for every model (not a model edit). */
 export function isSharedAction(a: { type: string }): boolean {
@@ -328,6 +334,15 @@ export function makeSessionReducer<Ch extends ChallengeBase<D>, D extends Design
         // The UI obtains reasons from the same pure helper; Req 23.6 forbids changing even UI state here.
         if (!imported.ok) return s
         return { ...s, draft: imported.value, draftStatus: statusOf(imported.value, s.history), draftErrors: [], pendingPrediction: undefined, ui: { predictionDialogOpen: false } }
+      }
+      case 'resetDraft': {
+        // Task 60: the baseline comes from the challenge content (persistence guarantees that
+        // history[0] holds the same design). Tested history, deletions, comparison, reflection
+        // and submission are the learner's evidence and stay untouched. draftStatus follows the
+        // same rule as restore: 'tested' only if the latest recorded test is the baseline design.
+        if (def.sameDesignIgnoringId(s.draft, ch.initialDesign)) return s
+        const draft = copyForRestore(ch.initialDesign, s)
+        return { ...s, draft, draftStatus: statusOf(draft, s.history), draftErrors: [], pendingPrediction: undefined, ui: { predictionDialogOpen: false } }
       }
       case 'reset': {
         // History is append-only even on reset (Req 18.1); no baseline is regenerated.

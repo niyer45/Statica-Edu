@@ -36,7 +36,8 @@ describe('loadHeatSinkChallenge: bundled-format config', () => {
 
   it('defines the identity and learning settings (HSK-01, HSK-08, HSK-09)', () => {
     expect(ch.id).toBe('heat-sink-1')
-    expect(ch.version).toBe(1)
+    // Version 2 (task 59): the baseline changed, so saves move to a new storage key (MM-04).
+    expect(ch.version).toBe(2)
     expect(ch.title).toBe('Heat Sink I')
     expect(ch.model).toEqual(HEAT_SINK_MODEL_REF)
     expect(ch.model).toEqual({ id: 'plateFinHeatSink', version: 1 })
@@ -79,7 +80,7 @@ describe('loadHeatSinkChallenge: bundled-format config', () => {
       finHeightM: { minM: 0.005, maxM: 0.045, stepM: 0.001 },
       minGeometricGapM: 0.001,
     })
-    expect(ch.initialDesign).toEqual({ id: 'baseline', finCount: 4, finThicknessM: 0.003, finHeightM: 0.015, materialId: 'aluminum-educational' })
+    expect(ch.initialDesign).toEqual({ id: 'baseline', finCount: 3, finThicknessM: 0.005, finHeightM: 0.04, materialId: 'aluminum-educational' })
     expect(ch.referenceDesign).toEqual({ id: 'reference', finCount: 10, finThicknessM: 0.0015, finHeightM: 0.035, materialId: 'aluminum-educational' })
   })
 

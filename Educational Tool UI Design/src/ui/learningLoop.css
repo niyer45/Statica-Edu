@@ -277,6 +277,10 @@
 .bracket-wall-face { stroke: #3d4a3f; stroke-width: 1.5; }
 .bracket-plate { fill: #7d8a7e; stroke: #2f3a31; stroke-width: 1; }
 .bracket-bolt { fill: #3d4a3f; }
+.bracket-washer { fill: #6f7c70; stroke: #2f3a31; stroke-width: 0.6; }
+.bracket-body-side { fill: #c7cfbb; stroke: #4f653e; stroke-width: 0.6; stroke-linejoin: round; }
+.bracket-wall-side { fill: #b9c0b1; stroke: #3d4a3f; stroke-width: 1; }
+.bracket-body-side-smooth { stroke: #c7cfbb; }
 .bracket-body-back { fill: #c7cfbb; stroke: #4f653e; stroke-width: 1; }
 .bracket-cable { stroke: #3d4a3f; stroke-width: 1.5; }
 .bracket-weight { fill: #cf744b; stroke: #7a3f14; stroke-width: 1; }
@@ -345,3 +349,8 @@
   .frame-tools .dimensions-heading { margin: 16px 0 10px; }
   .frame-metrics .metric { flex: 1 1 40%; }
 }
+/* Reset to baseline (task 60): one shared row under the Design tools title for every model. */
+.reset-baseline { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding: 10px 15px; border-bottom: 1px solid var(--line); }
+.reset-baseline .reset-baseline-button { color: #345640; border-color: #8a977d; font-size: 10px; padding: 6px 10px; }
+.reset-baseline .reset-baseline-button[aria-disabled='true'] { cursor: not-allowed; color: #5f6a56; border-color: #dce1d4; }
+.reset-baseline-note { font-size: 9px; color: #5f6a56; }

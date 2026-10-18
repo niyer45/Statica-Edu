@@ -32,7 +32,9 @@ describe('runtime dispatch', () => {
     expect(runtimeFor({ id: 'notARegisteredModel', version: 1 })).toBeUndefined()
     expect(runtimeFor({ id: 'plateFinHeatSink', version: 2 })).toBeUndefined()
     expect(runtimeFor(bracketModel.ref)).toBe(bracketRuntime)
-    expect(runtimeFor({ id: 'steppedBarBracket', version: 2 })).toBeUndefined()
+    expect(runtimeFor({ id: 'boltedLBracket', version: 2 })).toBeUndefined()
+    // The retired stepped-bar bracket (challenge version 1) is never substituted (MM-01, MM-07).
+    expect(runtimeFor({ id: 'steppedBarBracket', version: 1 })).toBeUndefined()
     expect(runtimeFor(bracedFrameModel.ref)).toBe(bracedFrameRuntime)
     expect(runtimeFor({ id: 'pinJointedBracedFrame', version: 2 })).toBeUndefined()
   })
@@ -44,7 +46,8 @@ describe('runtime dispatch', () => {
     ['an unregistered model', { model: { id: 'notARegisteredModel', version: 1 } }, undefined],
     ['an unregistered model version', { model: { id: 'sdofBaseIsolation', version: 2 } }, undefined],
     ['an explicit heat sink model', { model: { id: 'plateFinHeatSink', version: 1 } }, heatSinkRuntime],
-    ['an explicit bracket model', { model: { id: 'steppedBarBracket', version: 1 } }, bracketRuntime],
+    ['an explicit bracket model', { model: { id: 'boltedLBracket', version: 1 } }, bracketRuntime],
+    ['the retired stepped-bar bracket model', { model: { id: 'steppedBarBracket', version: 1 } }, undefined],
     ['an explicit braced-frame model', { model: { id: 'pinJointedBracedFrame', version: 1 } }, bracedFrameRuntime],
     ['a malformed model', { model: 'circularShaftTorsion' }, undefined],
     ['a model with a non-numeric version', { model: { id: 'circularShaftTorsion', version: '1' } }, undefined],
@@ -70,7 +73,7 @@ describe('runtime persistence', () => {
     const s = torsionRuntime.init(ch, T0, 't0', 'parametric')
     if (!s.ok) throw new Error(s.error.message)
     expect(s.value.mode).toBe('parametric')
-    expect(torsionRuntime.key(ch)).toBe('ei:session:torsion-shaft-1:v1')
+    expect(torsionRuntime.key(ch)).toBe('ei:session:torsion-shaft-1:v2')
     const raw = torsionRuntime.serialize(s.value, T0)
     expect(JSON.parse(raw)).toMatchObject({ schemaVersion: 2, model: torsionModel.ref })
     const back = torsionRuntime.deserialize(raw, ch)
@@ -84,7 +87,7 @@ describe('runtime persistence', () => {
     const s = heatSinkRuntime.init(ch, T0, 'h0', 'guided')
     if (!s.ok) throw new Error(s.error.message)
     expect(s.value.mode).toBe('guided')
-    expect(heatSinkRuntime.key(ch)).toBe('ei:session:heat-sink-1:v1')
+    expect(heatSinkRuntime.key(ch)).toBe('ei:session:heat-sink-1:v2')
     const raw = heatSinkRuntime.serialize(s.value, T0)
     expect(JSON.parse(raw)).toMatchObject({ schemaVersion: 2, model: heatSinkModel.ref })
     const back = heatSinkRuntime.deserialize(raw, ch)
@@ -102,7 +105,8 @@ describe('runtime persistence', () => {
     const s = bracketRuntime.init(ch, T0, 'br0', 'parametric')
     if (!s.ok) throw new Error(s.error.message)
     expect(s.value.mode).toBe('parametric')
-    expect(bracketRuntime.key(ch)).toBe('ei:session:mounting-bracket-1:v1')
+    // Challenge version 2 (L-bracket): stepped-bracket saves under …:v1 are never read (MM-04).
+    expect(bracketRuntime.key(ch)).toBe('ei:session:mounting-bracket-1:v2')
     const raw = bracketRuntime.serialize(s.value, T0)
     expect(JSON.parse(raw)).toMatchObject({ schemaVersion: 2, model: bracketModel.ref })
     const back = bracketRuntime.deserialize(raw, ch)
@@ -120,7 +124,7 @@ describe('runtime persistence', () => {
     const ch = bracedFrameChallenge()
     const s = bracedFrameRuntime.init(ch, T0, 'f0', 'guided')
     if (!s.ok) throw new Error(s.error.message)
-    expect(bracedFrameRuntime.key(ch)).toBe('ei:session:braced-frame-1:v1')
+    expect(bracedFrameRuntime.key(ch)).toBe('ei:session:braced-frame-1:v2')
     // Remove the upper diagonal (a mechanism), predict and test, so the saved history holds a mechanism.
     let next = bracedFrameRuntime.reduce(s.value, { type: 'edit', edit: { type: 'toggleDiagonal', memberId: 'diag2b' } }, ch)
     next = bracedFrameRuntime.reduce(next, { type: 'setPrediction', direction: 'increase', now: T0 }, ch)

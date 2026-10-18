@@ -48,43 +48,47 @@ async function noHorizontalOverflow(page: Page) {
 
 for (const mode of ['Guided', 'Parametric'] as const) {
   test(`Heat Sink I ${mode}: test an Accepted fin array, persist it and keep it isolated`, async ({ page }) => {
-    // Guided adds its experiment steps (task 58): three or four more tests before the final one.
+    // Guided adds its experiment steps (task 58): three more tests before the final one.
     test.setTimeout(mode === 'Guided' ? 150_000 : 90_000) // Keyboard entry, prediction, reload, cross-challenge check and axe.
-    await page.goto('/')
+    await page.goto('/#challenges')
     await openHeatSink(page, mode, mode === 'Guided')
     const initial = await readState(page)
     expect(initial.challengeId).toBe('heat-sink-1')
     expect(initial.mode).toBe(mode.toLowerCase())
     const requirements = page.getByRole('list', { name: 'Design requirements' })
-    await expect(requirements.getByText('118.2 °C', { exact: true })).toBeVisible()
+    // The baseline fails base temperature, mass and fin height (task 59).
+    await expect(requirements.getByText('82.1 °C', { exact: true })).toBeVisible()
+    await expect(requirements.getByText('136.1 g', { exact: true })).toBeVisible()
+    await expect(requirements.getByText('✗ Fail', { exact: true })).toHaveCount(3)
     await expect(page.getByText('Idealized plate-fin heat sink model, not a thermal certification')).toBeVisible()
-    await expect(page.getByRole('img', { name: /Front view across the heat sink: 4 fins/ })).toBeVisible()
-    const count = page.getByLabel('Fin count', { exact: true })
+    await expect(page.getByRole('img', { name: /Front view across the heat sink: 3 fins/ })).toBeVisible()
+    const height = page.getByLabel('Fin height', { exact: true })
     if (mode === 'Guided') {
-      // Task 58: structured experiments; only the fin height is editable in the first step.
-      await expectGuidedStep(page, 'Taller fins')
-      await expect(count).toHaveAttribute('readonly', '')
-      await expect(page.getByRole('button', { name: 'Add a fin' })).toBeDisabled()
+      // Task 58: structured experiments; only the fin count is editable in the first step.
+      await expectGuidedStep(page, 'More fins')
+      await expect(height).toHaveAttribute('readonly', '')
+      await expect(page.getByRole('button', { name: 'Add a fin' })).toBeEnabled()
     } else {
       await expect(page.getByRole('region', { name: 'Guided experiments' })).toHaveCount(0)
       await expect(page.getByText(/Every parameter is editable from the start/)).toBeVisible()
-      await expect(count).not.toHaveAttribute('readonly', '')
+      await expect(height).not.toHaveAttribute('readonly', '')
     }
     await expect(page.getByText(/convection coefficient is a given fan-assisted value/)).toBeVisible()
     await audit(page)
 
     if (mode === 'Guided') {
+      await setFin(page, 'Fin count', '4')
+      await runAnyTest(page)
+      await expectGuidedStep(page, 'Thinner fins')
+      await expect(page.getByRole('button', { name: 'Add a fin' })).toBeDisabled()
+      await setFin(page, 'Fin thickness', '3')
+      await runAnyTest(page)
+      await expectGuidedStep(page, 'Fin height')
       await setFin(page, 'Fin height', '35')
-      await runAnyTest(page)
-      await expectGuidedStep(page, 'More fins')
-      await expect(page.getByLabel('Fin height', { exact: true })).toHaveAttribute('readonly', '')
-      await setFin(page, 'Fin count', '10')
-      await runAnyTest(page)
-      await expectGuidedStep(page, 'Fin thickness')
-      await setFin(page, 'Fin thickness', '2')
       await runAnyTest(page)
       await expectGuidedStep(page, 'Meet every check')
       await setFin(page, 'Fin thickness', '1.5')
+      await setFin(page, 'Fin count', '10')
       await runAnyTest(page)
       await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('heading', { name: 'All experiments complete' })).toBeVisible()
     } else {

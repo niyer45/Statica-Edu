@@ -1,6 +1,5 @@
 import { useId, useState, type KeyboardEvent } from 'react'
 import type { BracedFrameChallenge } from '../../../challenge/bracedFrame/types'
-import { BRACED_FRAME_CONSTRAINT_LABELS } from '../../../evaluation/bracedFrame/constraints'
 import { explainBracedFrameChange } from '../../../evaluation/bracedFrame/explain'
 import { BRACED_FRAME_COMPARISON_METRICS, type BracedFrameMetricId } from '../../../evaluation/bracedFrame/metrics'
 import type { BracedFrameDesign } from '../../../geometry/bracedFrame/design'
@@ -10,7 +9,7 @@ import { useAnnounce } from '../../a11y/useAnnouncements'
 import Dialog from '../../dialogs/Dialog'
 import Icon from '../../icons/Icon'
 import { STATUS_LABELS } from '../../panels/resultPresentation'
-import { boolText, bracingSummary, constraintRows, formatFrame, NOT_APPLICABLE, useFrameStore } from './shared'
+import { boolText, bracingSummary, CHECK_LABELS, constraintRows, formatFrame, NOT_APPLICABLE, useFrameStore } from './shared'
 
 // Braced frame history and comparison (task 49.3; BFR-06, BFR-08, MM-13, MM-14, MM-19). Same
 // list/detail layout, compare limit, restore and confirmed deletion as the beam and torsion
@@ -187,11 +186,10 @@ export default function BracedFrameResults() {
             </span>
           </div>
           <div className="metrics frame-metrics">
-            {constraintRows(selected.evaluation)
-              .filter((row) => row.id !== 'applicability')
-              .map(({ id: cid, result: c }) => (
+            {constraintRows(selected.evaluation).map(({ id: cid, result: c }) =>
+              cid === 'applicability' ? null : (
                 <div className="metric" key={cid}>
-                  <div>{BRACED_FRAME_CONSTRAINT_LABELS[cid]}</div>
+                  <div>{CHECK_LABELS[cid]}</div>
                   {c === undefined ? (
                     <>
                       <strong>{NOT_APPLICABLE}</strong>
@@ -208,7 +206,8 @@ export default function BracedFrameResults() {
                     </>
                   )}
                 </div>
-              ))}
+              ),
+            )}
           </div>
           <details className="history-details">
             <summary>Test details</summary>

@@ -16,7 +16,7 @@ function tested(name: string): HeatSinkComparable {
 
 describe('explainHeatSinkSingle', () => {
   it('gives one fact per numeric constraint, then the model fact', () => {
-    const r = tested('baseline')
+    const r = tested('shortFins')
     const facts = r.evaluation.facts
     expect(facts.map((f) => f.id)).toEqual([
       'single.utilization.baseTemperature',
@@ -67,8 +67,8 @@ describe('explainHeatSinkSingle', () => {
 })
 
 describe('explainHeatSinkChange', () => {
-  it('baseline → reference compares effective area, rise, mass and fin efficiency and the pass changes', () => {
-    const prev = tested('baseline')
+  it('shortFins → reference compares effective area, rise, mass and fin efficiency and the pass changes', () => {
+    const prev = tested('shortFins')
     const next = tested('reference')
     const facts = explainHeatSinkChange(prev, next)
     const rArea = next.analysis.effectiveAreaM2 / prev.analysis.effectiveAreaM2

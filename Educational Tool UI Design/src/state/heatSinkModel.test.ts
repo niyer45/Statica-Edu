@@ -60,10 +60,11 @@ describe('heat sink learning loop through the engine', () => {
     expect(modelFor({ id: 'plateFinHeatSink', version: 2 })).toBeUndefined()
   })
 
-  it('stores the worksheet baseline and fails baseTemperature only', () => {
+  it('stores the worksheet baseline and fails baseTemperature, mass and finHeight', () => {
     const base = fresh().history[0]!
     expect(base.analysis.baseTemperatureK).toBeCloseTo(worksheetFixture('baseline').expected.baseTemperatureK, 9)
-    expect(base.failures).toEqual(['baseTemperature'])
+    expect(base.analysis.massKg).toBeCloseTo(worksheetFixture('baseline').expected.massKg, 12)
+    expect(base.failures).toEqual(['baseTemperature', 'mass', 'finHeight'])
     expect(base.evaluation.status).toBe('notAccepted')
   })
 
@@ -109,7 +110,7 @@ describe('heat sink learning loop through the engine', () => {
   it('shares restore, delete, compare and reset semantics with the beam', () => {
     let s = looped()
     s = heatSinkReducer(s, { type: 'restore', testResultId: 'base-1' }, ch)
-    expect(s.draft.finCount).toBe(4)
+    expect(s.draft.finCount).toBe(3)
     expect(s.draftStatus).toBe('draft')
     s = heatSinkReducer(s, { type: 'deleteIteration', testResultId: 'hs-1' }, ch)
     expect(s.deletedIterationIds).toEqual(['hs-1'])
@@ -269,6 +270,7 @@ describe('engine invariants for heat sink action sequences', () => {
     fc.constantFrom<'increase' | 'decrease' | 'same'>('increase', 'decrease', 'same').map((direction) => ({ type: 'setPrediction' as const, direction, now: T0 })),
     fc.nat(99).map((n) => ({ type: 'runTest' as const, now: T0, id: `t-${n}` })),
     fc.constant({ type: 'reset' as const }),
+    fc.constant({ type: 'resetDraft' as const }),
   )
 
   it('keeps history append-only, drafts valid, checkpoints predicted and reduction pure', () => {

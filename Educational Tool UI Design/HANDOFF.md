@@ -2,6 +2,19 @@
 
 Last updated: **2026-10-17** (Claude Code: task 54 3D views complete; next gate 51). Specification batch `ba1dc2d` passed [CI run 39071816823](https://github.com/niyer45/Statica-Edu/actions/runs/39071816823), all steps including the 2 responsive cases and full E2E. 34.1 step 1 adds the model registry with no user-visible change.
 
+## PAUSED 2026-10-18: owner feedback batch (tasks 55, 56, 38, 58, 59, 60) in progress
+
+Owner requests (2026-10-18): (1) Mounting Bracket I as a real L-bracket; (2) declutter Braced Frame and Vibration pages; (3) accounts + homepage; (4) a real Guided vs Parametric difference; (5) every baseline fails as many checks as possible; (6) Reset-to-baseline buttons. Work paused at owner request before integration verification.
+
+- `main` is unchanged apart from 04fa406 (configurable E2E ports `PW_DEV_PORT`/`PW_PREVIEW_PORT`, CI 39135461804 green).
+- Branch `integrate-55-60` (pushed, NOT verified as a whole, NOT on main) merges:
+  - task 55 L-bracket (`boltedLBracket` v1, challenge v2; agent: unit/lint/typecheck/build green; catalog E2E only partly green under host load),
+  - task 59 hardest baselines (beam/torsion/heat sink/frame bumped to v2; vibration already maximal; supersedes MVP Req 3.6/3.7 for the beam on owner instruction; regression test `test/challenges/baselineDifficulty.test.ts`),
+  - task 56 frame/vibration declutter (goal card + disclosures; frame workbench words 585→249, vibration 420→256).
+  Merge conflicts resolved by the lead in `e2e/catalog.spec.ts`, `bracedFrame.test.tsx`, `e2e/bracedFrame.spec.ts`; only typecheck and the frame/vibration unit tests were rerun after merging.
+- Not yet merged (local agent worktree branches): task 60 reset (`worktree-agent-a8b6366b02df77652`), task 58 Guided/Parametric (`worktree-agent-af88bf8e1d5ec93e8`), task 38 local-first accounts/homepage (`worktree-agent-a57218c1431197387`).
+- To resume: merge the three branches into `integrate-55-60`, run lint/typecheck/test/build/schema and the full E2E on a quiet machine, update tasks.md/DECISIONS.md (proposed D-46+ text is in the agent reports in the session transcript), then fast-forward main and watch CI. Accounts are device-local only; real cross-device sync needs an owner backend decision.
+
 ## Repository and local locations
 
 - GitHub: https://github.com/niyer45/Statica-Edu — default/development branch **main**.

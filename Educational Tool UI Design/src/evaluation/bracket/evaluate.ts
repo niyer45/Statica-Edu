@@ -7,11 +7,10 @@ import { bracketEfficiency, evaluateBracketConstraints } from './constraints'
 import { explainBracketSingle } from './explain'
 import type { BracketEvaluation } from './types'
 
-// Bracket evaluation (task 46.2; MBR-08, MBR-16, MM-11). Shared acceptance semantics: status is
-// modelNotApplicable when the model does not apply (including an undefined Kt fit, MM-10),
-// otherwise accepted iff every constraint passes; warnings never affect it. A not-applicable
-// design is therefore never Accepted. "Accepted" means "meets this challenge's educational
-// limits" (MBR-16), not real-world approval.
+// Bracket evaluation (task 55 L-bracket; MM-11). Shared acceptance semantics: status is
+// modelNotApplicable when the model does not apply, otherwise accepted iff every constraint
+// passes; warnings never affect it. A not-applicable design is therefore never Accepted.
+// "Accepted" means "meets this challenge's educational limits", not real-world approval.
 
 /**
  * Evaluates a bracket analysis against the challenge limits.

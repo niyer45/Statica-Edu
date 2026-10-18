@@ -1,11 +1,11 @@
 {
   "id": "mounting-bracket-1",
-  "version": 1,
-  "model": { "id": "steppedBarBracket", "version": 1 },
+  "version": 2,
+  "model": { "id": "boltedLBracket", "version": 1 },
   "title": "Mounting Bracket I",
   "difficulty": "intermediate",
   "allowedModes": ["guided", "parametric"],
-  "statement": "The aluminum mounting bracket carries more stress than it should under a static tip load. Find where its stress actually peaks and redesign the depths, the step location and the shoulder fillet to meet the peak stress limit while staying within the deflection, mass and envelope limits. The length, thickness, wall clamp, material and applied force are fixed.",
+  "statement": "An aluminum L-bracket is bolted flat to a wall by its vertical flange, and a load hangs from its horizontal arm. The current bracket, cut from wide thin sheet with a sharp bend and a short flange, is overstressed at the bend, sags too far, overloads its wall bolts and is too heavy. Redesign the thickness, width, flange height and inner bend radius so that every check passes. The load, its distance from the wall, the material and the two bolts are fixed.",
   "material": {
     "id": "al-educational",
     "name": "Aluminum (educational nominal)",
@@ -14,42 +14,43 @@
     "allowableStressPa": 120e6,
     "yieldStressPa": 240e6
   },
-  "lengthM": 0.3,
-  "thicknessM": 0.01,
-  "support": "wallClamp",
-  "load": { "forceN": 300, "location": "freeEnd", "direction": "down" },
+  "loadOffsetM": 0.12,
+  "tipOverhangM": 0.015,
+  "bolts": { "count": 2, "edgeDistanceM": 0.015 },
+  "support": "boltedWall",
+  "load": { "forceN": 200, "location": "loadLine", "direction": "down" },
   "initialDesign": {
     "id": "baseline",
-    "rootDepthM": 0.03,
-    "armDepthM": 0.02,
-    "stepLocationM": 0.15,
-    "filletRadiusM": 0.001,
+    "thicknessM": 0.003,
+    "widthM": 0.12,
+    "flangeHeightM": 0.055,
+    "innerRadiusM": 0.001,
     "materialId": "al-educational"
   },
   "referenceDesign": {
     "id": "reference",
-    "rootDepthM": 0.03,
-    "armDepthM": 0.02,
-    "stepLocationM": 0.175,
-    "filletRadiusM": 0.003,
+    "thicknessM": 0.007,
+    "widthM": 0.04,
+    "flangeHeightM": 0.08,
+    "innerRadiusM": 0.006,
     "materialId": "al-educational"
   },
-  "lockedFields": ["lengthM", "thicknessM", "materialId", "forceN", "support"],
+  "lockedFields": ["loadOffsetM", "materialId", "forceN", "bolts", "support"],
   "constraints": {
-    "maxPeakStressPa": 120e6,
-    "maxTipDeflectionM": 0.0024,
-    "maxMassKg": 0.215,
-    "maxEnvelopeDepthM": 0.04
+    "maxBendStressPa": 120e6,
+    "maxDeflectionM": 0.0024,
+    "maxBoltTensionN": 300,
+    "maxMassKg": 0.175
   },
   "designLimits": {
-    "rootDepthM": { "minM": 0.015, "maxM": 0.05, "stepM": 0.0005 },
-    "armDepthM": { "minM": 0.01, "maxM": 0.05, "stepM": 0.0005 },
-    "stepLocationM": { "minM": 0.06, "maxM": 0.24, "stepM": 0.005 },
-    "filletRadiusM": { "minM": 0.0005, "maxM": 0.01, "stepM": 0.0005 }
+    "thicknessM": { "minM": 0.003, "maxM": 0.01, "stepM": 0.0005 },
+    "widthM": { "minM": 0.04, "maxM": 0.12, "stepM": 0.001 },
+    "flangeHeightM": { "minM": 0.05, "maxM": 0.15, "stepM": 0.005 },
+    "innerRadiusM": { "minM": 0.001, "maxM": 0.012, "stepM": 0.0005 }
   },
   "predictionPolicy": { "requiredOnIterations": [1, 3] },
   "reflectionPrompt": {
     "id": "mounting-bracket-1-reflection",
-    "text": "Using your tested designs, explain where the peak stress occurred, how the fillet radius and the step location changed it, and why adding material everywhere was not the answer."
+    "text": "Using your tested designs, explain why the bend is the critical section, how the inner bend radius and the thickness changed the bend stress, how the flange height changed the bolt tension and the deflection, and why adding material everywhere was not the answer."
   }
 }

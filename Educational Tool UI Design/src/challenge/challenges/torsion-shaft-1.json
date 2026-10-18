@@ -1,11 +1,11 @@
 {
   "id": "torsion-shaft-1",
-  "version": 1,
+  "version": 2,
   "model": { "id": "circularShaftTorsion", "version": 1 },
   "title": "Torsion Shaft I",
   "difficulty": "intermediate",
   "allowedModes": ["guided", "parametric"],
-  "statement": "The steel drive shaft twists more than its allowable angle under a steady torque. Redesign its cross-section to meet the twist and shear stress limits while staying within the mass and packaging limits. The length, end support, material, and applied torque are fixed.",
+  "statement": "The steel drive shaft twists more than its allowable angle and is overstressed in shear under a steady torque. Redesign its cross-section to meet the twist and shear stress limits while staying within the mass and packaging limits. The length, end support, material, and applied torque are fixed.",
   "material": {
     "id": "steel-educational",
     "name": "Steel (educational nominal)",
@@ -19,7 +19,7 @@
   "support": "fixedEnd",
   "initialDesign": {
     "id": "baseline",
-    "section": { "kind": "circle", "diameterM": 0.03 },
+    "section": { "kind": "circle", "diameterM": 0.0265 },
     "lengthM": 0.8,
     "materialId": "steel-educational"
   },

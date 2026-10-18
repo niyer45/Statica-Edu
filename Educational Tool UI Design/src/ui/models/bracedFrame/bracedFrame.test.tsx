@@ -8,6 +8,7 @@ import StoreProvider from '../../state/StoreProvider'
 import Workbench from '../../workbench/Workbench'
 import { modelUiFor } from '../registry'
 import { bracedFrameUi, BRACED_FRAME_LIMITS_NOTICE } from '.'
+import { FRAME_CHANGE, FRAME_GOAL } from './BracedFrameGoal'
 
 // Braced Frame I workbench (task 49.3) through the PRODUCTION model UI registry. The challenge
 // is booted directly here; card activation is a separate, explicitly approved step. Expected
@@ -54,13 +55,14 @@ function testReference() {
   toggle('Storey 2 diagonal, bottom left to top right')
   section(/^Lower left column/, 'CHS48.3x3.2')
   section(/^Lower right column/, 'CHS88.9x5.0')
+  section(/^Upper left column/, 'CHS60.3x4.0')
   section(/^Upper right column/, 'CHS76.1x4.0')
   section(/^Floor beam/, 'CHS76.1x4.0')
   section(/^Roof beam/, 'CHS76.1x4.0')
   section(/^Lower diagonal \(bottom left to top right\)/, 'CHS76.1x4.0')
   section(/^Upper diagonal \(bottom left to top right\)/, 'CHS48.3x3.2')
-  // The worksheet ratio baseline → reference is 1.19: roof drift increases.
-  runWithPrediction(/Increase/)
+  // The worksheet ratio baseline → reference is 0.82: roof drift decreases.
+  runWithPrediction(/Decrease/)
 }
 
 const requirements = () => screen.getByRole('list', { name: 'Design requirements' })
@@ -75,23 +77,37 @@ describe('Braced Frame I workbench', () => {
     expect(modelUiFor(ch.model)).toBe(bracedFrameUi)
   })
 
-  it('shows the baseline utilization failure with frame wording and no beam or torsion wording', async () => {
+  it('shows the baseline drift, utilization and mass failures with frame wording and no beam or torsion wording', async () => {
     renderFrame()
     // The drawing is the lazy 3D chunk; jsdom has no WebGL2, so it resolves to the SVG fallback.
     await screen.findByRole('img', { name: /Two-storey braced frame elevation/ }, { timeout: 5000 })
     const list = requirements()
     expect(within(list).getByText('Stable')).toBeTruthy()
-    expect(within(list).getByText('8.72 mm')).toBeTruthy()
-    expect(within(list).getByText('337.2%')).toBeTruthy()
-    expect(within(list).getByText('166.6 kg')).toBeTruthy()
-    expect(within(list).getAllByText('✗ Fail')).toHaveLength(1)
-    expect(screen.getByText(/Governing member: Lower diagonal \(bottom right to top left\), in compression, limited by Euler buckling/)).toBeTruthy()
-    expect(screen.getByText(/This frame is modeled as pin-jointed: every joint is a hinge/)).toBeTruthy()
+    expect(within(list).getByText('12.61 mm')).toBeTruthy()
+    expect(within(list).getByText('819.9%')).toBeTruthy()
+    expect(within(list).getByText('201.8 kg')).toBeTruthy()
+    expect(within(list).getAllByText('✗ Fail')).toHaveLength(3)
+    // Task 56 goal card: one goal, what to change, short check labels and a pass count.
+    const goal = screen.getByRole('region', { name: 'Goal' })
+    expect(within(goal).getByText(FRAME_GOAL)).toBeTruthy()
+    expect(within(goal).getByText(FRAME_CHANGE)).toBeTruthy()
+    expect(within(goal).getByText('1 of 4 pass')).toBeTruthy()
+    expect(within(list).getAllByRole('listitem').map((li) => li.querySelector('.goal-label')!.textContent)).toEqual(['Stability', 'Roof drift', 'Member utilization', 'Mass'])
+    expect(within(goal).getByText('Governing member: Lower diagonal (bottom right to top left), compression, Euler buckling.')).toBeTruthy()
+    // The full statement with the pin-jointed idealization is kept behind a disclosure.
+    const brief = screen.getByText('Full brief and model assumptions').closest('details')!
+    expect(brief.open).toBe(false)
+    expect(within(brief).getByText(/This frame is modeled as pin-jointed: every joint is a hinge/)).toBeTruthy()
+    // Full constraint labels stay in the Test details table.
+    expect(within(screen.getByRole('table', { name: 'Latest tested results' })).getByText('Maximum member utilization')).toBeTruthy()
     expect(screen.getByText(BRACED_FRAME_LIMITS_NOTICE)).toBeTruthy()
     expect(screen.getByText('Direct stiffness · Pin-jointed frame')).toBeTruthy()
     expect(screen.getByRole('img', { name: /Two-storey braced frame elevation; diagonals not present/ })).toBeTruthy()
     // Member forces: pattern key text plus the table equivalent of the drawing.
     expect(screen.getByRole('list', { name: 'Line pattern key' }).textContent).toContain('Double: compression (C)')
+    // Key and member force table are collapsed by default (task 56).
+    expect(screen.getByRole('list', { name: 'Line pattern key' }).closest('details')!.open).toBe(false)
+    expect(forceTable()!.closest('details')!.open).toBe(false)
     const table = forceTable()!
     const diag = within(table).getByRole('row', { name: /Lower diagonal \(bottom right to top left\)/ })
     expect(within(diag).getByText('75.0 kN compression')).toBeTruthy()
@@ -114,7 +130,7 @@ describe('Braced Frame I workbench', () => {
     expect(screen.getByRole('button', { name: /^Iteration 1/ })).toBeTruthy()
     expect(screen.getAllByText('✓ Accepted').length).toBeGreaterThan(0)
     fireEvent.click(screen.getAllByText('Test details').at(-1)!)
-    expect(screen.getByText(/Prediction: increase · Actual: increase · Matched/)).toBeTruthy()
+    expect(screen.getByText(/Prediction: decrease · Actual: decrease · Matched/)).toBeTruthy()
     expect(within(forceTable()!).getByRole('row', { name: /^Lower diagonal \(bottom right to top left\)/ }).textContent).toContain('Not present')
   })
 
@@ -126,8 +142,10 @@ describe('Braced Frame I workbench', () => {
     expect(within(list).getByText('Unstable mechanism')).toBeTruthy()
     expect(within(list).getAllByText('Not applicable')).toHaveLength(2)
     expect(within(list).queryByText(/mm$|%$/)).toBeNull()
-    expect(within(list).getByText('138.8 kg')).toBeTruthy()
+    expect(within(list).getByText('184.0 kg')).toBeTruthy()
     expect(screen.getByText(/Unstable mechanism\. Unstable: storey 2 has no diagonal\. Member forces and drift are not defined/)).toBeTruthy()
+    expect(within(screen.getByRole('region', { name: 'Goal' })).getByText('Unstable: storey 2 has no diagonal.')).toBeTruthy()
+    expect(within(screen.getByRole('region', { name: 'Goal' })).getByText('1 of 4 pass')).toBeTruthy()
     expect(forceTable()).toBeNull()
     expect(document.querySelectorAll('.frame-label')).toHaveLength(0)
     expect(screen.getByRole('list', { name: 'Model applicability reasons' }).textContent).toMatch(/mechanism/)
@@ -145,11 +163,11 @@ describe('Braced Frame I workbench', () => {
     renderFrame()
     const upper = screen.getByRole('button', { name: 'Storey 2 diagonal, bottom left to top right' })
     expect(upper.getAttribute('aria-pressed')).toBe('false')
-    expect(upper.textContent).toContain('Not present')
+    expect(upper.textContent).toContain('Off')
     upper.focus()
     await user.keyboard('{Enter}')
     expect(upper.getAttribute('aria-pressed')).toBe('true')
-    expect(upper.textContent).toContain('✓ Present')
+    expect(upper.textContent).toContain('✓ On')
     await user.keyboard(' ')
     expect(upper.getAttribute('aria-pressed')).toBe('false')
     // Tab reaches the next diagonal toggle in document order.
@@ -157,7 +175,9 @@ describe('Braced Frame I workbench', () => {
     expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Storey 2 diagonal, bottom right to top left' }))
     await user.keyboard('{Enter}')
     expect(document.activeElement!.getAttribute('aria-pressed')).toBe('false')
-    expect(screen.getByLabelText(/^Upper diagonal \(bottom right to top left\)/).closest('div')!.textContent).toContain('not present; choice kept')
+    // The absent diagonal keeps its section select, named as not present and marked "off".
+    const absentSelect = screen.getByLabelText('Upper diagonal (bottom right to top left), not present (choice kept)')
+    expect(absentSelect.closest('div')!.querySelector('label small')!.textContent).toBe('off')
   })
 
   it('compares, restores and deletes with the shared semantics', () => {
@@ -167,11 +187,11 @@ describe('Braced Frame I workbench', () => {
     const table = screen.getByRole('table', { name: 'Iteration 1 differences' })
     const drift = within(table).getByRole('row', { name: /^roof drift/ })
     expect(within(drift).getByText('10.38 mm')).toBeTruthy()
-    expect(within(drift).getAllByText('+1.66 mm').length).toBeGreaterThan(0)
+    expect(within(drift).getAllByText('−2.23 mm').length).toBeGreaterThan(0)
     fireEvent.click(screen.getByRole('tab', { name: 'Design history' }))
     fireEvent.click(screen.getByRole('button', { name: 'Restore Baseline' }))
     expect(screen.getByRole('button', { name: 'Storey 1 diagonal, bottom right to top left' }).getAttribute('aria-pressed')).toBe('true')
-    expect((screen.getByLabelText(/^Lower right column/) as HTMLSelectElement).value).toBe('CHS60.3x4.0')
+    expect((screen.getByLabelText(/^Lower right column/) as HTMLSelectElement).value).toBe('CHS48.3x3.2')
     fireEvent.click(screen.getByRole('button', { name: 'Delete Iteration 1' }))
     fireEvent.click(within(screen.getByRole('dialog', { name: 'Delete Iteration 1?' })).getByRole('button', { name: 'Delete iteration' }))
     expect(screen.queryByRole('button', { name: /^Iteration 1/ })).toBeNull()
@@ -204,7 +224,7 @@ describe('Braced Frame I workbench', () => {
     const { values, storage } = memory()
     renderFrame('parametric', storage)
     testReference()
-    const saved = JSON.parse(values.get('ei:session:braced-frame-1:v1')!)
+    const saved = JSON.parse(values.get('ei:session:braced-frame-1:v2')!)
     expect(saved).toMatchObject({ schemaVersion: 2, model: { id: 'pinJointedBracedFrame', version: 1 } })
     cleanup()
     renderFrame('parametric', storage)

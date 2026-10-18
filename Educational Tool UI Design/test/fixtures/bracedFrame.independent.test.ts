@@ -51,7 +51,7 @@ function expectForces(a: BracedFrameSolvedAnalysis, expected: Partial<Record<Fra
 const expectRel = (actual: number, expected: number, what: string, rel = 1e-9) =>
   expect(relClose(actual, expected, rel), `${what}: ${actual} vs ${expected}`).toBe(true)
 
-const DETERMINATE = ['baseline', 'reference', 'bucklingBeam', 'lightLowerDiagonal', 'uniformS3Tension', 'mixedLight'] as const
+const DETERMINATE = ['baseline', 'uniform60', 'reference', 'bucklingBeam', 'lightLowerDiagonal', 'uniformS3Tension', 'mixedLight'] as const
 
 /** Challenge with the given free-joint loads (test-only config). */
 function withLoads(loads: FreeLoads): BracedFrameChallenge {
@@ -147,7 +147,7 @@ describe('(c) force method for X-braced (redundant) storeys', () => {
 })
 
 describe('(d) equilibrium', () => {
-  const solvedNames = ['baseline', 'reference', 'uniformS3Tension', 'bucklingBeam', 'lightLowerDiagonal', 'xBracedLight', 'lowerXUpperSingle', 'mixedLight', 'bruteForce']
+  const solvedNames = ['baseline', 'uniform60', 'reference', 'uniformS3Tension', 'bucklingBeam', 'lightLowerDiagonal', 'xBracedLight', 'lowerXUpperSingle', 'mixedLight', 'bruteForce']
 
   it.each(solvedNames.map((n) => [n] as const))('%s: global force and moment equilibrium within 1e-9 of the load scale', (name) => {
     const a = solved(worksheetFixture(name).design)

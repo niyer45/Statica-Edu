@@ -98,3 +98,14 @@ export function requireModel(ch: { model?: Readonly<ModelRef> }): RegisteredMode
   if (def === undefined) throw new UnregisteredModelError(ref)
   return def
 }
+
+/**
+ * Task 60: whether a draft already equals the challenge's baseline (initial) design, ignoring
+ * the design id, for the challenge's own registered model. The shared workbench uses it to make
+ * Reset to baseline unavailable; the engine's `resetDraft` applies the same rule.
+ */
+export function isDraftAtBaseline(ch: { model?: Readonly<ModelRef>; initialDesign: unknown }, draft: unknown): boolean {
+  // Each definition compares its own design type; the challenge's model identity selects it.
+  const def = requireModel(ch) as unknown as { sameDesignIgnoringId(a: unknown, b: unknown): boolean }
+  return def.sameDesignIgnoringId(draft, ch.initialDesign)
+}

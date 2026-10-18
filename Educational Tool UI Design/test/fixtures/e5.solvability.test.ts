@@ -3,7 +3,7 @@ import { bundledChallengeResult } from '../../src/challenge/content'
 import { evaluate } from '../../src/evaluation/evaluate'
 import type { BeamDesign } from '../../src/geometry/sections'
 import { analyze } from '../../src/physics/analyze'
-import { baseline, FIXTURE_REL_TOL, reference, tubeSameMass, type Fixture } from './designs'
+import { FIXTURE_REL_TOL, reference, solid30, tubeSameMass, type Fixture } from './designs'
 
 // Example test E5 (solvability; Req 12.8, 12.9): the challenge is solvable by the reference
 // I-section and by a same-mass tube, while no solid circle in the allowed range passes.
@@ -51,8 +51,8 @@ describe('E5: solvability', () => {
     expect(analysis.areaM2).toBeLessThanOrEqual(maxAreaM2)
   })
 
-  it('tubeSameMass is within 2% of baseline mass and is accepted', () => {
-    const base = run(baseline)
+  it('tubeSameMass is within 2% of the Ø30 solid (v1 baseline) mass and is accepted', () => {
+    const base = run(solid30)
     const { analysis, evaluation } = run(tubeSameMass)
     expectRel(analysis.massKg, base.analysis.massKg, 0.02)
     expect(evaluation.status).toBe('accepted')

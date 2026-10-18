@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { audit, expectGuidedStep, normalizeState, openWorkbench, readState, referenceDesign, runAnyTest, setDimension, tabTo } from './helpers'
+import { audit, expectGuidedStep, normalizeState, openWorkbench, readState, referenceDesign, runAnyTest, setDimension, tabTo, uprightSection } from './helpers'
 
 // Task 58: Guided = structured experiments (one variable per step, the rest locked, progress from
 // tested results); Parametric = open design (everything editable, no steps). Both are chosen in
@@ -11,7 +11,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     if (mode === 'Parametric') {
       await page.addInitScript(() => { Object.defineProperty(window, 'WebGL2RenderingContext', { configurable: true, value: undefined }) })
     }
-    await page.goto('/')
+    await page.goto('/#challenges')
     const view = page.getByRole('button', { name: 'View Cantilever Beam I', exact: true })
     await tabTo(page, view)
     await page.keyboard.press('Enter')
@@ -30,29 +30,31 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     await expect(page.getByLabel('Design mode')).toContainText(`${mode} mode`)
     const guide = page.getByRole('region', { name: 'Guided experiments' })
     const iSection = page.getByRole('button', { name: /I-section/ }).filter({ has: page.locator('svg') }).first()
-    const diameter = page.locator('#dim-diameterM')
+    const flange = page.locator('#dim-flangeThicknessM')
     if (mode === 'Guided') {
-      // Step 1: only the depth is editable; the section shape is locked with a visible reason.
-      await expectGuidedStep(page, 'Make it deeper')
+      // Step 1 (the task 59 Baseline lies on its side): only the orientation is editable; the
+      // section shape and every dimension are locked with a visible reason.
+      await expectGuidedStep(page, 'Stand it upright')
       await expect(iSection).toHaveAttribute('aria-disabled', 'true')
-      await expect(page.getByText('Locked in this step. Editable now: Depth (diameter or height).').first()).toBeVisible()
+      await expect(flange).toHaveAttribute('readonly', '')
+      await expect(page.getByText('Locked in this step. Editable now: Section orientation.').first()).toBeVisible()
       // aria-disabled: a forced click still reaches the tile but changes nothing.
       const before = await readState(page)
-      await iSection.click({ force: true })
+      await page.getByRole('button', { name: /Rectangle/ }).filter({ has: page.locator('svg') }).first().click({ force: true })
       expect((await readState(page)).draft).toEqual(before.draft)
-      await expect(diameter).not.toHaveAttribute('readonly', '')
-      await setDimension(page, 'diameterM', '40')
+      await uprightSection(page)
       await runAnyTest(page)
-      // Step 2: the shape unlocks and the diameter locks.
-      await expectGuidedStep(page, 'Try another shape')
-      await expect(guide).toContainText('Make it deeper complete: Iteration 1 compared with the Baseline. Tip deflection decreased; Mass increased.')
-      await expect(diameter).toHaveAttribute('readonly', '')
-      await expect(iSection).not.toHaveAttribute('aria-disabled', 'true')
-      await iSection.click()
-      await runAnyTest(page)
-      // Step 3: one dimension of the new shape.
+      // Step 2: the dimensions unlock and the orientation locks.
       await expectGuidedStep(page, 'Tune one dimension')
+      await expect(guide).toContainText('Stand it upright complete: Iteration 1 compared with the Baseline. Tip deflection decreased; Bending stress decreased; Mass did not change.')
+      await expect(flange).not.toHaveAttribute('readonly', '')
+      await expect(page.getByRole('radio', { name: '90°', exact: true })).toBeDisabled()
       await setDimension(page, 'heightM', '60')
+      await runAnyTest(page)
+      // Step 3: another shape.
+      await expectGuidedStep(page, 'Try another shape')
+      await expect(iSection).not.toHaveAttribute('aria-disabled', 'true')
+      await page.getByRole('button', { name: /Rectangle/ }).filter({ has: page.locator('svg') }).first().click()
       await runAnyTest(page)
       // Step 4: everything open; an Accepted test completes the experiments.
       await expectGuidedStep(page, 'Meet every check')
@@ -104,12 +106,12 @@ for (const mode of ['Guided', 'Parametric'] as const) {
 
 test('Guided step progress is derived from tested history and survives reload mid-sequence', async ({ page }) => {
   await openWorkbench(page, true, false, 'Guided')
-  await setDimension(page, 'diameterM', '40')
+  await uprightSection(page)
   await runAnyTest(page)
-  await expectGuidedStep(page, 'Try another shape')
+  await expectGuidedStep(page, 'Tune one dimension')
   await page.reload()
   await openWorkbench(page, false)
   expect((await readState(page)).mode).toBe('guided')
-  await expectGuidedStep(page, 'Try another shape')
-  await expect(page.locator('#dim-diameterM')).toHaveAttribute('readonly', '')
+  await expectGuidedStep(page, 'Tune one dimension')
+  await expect(page.getByRole('radio', { name: '0°', exact: true })).toBeDisabled()
 })
