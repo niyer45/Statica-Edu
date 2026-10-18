@@ -9,13 +9,7 @@ import {
   type ComponentRef,
   type RefObject,
 } from 'react'
-import {
-  DataTexture,
-  OrthographicCamera,
-  RepeatWrapping,
-  RGBAFormat,
-  type Mesh,
-} from 'three'
+import { OrthographicCamera, type Mesh } from 'three'
 import { selectDraftEnvelope, selectLatestResult } from '../../state/selectors'
 import { buildBeamGeometry } from '../mesh'
 import { useChallenge, useSession } from '../state/store'
@@ -25,27 +19,11 @@ import {
 } from './sceneLayout'
 import type { SceneHitTarget } from './Viewport3D'
 import DimensionHandles, { type HandleFeedback } from './DimensionHandles'
+import { wallHatchTexture } from './wallHatch'
+
+export { wallHatchTexture }
 
 const ORANGE = '#cf744b'
-/** Procedural RGBA hatch; no fetches, canvas serialization, or data URLs. */
-export function wallHatchTexture() {
-  const side = 16
-  const pixels = new Uint8Array(side * side * 4)
-  for (let y = 0; y < side; y++)
-    for (let x = 0; x < side; x++) {
-      const i = (y * side + x) * 4
-      pixels.set(
-        (x + y) % 8 < 2 ? [151, 161, 144, 255] : [214, 221, 205, 255],
-        i,
-      )
-    }
-  const texture = new DataTexture(pixels, side, side, RGBAFormat)
-  texture.wrapS = texture.wrapT = RepeatWrapping
-  texture.repeat.set(8, 12)
-  texture.needsUpdate = true
-  return texture
-}
-
 function CameraRig({
   lengthM,
   zoom,

@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { bracket, bracketChallenge } from '../../../../test/fixtures/bracket'
 import { bracketModel, bracketReducer, type BracketAction, type BracketSession } from '../../../state/bracketModel'
 import { bracketRuntime, type LoopSession, type ModelRuntime } from '../../../state/runtimes'
@@ -8,6 +8,18 @@ import StoreProvider from '../../state/StoreProvider'
 import Workbench from '../../workbench/Workbench'
 import { modelUiFor } from '../registry'
 import { bracketUi, BRACKET_LIMITS_NOTICE } from '.'
+import { STRIP_LABEL } from './BracketDetails'
+import { ELEVATION_LABEL } from './BracketElevation'
+import { BRACKET_FALLBACK_NOTICE } from './BracketView'
+
+// The real 3D scene needs WebGL; these tests replace the lazy chunk to drive the 3D-or-2D switch.
+const scene = vi.hoisted(() => ({ mode: 'ok' as 'ok' | 'throw' }))
+vi.mock('./BracketScene3D', () => ({
+  default: ({ onContextLost }: { onContextLost: () => void }) => {
+    if (scene.mode === 'throw') throw new Error('Canvas creation failed')
+    return <button type="button" onClick={onContextLost}>Stub 3D scene: lose context</button>
+  },
+}))
 
 // Mounting Bracket I workbench (task 46.3) through the PRODUCTION model UI registry. The
 // challenge is booted directly here; card activation is a separate, owner-approved step.
@@ -90,7 +102,11 @@ describe('Mounting Bracket I workbench', () => {
     expect(within(requirements).getAllByText('✗ Fail')).toHaveLength(1)
     expect(screen.getAllByText(/Peak stress 157\.9 MPa at the step · Kt at the step 2\.34/).length).toBeGreaterThan(0)
     expect(screen.getByText(BRACKET_LIMITS_NOTICE)).toBeTruthy()
-    const view = screen.getByRole('img', { name: /Side elevation of the stepped bracket/ })
+    // jsdom has no WebGL2: the 2D side view (wall, plate, bolts, bar, hanging load) shows with a notice.
+    expect(screen.getByRole('img', { name: ELEVATION_LABEL })).toBeTruthy()
+    expect(screen.getAllByText(BRACKET_FALLBACK_NOTICE).length).toBeGreaterThan(0)
+    expect(screen.getByText(/A flat bracket bolted to a wall carries a load hanging from its tip/)).toBeTruthy()
+    const view = screen.getByRole('img', { name: STRIP_LABEL })
     // The governing section is a distinct shape (filled triangle), not only a color.
     expect(view.querySelectorAll('polygon.governing-marker')).toHaveLength(1)
     expect(view.querySelectorAll('circle.section-marker')).toHaveLength(1)
@@ -131,7 +147,7 @@ describe('Mounting Bracket I workbench', () => {
     expect(within(within(stresses).getByRole('row', { name: /^Step peak stress/ })).getByText('Not applicable')).toBeTruthy()
     expect(within(screen.getByLabelText('Result status')).getByText(/Model not applicable/)).toBeTruthy()
     // No governing marker without a peak stress.
-    expect(screen.getByRole('img', { name: /Side elevation/ }).querySelectorAll('polygon.governing-marker')).toHaveLength(0)
+    expect(screen.getByRole('img', { name: STRIP_LABEL }).querySelectorAll('polygon.governing-marker')).toHaveLength(0)
     fireEvent.click(screen.getAllByText('Test details').at(-1)!)
     expect(screen.getByText('Prediction: decrease · Not scorable: no peak stress to compare')).toBeTruthy()
   })
@@ -255,5 +271,36 @@ describe('Mounting Bracket I workbench', () => {
     fireEvent.click(screen.getByRole('button', { name: '2. Experiment' }))
     fireEvent.click(screen.getByText('Hint & suggested experiment'))
     expect(screen.getByText(/Your latest test peaks at the step/)).toBeTruthy()
+  })
+})
+
+describe('Mounting Bracket I design view: 3D with a 2D fallback (task 54.1)', () => {
+  afterEach(() => {
+    scene.mode = 'ok'
+    vi.unstubAllGlobals()
+    vi.restoreAllMocks()
+  })
+
+  it('loads the lazy 3D scene when WebGL2 exists and swaps to the 2D side view on context loss', async () => {
+    vi.stubGlobal('WebGL2RenderingContext', class {})
+    renderBracket()
+    const stub = await screen.findByRole('button', { name: /Stub 3D scene/ })
+    expect(screen.queryByRole('img', { name: ELEVATION_LABEL })).toBeNull()
+    // The details (summary, moment strip, section table) show with the 3D scene too.
+    expect(screen.getByRole('img', { name: STRIP_LABEL })).toBeTruthy()
+    fireEvent.click(stub)
+    expect(screen.getByRole('img', { name: ELEVATION_LABEL })).toBeTruthy()
+    await waitFor(() => expect(screen.getAllByText(BRACKET_FALLBACK_NOTICE).length).toBeGreaterThan(0))
+    expect(screen.queryByRole('button', { name: /Stub 3D scene/ })).toBeNull()
+  })
+
+  it('shows the 2D side view when the 3D scene fails to render', async () => {
+    vi.stubGlobal('WebGL2RenderingContext', class {})
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    scene.mode = 'throw'
+    renderBracket()
+    expect(await screen.findByRole('img', { name: ELEVATION_LABEL })).toBeTruthy()
+    expect(screen.getAllByText(BRACKET_FALLBACK_NOTICE).length).toBeGreaterThan(0)
+    expect(screen.getByRole('table', { name: 'Checked sections of the latest tested design' })).toBeTruthy()
   })
 })

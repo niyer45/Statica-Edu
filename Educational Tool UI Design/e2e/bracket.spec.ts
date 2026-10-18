@@ -56,6 +56,12 @@ for (const mode of ['Guided', 'Parametric'] as const) {
   test(`Mounting Bracket I ${mode}: test an Accepted bracket, persist it and keep it isolated`, async ({ page }) => {
     test.setTimeout(90_000) // Keyboard entry, prediction, reload, cross-challenge check and axe.
     const keyboard = mode === 'Guided'
+    // Task 54.1: Guided exercises the 3D scene; Parametric hides WebGL2 to exercise the 2D fallback.
+    if (mode === 'Parametric') {
+      await page.addInitScript(() => {
+        Object.defineProperty(window, 'WebGL2RenderingContext', { configurable: true, value: undefined })
+      })
+    }
     await page.goto('/')
     await openBracket(page, mode, keyboard)
     const initial = await readState(page)
@@ -63,7 +69,18 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     expect(initial.mode).toBe(mode.toLowerCase())
     const requirements = page.getByRole('list', { name: 'Design requirements' })
     await expect(requirements.getByText('157.9 MPa', { exact: true })).toBeVisible()
-    await expect(page.getByRole('img', { name: /Side elevation of the stepped bracket/ })).toBeVisible()
+    if (mode === 'Guided') {
+      // Lazy chunk plus software WebGL can exceed the default 5 s when workers run in parallel.
+      await expect(page.getByRole('img', { name: /^3D view of the wall-mounted bracket/ })).toBeVisible({ timeout: 20_000 })
+      await expect(page.getByRole('img', { name: /^Side view of the wall-mounted bracket/ })).toHaveCount(0)
+      await page.getByRole('button', { name: 'Zoom in', exact: true }).click()
+      await page.getByRole('button', { name: 'Reset view', exact: true }).click()
+    } else {
+      await expect(page.getByRole('img', { name: /^Side view of the wall-mounted bracket/ })).toBeVisible()
+      await expect(page.getByText('3D view is unavailable. Showing the 2D side view of the bracket instead.').first()).toBeVisible()
+      await expect(page.locator('canvas')).toHaveCount(0)
+    }
+    await expect(page.getByRole('img', { name: /^Bending-moment strip of the latest tested design/ })).toBeVisible()
     await expect(page.getByText(/fillet Kt coefficients from secondary copies, pending printed-edition verification/)).toBeVisible()
     if (mode === 'Guided') {
       await expect(page.getByRole('region', { name: 'Guided instructions' }).getByRole('heading', { name: 'Inspect', exact: true })).toBeVisible()

@@ -248,7 +248,7 @@
 .fin-profile { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 9px; color: #46583b; }
 .fin-profile caption { text-align: left; color: #5c6a55; margin-bottom: 4px; }
 .fin-profile th, .fin-profile td { text-align: left; padding: 3px 6px 3px 0; border-bottom: 1px solid #e6eadf; }
-/* Mounting Bracket I (task 46.3): display-only SVG elevation, moment strip and section table. */
+/* Mounting Bracket I (tasks 46.3, 54.1): lazy 3D scene or 2D side view, moment strip and section table. */
 .bracket-view { display: flex; flex-direction: column; flex: 1; justify-content: center; padding: 0 12px 12px; min-width: 0; }
 .bracket-view svg { width: 100%; height: auto; min-height: 0; cursor: default; }
 .bracket-body { fill: #a8b49a; stroke: #4f653e; stroke-width: 1; }
@@ -266,6 +266,21 @@
 .bracket-sections table { border-collapse: collapse; margin-top: 6px; }
 .bracket-sections th, .bracket-sections td { padding: 2px 8px 2px 0; text-align: left; white-space: nowrap; }
 .bracket-step-note, .bracket-peak { margin: 0 0 8px; font-size: 11px; color: #46583b; }
+.bracket-view .bracket-elevation { min-height: 0; max-height: 300px; touch-action: auto; user-select: auto; }
+.bracket-view .bracket-moment { max-height: 96px; margin-top: 4px; }
+.bracket-hatch-line { stroke: #8b9282; stroke-width: 1.5; }
+.bracket-wall-face { stroke: #3d4a3f; stroke-width: 1.5; }
+.bracket-plate { fill: #7d8a7e; stroke: #2f3a31; stroke-width: 1; }
+.bracket-bolt { fill: #3d4a3f; }
+.bracket-body-back { fill: #c7cfbb; stroke: #4f653e; stroke-width: 1; }
+.bracket-cable { stroke: #3d4a3f; stroke-width: 1.5; }
+.bracket-weight { fill: #cf744b; stroke: #7a3f14; stroke-width: 1; }
+.bracket-fallback-notice { margin: 0 0 4px; letter-spacing: 0; text-transform: none; font-weight: 500; }
+/* Task 54: lazy 3D model views (bracket, torsion, frame) share a control row below the canvas. */
+.bracket-scene { min-height: 300px; }
+.model-scene-controls { display: flex; align-items: center; gap: 2px; align-self: flex-end; margin-top: 6px; background: #fcfdf8; border: 1px solid #e1e6d7; border-radius: 5px; padding: 4px; }
+.model-scene-controls button { display: grid; place-items: center; width: 28px; height: 26px; color: #4f653e; }
+.model-scene-hint { font-size: 10px; color: #5c6a55; padding: 0 6px; }
 .field-note { grid-column: 1 / -1; margin: 0; font-size: 10px; color: #5c6a55; }
 /* Braced Frame I (task 49.3): main-bundle SVG frame view, bracing toggles and member sections.
    Member stroke widths are SVG presentation attributes (by section), so these rules set no
