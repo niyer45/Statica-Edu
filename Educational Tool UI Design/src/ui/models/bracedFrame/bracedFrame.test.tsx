@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeAll, describe, expect, it } from 'vitest'
 import { bracedFrameChallenge } from '../../../../test/fixtures/bracedFrame'
 import { bracedFrameRuntime, type ModelRuntime } from '../../../state/runtimes'
 import type { SessionStorage } from '../../../state/persistence'
@@ -66,14 +66,18 @@ const requirements = () => screen.getByRole('list', { name: 'Design requirements
 const forceTable = () => screen.queryByRole('table', { name: 'Latest tested member forces' })
 
 afterEach(cleanup)
+// Load the lazy 3D view chunk once up front so later renders resolve it without delay.
+beforeAll(() => import('./BracedFrameViewport3D'), 30_000)
 
 describe('Braced Frame I workbench', () => {
   it('is registered in the production model UI registry', () => {
     expect(modelUiFor(ch.model)).toBe(bracedFrameUi)
   })
 
-  it('shows the baseline utilization failure with frame wording and no beam or torsion wording', () => {
+  it('shows the baseline utilization failure with frame wording and no beam or torsion wording', async () => {
     renderFrame()
+    // The drawing is the lazy 3D chunk; jsdom has no WebGL2, so it resolves to the SVG fallback.
+    await screen.findByRole('img', { name: /Two-storey braced frame elevation/ }, { timeout: 5000 })
     const list = requirements()
     expect(within(list).getByText('Stable')).toBeTruthy()
     expect(within(list).getByText('8.72 mm')).toBeTruthy()

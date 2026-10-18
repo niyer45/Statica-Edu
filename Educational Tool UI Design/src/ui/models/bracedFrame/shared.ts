@@ -22,6 +22,11 @@ export const useFrameStore = () => useModelStore<BracedFrameSession, BracedFrame
 export const NOT_APPLICABLE = 'Not applicable'
 export const MECHANISM_TEXT = 'Unstable mechanism'
 
+/** Id of the latest-test text summary that describes the frame drawing (3D canvas or SVG). */
+export const FRAME_SUMMARY_ID = 'frame-view-summary'
+/** Shown (and announced once) when the 3D frame view cannot run. */
+export const FRAME_FALLBACK_NOTICE = '3D view is unavailable. Use the 2D elevation and the member force table instead.'
+
 /** Display text for a stored frame constraint value or limit. */
 export function formatFrame(value: number, unit: BracedFrameConstraintUnit): string {
   if (unit === 'm') return `${formatMm(value, 2)} mm`
