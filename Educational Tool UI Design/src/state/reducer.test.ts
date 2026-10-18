@@ -37,8 +37,9 @@ describe('initSession (Req 15.1, 15.2, 15.7, 16.7)', () => {
     expect(b.prediction).toBeUndefined()
     expect(b.designSnapshot).toEqual(ch.initialDesign)
     expect(b.evaluation.status).toBe('notAccepted')
-    expect(b.failures).toEqual(['deflection', 'stress', 'mass', 'envelopeWidth'])
-    expect(b.analysis.tipDeflectionM).toBeCloseTo(11.794e-3, 6)
+    // The v3 baseline (D-47 amendment) is a solid Ø31 mm circle: too flexible and too heavy.
+    expect(b.failures).toEqual(['deflection', 'mass'])
+    expect(b.analysis.tipDeflectionM).toBeCloseTo(6.9054e-3, 6)
   })
 
   it('starts with a tested, valid, error-free draft and an empty learning state', () => {
@@ -95,9 +96,8 @@ describe('initSession (Req 15.1, 15.2, 15.7, 16.7)', () => {
 
 describe('setParam (Req 6.6, 6.8, 15.9, 16.2, 16.9)', () => {
   it('clamp mode clamps out-of-range values into the range and marks the draft untested', () => {
-    // The baseline is an I-section, so its height is the parameter under edit.
-    const s = run(fresh(), { type: 'setParam', param: 'heightM', valueM: 5, mode: 'clamp' })
-    expect(s.draft.section).toEqual({ ...ch.initialDesign.section, heightM: ch.sectionLimits.iSection.heightM.maxM })
+    const s = run(fresh(), { type: 'setParam', param: 'diameterM', valueM: 5, mode: 'clamp' })
+    expect(s.draft.section).toEqual({ kind: 'circle', diameterM: ch.sectionLimits.circle.diameterM.maxM })
     expect(s.draftErrors).toEqual([])
     expect(s.draftStatus).toBe('draft')
     expect(selectStatusBadge(s)).toBe('Draft')
@@ -105,23 +105,23 @@ describe('setParam (Req 6.6, 6.8, 15.9, 16.2, 16.9)', () => {
 
   it('clamp mode ignores non-finite values', () => {
     const s0 = fresh()
-    const s = run(s0, { type: 'setParam', param: 'heightM', valueM: Number.NaN, mode: 'clamp' })
+    const s = run(s0, { type: 'setParam', param: 'diameterM', valueM: Number.NaN, mode: 'clamp' })
     expect(s.draft).toEqual(s0.draft)
     expect(s.draftStatus).toBe('tested')
   })
 
   it('strict mode rejects out-of-range values, keeping draft and status (Req 6.6, 16.9)', () => {
     const s0 = fresh()
-    const s = run(s0, { type: 'setParam', param: 'heightM', valueM: 0.001, mode: 'strict' })
+    const s = run(s0, { type: 'setParam', param: 'diameterM', valueM: 0.001, mode: 'strict' })
     expect(s.draft).toEqual(s0.draft)
     expect(s.draftStatus).toBe('tested')
-    expect(s.draftErrors[0]).toMatchObject({ code: 'BELOW_MIN', param: 'heightM' })
+    expect(s.draftErrors[0]).toMatchObject({ code: 'BELOW_MIN', param: 'diameterM' })
     expect(s.draftErrors[0]!.message.length).toBeGreaterThan(0)
   })
 
   it('strict mode rejects non-finite values with NON_FINITE (Req 6.7)', () => {
     const s0 = fresh()
-    const s = run(s0, { type: 'setParam', param: 'heightM', valueM: Infinity, mode: 'strict' })
+    const s = run(s0, { type: 'setParam', param: 'diameterM', valueM: Infinity, mode: 'strict' })
     expect(s.draft).toEqual(s0.draft)
     expect(s.draftErrors.map((e) => e.code)).toContain('NON_FINITE')
   })
@@ -129,10 +129,10 @@ describe('setParam (Req 6.6, 6.8, 15.9, 16.2, 16.9)', () => {
   it('strict mode accepts a valid value and clears previous errors (Req 6.8)', () => {
     const s = run(
       fresh(),
-      { type: 'setParam', param: 'heightM', valueM: 0.001, mode: 'strict' },
-      { type: 'setParam', param: 'heightM', valueM: 0.06, mode: 'strict' },
+      { type: 'setParam', param: 'diameterM', valueM: 0.001, mode: 'strict' },
+      { type: 'setParam', param: 'diameterM', valueM: 0.04, mode: 'strict' },
     )
-    expect(s.draft.section).toEqual({ ...ch.initialDesign.section, heightM: 0.06 })
+    expect(s.draft.section).toEqual({ kind: 'circle', diameterM: 0.04 })
     expect(s.draftErrors).toEqual([])
     expect(s.draftStatus).toBe('draft')
   })
@@ -145,7 +145,7 @@ describe('setParam (Req 6.6, 6.8, 15.9, 16.2, 16.9)', () => {
   })
 
   it('rejects edits to locked fields in either mode (Req 4.1, 4.4, 16.9)', () => {
-    const s0 = run(fresh(), { type: 'setParam', param: 'heightM', valueM: 0.06, mode: 'clamp' })
+    const s0 = run(fresh(), { type: 'setParam', param: 'diameterM', valueM: 0.04, mode: 'clamp' })
     for (const mode of ['clamp', 'strict'] as const) {
       for (const param of ['lengthM', 'materialId', 'forceN', 'support']) {
         const s = run(s0, { type: 'setParam', param, valueM: 1, mode })
@@ -159,9 +159,9 @@ describe('setParam (Req 6.6, 6.8, 15.9, 16.2, 16.9)', () => {
   it('rejects a parameter that the current section kind does not have', () => {
     const s0 = fresh()
     for (const mode of ['clamp', 'strict'] as const) {
-      const s = run(s0, { type: 'setParam', param: 'diameterM', valueM: 0.02, mode })
+      const s = run(s0, { type: 'setParam', param: 'widthM', valueM: 0.02, mode })
       expect(s.draft).toEqual(s0.draft)
-      expect(s.draftErrors[0]).toMatchObject({ code: 'SECTION_NOT_ALLOWED', param: 'diameterM' })
+      expect(s.draftErrors[0]).toMatchObject({ code: 'SECTION_NOT_ALLOWED', param: 'widthM' })
     }
   })
 })
@@ -170,8 +170,8 @@ describe('draftStatus (Req 16.1, 16.2)', () => {
   it('returns to tested when the draft is edited back to the latest snapshot', () => {
     const s = run(
       fresh(),
-      { type: 'setParam', param: 'heightM', valueM: 0.06, mode: 'strict' },
-      { type: 'setParam', param: 'heightM', valueM: 0.084, mode: 'strict' },
+      { type: 'setParam', param: 'diameterM', valueM: 0.04, mode: 'strict' },
+      { type: 'setParam', param: 'diameterM', valueM: 0.031, mode: 'strict' },
     )
     expect(s.draftStatus).toBe('tested')
   })
@@ -179,19 +179,18 @@ describe('draftStatus (Req 16.1, 16.2)', () => {
   it('ignores the design id when comparing with the snapshot', () => {
     const s0 = fresh()
     const renamed: SessionState = { ...s0, draft: { ...s0.draft, id: 'some-other-id' } }
-    const s = run(renamed, { type: 'setParam', param: 'heightM', valueM: 0.084, mode: 'strict' })
+    const s = run(renamed, { type: 'setParam', param: 'diameterM', valueM: 0.031, mode: 'strict' })
     expect(s.draft.id).toBe('some-other-id')
     expect(s.draftStatus).toBe('tested')
     expect(sameDesignIgnoringId(s.draft, s0.history[0]!.designSnapshot)).toBe(true)
-    expect(sameDesignIgnoringId(s.draft, { ...s.draft, orientationDeg: 0 })).toBe(false)
+    expect(sameDesignIgnoringId(s.draft, { ...s.draft, orientationDeg: 90 })).toBe(false)
   })
 })
 
 describe('applySection and setOrientation (Req 6.9, 7.6, 7.8)', () => {
   it('converts the section preserving the bounding box, keeping locked fields', () => {
-    // The unrotated bounding box of the baseline I-section is 36.5 mm × 84 mm.
-    const s = run(fresh(), { type: 'applySection', kind: 'rectangle' })
-    expect(s.draft.section).toEqual({ kind: 'rectangle', widthM: 0.0365, heightM: 0.084 })
+    const s = run(fresh(), { type: 'applySection', kind: 'iSection' })
+    expect(s.draft.section).toMatchObject({ kind: 'iSection', widthM: 0.031, heightM: 0.031 })
     expect(validateDesign(s.draft, ch)).toEqual([])
     expect(s.draft.lengthM).toBe(ch.initialDesign.lengthM)
     expect(s.draft.materialId).toBe(ch.initialDesign.materialId)
@@ -200,7 +199,7 @@ describe('applySection and setOrientation (Req 6.9, 7.6, 7.8)', () => {
 
   it('applying the current kind is a no-op that stays tested', () => {
     const s0 = fresh()
-    const s = run(s0, { type: 'applySection', kind: 'iSection' })
+    const s = run(s0, { type: 'applySection', kind: 'circle' })
     expect(s.draft).toEqual(s0.draft)
     expect(s.draftStatus).toBe('tested')
   })
@@ -216,11 +215,9 @@ describe('applySection and setOrientation (Req 6.9, 7.6, 7.8)', () => {
   })
 
   it('sets 0° / 90° without touching the section or locked fields (Req 7.6)', () => {
-    // The baseline is turned 90° and applying a section keeps the orientation, so turn it upright.
     const s0 = run(fresh(), { type: 'applySection', kind: 'rectangle' })
-    expect(s0.draft.orientationDeg).toBe(90)
-    const s = run(s0, { type: 'setOrientation', orientationDeg: 0 })
-    expect(s.draft).toEqual({ ...s0.draft, orientationDeg: 0 })
+    const s = run(s0, { type: 'setOrientation', orientationDeg: 90 })
+    expect(s.draft).toEqual({ ...s0.draft, orientationDeg: 90 })
     expect(s.draftErrors).toEqual([])
   })
 
@@ -241,7 +238,7 @@ describe('reducer purity', () => {
       s0,
       { type: 'applySection', kind: 'tube' },
       { type: 'setParam', param: 'outerDiameterM', valueM: 0.05, mode: 'clamp' },
-      { type: 'setOrientation', orientationDeg: 0 },
+      { type: 'setOrientation', orientationDeg: 90 },
     )
     expect(s0).toEqual(before)
     expect(s.history).toBe(s0.history)

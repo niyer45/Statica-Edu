@@ -9,10 +9,8 @@ it('runs the design Example Usage flow with cancel, rejection, restore and accep
   const ch = bundledChallenge()
   let s = createHarness(ch).real.state
   const dispatch = (action: Action) => { s = sessionReducer(s, action, ch) }
-  // The baseline is already an I-section, turned 90°: stand it upright and resize it to the reference.
   dispatch({ type: 'applySection', kind: 'iSection' })
-  dispatch({ type: 'setOrientation', orientationDeg: 0 })
-  for (const [param, valueM] of [['heightM', 0.06], ['widthM', 0.04], ['flangeThicknessM', 0.004], ['webThicknessM', 0.003]] as const) dispatch({ type: 'setParam', param, valueM, mode: 'strict' })
+  for (const [param, valueM] of [['heightM', 0.06], ['widthM', 0.04], ['webThicknessM', 0.003]] as const) dispatch({ type: 'setParam', param, valueM, mode: 'strict' })
   dispatch({ type: 'runTest', now: 't', id: 't1' })
   expect(s.ui.predictionDialogOpen).toBe(true)
   dispatch({ type: 'cancelPrediction' })

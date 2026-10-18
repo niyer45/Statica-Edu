@@ -138,28 +138,28 @@ describe('Workbench layout', () => {
     // Baseline only: the first experiment is current, the rest locked.
     const { unmount } = renderWorkbench(session)
     expect(stepTexts()).toEqual([
-      '1. Stand it upright, current step',
-      '2. Tune one dimension, locked',
-      '3. Try another shape, locked',
+      '1. Grow the circle, current step',
+      '2. Try another shape, locked',
+      '3. Tune one dimension, locked',
       '4. Meet every check, locked',
     ])
-    expect(screen.getByRole('listitem', { current: 'step' }).textContent).toContain('Stand it upright')
+    expect(screen.getByRole('listitem', { current: 'step' }).textContent).toContain('Grow the circle')
     unmount()
 
-    // A stored test that changed only the orientation completes the first step.
-    const upright = { ...baseline.designSnapshot, orientationDeg: 0 as const }
+    // A stored test of a larger circle completes the first step.
+    const grown = { ...baseline.designSnapshot, section: { kind: 'circle' as const, diameterM: 0.034 } }
     const tested: SessionState = {
       ...session,
-      history: [...session.history, { ...baseline, id: 'run-1', iteration: 1, designSnapshot: upright }],
+      history: [...session.history, { ...baseline, id: 'run-1', iteration: 1, designSnapshot: grown }],
     }
     renderWorkbench(tested)
     expect(stepTexts()).toEqual([
-      '1. Stand it upright, complete',
-      '2. Tune one dimension, current step',
-      '3. Try another shape, locked',
+      '1. Grow the circle, complete',
+      '2. Try another shape, current step',
+      '3. Tune one dimension, locked',
       '4. Meet every check, locked',
     ])
-    expect(screen.getByRole('listitem', { current: 'step' }).textContent).toContain('Tune one dimension')
+    expect(screen.getByRole('listitem', { current: 'step' }).textContent).toContain('Try another shape')
   })
 
   it('always shows the model-limits notice in the footer (Req 29.7)', () => {

@@ -32,8 +32,7 @@ describe('exportDesign (Req 22.1)', () => {
   })
 
   it('writes only the given design (no referenceDesign or challenge data)', () => {
-    // A circle design: 'iSection' could then only come from the (I-section) reference.
-    const text = exportDesign({ ...baseline, section: { kind: 'circle', diameterM: 0.03 }, orientationDeg: 0 }, ch)
+    const text = exportDesign(baseline, ch)
     expect(text).not.toContain('referenceDesign')
     expect(text).not.toContain('iSection')
     expect(text).not.toContain('constraints')

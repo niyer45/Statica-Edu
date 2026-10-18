@@ -5,8 +5,9 @@ import type { GuidedPlan } from './plan'
 
 // Cantilever Beam I guided experiments (task 58). Step data only: swap this file to change the
 // sequence. Parameter ids are the section kind ('section'), 'orientationDeg' and the section's
-// own dimension keys. The sequence starts from the task 59 Baseline, an I-section lying on its
-// side (90°), so the first experiment stands it upright.
+// own dimension keys. The sequence starts from the Baseline, a solid Ø31 mm circle that is too
+// flexible and too heavy (D-47 amendment): growing the circle trades mass for stiffness, so the
+// student then tries a shape that places material away from the centre and tunes it.
 
 const DIMENSIONS = ['diameterM', 'outerDiameterM', 'innerDiameterM', 'widthM', 'heightM', 'flangeThicknessM', 'webThicknessM'] as const
 
@@ -23,23 +24,13 @@ export const BEAM_GUIDED_PLAN: GuidedPlan<BeamDesign, { analysis: Analysis }> = 
   },
   steps: [
     {
-      id: 'upright',
-      title: 'Stand it upright',
-      instruction: 'Change only the section orientation, keeping every dimension. Predict how tip deflection will change, then Run Test.',
-      hint: 'The same material resists bending far better when the tall side of the section lines up with the load. Mass does not change.',
-      focus: 'Section orientation',
-      unlocks: ['orientationDeg'],
-      objective: { kind: 'change', params: ['orientationDeg'], direction: 'any' },
-      observe: ['tipDeflectionM', 'nominalMaxStressPa', 'massKg'],
-    },
-    {
-      id: 'tune',
-      title: 'Tune one dimension',
-      instruction: 'Change exactly one dimension of the section. Predict the effect on deflection and mass, then Run Test.',
-      hint: 'One change per test keeps cause and effect clear. Material far from the centre (flanges, height) adds stiffness fastest; check the envelope limit too.',
-      focus: 'Any one dimension',
-      unlocks: DIMENSIONS,
-      objective: { kind: 'change', params: DIMENSIONS, direction: 'any', single: true },
+      id: 'diameter',
+      title: 'Grow the circle',
+      instruction: 'Increase only the diameter of the solid circle. Predict how tip deflection will change, then Run Test.',
+      hint: 'A wider circle is much stiffer, but every extra millimetre adds mass. Watch whether deflection and mass can both be met this way.',
+      focus: 'Diameter',
+      unlocks: ['diameterM'],
+      objective: { kind: 'change', params: ['diameterM'], direction: 'increase' },
       observe: ['tipDeflectionM', 'massKg', 'nominalMaxStressPa'],
     },
     {
@@ -51,6 +42,16 @@ export const BEAM_GUIDED_PLAN: GuidedPlan<BeamDesign, { analysis: Analysis }> = 
       unlocks: ['section'],
       objective: { kind: 'change', params: ['section'], direction: 'any' },
       observe: ['tipDeflectionM', 'massKg'],
+    },
+    {
+      id: 'tune',
+      title: 'Tune one dimension',
+      instruction: 'Change exactly one dimension of the section, or its orientation. Predict the effect on deflection and mass, then Run Test.',
+      hint: 'One change per test keeps cause and effect clear. Material far from the centre (flanges, height) adds stiffness fastest; check the envelope limit too.',
+      focus: 'Any one dimension or the orientation',
+      unlocks: [...DIMENSIONS, 'orientationDeg'],
+      objective: { kind: 'change', params: [...DIMENSIONS, 'orientationDeg'], direction: 'any', single: true },
+      observe: ['tipDeflectionM', 'massKg', 'nominalMaxStressPa'],
     },
     {
       id: 'open',

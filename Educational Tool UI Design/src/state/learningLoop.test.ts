@@ -18,8 +18,7 @@ function tested(count = 4) {
   let s = fresh()
   for (let n = 1; n <= count; n++) {
     s = run(s,
-      // The baseline is an I-section; each test raises its height by 2 mm.
-      { type: 'setParam', param: 'heightM', valueM: 0.084 + n * 0.002, mode: 'strict' },
+      { type: 'setParam', param: 'diameterM', valueM: 0.03 + n * 0.005, mode: 'strict' },
       { type: 'setPrediction', direction: 'decrease', now: 'prediction-time' },
       { type: 'runTest', id: `test-${n}`, now: `time-${n}` })
   }
@@ -40,13 +39,13 @@ describe('restore and reset (task 19.2)', () => {
       expect(restored.pendingPrediction).toBeUndefined()
       expect(restored.ui.predictionDialogOpen).toBe(false)
       expect(analyze(restored.draft, ch)).toEqual(result.analysis)
-      const edited = run(restored, { type: 'setParam', param: 'heightM', valueM: 0.06, mode: 'strict' })
+      const edited = run(restored, { type: 'setParam', param: 'diameterM', valueM: 0.06, mode: 'strict' })
       expect(edited.history).toBe(s.history)
       expect(result.designSnapshot.section).not.toEqual(edited.draft.section)
     }
   })
   it('unknown restore returns the exact input including errors', () => {
-    const s = run(tested(), { type: 'setParam', param: 'heightM', valueM: -1, mode: 'strict' })
+    const s = run(tested(), { type: 'setParam', param: 'diameterM', valueM: -1, mode: 'strict' })
     expect(run(s, { type: 'restore', testResultId: 'missing' })).toBe(s)
   })
   it('uses deterministic fresh ids even when a derived id collides', () => {

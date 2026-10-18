@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { circleStartChallenge } from '../../../test/arbitraries'
+import { bundledChallengeResult } from '../../challenge/content'
 import { sectionOutline } from '../../geometry/outline'
 import { orientedEnvelope } from '../../geometry/envelope'
 import { PARAM_LABELS, SECTION_PARAMS } from '../../geometry/params'
@@ -27,9 +27,7 @@ afterEach(() => { cleanup(); vi.unstubAllGlobals() })
 describe('Milestone 2 component gate', () => {
   it.each(profiles)('$section.kind: editable fields, SVG view and Three mesh agree with typed state', async ({ tile, section }) => {
     vi.stubGlobal('WebGL2RenderingContext', undefined)
-    // Every profile is applied from a Ø30 mm circle at 0°, so each tile click is a real change and
-    // orientation starts at 0° (the bundled baseline is an I-section turned 90°, task 59).
-    const boot = bootstrap({ ok: true, value: circleStartChallenge() }, () => '2026-10-15T00:00:00.000Z', () => 'baseline')
+    const boot = bootstrap(bundledChallengeResult, () => '2026-10-15T00:00:00.000Z', () => 'baseline')
     if (!boot.ok) throw new Error(boot.error.message)
     // Free editing of every parameter: Parametric (Guided locks parameters by step, task 58).
     render(<StoreProvider challenge={boot.value.challenge} initialSession={{ ...boot.value.session, mode: 'parametric' }}>

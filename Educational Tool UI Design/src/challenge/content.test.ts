@@ -39,10 +39,10 @@ describe('bundled cantilever-beam-1 challenge', () => {
       yieldStressPa: 240e6,
     })
     expect(ch.initialDesign.materialId).toBe(ch.material.id)
-    // Task 59: the baseline is an I-section turned on its side, failing four of the five limits.
-    expect(ch.initialDesign.section).toEqual({ kind: 'iSection', widthM: 0.0365, heightM: 0.084, flangeThicknessM: 0.003, webThicknessM: 0.007 })
-    expect(ch.initialDesign.orientationDeg).toBe(90)
-    expect(ch.version).toBe(2)
+    // Content version 3 (D-47 amendment): a solid Ø31 mm circle failing deflection and mass.
+    expect(ch.initialDesign.section).toEqual({ kind: 'circle', diameterM: 0.031 })
+    expect(ch.initialDesign.orientationDeg).toBe(0)
+    expect(ch.version).toBe(3)
     expect(ch.constraints).toEqual({
       maxMassKg: 1.2,
       maxDeflectionM: 0.004,

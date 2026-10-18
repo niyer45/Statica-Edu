@@ -58,7 +58,6 @@ const CASES: Case[] = [
     experiment: (step, d, ch) => {
       const section = beamSection(d)
       if (step.id === 'shape') return [{ type: 'applySection', kind: (ch.allowedSections as string[]).find((k) => k !== section.kind)! }]
-      if (step.id === 'upright') return [{ type: 'setOrientation', orientationDeg: d.orientationDeg === 0 ? 90 : 0 }]
       const param = step.id === 'tune' ? SECTION_PARAMS[section.kind as keyof typeof SECTION_PARAMS][0] : target(step, section)
       return [{ type: 'setParam', param, valueM: (section[param] as number) + 0.005, mode: 'clamp' }]
     },

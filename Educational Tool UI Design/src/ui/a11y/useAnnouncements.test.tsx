@@ -12,10 +12,9 @@ it('announces section, recorded test and restore once per event without moving f
   function Probe() { store = useStore(); useAnnouncements(announce); return <button>Focused</button> }
   const view = render(<StoreProvider challenge={bundledChallenge()} initialSession={{ ...createHarness(bundledChallenge()).real.state, mode: 'parametric' }}><Probe /></StoreProvider>)
   const button = view.getByRole('button'); button.focus()
-  // The baseline is an I-section, so a rectangle is a real change of section.
-  act(() => store!.dispatch({ type: 'applySection', kind: 'rectangle' }))
-  expect(store!.state.draft.section.kind).toBe('rectangle')
-  expect(announce).toHaveBeenLastCalledWith('Section applied: Rectangle.')
+  act(() => store!.dispatch({ type: 'applySection', kind: 'iSection' }))
+  expect(store!.state.draft.section.kind).toBe('iSection')
+  expect(announce).toHaveBeenLastCalledWith('Section applied: I-section.')
   act(() => { store!.dispatch({ type: 'setPrediction', direction: 'decrease', now: 't' }); store!.runTest() })
   expect(announce.mock.lastCall![0]).toMatch(/Test 1: .*; \d+ failed constraints/)
   expect(document.activeElement).toBe(button)
@@ -30,8 +29,8 @@ it('adds Guided step completion to the test announcement (task 58)', () => {
   function Probe() { store = useStore(); useAnnouncements(announce); return null }
   render(<StoreProvider challenge={bundledChallenge()} initialSession={{ ...createHarness(bundledChallenge()).real.state, mode: 'guided' }}><Probe /></StoreProvider>)
   act(() => store!.dispatch({ type: 'applySection', kind: 'rectangle' }))
-  expect(announce).toHaveBeenLastCalledWith('Section shape is locked in this Guided step. Editable now: Section orientation.')
-  act(() => store!.dispatch({ type: 'setOrientation', orientationDeg: 0 }))
+  expect(announce).toHaveBeenLastCalledWith('Section shape is locked in this Guided step. Editable now: Diameter.')
+  act(() => store!.dispatch({ type: 'setParam', param: 'diameterM', valueM: 0.034, mode: 'strict' }))
   act(() => { store!.dispatch({ type: 'setPrediction', direction: 'decrease', now: 't' }); store!.runTest() })
-  expect(announce.mock.lastCall![0]).toMatch(/^Test 1: .*failed constraints\. Guided step 1 complete: Stand it upright\. Next: Tune one dimension\.$/)
+  expect(announce.mock.lastCall![0]).toMatch(/^Test 1: .*failed constraints?\. Guided step 1 complete: Grow the circle\. Next: Try another shape\.$/)
 })

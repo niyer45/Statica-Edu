@@ -33,19 +33,19 @@ const test = () => act(() => { store.dispatch({ type: 'setPrediction', direction
 const steps = () => within(screen.getByRole('list', { name: 'Experiment steps' })).getAllByRole('listitem').map((li) => li.textContent)
 afterEach(cleanup)
 
-// The Baseline is an I-section lying on its side at 90° (task 59), so the beam's first experiment
-// stands it upright.
-const upright = () => act(() => store.dispatch({ type: 'setOrientation', orientationDeg: 0 }))
+// The Baseline is a solid Ø31 mm circle (task 59, D-47 amendment): the beam's first experiment
+// grows the diameter, the second changes the shape.
+const grow = (valueM = 0.034) => act(() => store.dispatch({ type: 'setParam', param: 'diameterM', valueM, mode: 'strict' }))
 
 describe('Guided structured experiments (task 58)', () => {
   it('shows the ordered single-variable steps with the first one current', () => {
     setup()
     const guide = screen.getByRole('region', { name: 'Guided experiments' })
     expect(within(guide).getByText(/Step 1 of 4/)).toBeTruthy()
-    expect(steps()).toEqual(['1. Stand it upright, current step', '2. Tune one dimension, locked', '3. Try another shape, locked', '4. Meet every check, locked'])
-    expect(within(guide).getByRole('heading', { name: 'Stand it upright' })).toBeTruthy()
-    expect(within(guide).getByText(/Change only the section orientation/)).toBeTruthy()
-    expect(within(guide).getByText('Section orientation')).toBeTruthy()
+    expect(steps()).toEqual(['1. Grow the circle, current step', '2. Try another shape, locked', '3. Tune one dimension, locked', '4. Meet every check, locked'])
+    expect(within(guide).getByRole('heading', { name: 'Grow the circle' })).toBeTruthy()
+    expect(within(guide).getByText(/Increase only the diameter of the solid circle/)).toBeTruthy()
+    expect(within(guide).getByText('Diameter')).toBeTruthy()
     expect(guide.querySelector('details')?.open).toBe(false)
   })
 
@@ -55,27 +55,29 @@ describe('Guided structured experiments (task 58)', () => {
     // Browsing the hint never changes the session.
     fireEvent.click(screen.getByText('Hint'))
     expect(store.state).toBe(before)
-    // Retesting the unchanged Baseline does not meet "change only the orientation".
+    // Retesting the unchanged Baseline does not meet "increase the diameter".
     test()
-    expect(screen.getByRole('heading', { name: 'Stand it upright' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Grow the circle' })).toBeTruthy()
     expect(screen.getByText(/Iteration 1 did not complete this step yet/)).toBeTruthy()
-    upright()
+    // A smaller circle changes the diameter in the wrong direction.
+    grow(0.029)
     test()
-    expect(screen.getByRole('heading', { name: 'Tune one dimension' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Grow the circle' })).toBeTruthy()
+    grow(0.034)
+    test()
+    expect(screen.getByRole('heading', { name: 'Try another shape' })).toBeTruthy()
     expect(screen.getByText(/Step 2 of 4/)).toBeTruthy()
-    expect(screen.getByText(/Stand it upright complete: Iteration 2 compared with Iteration 1\. Tip deflection decreased; Bending stress decreased; Mass did not change\./)).toBeTruthy()
-    expect(steps()[0]).toBe('1. Stand it upright, complete')
+    expect(screen.getByText(/Grow the circle complete: Iteration 3 compared with Iteration 2\. Tip deflection decreased; Mass increased; Bending stress decreased\./)).toBeTruthy()
+    expect(steps()[0]).toBe('1. Grow the circle, complete')
   })
 
   it('locks every control the current step does not unlock; Parametric locks nothing', () => {
     setup(fresh('guided'), undefined, challenge, true)
-    const flange = () => screen.getByRole('spinbutton', { name: /^Flange thickness/ }) as HTMLInputElement
-    expect(flange().readOnly).toBe(true)
-    expect((screen.getByRole('slider', { name: /^Flange thickness slider/ }) as HTMLInputElement).disabled).toBe(true)
-    expect((screen.getByRole('radio', { name: '0°' }) as HTMLInputElement).disabled).toBe(false)
+    const diameter = () => screen.getByRole('spinbutton', { name: /^Diameter/ }) as HTMLInputElement
+    expect(diameter().readOnly).toBe(false)
     const rectangle = screen.getByRole('button', { name: /Rectangle/ })
     expect(rectangle.getAttribute('aria-disabled')).toBe('true')
-    expect(screen.getAllByText('Locked in this step. Editable now: Section orientation.').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Locked in this step. Editable now: Diameter.').length).toBeGreaterThan(0)
     const before = store.state
     fireEvent.click(rectangle)
     fireEvent.keyDown(rectangle, { key: 'Enter' })
@@ -83,36 +85,35 @@ describe('Guided structured experiments (task 58)', () => {
     // A direct dispatch (e.g. a viewport drop) is rejected by the runtime lock with a reason.
     act(() => store.dispatch({ type: 'applySection', kind: 'rectangle' }))
     expect(store.state.draft).toBe(before.draft)
-    expect(store.state.ui.notice?.message).toBe('Section shape is locked in this Guided step. Editable now: Section orientation.')
+    expect(store.state.ui.notice?.message).toBe('Section shape is locked in this Guided step. Editable now: Diameter.')
 
-    // Step 2 unlocks the dimensions and locks the orientation; the shape stays locked.
-    upright()
+    // Step 2 unlocks the shape and locks the diameter.
+    grow()
     test()
-    expect(flange().readOnly).toBe(false)
-    expect((screen.getByRole('radio', { name: '90°' }) as HTMLInputElement).disabled).toBe(true)
-    expect(screen.getByRole('button', { name: /Rectangle/ }).getAttribute('aria-disabled')).toBe('true')
+    expect(diameter().readOnly).toBe(true)
+    expect((screen.getByRole('slider', { name: /^Diameter slider/ }) as HTMLInputElement).disabled).toBe(true)
+    expect(screen.getByRole('button', { name: /Rectangle/ }).getAttribute('aria-disabled')).not.toBe('true')
     cleanup()
 
     setup(fresh('parametric'), undefined, challenge, true)
     expect(screen.queryByRole('region', { name: 'Guided experiments' })).toBeNull()
     expect(screen.queryByText(/Locked in this step/)).toBeNull()
-    expect(flange().readOnly).toBe(false)
+    expect(diameter().readOnly).toBe(false)
     fireEvent.click(screen.getByRole('button', { name: /Rectangle/ }))
     expect(store.state.draft.section.kind).toBe('rectangle')
   })
 
   it('opens every parameter in the final step and completes on an Accepted test', () => {
     setup(fresh('guided'), undefined, challenge, true)
-    upright()
+    grow()
+    test()
+    act(() => store.dispatch({ type: 'applySection', kind: 'iSection' }))
     test()
     act(() => store.dispatch({ type: 'setParam', param: 'heightM', valueM: 0.06, mode: 'strict' }))
-    test()
-    act(() => store.dispatch({ type: 'applySection', kind: 'rectangle' }))
     test()
     expect(screen.getByRole('heading', { name: 'Meet every check' })).toBeTruthy()
     expect(screen.queryByText(/Locked in this step/)).toBeNull()
     act(() => {
-      store.dispatch({ type: 'applySection', kind: 'iSection' })
       for (const [param, valueM] of [['heightM', 0.06], ['widthM', 0.04], ['flangeThicknessM', 0.004], ['webThicknessM', 0.003]] as const) store.dispatch({ type: 'setParam', param, valueM, mode: 'strict' })
     })
     test()
@@ -125,14 +126,14 @@ describe('Guided structured experiments (task 58)', () => {
     const values = new Map<string, string>()
     const storage = { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => { values.set(key, value) }, removeItem: (key: string) => { values.delete(key) } }
     const mounted = setup(fresh('guided'), storage)
-    upright()
+    grow()
     test()
     const before = store.state
     mounted.unmount()
     setup(fresh('guided'), storage)
     expect(store.state).toEqual(before)
     expect([...values.values()].join('')).not.toMatch(/completions|progress|stepId/)
-    expect(screen.getByRole('heading', { name: 'Tune one dimension' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Try another shape' })).toBeTruthy()
   })
 })
 

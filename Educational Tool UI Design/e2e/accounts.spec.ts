@@ -87,7 +87,7 @@ test('sign up, work, sign out, guest sees none of it, sign in restores it', asyn
   await audit(page)
 
   const session = JSON.parse((await page.evaluate(() => window.localStorage.getItem('ei:account-session:v1')))!) as { userId: string }
-  const userKey = `ei:user:${session.userId}:session:${BEAM}:v2` // content version 2 since task 59
+  const userKey = `ei:user:${session.userId}:session:${BEAM}:v3` // content version 3 since the D-47 amendment
   // The password is never stored in plain text.
   const stored = await page.evaluate(() => Object.values(window.localStorage).join('\n'))
   expect(stored).not.toContain(ANA.password)

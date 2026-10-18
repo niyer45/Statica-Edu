@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { bundledChallengeResult } from '../../src/challenge/content'
 import { evaluate } from '../../src/evaluation/evaluate'
 import { analyze } from '../../src/physics/analyze'
-import { baseline, FIXTURE_REL_TOL, reference, solid30, type Fixture } from './designs'
+import { baseline, FIXTURE_REL_TOL, reference, sidewaysI, solid30, type Fixture } from './designs'
 
 // Example tests E1 (baseline) and E2 (reference) against the verified fixtures table
 // (Req 8.10, 12.7, 12.8).
@@ -33,38 +33,50 @@ function expectTableValues(f: Fixture): void {
   expectRel(analysis.nominalMaxStressPa, f.expected.nominalMaxStressPa)
 }
 
-describe('E1: baseline (I-section 36.5 × 84, tf = 3, tw = 7 mm, turned 90°)', () => {
+describe('E1: baseline (solid circle D = 31 mm)', () => {
   it('is the bundled challenge baseline', () => {
     expect(challenge.initialDesign.section).toEqual(baseline.design.section)
     expect(challenge.initialDesign.orientationDeg).toBe(baseline.design.orientationDeg)
   })
 
-  it('is notAccepted, failing deflection, stress, mass and envelope width, with no warnings', () => {
+  it('is notAccepted, failing deflection and mass, with no warnings', () => {
     const { analysis, evaluation } = run(baseline)
     expect(evaluation.status).toBe('notAccepted')
     expect(evaluation.accepted).toBe(false)
-    expect(evaluation.failures).toEqual(['deflection', 'stress', 'mass', 'envelopeWidth'])
+    expect(evaluation.failures).toEqual(['deflection', 'mass'])
     expect(analysis.applicable).toBe(true)
     expect(analysis.warnings).toEqual([])
   })
 
-  it('has δ ≈ 11.79 mm, m ≈ 1.239 kg, σ ≈ 123.8 MPa and an 84 mm envelope width', () => {
-    const { analysis, evaluation } = run(baseline)
-    expectRel(analysis.tipDeflectionM, 11.794e-3)
-    expectRel(analysis.massKg, 1.2393)
-    expectRel(analysis.nominalMaxStressPa, 123.76e6)
-    expectRel(evaluation.constraints.find((c) => c.id === 'envelopeWidth')!.value, 0.084)
+  it('has δ ≈ 6.91 mm, m ≈ 1.223 kg, σ ≈ 61.5 MPa', () => {
+    const { analysis } = run(baseline)
+    expectRel(analysis.tipDeflectionM, 6.9054e-3)
+    expectRel(analysis.massKg, 1.2227)
+    expectRel(analysis.nominalMaxStressPa, 61.544e6)
   })
 
   it('matches the fixture table', () => {
     expectTableValues(baseline)
   })
 
-  it('has negative deflection and stress margins and uses more than the mass budget', () => {
+  it('has a negative deflection margin and uses more than the mass budget', () => {
     const { evaluation } = run(baseline)
     expect(evaluation.efficiency.deflectionMargin).toBeLessThan(0)
-    expect(evaluation.efficiency.stressMargin).toBeLessThan(0)
     expect(evaluation.efficiency.massUsage).toBeGreaterThan(1)
+  })
+})
+
+describe('E1 (v2): I-section 36.5 × 84, tf = 3, tw = 7 mm, turned 90° (the challenge v2 baseline)', () => {
+  it('is notAccepted, failing deflection, stress, mass and envelope width, with no warnings', () => {
+    const { analysis, evaluation } = run(sidewaysI)
+    expect(evaluation.failures).toEqual(['deflection', 'stress', 'mass', 'envelopeWidth'])
+    expect(analysis.applicable).toBe(true)
+    expect(analysis.warnings).toEqual([])
+    expectRel(evaluation.constraints.find((c) => c.id === 'envelopeWidth')!.value, 0.084)
+  })
+
+  it('matches the fixture table', () => {
+    expectTableValues(sidewaysI)
   })
 })
 

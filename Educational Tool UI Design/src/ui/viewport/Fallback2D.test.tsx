@@ -11,7 +11,6 @@ import FallbackViewport, { FALLBACK_NOTICE } from './FallbackViewport'
 import { DEFAULT_ORBIT, project, SCENE_UNITS_PER_M } from './projection'
 import Viewport3D from './Viewport3D'
 import ViewportBoundary from './ViewportBoundary'
-import { localToGlobalYZ } from './sceneLayout'
 import type { HandleFeedback } from './DimensionHandles'
 
 const glMock = vi.hoisted(() => ({ canvas: null as HTMLCanvasElement | null, throws: false, feedback: undefined as ((value: HandleFeedback | null) => void) | undefined }))
@@ -62,9 +61,6 @@ describe('typed SVG fallback (14.4/14.5)', () => {
   it('renders independent I-section dimensions and rotated outline, while retaining stored deformation', () => {
     setup(<FallbackViewport />)
     const before = screen.getByTestId('fallback-deformation').innerHTML
-    // The baseline is already an I-section: go through a tube so the I-section is freshly applied
-    // with the challenge default thicknesses.
-    fireEvent.click(screen.getByText('Apply tube'))
     fireEvent.click(screen.getByText('Apply I'))
     fireEvent.click(screen.getByText('Change web'))
     fireEvent.click(screen.getByText('Rotate section'))
@@ -88,13 +84,11 @@ describe('typed SVG fallback (14.4/14.5)', () => {
     const expectedOffset = Math.min(ch.visualization.exaggerationFactor * result.analysis.tipDeflectionM, 0.3 * result.designSnapshot.lengthM)
     const line = screen.getByTestId('fallback-deformation').querySelector('polyline')!
     const last = line.getAttribute('points')!.split(' ').at(-1)!.split(',').map(Number)
-    // The bundled baseline is turned 90°, so map the section point with the stored orientation.
     const outer = sectionOutline(result.designSnapshot.section).outer[0]
-    const g = localToGlobalYZ(outer.u, outer.v, result.designSnapshot.orientationDeg)
-    const tip = project([result.designSnapshot.lengthM, g.y - expectedOffset, g.z], result.designSnapshot.lengthM, DEFAULT_ORBIT.angle, DEFAULT_ORBIT.elevation, 1)
+    const tip = project([result.designSnapshot.lengthM, outer.v - expectedOffset, outer.u], result.designSnapshot.lengthM, DEFAULT_ORBIT.angle, DEFAULT_ORBIT.elevation, 1)
     expect(last[0]).toBeCloseTo(tip[0], 10)
     expect(last[1]).toBeCloseTo(tip[1], 10)
-    const unbent = project([result.designSnapshot.lengthM, g.y, g.z], result.designSnapshot.lengthM, DEFAULT_ORBIT.angle, DEFAULT_ORBIT.elevation, 1)
+    const unbent = project([result.designSnapshot.lengthM, outer.v, outer.u], result.designSnapshot.lengthM, DEFAULT_ORBIT.angle, DEFAULT_ORBIT.elevation, 1)
     expect(last[1] - unbent[1]).toBeCloseTo(expectedOffset * SCENE_UNITS_PER_M * Math.cos(DEFAULT_ORBIT.elevation), 10)
   })
   it('keeps orbit keyboard-operable, allows Tab to leave, and restores default view', () => {

@@ -183,8 +183,7 @@ describe('platform shell component suite (13.6)', () => {
     }
     renderShell(seeded)
     openMode('Parametric') // free editing; Guided locks parameters by step (task 58)
-    // The baseline is an I-section (task 59): edit its height.
-    act(() => dispatch({ type: 'setParam', param: 'heightM', valueM: 0.06, mode: 'strict' }))
+    act(() => dispatch({ type: 'setParam', param: 'diameterM', valueM: 0.04, mode: 'strict' }))
     const before = latest
     const workbench = host().querySelector('.workbench')
     for (const page of ['Notebook', 'Learning paths', 'My designs', 'Challenges']) {
@@ -195,7 +194,7 @@ describe('platform shell component suite (13.6)', () => {
       expect(host().hidden).toBe(false)
       expect(host().querySelector('.workbench')).toBe(workbench)
       expect(latest).toBe(before)
-      expect((screen.getByRole('spinbutton', { name: /^Height/ }) as HTMLInputElement).value).toBe('60.00')
+      expect((screen.getByRole('spinbutton', { name: /Diameter/ }) as HTMLInputElement).value).toBe('40.00')
     }
   })
 
@@ -205,14 +204,14 @@ describe('platform shell component suite (13.6)', () => {
     const baseline = boot.value.session.history[0]!
     renderShell({ ...boot.value.session, history: [baseline, { ...baseline, id: 'stored-1', iteration: 1, label: undefined }] })
     openMode('Parametric') // free editing; Guided locks parameters by step (task 58)
-    act(() => dispatch({ type: 'setParam', param: 'heightM', valueM: 0.08, mode: 'strict' }))
+    act(() => dispatch({ type: 'setParam', param: 'diameterM', valueM: 0.08, mode: 'strict' }))
     navigate('My designs')
     const saved = latest
     expect(screen.queryByRole('table', { name: 'Session test results' })).toBeNull()
     expect(screen.queryByText('Test #1')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: /Return to workbench/ }))
     expect(latest).toBe(saved)
-    expect(latest.draft.section).toEqual({ ...boot.value.session.draft.section, heightM: 0.08 })
+    expect(latest.draft.section).toEqual({ kind: 'circle', diameterM: 0.08 })
     expect(latest.history).toHaveLength(2)
   })
 

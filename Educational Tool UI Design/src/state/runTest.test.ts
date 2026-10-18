@@ -19,9 +19,7 @@ function fresh(): SessionState {
 const step = (s: SessionState, a: Action) => sessionReducer(s, a, ch)
 const predict = (s: SessionState, direction: 'same' | 'increase' | 'decrease' = 'same') => step(s, { type: 'setPrediction', direction, explanation: 'My prediction.', now })
 const run = (s: SessionState, id = 'run-1') => step(s, { type: 'runTest', id, now })
-// The baseline is an I-section turned 90°: its flange width is the depth that bends, so widening
-// it stiffens the beam (36.5 → 40 mm lowers the deflection) and narrowing it does the reverse.
-const edit = (s: SessionState, widthM: number) => step(s, { type: 'setParam', param: 'widthM', valueM: widthM, mode: 'strict' })
+const edit = (s: SessionState, diameterM: number) => step(s, { type: 'setParam', param: 'diameterM', valueM: diameterM, mode: 'strict' })
 afterEach(() => vi.restoreAllMocks())
 
 function expectDeepFrozen(value: unknown) {
@@ -156,12 +154,12 @@ describe('runTest snapshots and evaluation (19.1)', () => {
     expect(Object.isFrozen(mutable.draft)).toBe(false)
     expect(Object.isFrozen(mutable.draft.section)).toBe(false)
     expect(Object.isFrozen(mutable.pendingPrediction)).toBe(false)
-    if (mutable.draft.section.kind !== 'iSection') throw new Error('Expected I-section')
-    mutable.draft.section.widthM = 0.08
+    if (mutable.draft.section.kind !== 'circle') throw new Error('Expected circle')
+    mutable.draft.section.diameterM = 0.08
     mutable.pendingPrediction!.direction = 'increase'
-    expect(s.history[1]!.designSnapshot.section).toEqual(ch.initialDesign.section)
+    expect(s.history[1]!.designSnapshot.section).toEqual({ kind: 'circle', diameterM: 0.031 })
     expect(s.history[1]!.prediction!.direction).toBe('same')
-    expect(() => { (s.history[1]!.designSnapshot.section as { widthM: number }).widthM = 0.07 }).toThrow()
+    expect(() => { (s.history[1]!.designSnapshot.section as { diameterM: number }).diameterM = 0.07 }).toThrow()
   })
 
   it('keeps the highest-numbered three selected non-baseline iterations in history order', () => {
@@ -177,8 +175,7 @@ describe('runTest snapshots and evaluation (19.1)', () => {
   })
 
   it('records out-of-assumption geometry as modelNotApplicable rather than blocking the test', () => {
-    // A 10 mm flange width deflects about 114 mm (δ/L ≈ 0.19 > 0.1): outside small deflection.
-    const s = run(predict(edit(fresh(), 0.01)))
+    const s = run(predict(edit(fresh(), 0.005)))
     expect(s.history[1]!.evaluation.status).toBe('modelNotApplicable')
     expect(s.history[1]!.accepted).toBe(false)
   })

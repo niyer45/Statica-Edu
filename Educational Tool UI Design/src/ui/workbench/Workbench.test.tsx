@@ -39,7 +39,7 @@ describe('Workbench', () => {
     // Explain & submit disabled until a non-baseline test exists (Req 35.6).
     expect(screen.getByRole('button', { name: /Explain & submit/ }).hasAttribute('disabled')).toBe(true)
     // Guided experiment step states conveyed by text (task 58).
-    expect(screen.getByRole('list', { name: 'Experiment steps' }).textContent).toContain('1. Stand it upright, current step')
+    expect(screen.getByRole('list', { name: 'Experiment steps' }).textContent).toContain('1. Grow the circle, current step')
     expect(document.querySelector('[aria-live="polite"]')).not.toBeNull()
 
     // The lazy viewport resolves into the same region.

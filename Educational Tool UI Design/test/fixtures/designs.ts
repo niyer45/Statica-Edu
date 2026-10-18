@@ -43,14 +43,36 @@ function design(id: string, section: Section, orientationDeg: 0 | 90 = 0): BeamD
 }
 
 /**
+ * Challenge v3 baseline (D-47 amendment): a solid Ø31 mm circle. It fails deflection and mass, the
+ * most checks any circle fails with no applicability warning (circles failing more carry a
+ * LARGE_DEFLECTION or DEPTH_SPAN warning). Values from an independent hand calculation:
+ * A = πd²/4, I = πd⁴/64, δ = F L³/(3 E I), σ = F L (d/2)/I.
+ */
+export const baseline: Fixture = {
+  name: 'baseline',
+  design: design('baseline', { kind: 'circle', diameterM: 0.031 }),
+  expected: {
+    areaM2: 7.5477e-4,
+    massKg: 1.2227,
+    bendingInertiaM4: 4.5333e-8,
+    tipDeflectionM: 6.9054e-3,
+    nominalMaxStressPa: 61.544e6,
+    status: 'notAccepted',
+    failures: ['deflection', 'mass'],
+    warningCodes: [],
+    notApplicableCodes: [],
+  },
+}
+
+/**
  * Challenge v2 baseline (task 59): an I-section turned on its side (bending about its weak axis),
  * 84 mm wide. It fails deflection, stress, mass and envelope width, the most checks any applicable
  * in-range section fails, with no applicability warning (δ/L = 0.0197 < 0.02). Values from an
  * independent hand calculation: A = 2·b·tf + (h − 2tf)·tw, I = 2·tf·b³/12 + (h − 2tf)·tw³/12.
  */
-export const baseline: Fixture = {
-  name: 'baseline',
-  design: design('baseline', { kind: 'iSection', widthM: 0.0365, heightM: 0.084, flangeThicknessM: 0.003, webThicknessM: 0.007 }, 90),
+export const sidewaysI: Fixture = {
+  name: 'sidewaysI',
+  design: design('sidewaysI', { kind: 'iSection', widthM: 0.0365, heightM: 0.084, flangeThicknessM: 0.003, webThicknessM: 0.007 }, 90),
   expected: {
     areaM2: 7.65e-4,
     massKg: 1.2393,
@@ -211,6 +233,7 @@ export const tinyCircle: Fixture = {
 
 export const FIXTURES: readonly Fixture[] = [
   baseline,
+  sidewaysI,
   solid30,
   reference,
   tubeSameMass,

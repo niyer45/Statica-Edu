@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { bundledChallenge, circleStartChallenge } from '../arbitraries'
-import { baseline as beamBaseline, reference as beamReference } from '../fixtures/designs'
+import { bundledChallenge } from '../arbitraries'
+import { baseline as beamBaseline, reference as beamReference, sidewaysI } from '../fixtures/designs'
 import type { BeamDesign, Section } from '../../src/geometry/sections'
 import { beamModel } from '../../src/state/models'
 import { bracedFrameChallenge, frameDesign, worksheetFixture as frameFixture } from '../fixtures/bracedFrame'
@@ -68,16 +68,41 @@ function expectStaleSaveIgnored<Ch extends { version: number }>(rt: SaveRuntime,
   expect(rt.deserialize(raw, ch as never)).toEqual({ ok: false, error: 'Saved challenge mismatch' })
 }
 
-describe('Cantilever Beam I baseline difficulty', () => {
+describe('Cantilever Beam I baseline difficulty (a solid circle, D-47 amendment)', () => {
   const ch = bundledChallenge()
   const base = designChecksFailed(beamModel, ch.initialDesign, ch)
+  const circle = (diameterM: number): BeamDesign => ({ ...ch.initialDesign, id: 'c', section: { kind: 'circle', diameterM }, orientationDeg: 0 })
+  const r = ch.sectionLimits.circle.diameterM
+  const circles = grid(r.minM, r.maxM, r.stepM).map((d) => ({ d, ...designChecksFailed(beamModel, circle(d), ch) }))
 
-  it('is an I-section turned 90° failing deflection, stress, mass and envelope width, applicable without warnings', () => {
-    expect(ch.initialDesign).toMatchObject({ section: beamBaseline.design.section, orientationDeg: 90 })
-    expect(base).toEqual({ applicable: true, warnings: 0, failed: ['deflection', 'stress', 'mass', 'envelopeWidth'], status: 'notAccepted' })
+  it('is a solid Ø31 mm circle failing deflection and mass, applicable without warnings', () => {
+    expect(ch.initialDesign).toMatchObject({ section: beamBaseline.design.section, orientationDeg: 0 })
+    expect(base).toEqual({ applicable: true, warnings: 0, failed: ['deflection', 'mass'], status: 'notAccepted' })
   })
 
-  it('no section can fail all five: one wider and taller than the envelope always meets the deflection limit', () => {
+  it('no circle on the step grid fails more design checks without a warning; ties go to the most flexible', () => {
+    expect(circles).toHaveLength(191)
+    const clean = circles.filter((c) => c.applicable && c.warnings === 0)
+    const max = Math.max(...clean.map((c) => c.failed.length))
+    expect(max).toBe(base.failed.length)
+    const tied = clean.filter((c) => c.failed.length === max)
+    // Every tie fails deflection and mass (Ø31–35.5 mm); the smallest misses deflection by most.
+    expect(tied.map((c) => c.d)).toEqual(grid(0.031, 0.0355, 0.0005))
+    for (const c of tied) expect(c.failed).toEqual(['deflection', 'mass'])
+    expect(tied[0]!.d).toBe((ch.initialDesign.section as { diameterM: number }).diameterM)
+  })
+
+  it('records the circles that fail more only with a model warning', () => {
+    // Small circles fail deflection and stress but deflect beyond small-deflection accuracy; circles
+    // above 80 mm fail mass and both envelope checks but are deep for their span.
+    const at = (d: number) => circles.find((c) => Math.abs(c.d - d) < 1e-9)!
+    expect(at(0.0245)).toMatchObject({ applicable: true, warnings: 1, failed: ['deflection', 'stress'] })
+    expect(at(0.0805)).toMatchObject({ applicable: true, warnings: 1, failed: ['mass', 'envelopeWidth', 'envelopeHeight'] })
+    expect(Math.max(...circles.filter((c) => c.applicable).map((c) => c.failed.length))).toBe(3)
+  })
+
+  it('global maximum over every section kind: 4 (the v2 sideways I-section), never 5', () => {
+    expect(designChecksFailed(beamModel, sidewaysI.design, ch)).toEqual({ applicable: true, warnings: 0, failed: ['deflection', 'stress', 'mass', 'envelopeWidth'], status: 'notAccepted' })
     // Failing both envelope checks needs both outer dimensions above 80 mm. The bending inertia of
     // every allowed kind grows with each dimension and thickness, so the least stiff such sections
     // are these minimum-thickness 80.5 mm profiles (the next 0.5 mm step), in either orientation.
@@ -90,20 +115,21 @@ describe('Cantilever Beam I baseline difficulty', () => {
     ]
     for (const section of weakest) {
       for (const o of [0, 90] as const) {
-        const r = designChecksFailed(beamModel, d(section, o), ch)
-        expect(r.failed, `${section.kind} at ${o}°`).toEqual(expect.arrayContaining(['envelopeWidth', 'envelopeHeight']))
-        expect(r.failed, `${section.kind} at ${o}°`).not.toContain('deflection')
+        const f = designChecksFailed(beamModel, d(section, o), ch)
+        expect(f.failed, `${section.kind} at ${o}°`).toEqual(expect.arrayContaining(['envelopeWidth', 'envelopeHeight']))
+        expect(f.failed, `${section.kind} at ${o}°`).not.toContain('deflection')
       }
     }
   })
 
-  it('keeps the reference Accepted and reachable (rotate to 0° and resize)', () => {
+  it('keeps the I-section reference Accepted and reachable (change shape, then resize)', () => {
     expect(designChecksFailed(beamModel, beamReference.design, ch)).toMatchObject({ applicable: true, failed: [], status: 'accepted' })
-    expect(beamReference.design.section.kind).toBe(ch.initialDesign.section.kind)
+    expect(ch.allowedSections).toContain(beamReference.design.section.kind)
+    expect(beamReference.design.orientationDeg).toBe(ch.initialDesign.orientationDeg)
   })
 
-  it('moves saves to a new key so a previous-version save is never re-scored', () => {
-    expectStaleSaveIgnored(beamRuntime, ch, { ...circleStartChallenge(), version: 1 })
+  it('moves saves to a new key so a version 2 save is never re-scored', () => {
+    expectStaleSaveIgnored(beamRuntime, ch, { ...ch, version: 2, initialDesign: { ...sidewaysI.design, id: 'baseline' } })
   })
 })
 

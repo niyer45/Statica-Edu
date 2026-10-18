@@ -12,7 +12,7 @@ import { initSession, type Action, type SessionState } from './session'
 // (the writer is unchanged, so a rollback to that release can read new saves). Loading
 // normalizes key order to the schema order, which is pre-existing and content-neutral.
 
-// Task 59 changed the bundled baseline and moved the challenge to version 2, so this save
+// Task 59 and its D-47 amendment changed the bundled baseline (now content version 3), so this save
 // belongs to the version 1 content: the same challenge with the Ø30 mm circle baseline. The
 // frozen v1 envelope format is unchanged; only the content version (and storage key) moved.
 const raw = readFileSync(new URL('../../test/fixtures/sessions/cantilever-beam-1.v1.json', import.meta.url), 'utf8')
@@ -80,10 +80,10 @@ describe('recorded v1 Cantilever Beam I save', () => {
     expect(restored).toEqual({ ok: false, error: 'Analysis model "sdofBaseIsolation" version 2 is not available.' })
   })
 
-  it('is stored under the version 1 key and never loads into the current (version 2) content', () => {
-    expect(current.version).toBe(2)
+  it('is stored under the version 1 key and never loads into the current (version 3) content', () => {
+    expect(current.version).toBe(3)
     expect(sessionKey(ch)).toBe('ei:session:cantilever-beam-1:v1')
-    expect(sessionKey(current)).toBe('ei:session:cantilever-beam-1:v2')
+    expect(sessionKey(current)).toBe('ei:session:cantilever-beam-1:v3')
     expect(deserializeSession(raw, current)).toEqual({ ok: false, error: 'Saved challenge mismatch' })
   })
 
