@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { bundledChallenge } from '../../test/arbitraries'
-import { deserializeSession, serializeSession } from './persistence'
+import { deserializeSession, serializeSession, sessionKey } from './persistence'
 import { sessionReducer } from './reducer'
 import { initSession, type Action, type SessionState } from './session'
 
@@ -12,8 +12,12 @@ import { initSession, type Action, type SessionState } from './session'
 // (the writer is unchanged, so a rollback to that release can read new saves). Loading
 // normalizes key order to the schema order, which is pre-existing and content-neutral.
 
+// Task 59 changed the bundled baseline and moved the challenge to version 2, so this save
+// belongs to the version 1 content: the same challenge with the Ø30 mm circle baseline. The
+// frozen v1 envelope format is unchanged; only the content version (and storage key) moved.
 const raw = readFileSync(new URL('../../test/fixtures/sessions/cantilever-beam-1.v1.json', import.meta.url), 'utf8')
-const ch = bundledChallenge()
+const current = bundledChallenge()
+const ch = { ...current, version: 1, initialDesign: { ...current.initialDesign, section: { kind: 'circle' as const, diameterM: 0.03 }, orientationDeg: 0 as const } }
 const SAVED_AT = '2026-10-17T09:05:00.000Z'
 
 /** The action sequence that produced the fixture. */
@@ -74,6 +78,13 @@ describe('recorded v1 Cantilever Beam I save', () => {
   it('rejects the same save for a challenge bound to an unregistered model', () => {
     const restored = deserializeSession(raw, { ...ch, model: { id: 'sdofBaseIsolation', version: 2 } })
     expect(restored).toEqual({ ok: false, error: 'Analysis model "sdofBaseIsolation" version 2 is not available.' })
+  })
+
+  it('is stored under the version 1 key and never loads into the current (version 2) content', () => {
+    expect(current.version).toBe(2)
+    expect(sessionKey(ch)).toBe('ei:session:cantilever-beam-1:v1')
+    expect(sessionKey(current)).toBe('ei:session:cantilever-beam-1:v2')
+    expect(deserializeSession(raw, current)).toEqual({ ok: false, error: 'Saved challenge mismatch' })
   })
 
   it('never reads a v1 beam save through another registered model', () => {

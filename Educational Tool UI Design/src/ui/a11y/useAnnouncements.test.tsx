@@ -12,8 +12,10 @@ it('announces section, recorded test and restore once per event without moving f
   function Probe() { store = useStore(); useAnnouncements(announce); return <button>Focused</button> }
   const view = render(<StoreProvider challenge={bundledChallenge()} initialSession={createHarness(bundledChallenge()).real.state}><Probe /></StoreProvider>)
   const button = view.getByRole('button'); button.focus()
-  act(() => store!.dispatch({ type: 'applySection', kind: 'iSection' }))
-  expect(announce).toHaveBeenLastCalledWith('Section applied: I-section.')
+  // The baseline is an I-section, so a rectangle is a real change of section.
+  act(() => store!.dispatch({ type: 'applySection', kind: 'rectangle' }))
+  expect(store!.state.draft.section.kind).toBe('rectangle')
+  expect(announce).toHaveBeenLastCalledWith('Section applied: Rectangle.')
   act(() => { store!.dispatch({ type: 'setPrediction', direction: 'decrease', now: 't' }); store!.runTest() })
   expect(announce.mock.lastCall![0]).toMatch(/Test 1: .*; \d+ failed constraints/)
   expect(document.activeElement).toBe(button)

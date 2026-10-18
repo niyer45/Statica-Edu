@@ -26,7 +26,8 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await expect(guide.getByRole('heading', { name: 'Inspect', exact: true })).toBeVisible()
       await guide.getByRole('button', { name: '2. Experiment' }).click()
       await guide.getByText('Hint & suggested experiment').click()
-      await expect(guide.getByText(/Try a diameter change/)).toBeVisible()
+      // The baseline is an I-section turned 90° (task 59), so the suggestion is to rotate it.
+      await expect(guide.getByText(/Try rotating a rectangle or I-section/)).toBeVisible()
     } else {
       await expect(guide).toHaveCount(0)
       await expect(page.getByRole('list', { name: 'Workflow' })).toHaveCount(0)

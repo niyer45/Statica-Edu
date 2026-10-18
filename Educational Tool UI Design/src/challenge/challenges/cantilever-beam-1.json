@@ -1,10 +1,10 @@
 {
   "id": "cantilever-beam-1",
-  "version": 1,
+  "version": 2,
   "title": "Cantilever Beam I",
   "difficulty": "introductory",
   "allowedModes": ["guided", "parametric"],
-  "statement": "The cantilevered component exceeds its allowable tip deflection. Redesign its cross-section to meet stiffness and nominal stress requirements while staying within the mass and packaging limits. The span, support interface, material, and applied load are fixed.",
+  "statement": "The cantilevered component deflects too much, is overstressed, is over its mass limit and is too wide for its packaging envelope. Redesign its cross-section to meet stiffness and nominal stress requirements while staying within the mass and packaging limits. The span, support interface, material, and applied load are fixed.",
   "material": {
     "id": "al-educational",
     "name": "Aluminum (educational nominal)",
@@ -15,8 +15,14 @@
   },
   "initialDesign": {
     "id": "baseline",
-    "section": { "kind": "circle", "diameterM": 0.03 },
-    "orientationDeg": 0,
+    "section": {
+      "kind": "iSection",
+      "widthM": 0.0365,
+      "heightM": 0.084,
+      "flangeThicknessM": 0.003,
+      "webThicknessM": 0.007
+    },
+    "orientationDeg": 90,
     "lengthM": 0.6,
     "materialId": "al-educational"
   },

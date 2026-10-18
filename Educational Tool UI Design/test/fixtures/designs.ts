@@ -42,9 +42,32 @@ function design(id: string, section: Section, orientationDeg: 0 | 90 = 0): BeamD
   return { id, section, orientationDeg, lengthM: LENGTH_M, materialId: MATERIAL_ID }
 }
 
+/**
+ * Challenge v2 baseline (task 59): an I-section turned on its side (bending about its weak axis),
+ * 84 mm wide. It fails deflection, stress, mass and envelope width, the most checks any applicable
+ * in-range section fails, with no applicability warning (δ/L = 0.0197 < 0.02). Values from an
+ * independent hand calculation: A = 2·b·tf + (h − 2tf)·tw, I = 2·tf·b³/12 + (h − 2tf)·tw³/12.
+ */
 export const baseline: Fixture = {
   name: 'baseline',
-  design: design('baseline', { kind: 'circle', diameterM: 0.03 }),
+  design: design('baseline', { kind: 'iSection', widthM: 0.0365, heightM: 0.084, flangeThicknessM: 0.003, webThicknessM: 0.007 }, 90),
+  expected: {
+    areaM2: 7.65e-4,
+    massKg: 1.2393,
+    bendingInertiaM4: 2.6543e-8,
+    tipDeflectionM: 11.794e-3,
+    nominalMaxStressPa: 123.76e6,
+    status: 'notAccepted',
+    failures: ['deflection', 'stress', 'mass', 'envelopeWidth'],
+    warningCodes: [],
+    notApplicableCodes: [],
+  },
+}
+
+/** Design-table row "baseline": the solid Ø30 circle that was the challenge v1 baseline. */
+export const solid30: Fixture = {
+  name: 'solid30',
+  design: design('solid30', { kind: 'circle', diameterM: 0.03 }),
   expected: {
     areaM2: 7.0686e-4,
     massKg: 1.1451,
@@ -188,6 +211,7 @@ export const tinyCircle: Fixture = {
 
 export const FIXTURES: readonly Fixture[] = [
   baseline,
+  solid30,
   reference,
   tubeSameMass,
   rectTall,

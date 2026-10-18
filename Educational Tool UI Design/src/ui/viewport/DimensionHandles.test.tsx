@@ -2,7 +2,7 @@ import { act, createRoot, extend, type RootStore, type ThreeEvent } from '@react
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Group, Mesh, MeshBasicMaterial, SphereGeometry, Ray, Vector3, type WebGLRenderer } from 'three'
 extend({ Group, Mesh, MeshBasicMaterial, SphereGeometry })
-import { bundledChallengeResult } from '../../challenge/content'
+import { circleStartChallenge } from '../../../test/arbitraries'
 import { bootstrap } from '../state/bootstrap'
 import StoreProvider from '../state/StoreProvider'
 import { useDispatch, useSession } from '../state/store'
@@ -34,7 +34,8 @@ async function setup() {
   const renderer = { domElement: canvas, render: vi.fn(), setSize: vi.fn(), setPixelRatio: vi.fn(), getPixelRatio: () => 1, xr: { isPresenting: false, addEventListener: vi.fn(), removeEventListener: vi.fn(), setAnimationLoop: vi.fn() }, shadowMap: { enabled: false } }
   root = createRoot(canvas)
   await root.configure({ gl: renderer as unknown as WebGLRenderer, frameloop: 'never', size: { width: 500, height: 400, top: 0, left: 0 } })
-  const boot = bootstrap(bundledChallengeResult, () => '2026-10-15T00:00:00.000Z', () => 'baseline')
+  // These drags exercise the circle diameter handle, so start from a Ø30 mm circle at 0°.
+  const boot = bootstrap({ ok: true, value: circleStartChallenge() }, () => '2026-10-15T00:00:00.000Z', () => 'baseline')
   if (!boot.ok) throw new Error('Invalid session')
   const dragActive = vi.fn()
   const feedback = vi.fn()

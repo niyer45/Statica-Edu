@@ -107,8 +107,8 @@ describe('E4: template checks re-expressed on the spec engine', () => {
     expect(bendingProperties(p, 90)).toEqual({ I: p.IyyM4, c: p.cHorizontalM })
   })
 
-  it('baseline circle Ø30 fails deflection but passes mass and stress', () => {
-    const d = design('baseline', { kind: 'circle', diameterM: 0.03 })
+  it('the Ø30 circle (the v1 baseline) fails deflection but passes mass and stress', () => {
+    const d = design('solid30', { kind: 'circle', diameterM: 0.03 })
     const a = analyze(d, challenge)
     const e = evaluate(d, a, challenge)
     const passed = (id: ConstraintId): boolean | undefined =>

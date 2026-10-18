@@ -8,7 +8,8 @@ import Viewport3D from '../viewport/Viewport3D'
 import SectionPalette from './SectionPalette'
 import { SECTION_DRAG_MIME } from './useSectionDrop'
 
-// Tasks 15.1/15.2 (Req 26.1, 26.2, 26.4–26.7, 32.1). The bundled baseline draft is a solid circle.
+// Tasks 15.1/15.2 (Req 26.1, 26.2, 26.4–26.7, 32.1). The bundled baseline draft is an I-section
+// (turned 90°), so each apply below targets another kind.
 
 const clock = () => '2025-01-01T00:00:00.000Z'
 const newId = () => 'baseline-id'
@@ -76,11 +77,11 @@ describe('SectionPalette', () => {
 
   it('applies a valid kind dropped on the viewport and clears the highlight', () => {
     const { dropZone } = setup()
-    const dt = transfer(SECTION_DRAG_MIME, 'iSection')
+    const dt = transfer(SECTION_DRAG_MIME, 'circle')
     fireEvent.dragOver(dropZone, { dataTransfer: dt })
     expect(dropZone.dataset.sectionDropTarget).toBe('active')
     fireEvent.drop(dropZone, { dataTransfer: dt })
-    expect(latest!.draft.section.kind).toBe('iSection')
+    expect(latest!.draft.section.kind).toBe('circle')
     expect(dropZone.dataset.sectionDropTarget).toBe('idle')
   })
 
@@ -101,10 +102,10 @@ describe('SectionPalette', () => {
 describe('palette state equivalence (15.2)', () => {
   it('applies by Space while retaining focus and marks a changed draft', () => {
     setup()
-    const target=tile(/I-section/)
+    const target=tile(/Solid circle/)
     target.focus()
     fireEvent.keyDown(target,{key:' '})
-    expect(latest!.draft.section.kind).toBe('iSection')
+    expect(latest!.draft.section.kind).toBe('circle')
     expect(latest!.draftStatus).toBe('draft')
     expect(document.activeElement).toBe(target)
     expect(pressed()).toHaveLength(1)

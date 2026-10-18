@@ -39,11 +39,20 @@ describe('mode guidance (task 44)', () => {
     fireEvent.click(within(guidance).getByRole('button', { name: '2. Experiment' }))
     fireEvent.click(within(guidance).getByText('Hint & suggested experiment'))
     expect(guidance.querySelector('details')?.open).toBe(true)
-    expect(within(guidance).getByText(/Try a diameter change/)).toBeTruthy()
+    // The baseline is an I-section turned 90°, so the suggested experiment is a rotation (task 59).
+    expect(within(guidance).getByText(/Try rotating a rectangle or I-section/)).toBeTruthy()
     expect(store.state).toBe(before)
     fireEvent.click(within(guidance).getByRole('button', { name: '3. Compare' }))
     expect(guidance.querySelector('details')?.open).toBe(false)
     expect(store.state).toBe(before)
+  })
+
+  it('suggests a diameter change once the draft is round', () => {
+    setup()
+    act(() => store.dispatch({ type: 'applySection', kind: 'circle' }))
+    const guidance = screen.getByRole('region', { name: 'Guided instructions' })
+    fireEvent.click(within(guidance).getByText('Hint & suggested experiment'))
+    expect(within(guidance).getByText(/Try a diameter change/)).toBeTruthy()
   })
 
   it('recommends guidance from actual changes and uses orientation hints for non-round sections', () => {
@@ -64,7 +73,7 @@ describe('mode guidance (task 44)', () => {
     const before = store.state
     expect(screen.queryByRole('combobox', { name: 'Interaction mode' })).toBeNull()
     expect(screen.queryByRole('button', { name: /^Switch.*mode/ })).toBeNull()
-    expect(screen.getByRole('spinbutton', { name: /Diameter/ })).toBeTruthy()
+    expect(screen.getByRole('spinbutton', { name: /^Flange thickness/ })).toBeTruthy()
     expect(screen.getByRole('region', { name: 'Design view' })).toBeTruthy()
     if (mode === 'guided') {
       expect(screen.getByRole('region', { name: 'Guided instructions' })).toBeTruthy()

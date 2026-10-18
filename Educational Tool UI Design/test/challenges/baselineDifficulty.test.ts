@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest'
+import { bundledChallenge, circleStartChallenge } from '../arbitraries'
+import { baseline as beamBaseline, reference as beamReference } from '../fixtures/designs'
+import type { BeamDesign, Section } from '../../src/geometry/sections'
+import { beamModel } from '../../src/state/models'
 import { bracedFrameChallenge, frameDesign, worksheetFixture as frameFixture } from '../fixtures/bracedFrame'
 import { heatSink, heatSinkChallenge } from '../fixtures/heatSink'
 import { shaft, solid, torsionChallenge } from '../fixtures/torsion'
 import { vibrationChallenge } from '../fixtures/vibration'
 import { bracedFrameModel } from '../../src/state/bracedFrameModel'
 import { heatSinkModel } from '../../src/state/heatSinkModel'
-import { bracedFrameRuntime, heatSinkRuntime, torsionRuntime } from '../../src/state/runtimes'
+import { beamRuntime, bracedFrameRuntime, heatSinkRuntime, torsionRuntime } from '../../src/state/runtimes'
 import { torsionModel } from '../../src/state/torsionModel'
 import { vibrationModel } from '../../src/state/vibrationModel'
 
@@ -13,7 +17,8 @@ import { vibrationModel } from '../../src/state/vibrationModel'
 // any valid, in-range design can, while staying applicable (no model-validity failure or warning)
 // and leaving the reference design reachable and Accepted. "Design checks" are the challenge
 // limits; the applicability check is a model-validity gate, not a design task, so it is excluded
-// and the baseline must pass it. Each search walks the challenge's own step grid exhaustively.
+// and the baseline must pass it (as must the beam's feature-geometry validity check). Each search
+// walks the challenge's own step grid exhaustively, except the beam, which is bounded by argument.
 
 /** Every valid design's applicable/failure summary, from the registered model's pure functions. */
 interface ModelFns<D, Ch> {
@@ -25,7 +30,7 @@ interface ModelFns<D, Ch> {
 function designChecksFailed<D, Ch>(model: ModelFns<D, Ch>, d: D, ch: Ch): { applicable: boolean; warnings: number; failed: string[]; status: string } {
   const a = model.analyze(d, ch)
   const e = model.evaluate(d, a as never, ch)
-  return { applicable: a.applicable, warnings: a.warnings?.length ?? 0, failed: e.failures.filter((f) => f !== 'applicability'), status: e.status }
+  return { applicable: a.applicable, warnings: a.warnings?.length ?? 0, failed: e.failures.filter((f) => f !== 'applicability' && f !== 'featureGeometry'), status: e.status }
 }
 
 /** The most design checks any valid, applicable design in `designs` fails. */
@@ -62,6 +67,45 @@ function expectStaleSaveIgnored<Ch extends { version: number }>(rt: SaveRuntime,
   expect(rt.deserialize(raw, previous as never).ok).toBe(true)
   expect(rt.deserialize(raw, ch as never)).toEqual({ ok: false, error: 'Saved challenge mismatch' })
 }
+
+describe('Cantilever Beam I baseline difficulty', () => {
+  const ch = bundledChallenge()
+  const base = designChecksFailed(beamModel, ch.initialDesign, ch)
+
+  it('is an I-section turned 90° failing deflection, stress, mass and envelope width, applicable without warnings', () => {
+    expect(ch.initialDesign).toMatchObject({ section: beamBaseline.design.section, orientationDeg: 90 })
+    expect(base).toEqual({ applicable: true, warnings: 0, failed: ['deflection', 'stress', 'mass', 'envelopeWidth'], status: 'notAccepted' })
+  })
+
+  it('no section can fail all five: one wider and taller than the envelope always meets the deflection limit', () => {
+    // Failing both envelope checks needs both outer dimensions above 80 mm. The bending inertia of
+    // every allowed kind grows with each dimension and thickness, so the least stiff such sections
+    // are these minimum-thickness 80.5 mm profiles (the next 0.5 mm step), in either orientation.
+    const d = (section: Section, orientationDeg: 0 | 90): BeamDesign => ({ ...ch.initialDesign, id: 'min', section, orientationDeg })
+    const weakest: Section[] = [
+      { kind: 'circle', diameterM: 0.0805 },
+      { kind: 'tube', outerDiameterM: 0.0805, innerDiameterM: 0.0805 - 2 * ch.sectionLimits.tube.minWallM },
+      { kind: 'rectangle', widthM: 0.0805, heightM: 0.0805 },
+      { kind: 'iSection', widthM: 0.0805, heightM: 0.0805, flangeThicknessM: 0.003, webThicknessM: 0.003 },
+    ]
+    for (const section of weakest) {
+      for (const o of [0, 90] as const) {
+        const r = designChecksFailed(beamModel, d(section, o), ch)
+        expect(r.failed, `${section.kind} at ${o}°`).toEqual(expect.arrayContaining(['envelopeWidth', 'envelopeHeight']))
+        expect(r.failed, `${section.kind} at ${o}°`).not.toContain('deflection')
+      }
+    }
+  })
+
+  it('keeps the reference Accepted and reachable (rotate to 0° and resize)', () => {
+    expect(designChecksFailed(beamModel, beamReference.design, ch)).toMatchObject({ applicable: true, failed: [], status: 'accepted' })
+    expect(beamReference.design.section.kind).toBe(ch.initialDesign.section.kind)
+  })
+
+  it('moves saves to a new key so a previous-version save is never re-scored', () => {
+    expectStaleSaveIgnored(beamRuntime, ch, { ...circleStartChallenge(), version: 1 })
+  })
+})
 
 describe('Torsion Shaft I baseline difficulty', () => {
   const ch = torsionChallenge()
