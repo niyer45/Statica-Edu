@@ -12,7 +12,9 @@ import Workbench from '../workbench/Workbench'
 import { beamUi } from './beam'
 import { vibrationUi } from './vibration'
 import { heatSinkUi } from './heatSink'
-import { modelUiFor, ModelUiContext } from './registry'
+import { bracketUi } from './bracket'
+import { defaultModelUis, modelUiFor, ModelUiContext } from './registry'
+import { torsionUi } from './torsion'
 import type { ModelUi } from './types'
 
 // Model UI registry contract (task 34.2; MM-20, MM-21). The workbench renders a non-beam model
@@ -82,6 +84,18 @@ function renderTorsion(mode: 'guided' | 'parametric' = 'guided', registry: Reado
 afterEach(cleanup)
 
 describe('model UI registry', () => {
+  it('maps each registered production model to its own UI and nothing else', () => {
+    expect([...defaultModelUis().entries()]).toEqual([
+      ['eulerBernoulliCantileverTipForce', beamUi],
+      ['circularShaftTorsion', torsionUi],
+      ['sdofBaseIsolation', vibrationUi],
+      ['plateFinHeatSink', heatSinkUi],
+      ['steppedBarBracket', bracketUi],
+    ])
+    expect(modelUiFor({ id: 'steppedBarBracket', version: 1 })).toBe(bracketUi)
+    expect(bracketUi.copy.prediction.title).toBe('Predict peak stress')
+  })
+
   it('keeps the beam wording unchanged and registers no UI for models without one', () => {
     expect(modelUiFor({ id: 'eulerBernoulliCantileverTipForce', version: 1 })).toBe(beamUi)
     expect(modelUiFor({ id: 'sdofBaseIsolation', version: 1 })).toBe(vibrationUi)

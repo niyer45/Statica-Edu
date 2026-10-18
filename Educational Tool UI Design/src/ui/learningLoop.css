@@ -248,3 +248,22 @@
 .fin-profile { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 9px; color: #46583b; }
 .fin-profile caption { text-align: left; color: #5c6a55; margin-bottom: 4px; }
 .fin-profile th, .fin-profile td { text-align: left; padding: 3px 6px 3px 0; border-bottom: 1px solid #e6eadf; }
+/* Mounting Bracket I (task 46.3): display-only SVG elevation, moment strip and section table. */
+.bracket-view { display: flex; flex-direction: column; flex: 1; justify-content: center; padding: 0 12px 12px; min-width: 0; }
+.bracket-view svg { width: 100%; height: auto; min-height: 0; cursor: default; }
+.bracket-body { fill: #a8b49a; stroke: #4f653e; stroke-width: 1; }
+.bracket-wall { fill: #62685c; }
+.bracket-section-line { stroke: #4f653e; stroke-width: 1; stroke-dasharray: 3 3; }
+.bracket-load { stroke: #8a4b1c; stroke-width: 2; }
+.bracket-load-head { fill: #8a4b1c; }
+.moment-axis { stroke: #5c6a55; stroke-width: 1; }
+.moment-strip { fill: #dfe5d6; stroke: #4f653e; stroke-width: 1.5; }
+.governing-marker { fill: #34543c; stroke: #1f3324; stroke-width: 1; }
+.section-marker { fill: #f4f6ef; stroke: #34543c; stroke-width: 1.5; }
+.bracket-summary { margin: 8px 0 0; letter-spacing: 0; text-transform: none; font-weight: 500; }
+.bracket-sections { margin-top: 6px; font-size: 11px; max-width: 100%; overflow-x: auto; }
+.bracket-sections summary { cursor: pointer; font-weight: 600; }
+.bracket-sections table { border-collapse: collapse; margin-top: 6px; }
+.bracket-sections th, .bracket-sections td { padding: 2px 8px 2px 0; text-align: left; white-space: nowrap; }
+.bracket-step-note, .bracket-peak { margin: 0 0 8px; font-size: 11px; color: #46583b; }
+.field-note { grid-column: 1 / -1; margin: 0; font-size: 10px; color: #5c6a55; }

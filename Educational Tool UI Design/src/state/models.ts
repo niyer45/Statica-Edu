@@ -7,6 +7,7 @@ import { validateDesign } from '../geometry/validate'
 import { analyze, PhysicsInvariantError } from '../physics/analyze'
 import type { Analysis } from '../physics/types'
 import { heatSinkModel, type HeatSinkModelDefinition } from './heatSinkModel'
+import { bracketModel, type BracketModelDefinition } from './bracketModel'
 import type { ChallengeBase, DesignBase, DesignError, EngineModel, EvaluationBase } from './engine'
 import { exportDesign, importDesign } from './importExport'
 import { cloneDesign, sameDesignIgnoringId } from './session'
@@ -56,7 +57,7 @@ export const beamModel: BeamModelDefinition = Object.freeze({
 })
 
 /** Any registered model definition. Dispatch narrows by identity (`def === beamModel`). */
-export type RegisteredModel = BeamModelDefinition | TorsionModelDefinition | VibrationModelDefinition | HeatSinkModelDefinition
+export type RegisteredModel = BeamModelDefinition | TorsionModelDefinition | VibrationModelDefinition | HeatSinkModelDefinition | BracketModelDefinition
 
 /** Every registered model, keyed by id. Exactly one version per id (MM-04). */
 const REGISTRY: ReadonlyMap<string, RegisteredModel> = new Map<string, RegisteredModel>([
@@ -64,6 +65,7 @@ const REGISTRY: ReadonlyMap<string, RegisteredModel> = new Map<string, Registere
   [torsionModel.ref.id, torsionModel],
   [vibrationModel.ref.id, vibrationModel],
   [heatSinkModel.ref.id, heatSinkModel],
+  [bracketModel.ref.id, bracketModel],
 ])
 
 /** The registered model ids, for guard tests. */

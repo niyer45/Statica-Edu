@@ -102,7 +102,7 @@ describe('loadBracketChallenge: bundled-format config', () => {
     expect(s.ok && s.value).toEqual(ch)
   })
 
-  it('stays unlinked: not bundled, not runnable from the catalog, not imported by UI code (MM-06, MBR-20)', () => {
+  it('stays unlinked: not bundled, not runnable from the catalog, its config never imported by UI code (MM-06, MBR-20)', () => {
     expect(Object.keys(BUNDLED_CHALLENGE_JSON)).not.toContain('mounting-bracket-1')
     expect(catalog.some((e) => e.available && e.challengeId === 'mounting-bracket-1')).toBe(false)
     const bundled = readFileSync(new URL('../bundled.ts', import.meta.url), 'utf8')
@@ -112,9 +112,14 @@ describe('loadBracketChallenge: bundled-format config', () => {
     const uiRoot = fileURLToPath(new URL('../../ui', import.meta.url))
     const uiFiles = readdirSync(uiRoot, { recursive: true, encoding: 'utf8' }).filter((f) => /\.tsx?$/.test(f))
     expect(uiFiles.length).toBeGreaterThan(0)
+    // Since 46.3 the bracket UI (ui/models/bracket/, registered in ui/models/registry.ts) reads the
+    // bracket modules; no other UI file does, and no UI file imports the raw config.
+    const bracketUiDir = path.join('models', 'bracket') + path.sep
+    expect(uiFiles.some((f) => f.startsWith(bracketUiDir))).toBe(true)
     for (const f of uiFiles) {
       const text = readFileSync(path.join(uiRoot, f), 'utf8')
-      expect(text, f).not.toMatch(/mounting-bracket-1\.json|\/bracket\/|bracketModel/)
+      expect(text, f).not.toMatch(/mounting-bracket-1\.json/)
+      if (!f.startsWith(bracketUiDir)) expect(text, f).not.toMatch(/\/bracket\/|bracketModel/)
     }
   })
 

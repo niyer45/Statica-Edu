@@ -19,8 +19,8 @@ import type { V2Persistence } from './persistence'
 // Mounting Bracket I model definition (task 46.2; mounting-bracket-1, MM-05, MM-13, MM-18,
 // MM-19). Binds the pure bracket modules to the learning-loop engine: v2 persistence, v2 design
 // files and a peak-stress prediction that is not scorable when either result has no peak stress
-// (Kt fit undefined). Not yet added to the registry in state/models.ts (that file is outside
-// 46.2's change set); registration and any catalog link follow in 46.3.
+// (Kt fit undefined). Registered for dispatch in 46.3 (state/models.ts, state/runtimes.ts); no
+// catalog entry links a bracket challenge until its owner-approved activation.
 
 export type BracketModelDefinition = ModelDefinition<
   BracketChallenge,

@@ -1,11 +1,14 @@
 import { loadHeatSinkChallenge } from '../challenge/heatSink/loader'
 import type { HeatSinkChallenge } from '../challenge/heatSink/types'
+import { loadBracketChallenge } from '../challenge/bracket/loader'
+import type { BracketChallenge } from '../challenge/bracket/types'
 import { loadChallenge } from '../challenge/loader'
 import { loadTorsionChallenge } from '../challenge/torsion/loader'
 import type { TorsionChallenge } from '../challenge/torsion/types'
 import { loadVibrationChallenge } from '../challenge/vibration/loader'
 import type { VibrationChallenge } from '../challenge/vibration/types'
 import type { Challenge, InteractionMode, ModelRef, Result, SchemaIssue } from '../challenge/types'
+import { bracketModel, bracketPersistence, bracketReducer, type BracketAction, type BracketSession } from './bracketModel'
 import { initSessionWith } from './engine'
 import { heatSinkModel, heatSinkPersistence, heatSinkReducer, type HeatSinkAction, type HeatSinkSession } from './heatSinkModel'
 import { beamModel, modelFor, modelOf } from './models'
@@ -94,6 +97,16 @@ export const heatSinkRuntime: ModelRuntime<HeatSinkSession, HeatSinkAction, Heat
   deserialize: (raw: string, ch: HeatSinkChallenge) => deserializeSessionV2(heatSinkModel, heatSinkPersistence, raw, ch),
 })
 
+export const bracketRuntime: ModelRuntime<BracketSession, BracketAction, BracketChallenge> = Object.freeze({
+  ref: bracketModel.ref,
+  load: loadBracketChallenge,
+  init: (ch: BracketChallenge, now: string, id: string, mode?: InteractionMode) => initSessionWith(bracketModel, ch, now, id, mode),
+  reduce: bracketReducer,
+  key: sessionKey,
+  serialize: (s: BracketSession, savedAt: string) => serializeSessionV2(bracketModel.ref, s, savedAt),
+  deserialize: (raw: string, ch: BracketChallenge) => deserializeSessionV2(bracketModel, bracketPersistence, raw, ch),
+})
+
 /** Erased runtime type for dispatch; callers only pass values the same runtime produced. */
 export type AnyRuntime = ModelRuntime<LoopSession, { type: string }, LoopChallenge>
 
@@ -102,6 +115,7 @@ const RUNTIMES: ReadonlyMap<string, AnyRuntime> = new Map<string, AnyRuntime>([
   [torsionRuntime.ref.id, torsionRuntime as unknown as AnyRuntime],
   [vibrationRuntime.ref.id, vibrationRuntime as unknown as AnyRuntime],
   [heatSinkRuntime.ref.id, heatSinkRuntime as unknown as AnyRuntime],
+  [bracketRuntime.ref.id, bracketRuntime as unknown as AnyRuntime],
 ])
 
 /** Runtime for an exact registered model identity, or undefined (never a substitute, MM-07). */

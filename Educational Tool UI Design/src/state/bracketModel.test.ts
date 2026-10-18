@@ -9,12 +9,13 @@ import type { BracketEdit } from '../geometry/bracket/edit'
 import { bracketModel, bracketPersistence, bracketReducer, parseBracketDesign, type BracketAction, type BracketSession } from './bracketModel'
 import { initSessionWith } from './engine'
 import { exportDesign as exportBeamDesign } from './importExport'
-import { modelFor } from './models'
+import { modelFor, requireModel } from './models'
 import { deserializeSession, deserializeSessionV2, serializeSessionV2 } from './persistence'
 import { torsionModel } from './torsionModel'
 
 // Mounting Bracket I through the model-generic engine (task 46.2; MBR-08, MBR-09, MM-10, MM-13,
-// MM-15, MM-18, MM-19, MM-26). The definition is not linked from the catalog or bundled registry.
+// MM-15, MM-18, MM-19, MM-26). Registered for dispatch in 46.3; the definition is not linked from
+// the catalog or bundled registry until owner-approved activation.
 
 const ch = bracketChallenge()
 const T0 = '2026-10-17T10:00:00.000Z'
@@ -54,8 +55,10 @@ describe('bracket learning loop through the engine', () => {
   it('dispatches only to the bracket definition by explicit identity, never substituting another model', () => {
     expect(bracketModel.ref).toEqual(ch.model)
     expect(bracketModel.envelopeVersion).toBe(2)
-    // Registration in state/models.ts follows in 46.3; until then dispatch finds nothing (MM-07).
-    expect([undefined, bracketModel]).toContain(modelFor(ch.model))
+    // Registered in 46.3: dispatch resolves the exact identity only (MM-05, MM-07).
+    expect(modelFor(ch.model)).toBe(bracketModel)
+    expect(requireModel(ch)).toBe(bracketModel)
+    expect(modelFor({ id: 'steppedBarBracket', version: 2 })).toBeUndefined()
     expect(modelFor(ch.model)).not.toBe(torsionModel)
   })
 
