@@ -67,7 +67,7 @@ test('WebGL-disabled flow reaches the same normalized session as the 3D flow', a
   const context = await browser.newContext({ viewport: { width: 1280, height: 1000 } })
   await context.addInitScript(() => { Object.defineProperty(window, 'WebGL2RenderingContext', { configurable: true, value: undefined }) })
   const fallback = await context.newPage()
-  await fallback.goto(DEV_URL)
+  await fallback.goto(`${DEV_URL}/#challenges`)
   await openWorkbench(fallback, false)
   await expect(fallback.locator('canvas')).toHaveCount(0)
   await referenceDesign(fallback)
@@ -81,7 +81,7 @@ test('production obeys CSP, makes no other-origin requests, and exposes no state
   const other = recordOtherOrigins(page, PREVIEW_URL)
   const csp: string[] = []
   page.on('console', (message) => { if (/content security policy|violates.*directive/i.test(message.text())) csp.push(message.text()) })
-  await page.goto(PREVIEW_URL)
+  await page.goto(`${PREVIEW_URL}/#challenges`)
   await openWorkbench(page, false)
   await referenceDesign(page)
   await runTest(page)
@@ -100,7 +100,7 @@ test('production obeys CSP, makes no other-origin requests, and exposes no state
 })
 
 test('Freeform cannot open a workbench, and every catalog challenge is runnable', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/#challenges')
   await page.getByRole('button', { name: 'View Cantilever Beam I', exact: true }).click()
   await page.getByRole('dialog', { name: 'Cantilever Beam I', exact: true }).getByRole('button', { name: /Freeform/ }).click()
   await expect(page.getByRole('button', { name: 'Not available yet', exact: true })).toBeDisabled()

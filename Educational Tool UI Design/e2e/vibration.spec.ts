@@ -68,7 +68,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
   test(`Vibration Isolation I ${mode}: test an Accepted mount, persist it and keep it isolated`, async ({ page }) => {
     test.setTimeout(90_000) // Keyboard entry, prediction, reload, cross-challenge check and axe.
     const keyboard = mode === 'Guided'
-    await page.goto('/')
+    await page.goto('/#challenges')
     await openVibration(page, mode, keyboard)
     const initial = await readState(page)
     expect(initial.challengeId).toBe('vibration-isolation-1')

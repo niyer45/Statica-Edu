@@ -49,7 +49,7 @@ async function noHorizontalOverflow(page: Page) {
 for (const mode of ['Guided', 'Parametric'] as const) {
   test(`Heat Sink I ${mode}: test an Accepted fin array, persist it and keep it isolated`, async ({ page }) => {
     test.setTimeout(90_000) // Keyboard entry, prediction, reload, cross-challenge check and axe.
-    await page.goto('/')
+    await page.goto('/#challenges')
     await openHeatSink(page, mode, mode === 'Guided')
     const initial = await readState(page)
     expect(initial.challengeId).toBe('heat-sink-1')

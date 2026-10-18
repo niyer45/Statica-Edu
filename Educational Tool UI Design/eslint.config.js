@@ -82,4 +82,12 @@ export default tseslint.config(
       ],
     },
   },
+  // Account provider contract and local implementation (task 38) stay framework-free so a
+  // backend implementation can replace them; storage and crypto are injected.
+  {
+    files: ['src/account/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': ['error', { patterns: DOMAIN_RESTRICTED_PATTERNS }],
+    },
+  },
 );

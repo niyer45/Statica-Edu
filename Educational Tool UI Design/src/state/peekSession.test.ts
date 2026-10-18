@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { bundledChallenge } from '../../test/arbitraries'
 import { peekSession, serializeSession, sessionKey, type SessionStorage } from './persistence'
 import { sessionReducer } from './reducer'
-import { selectWorkspaceStarted } from './selectors'
+import { selectProgress, selectWorkspaceStarted } from './selectors'
 import { initSession } from './session'
 
 // Read-only saved-session summaries for the shell (task 34.1 step 2; MM-23).
@@ -51,5 +51,24 @@ describe('selectWorkspaceStarted', () => {
     expect(selectWorkspaceStarted(fresh)).toBe(false)
     expect(selectWorkspaceStarted(sessionReducer(fresh, { type: 'applySection', kind: 'tube' }, ch))).toBe(true)
     expect(selectWorkspaceStarted(sessionReducer(fresh, { type: 'setReflection', text: 'x' }, ch))).toBe(true)
+  })
+})
+
+describe('selectProgress (task 38 homepage)', () => {
+  const tested = { ...fresh, draftStatus: 'tested' as const, history: [...fresh.history, { ...fresh.history[0]!, id: 't1', iteration: 1, label: undefined }] }
+  it('is not started for an untouched Baseline', () => {
+    expect(selectProgress(fresh)).toEqual({ status: 'notStarted', testsRun: 0 })
+  })
+  it('is in progress with work, including an unsuccessful submission', () => {
+    expect(selectProgress(sessionReducer(fresh, { type: 'setReflection', text: 'x' }, ch))).toEqual({ status: 'inProgress', testsRun: 0 })
+    expect(selectProgress(tested)).toEqual({ status: 'inProgress', testsRun: 1 })
+    expect(selectProgress({ ...tested, submission: { status: 'notAccepted' } })).toEqual({ status: 'inProgress', testsRun: 1, submission: 'notAccepted' })
+    expect(selectProgress({ ...tested, submission: { status: 'modelNotApplicable' } }).status).toBe('inProgress')
+  })
+  it('is completed only for an Accepted submission', () => {
+    expect(selectProgress({ ...tested, submission: { status: 'accepted' } })).toEqual({ status: 'completed', testsRun: 1, submission: 'accepted' })
+  })
+  it('does not count deleted tests', () => {
+    expect(selectProgress({ ...tested, deletedIterationIds: ['t1'] })).toEqual({ status: 'inProgress', testsRun: 0 })
   })
 })

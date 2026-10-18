@@ -72,7 +72,7 @@ async function runWithPrediction(page: Page) {
 test('all six original challenges keep separate saved work in one browser profile', async ({ page }) => {
   test.setTimeout(180_000) // Six workbenches, six tests, a reload and six restores.
   expect(catalog.filter((e) => e.available).map((e) => e.title).sort()).toEqual(ENTRIES.map((e) => e.title).sort())
-  await page.goto('/')
+  await page.goto('/#challenges')
   const saved = new Map<string, { draft: unknown; history: unknown }>()
   const versions = new Map<string, number>()
   for (const entry of ENTRIES) {
@@ -118,7 +118,7 @@ async function exportDesign(page: Page): Promise<string> {
 
 test("a design file opens only in its own challenge's workbench", async ({ page }) => {
   test.setTimeout(180_000) // Six exports, six own-challenge imports and six cross-challenge refusals.
-  await page.goto('/')
+  await page.goto('/#challenges')
   const files = new Map<string, string>()
   for (const entry of ENTRIES) {
     await open(page, entry)

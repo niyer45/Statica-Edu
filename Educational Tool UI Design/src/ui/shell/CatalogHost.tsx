@@ -4,7 +4,7 @@ import type { InteractionMode } from '../../challenge/types'
 import { modelOf } from '../../state/models'
 import { peekSessionWith, type SessionStorage } from '../../state/persistence'
 import { runtimeFor, type AnyRuntime, type LoopChallenge, type LoopSession } from '../../state/runtimes'
-import { selectWorkspaceStarted } from '../../state/selectors'
+import { selectProgress, selectWorkspaceStarted } from '../../state/selectors'
 import type { Clock, IdFactory } from '../state/bootstrap'
 import StoreProvider from '../state/StoreProvider'
 import PlatformShell, { type OtherChallenge } from './PlatformShell'
@@ -35,6 +35,8 @@ export interface CatalogHostProps {
   storage?: SessionStorage | null
   clock: Clock
   newId: IdFactory
+  /** Route shell pages through the URL fragment and start on Home (the app; task 38). */
+  routed?: boolean
 }
 
 function memoryStorage(): SessionStorage {
@@ -50,7 +52,7 @@ function memoryStorage(): SessionStorage {
   }
 }
 
-export default function CatalogHost({ runnable, entries, storage = null, clock, newId }: CatalogHostProps) {
+export default function CatalogHost({ runnable, entries, storage = null, clock, newId, routed = false }: CatalogHostProps) {
   const first = runnable[0]
   if (first === undefined) throw new Error('CatalogHost needs at least one runnable challenge.')
   const [store] = useState(() => storage ?? memoryStorage())
@@ -72,7 +74,7 @@ export default function CatalogHost({ runnable, entries, storage = null, clock, 
             title: r.challenge.title,
             model: modelOf(r.challenge),
             allowedModes: r.challenge.allowedModes,
-            ...(s ? { saved: { mode: s.mode, started: selectWorkspaceStarted(s) } } : {}),
+            ...(s ? { saved: { mode: s.mode, started: selectWorkspaceStarted(s), progress: selectProgress(s) } } : {}),
           }
         }),
     [runnable, current, store],
@@ -98,6 +100,7 @@ export default function CatalogHost({ runnable, entries, storage = null, clock, 
         onSavedChange={setSaved}
         notes={notes}
         onNotesChange={setNotes}
+        routed={routed}
       />
     </StoreProvider>
   )
