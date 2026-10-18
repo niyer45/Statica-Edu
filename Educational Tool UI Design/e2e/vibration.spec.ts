@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, readState, tabTo } from './helpers'
+import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers'
 
 // Vibration Isolation I (task 50.3; VIB-14–VIB-16, MM-16, MM-22): chosen before entry from the
 // library, full prediction/test loop to an Accepted reference-class mount, saved under its own
@@ -46,6 +46,8 @@ async function setReferenceMount(page: Page, keyboard: boolean) {
   await expect(field).not.toHaveAttribute('aria-invalid', 'true')
   await expect(field).toHaveValue('85.0')
   const neoprene = page.getByRole('radio', { name: /Neoprene/ })
+  // A Guided damping experiment may already have chosen neoprene.
+  if (await neoprene.isChecked()) return
   if (keyboard) {
     // Natural rubber (the baseline) is checked; the next radio in the group is Neoprene.
     await tabTo(page, page.getByRole('radio', { name: /Natural rubber/ }))
@@ -78,14 +80,29 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     await expect(page.getByText('Idealized steady-state vibration isolation, not an engineering certification')).toBeVisible()
     await expect(page.getByRole('img', { name: /Steady-state frequency response/ })).toBeVisible()
     await expect(page.getByRole('table', { name: 'Frequency response values' }).getByText('30.20 Hz', { exact: true })).toBeVisible()
+    const neoprene = page.getByRole('radio', { name: /Neoprene/ })
     if (mode === 'Guided') {
-      await expect(page.getByRole('region', { name: 'Guided instructions' }).getByRole('heading', { name: 'Inspect', exact: true })).toBeVisible()
+      // Task 58: structured experiments; the material stays locked until its step.
+      await expectGuidedStep(page, 'Soften the mount')
+      await expect(neoprene).toBeDisabled()
     } else {
-      await expect(page.getByRole('region', { name: 'Guided instructions' })).toHaveCount(0)
-      await expect(page.getByText('Direct mount stiffness and material editing')).toBeVisible()
+      await expect(page.getByRole('region', { name: 'Guided experiments' })).toHaveCount(0)
+      await expect(page.getByText(/Every parameter is editable from the start/)).toBeVisible()
+      await expect(neoprene).toBeEnabled()
     }
     await audit(page)
 
+    if (mode === 'Guided') {
+      const stiffness = page.getByLabel('Stiffness', { exact: true })
+      await stiffness.fill('1000')
+      await stiffness.press('Enter')
+      await runAnyTest(page)
+      await expectGuidedStep(page, 'Change the damping')
+      await expect(stiffness).toHaveAttribute('readonly', '')
+      await neoprene.check()
+      await runAnyTest(page)
+      await expectGuidedStep(page, 'Meet every check')
+    }
     await setReferenceMount(page, keyboard)
     const run = page.getByRole('button', { name: 'Run Test', exact: true })
     if (keyboard) {
@@ -108,9 +125,12 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await confirm.click()
     }
     await expect(prediction).toBeHidden()
+    // Guided: the final experiment is iteration 3, which is also a prediction checkpoint.
+    const tests = mode === 'Guided' ? 4 : 2
     const tested = await readState(page)
-    expect(tested.history).toHaveLength(2)
-    expect(tested.history[1].evaluation.status).toBe('accepted')
+    expect(tested.history).toHaveLength(tests)
+    expect(tested.history[tests - 1].evaluation.status).toBe('accepted')
+    if (mode === 'Guided') await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('heading', { name: 'All experiments complete' })).toBeVisible()
     await expect(requirements.getByText('0.0929', { exact: true })).toBeVisible()
     await audit(page)
     await noHorizontalOverflow(page)
@@ -122,8 +142,8 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     const restored = await readState(page)
     expect(restored.challengeId).toBe('vibration-isolation-1')
     expect(restored.mode).toBe(mode.toLowerCase())
-    expect(restored.history).toHaveLength(2)
-    expect(restored.history[1].evaluation.status).toBe('accepted')
+    expect(restored.history).toHaveLength(tests)
+    expect(restored.history[tests - 1].evaluation.status).toBe('accepted')
 
     // Back to the library: sidebar navigation on desktop, the workspace menu on narrow screens.
     const library = page.locator('.platform-sidebar').getByRole('button', { name: 'Challenges' })

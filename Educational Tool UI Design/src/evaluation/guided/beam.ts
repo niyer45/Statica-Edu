@@ -13,6 +13,8 @@ const DIMENSIONS = ['diameterM', 'outerDiameterM', 'innerDiameterM', 'widthM', '
 export const BEAM_GUIDED_PLAN: GuidedPlan<BeamDesign, { analysis: Analysis }> = Object.freeze({
   params: (d: Readonly<BeamDesign>) => ({ ...(d.section as unknown as Record<string, number>), section: d.section.kind, orientationDeg: d.orientationDeg }),
   structural: ['section'],
+  // Clamp-mode coupled shrinks (geometry/clamp.ts).
+  coupled: { outerDiameterM: ['innerDiameterM'], heightM: ['flangeThicknessM'], widthM: ['webThicknessM'] },
   label: (id: string) => (id === 'section' ? 'Section shape' : id === 'orientationDeg' ? 'Section orientation' : (PARAM_LABELS[id as SectionParam] ?? id)),
   metrics: {
     tipDeflectionM: { label: 'Tip deflection', read: (r: Readonly<{ analysis: Analysis }>) => r.analysis.tipDeflectionM },

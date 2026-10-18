@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, readState, tabTo } from './helpers'
+import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers'
 
 // Mounting Bracket I (task 46.3; MBR-18–MBR-20, MM-16, MM-22): chosen before entry from the
 // library, full prediction/test loop to the Accepted spec reference, saved under its own key,
@@ -82,26 +82,46 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     }
     await expect(page.getByRole('img', { name: /^Bending-moment strip of the latest tested design/ })).toBeVisible()
     await expect(page.getByText(/fillet Kt coefficients from secondary copies, pending printed-edition verification/)).toBeVisible()
+    const rootDepth = page.getByLabel('Root depth', { exact: true })
     if (mode === 'Guided') {
-      await expect(page.getByRole('region', { name: 'Guided instructions' }).getByRole('heading', { name: 'Inspect', exact: true })).toBeVisible()
+      // Task 58: structured experiments; only the first step's dimension is editable.
+      await expectGuidedStep(page, 'Round the corner')
+      await expect(rootDepth).toHaveAttribute('readonly', '')
     } else {
-      await expect(page.getByRole('region', { name: 'Guided instructions' })).toHaveCount(0)
-      await expect(page.getByText('Direct depth, step and fillet editing')).toBeVisible()
+      await expect(page.getByRole('region', { name: 'Guided experiments' })).toHaveCount(0)
+      await expect(page.getByText(/Every parameter is editable from the start/)).toBeVisible()
+      await expect(rootDepth).not.toHaveAttribute('readonly', '')
     }
     await audit(page)
 
     // The internal spec reference (30/20/175/3 mm): only the step location and fillet change.
-    await setDimension(page, 'Step location', '175', keyboard)
-    await setDimension(page, 'Fillet radius', '3', keyboard)
-    await page.getByRole('button', { name: 'Run Test', exact: true }).click()
-    const prediction = page.getByRole('dialog', { name: 'Predict peak stress' })
-    await expect(prediction).toBeVisible()
-    await prediction.getByLabel('Decrease', { exact: true }).check()
-    await prediction.getByRole('button', { name: 'Run structural test' }).click()
-    await expect(prediction).toBeHidden()
+    if (mode === 'Guided') {
+      await setDimension(page, 'Fillet radius', '3', keyboard)
+      await runAnyTest(page, keyboard)
+      await expectGuidedStep(page, 'Arm depth')
+      await setDimension(page, 'Arm depth', '21', keyboard)
+      await runAnyTest(page, keyboard)
+      await expectGuidedStep(page, 'Move the step')
+      await setDimension(page, 'Step location', '175', keyboard)
+      await runAnyTest(page, keyboard)
+      await expectGuidedStep(page, 'Meet every check')
+      await setDimension(page, 'Arm depth', '20', keyboard)
+      await runAnyTest(page, keyboard)
+      await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('heading', { name: 'All experiments complete' })).toBeVisible()
+    } else {
+      await setDimension(page, 'Step location', '175', keyboard)
+      await setDimension(page, 'Fillet radius', '3', keyboard)
+      await page.getByRole('button', { name: 'Run Test', exact: true }).click()
+      const prediction = page.getByRole('dialog', { name: 'Predict peak stress' })
+      await expect(prediction).toBeVisible()
+      await prediction.getByLabel('Decrease', { exact: true }).check()
+      await prediction.getByRole('button', { name: 'Run structural test' }).click()
+      await expect(prediction).toBeHidden()
+    }
+    const tests = mode === 'Guided' ? 5 : 2
     const tested = await readState(page)
-    expect(tested.history).toHaveLength(2)
-    expect(tested.history[1].evaluation.status).toBe('accepted')
+    expect(tested.history).toHaveLength(tests)
+    expect(tested.history[tests - 1].evaluation.status).toBe('accepted')
     await expect(requirements.getByText('90.8 MPa', { exact: true })).toBeVisible()
     await audit(page)
     await noHorizontalOverflow(page)
@@ -110,8 +130,8 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     await openBracket(page, mode, false)
     const restored = await readState(page)
     expect(restored.challengeId).toBe('mounting-bracket-1')
-    expect(restored.history).toHaveLength(2)
-    expect(restored.history[1].evaluation.status).toBe('accepted')
+    expect(restored.history).toHaveLength(tests)
+    expect(restored.history[tests - 1].evaluation.status).toBe('accepted')
 
     // Back to the library: sidebar navigation on desktop, the workspace menu on narrow screens.
     const library = page.locator('.platform-sidebar').getByRole('button', { name: 'Challenges' })

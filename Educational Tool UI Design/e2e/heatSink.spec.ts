@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, readState, tabTo } from './helpers'
+import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers'
 
 // Heat Sink I (task 48.3; HSK-14–HSK-16, MM-16, MM-22): chosen before entry from the library,
 // full prediction/test loop to an Accepted fin array, saved under its own key, isolated from
@@ -58,26 +58,49 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     await expect(requirements.getByText('118.2 °C', { exact: true })).toBeVisible()
     await expect(page.getByText('Idealized plate-fin heat sink model, not a thermal certification')).toBeVisible()
     await expect(page.getByRole('img', { name: /Front view across the heat sink: 4 fins/ })).toBeVisible()
+    const count = page.getByLabel('Fin count', { exact: true })
     if (mode === 'Guided') {
-      await expect(page.getByRole('region', { name: 'Guided instructions' }).getByRole('heading', { name: 'Inspect', exact: true })).toBeVisible()
+      // Task 58: structured experiments; only the fin height is editable in the first step.
+      await expectGuidedStep(page, 'Taller fins')
+      await expect(count).toHaveAttribute('readonly', '')
+      await expect(page.getByRole('button', { name: 'Add a fin' })).toBeDisabled()
     } else {
-      await expect(page.getByRole('region', { name: 'Guided instructions' })).toHaveCount(0)
-      await expect(page.getByText('Direct fin array editing')).toBeVisible()
+      await expect(page.getByRole('region', { name: 'Guided experiments' })).toHaveCount(0)
+      await expect(page.getByText(/Every parameter is editable from the start/)).toBeVisible()
+      await expect(count).not.toHaveAttribute('readonly', '')
     }
+    await expect(page.getByText(/convection coefficient is a given fan-assisted value/)).toBeVisible()
     await audit(page)
 
-    await setFin(page, 'Fin thickness', '1.5')
-    await setFin(page, 'Fin count', '10')
-    await setFin(page, 'Fin height', '35')
-    await page.getByRole('button', { name: 'Run Test', exact: true }).click()
-    const prediction = page.getByRole('dialog', { name: 'Predict base temperature rise' })
-    await expect(prediction).toBeVisible()
-    await prediction.getByLabel('Decrease', { exact: true }).check()
-    await prediction.getByRole('button', { name: 'Run structural test' }).click()
-    await expect(prediction).toBeHidden()
+    if (mode === 'Guided') {
+      await setFin(page, 'Fin height', '35')
+      await runAnyTest(page)
+      await expectGuidedStep(page, 'More fins')
+      await expect(page.getByLabel('Fin height', { exact: true })).toHaveAttribute('readonly', '')
+      await setFin(page, 'Fin count', '10')
+      await runAnyTest(page)
+      await expectGuidedStep(page, 'Fin thickness')
+      await setFin(page, 'Fin thickness', '2')
+      await runAnyTest(page)
+      await expectGuidedStep(page, 'Meet every check')
+      await setFin(page, 'Fin thickness', '1.5')
+      await runAnyTest(page)
+      await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('heading', { name: 'All experiments complete' })).toBeVisible()
+    } else {
+      await setFin(page, 'Fin thickness', '1.5')
+      await setFin(page, 'Fin count', '10')
+      await setFin(page, 'Fin height', '35')
+      await page.getByRole('button', { name: 'Run Test', exact: true }).click()
+      const prediction = page.getByRole('dialog', { name: 'Predict base temperature rise' })
+      await expect(prediction).toBeVisible()
+      await prediction.getByLabel('Decrease', { exact: true }).check()
+      await prediction.getByRole('button', { name: 'Run structural test' }).click()
+      await expect(prediction).toBeHidden()
+    }
+    const tests = mode === 'Guided' ? 5 : 2
     const tested = await readState(page)
-    expect(tested.history).toHaveLength(2)
-    expect(tested.history[1].evaluation.status).toBe('accepted')
+    expect(tested.history).toHaveLength(tests)
+    expect(tested.history[tests - 1].evaluation.status).toBe('accepted')
     await expect(requirements.getByText('48.5 °C', { exact: true })).toBeVisible()
     await expect(page.getByRole('img', { name: /10 fins on the base, drawn to scale, shaded by the tested fin temperature/ })).toBeVisible()
     await audit(page)
@@ -87,8 +110,8 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     await openHeatSink(page, mode, false)
     const restored = await readState(page)
     expect(restored.challengeId).toBe('heat-sink-1')
-    expect(restored.history).toHaveLength(2)
-    expect(restored.history[1].evaluation.status).toBe('accepted')
+    expect(restored.history).toHaveLength(tests)
+    expect(restored.history[tests - 1].evaluation.status).toBe('accepted')
 
     // Back to the library: sidebar navigation on desktop, the workspace menu on narrow screens.
     const library = page.locator('.platform-sidebar').getByRole('button', { name: 'Challenges' })

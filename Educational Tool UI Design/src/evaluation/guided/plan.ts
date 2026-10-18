@@ -50,6 +50,12 @@ export interface GuidedPlan<D = unknown, R = unknown> {
    * as changed; the remaining parameters of different shapes are not comparable.
    */
   structural?: readonly string[]
+  /**
+   * Parameters a clamp edit of the key may adjust automatically to keep the design valid (a tube's
+   * inner diameter when its outer diameter shrinks). When the key changes, its followers are
+   * part of the same edit: they need no unlock of their own and do not count as extra changes.
+   */
+  coupled?: Readonly<Record<string, readonly string[]>>
   /** Student-facing name of a parameter id. */
   label(id: string): string
   metrics: Readonly<Record<string, GuidedMetric<R>>>
@@ -88,16 +94,23 @@ function matchesAny(patterns: readonly string[], id: string): boolean {
   return patterns.some((p) => patternMatches(p, id))
 }
 
+/** Drops followers whose coupled leader also changed (see GuidedPlan.coupled). */
+function withoutFollowers<D, R>(plan: GuidedPlan<D, R>, changed: string[]): string[] {
+  const followers = new Set(changed.flatMap((k) => plan.coupled?.[k] ?? []))
+  return changed.filter((k) => !followers.has(k))
+}
+
 /**
  * Parameter ids that differ between two designs. A parameter present in only one design is not
- * comparable and is ignored; if a structural parameter changed, only structural ones are listed.
+ * comparable and is ignored; if a structural parameter changed, only structural ones are listed;
+ * a coupled follower of a changed parameter is not listed separately.
  */
 export function changedParams<D>(plan: GuidedPlan<D, unknown>, before: Readonly<D>, after: Readonly<D>): string[] {
   const a = plan.params(before)
   const b = plan.params(after)
   const changed = Object.keys(b).filter((k) => Object.prototype.hasOwnProperty.call(a, k) && !Object.is(a[k], b[k]))
   const structural = changed.filter((k) => plan.structural?.includes(k))
-  return structural.length > 0 ? structural : changed
+  return structural.length > 0 ? structural : withoutFollowers(plan, changed)
 }
 
 function changeMeets<D>(plan: GuidedPlan<D, unknown>, objective: Extract<GuidedObjective, { kind: 'change' }>, before: Readonly<D>, after: Readonly<D>): boolean {
@@ -169,7 +182,7 @@ export function lockedChange<D>(plan: GuidedPlan<D, unknown>, history: ReadonlyA
   // Every differing parameter counts here (not only comparable ones), so a structural change
   // cannot smuggle in locked parameters; a structural change itself needs its own unlock.
   const structural = Object.keys({ ...a, ...b }).filter((k) => plan.structural?.includes(k) && !Object.is(a[k], b[k]))
-  const changed = structural.length > 0 ? structural : Object.keys({ ...a, ...b }).filter((k) => !Object.is(a[k], b[k]))
+  const changed = structural.length > 0 ? structural : withoutFollowers(plan, Object.keys({ ...a, ...b }).filter((k) => !Object.is(a[k], b[k])))
   return changed.find((id) => !isEditable(plan, progress, id))
 }
 

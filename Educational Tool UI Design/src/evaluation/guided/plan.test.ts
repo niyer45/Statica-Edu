@@ -92,6 +92,16 @@ describe('guided progress', () => {
     expect(lockedChange(PLAN, h2, base, { ...base, a: 3 })).toBe('a')
   })
 
+  it('treats a coupled follower as part of its leader edit', () => {
+    const plan: GuidedPlan<D, R> = { ...PLAN, coupled: { a: ['b'] } }
+    // Step 1 unlocks only `a`: a clamp shrink of `b` along with `a` is allowed and is one change.
+    expect(lockedChange(plan, history(base), base, { ...base, a: 0.5, b: 0.4 })).toBeUndefined()
+    expect(changedParams(plan, base, { ...base, a: 2, b: 0.4 })).toEqual(['a'])
+    expect(guidedProgress(plan, history(base, { ...base, a: 2, b: 0.4 })).current).toBe(1)
+    // A follower changed alone still needs its own unlock.
+    expect(lockedChange(plan, history(base), base, { ...base, b: 0.4 })).toBe('b')
+  })
+
   it('reports unavailable metrics without inventing values', () => {
     const plan: GuidedPlan<D, R> = { ...PLAN, metrics: { y: { label: 'Y', read: (r) => (r.analysis.y < 0 ? undefined : r.analysis.y) } } }
     const h = history(base, [{ ...base, a: 2 }, -1])

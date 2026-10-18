@@ -17,13 +17,58 @@ export async function tabTo(page: Page, target: Locator) {
   }
   throw new Error(`Control not reachable by Tab: ${await target.getAttribute('aria-label') ?? await target.textContent()}`)
 }
-export async function openWorkbench(page: Page, navigate = true, keyboard = false) {
+/**
+ * Opens Cantilever Beam I. With `mode`, the mode is chosen in the challenge drawer before entry
+ * (D-37); a fresh navigation defaults to Parametric, the open-design mode the generic learning-loop
+ * specs need (Guided locks parameters by step, task 58). Without `mode` (a reload), the featured
+ * Open/Continue button reopens the saved session in its own mode.
+ */
+export async function openWorkbench(page: Page, navigate = true, keyboard = false, mode: 'Guided' | 'Parametric' | undefined = navigate ? 'Parametric' : undefined) {
   if (navigate) await page.goto('/')
-  const open = page.getByRole('button', { name: /^(Open|Continue) challenge$/ }).first()
-  if (keyboard) { await tabTo(page, open); await page.keyboard.press('Enter') }
-  else await open.click()
+  const press = async (target: Locator) => {
+    if (keyboard) { await tabTo(page, target); await page.keyboard.press('Enter') }
+    else await target.click()
+  }
+  if (mode !== undefined) {
+    await press(page.getByRole('button', { name: 'View Cantilever Beam I', exact: true }))
+    const drawer = page.getByRole('dialog', { name: 'Cantilever Beam I', exact: true })
+    await press(drawer.getByRole('button', { name: new RegExp(`^${mode}`) }))
+    await press(drawer.getByRole('button', { name: /^(Open|Continue) challenge$/ }))
+  } else {
+    await press(page.getByRole('button', { name: /^(Open|Continue) challenge$/ }).first())
+  }
   await expect(page.getByRole('button', { name: 'Run Test', exact: true })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Zoom in', exact: true })).toBeVisible()
+}
+
+/** Clicks Run Test and answers the prediction checkpoint if this iteration requires one. */
+export async function runAnyTest(page: Page, keyboard = false) {
+  const button = page.getByRole('button', { name: 'Run Test', exact: true })
+  const before = (await readState(page)).history.length
+  if (keyboard) { await tabTo(page, button); await button.press('Enter') } else await button.click()
+  const dialog = page.getByRole('dialog').filter({ has: page.getByRole('button', { name: 'Run structural test' }) })
+  if (await dialog.isVisible()) {
+    const radio = dialog.getByLabel('Decrease', { exact: true })
+    if (keyboard) { await tabTo(page, radio); await radio.press('Space') } else await radio.check()
+    const confirm = dialog.getByRole('button', { name: 'Run structural test' })
+    if (keyboard) { await tabTo(page, confirm); await confirm.press('Enter') } else await confirm.click()
+    await expect(dialog).toBeHidden()
+  }
+  await expect.poll(async () => (await readState(page)).history.length).toBe(before + 1)
+}
+
+/** Asserts the current Guided experiment step by its heading (task 58). */
+export async function expectGuidedStep(page: Page, title: string) {
+  await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('heading', { name: title, exact: true })).toBeVisible()
+}
+
+/** Fills a labelled numeric field and commits it with Enter. */
+export async function fillField(page: Page, label: string, value: string) {
+  const field = page.getByLabel(label, { exact: true })
+  await field.scrollIntoViewIfNeeded()
+  await field.fill(value)
+  await field.press('Enter')
+  await expect(field).not.toHaveAttribute('aria-invalid', 'true')
 }
 export async function readState(page: Page): Promise<SessionState> {
   await page.waitForFunction(() => window.__EI_STATE__ !== undefined)

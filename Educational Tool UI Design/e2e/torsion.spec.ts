@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { audit, readState, tabTo } from './helpers'
+import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers'
 
 // Torsion Shaft I (task 47.3; TSH-14–TSH-16, MM-16, MM-22): chosen before entry from the
 // library, full prediction/test loop to an Accepted hollow shaft, saved under its own key,
@@ -70,26 +70,48 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     const requirements = page.getByRole('list', { name: 'Design requirements' })
     await expect(requirements.getByText('2.92°', { exact: true })).toBeVisible()
     await expect(page.getByText('Idealized circular-shaft torsion, not a structural certification')).toBeVisible()
+    const hollow = page.getByRole('button', { name: 'Hollow tube', exact: true })
     if (mode === 'Guided') {
-      await expect(page.getByRole('region', { name: 'Guided instructions' }).getByRole('heading', { name: 'Inspect', exact: true })).toBeVisible()
+      // Task 58: structured experiments, one variable per step; the shaft type starts locked.
+      await expectGuidedStep(page, 'Thicken the shaft')
+      await expect(hollow).toHaveAttribute('aria-disabled', 'true')
     } else {
-      await expect(page.getByRole('region', { name: 'Guided instructions' })).toHaveCount(0)
-      await expect(page.getByText('Direct shaft diameter editing')).toBeVisible()
+      await expect(page.getByRole('region', { name: 'Guided experiments' })).toHaveCount(0)
+      await expect(page.getByText(/Every parameter is editable from the start/)).toBeVisible()
+      await expect(hollow).not.toHaveAttribute('aria-disabled', 'true')
     }
     await audit(page)
 
-    await page.getByRole('button', { name: /Hollow tube/ }).click()
+    if (mode === 'Guided') {
+      await setShaft(page, 'Diameter', '35')
+      await runAnyTest(page)
+      await expectGuidedStep(page, 'Solid or hollow')
+      await expect(page.getByLabel('Diameter', { exact: true })).toHaveAttribute('readonly', '')
+      await hollow.click()
+      await runAnyTest(page)
+      await expectGuidedStep(page, 'Tune one diameter')
+      await setShaft(page, 'Outer diameter', '50')
+      await runAnyTest(page)
+      await expectGuidedStep(page, 'Meet every check')
+    }
+    await hollow.click()
     await setShaft(page, 'Outer diameter', '50')
     await setShaft(page, 'Inner diameter', '44')
-    await page.getByRole('button', { name: 'Run Test', exact: true }).click()
-    const prediction = page.getByRole('dialog', { name: 'Predict twist' })
-    await expect(prediction).toBeVisible()
-    await prediction.getByLabel('Decrease', { exact: true }).check()
-    await prediction.getByRole('button', { name: 'Run structural test' }).click()
-    await expect(prediction).toBeHidden()
+    if (mode === 'Guided') {
+      await runAnyTest(page)
+      await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('heading', { name: 'All experiments complete' })).toBeVisible()
+    } else {
+      await page.getByRole('button', { name: 'Run Test', exact: true }).click()
+      const prediction = page.getByRole('dialog', { name: 'Predict twist' })
+      await expect(prediction).toBeVisible()
+      await prediction.getByLabel('Decrease', { exact: true }).check()
+      await prediction.getByRole('button', { name: 'Run structural test' }).click()
+      await expect(prediction).toBeHidden()
+    }
+    const tests = mode === 'Guided' ? 5 : 2
     const tested = await readState(page)
-    expect(tested.history).toHaveLength(2)
-    expect(tested.history[1].evaluation.status).toBe('accepted')
+    expect(tested.history).toHaveLength(tests)
+    expect(tested.history[tests - 1].evaluation.status).toBe('accepted')
     await expect(requirements.getByText('0.94°', { exact: true })).toBeVisible()
     await audit(page)
     await noHorizontalOverflow(page)
@@ -98,8 +120,8 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     await openTorsion(page, mode, false)
     const restored = await readState(page)
     expect(restored.challengeId).toBe('torsion-shaft-1')
-    expect(restored.history).toHaveLength(2)
-    expect(restored.history[1].evaluation.status).toBe('accepted')
+    expect(restored.history).toHaveLength(tests)
+    expect(restored.history[tests - 1].evaluation.status).toBe('accepted')
 
     // Back to the library: sidebar navigation on desktop, the workspace menu on narrow screens.
     const library = page.locator('.platform-sidebar').getByRole('button', { name: 'Challenges' })

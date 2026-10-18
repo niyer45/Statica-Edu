@@ -18,6 +18,8 @@ type R = { analysis: TorsionAnalysis }
 export const TORSION_GUIDED_PLAN: GuidedPlan<TorsionDesign, R> = Object.freeze({
   params: (d: Readonly<TorsionDesign>) => ({ ...(d.section as unknown as Record<string, number>), section: d.section.kind }),
   structural: ['section'],
+  // Clamp-mode coupled shrink of the bore (geometry/torsion/edit.ts).
+  coupled: { outerDiameterM: ['innerDiameterM'] },
   label: (id: string) => LABELS[id] ?? id,
   metrics: {
     twistRad: { label: 'Twist angle', read: (r: Readonly<R>) => r.analysis.twistRad },

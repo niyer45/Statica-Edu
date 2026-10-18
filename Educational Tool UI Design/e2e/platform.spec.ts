@@ -68,7 +68,7 @@ test('WebGL-disabled flow reaches the same normalized session as the 3D flow', a
   await context.addInitScript(() => { Object.defineProperty(window, 'WebGL2RenderingContext', { configurable: true, value: undefined }) })
   const fallback = await context.newPage()
   await fallback.goto(DEV_URL)
-  await openWorkbench(fallback, false)
+  await openWorkbench(fallback, false, false, 'Parametric')
   await expect(fallback.locator('canvas')).toHaveCount(0)
   await referenceDesign(fallback)
   await runTest(fallback)
@@ -82,7 +82,7 @@ test('production obeys CSP, makes no other-origin requests, and exposes no state
   const csp: string[] = []
   page.on('console', (message) => { if (/content security policy|violates.*directive/i.test(message.text())) csp.push(message.text()) })
   await page.goto(PREVIEW_URL)
-  await openWorkbench(page, false)
+  await openWorkbench(page, false, false, 'Parametric')
   await referenceDesign(page)
   await runTest(page)
   await page.getByRole('button', { name: 'Explain & submit' }).click()

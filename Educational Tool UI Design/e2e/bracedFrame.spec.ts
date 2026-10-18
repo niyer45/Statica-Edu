@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, readState, tabTo } from './helpers'
+import { audit, expectGuidedStep, readState, tabTo } from './helpers'
 
 // Braced Frame I (task 49.3; braced-frame-1 BFR-16–BFR-18, MM-16, MM-22): chosen before entry
 // from the library, diagonals toggled from the keyboard, a mechanism shown as unstable with a
@@ -103,11 +103,15 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await expect(page.locator('canvas')).toHaveCount(0)
     }
     await expect(page.getByRole('table', { name: 'Latest tested member forces' })).toBeVisible()
+    const lowerLeft = page.getByLabel(/^Lower left column/)
     if (mode === 'Guided') {
-      await expect(page.getByRole('region', { name: 'Guided instructions' }).getByRole('heading', { name: 'Inspect', exact: true })).toBeVisible()
+      // Task 58: structured experiments; member sections stay locked in the bracing step.
+      await expectGuidedStep(page, 'Rearrange the bracing')
+      await expect(lowerLeft).toBeDisabled()
     } else {
-      await expect(page.getByRole('region', { name: 'Guided instructions' })).toHaveCount(0)
-      await expect(page.getByText('Direct bracing and member section editing', { exact: true })).toBeVisible()
+      await expect(page.getByRole('region', { name: 'Guided experiments' })).toHaveCount(0)
+      await expect(page.getByText(/Every parameter is editable from the start/)).toBeVisible()
+      await expect(lowerLeft).toBeEnabled()
     }
     await audit(page)
 
@@ -133,7 +137,18 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     expect(mechanism.history[1].predictionOutcome).toMatchObject({ scorable: false })
     await audit(page)
 
-    // Iteration 2: the reference frame (BFR-05): tension diagonals and resized members.
+    if (mode === 'Guided') {
+      // The bracing experiment is complete; now only member sections are editable.
+      await expectGuidedStep(page, 'Resize members')
+      await expect(page.getByRole('button', { name: 'Storey 1 diagonal, bottom left to top right', exact: true })).toBeDisabled()
+      await setSection(page, /^Lower left column/, 'CHS48.3x3.2')
+      await page.getByRole('button', { name: 'Run Test', exact: true }).click()
+      await expect.poll(async () => (await readState(page)).history.length).toBe(3)
+      await expectGuidedStep(page, 'Meet every check')
+    }
+
+    // The reference frame (BFR-05): tension diagonals and resized members (iteration 2, or the
+    // Guided final step at iteration 3, which is a prediction checkpoint).
     await toggleDiagonal(page, 'Storey 1 diagonal, bottom right to top left', keyboard)
     await toggleDiagonal(page, 'Storey 1 diagonal, bottom left to top right', keyboard)
     await toggleDiagonal(page, 'Storey 2 diagonal, bottom left to top right', keyboard)
@@ -144,22 +159,31 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     await setSection(page, /^Roof beam/, 'CHS76.1x4.0')
     await setSection(page, /^Lower diagonal \(bottom left to top right\)/, 'CHS76.1x4.0')
     await setSection(page, /^Upper diagonal \(bottom left to top right\)/, 'CHS48.3x3.2')
-    await page.getByRole('button', { name: 'Run Test', exact: true }).click()
+    if (mode === 'Guided') await runWithPrediction(page, 'Decrease')
+    else await page.getByRole('button', { name: 'Run Test', exact: true }).click()
+    const accepted = mode === 'Guided' ? 3 : 2
+    await expect.poll(async () => (await readState(page)).history.length).toBe(accepted + 1)
     const tested = await readState(page)
-    expect(tested.history).toHaveLength(3)
-    expect(tested.history[2].evaluation.status).toBe('accepted')
+    expect(tested.history[accepted].evaluation.status).toBe('accepted')
     await expect(requirements.getByText('10.38 mm', { exact: true })).toBeVisible()
+    if (mode === 'Guided') {
+      await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('heading', { name: 'All experiments complete' })).toBeVisible()
+      await audit(page)
+      await noHorizontalOverflow(page)
+    }
 
-    // Iteration 3 is a checkpoint: a lighter roof beam barely changes the roof drift (worksheet
+    // Parametric: iteration 3 is a checkpoint: a lighter roof beam barely changes the roof drift (worksheet
     // ratio 1.012, within the 0.98–1.02 band) but overloads that beam in buckling.
-    await setSection(page, /^Roof beam/, 'CHS60.3x4.0')
-    await runWithPrediction(page, 'Stay the same')
-    const third = await readState(page)
-    expect(third.history).toHaveLength(4)
-    expect(third.history[3].predictionOutcome).toMatchObject({ scorable: true, actual: 'same', matched: true })
-    expect(third.history[3].evaluation.status).toBe('notAccepted')
-    await audit(page)
-    await noHorizontalOverflow(page)
+    if (mode === 'Parametric') {
+      await setSection(page, /^Roof beam/, 'CHS60.3x4.0')
+      await runWithPrediction(page, 'Stay the same')
+      const third = await readState(page)
+      expect(third.history).toHaveLength(4)
+      expect(third.history[3].predictionOutcome).toMatchObject({ scorable: true, actual: 'same', matched: true })
+      expect(third.history[3].evaluation.status).toBe('notAccepted')
+      await audit(page)
+      await noHorizontalOverflow(page)
+    }
 
     await page.reload()
     await openFrame(page, mode, false)
@@ -167,7 +191,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     expect(restored.challengeId).toBe('braced-frame-1')
     expect(restored.history).toHaveLength(4)
     expect(restored.history[1].evaluation.status).toBe('modelNotApplicable')
-    expect(restored.history[2].evaluation.status).toBe('accepted')
+    expect(restored.history[accepted].evaluation.status).toBe('accepted')
 
     // Back to the library: sidebar navigation on desktop, the workspace menu on narrow screens.
     const library = page.locator('.platform-sidebar').getByRole('button', { name: 'Challenges' })
