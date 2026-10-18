@@ -20,8 +20,8 @@ import type { V2Persistence } from './persistence'
 // Braced Frame I model definition (task 49.2; braced-frame-1, MM-05, MM-10, MM-13, MM-18,
 // MM-19). Binds the pure braced-frame modules to the learning-loop engine: v2 persistence, v2
 // design files and a roof-drift prediction that is not scorable when either side is a
-// mechanism. Not registered in state/models.ts and not linked from any catalog entry: dispatch
-// registration and card gating belong to the integration step (49.3).
+// mechanism. Registered for dispatch in state/models.ts and state/runtimes.ts (49.3); the
+// catalog card stays unavailable until owner-approved activation.
 
 export type BracedFrameModelDefinition = ModelDefinition<
   BracedFrameChallenge,

@@ -18,6 +18,8 @@ export const m2ToMm2 = (m2: number): number => m2 * 1e6;
 
 /** Radians to degrees, for displaying stored angles such as shaft twist (task 47.3). */
 export const radToDeg = (rad: number): number => (rad * 180) / Math.PI;
+/** N -> kN (÷10³), for displaying stored member forces and capacities (task 49.3). */
+export const nToKn = (n: number): number => n / 1e3;
 
 /** N/m -> kN/m (÷10³), for displaying stored isolator stiffness (task 50.3). */
 export const nPerMToKnPerM = (nPerM: number): number => nPerM / 1e3;

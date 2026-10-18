@@ -9,8 +9,9 @@ import type { BracedFrameEdit } from '../geometry/bracedFrame/edit'
 import { FRAME_MEMBER_IDS } from '../geometry/bracedFrame/template'
 import { initSessionWith } from './engine'
 import { exportDesign as exportBeamDesign } from './importExport'
-import { modelFor } from './models'
+import { modelFor, requireModel } from './models'
 import { deserializeSession, deserializeSessionV2, serializeSessionV2 } from './persistence'
+import { bracedFrameRuntime, runtimeFor, runtimeForJson } from './runtimes'
 import { torsionModel } from './torsionModel'
 import {
   bracedFrameModel,
@@ -22,8 +23,8 @@ import {
 } from './bracedFrameModel'
 
 // Braced Frame I through the model-generic engine (task 49.2; MM-10, MM-11, MM-13, MM-15, MM-18,
-// MM-19, MM-26). The definition is not registered in state/models.ts and no catalog entry links
-// the challenge; registration and card gating belong to the integration step (49.3).
+// MM-19, MM-26). Registered for dispatch since 49.3; no catalog entry links the challenge until
+// owner-approved activation.
 
 const ch = bracedFrameChallenge()
 const T0 = '2026-10-17T10:00:00.000Z'
@@ -77,8 +78,12 @@ function looped(): BracedFrameSession {
 }
 
 describe('braced-frame learning loop through the engine', () => {
-  it('is not registered for dispatch yet: state/models.ts is unchanged until integration (49.3)', () => {
-    expect(modelFor(ch.model)).toBeUndefined()
+  it('is registered for dispatch under its exact identity only (49.3, MM-05, MM-07)', () => {
+    expect(modelFor(ch.model)).toBe(bracedFrameModel)
+    expect(requireModel(ch)).toBe(bracedFrameModel)
+    expect(modelFor({ id: 'pinJointedBracedFrame', version: 2 })).toBeUndefined()
+    expect(runtimeFor(ch.model)).toBe(bracedFrameRuntime)
+    expect(runtimeForJson(JSON.parse(JSON.stringify(ch)))).toBe(bracedFrameRuntime)
     expect(bracedFrameModel.ref).toEqual({ id: 'pinJointedBracedFrame', version: 1 })
     expect(bracedFrameModel.envelopeVersion).toBe(2)
     expect(bracedFrameModel.primaryMetric.label).toBe('roof drift')

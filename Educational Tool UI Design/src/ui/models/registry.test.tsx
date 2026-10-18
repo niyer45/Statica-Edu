@@ -13,6 +13,7 @@ import { beamUi } from './beam'
 import { vibrationUi } from './vibration'
 import { heatSinkUi } from './heatSink'
 import { bracketUi } from './bracket'
+import { bracedFrameUi } from './bracedFrame'
 import { defaultModelUis, modelUiFor, ModelUiContext } from './registry'
 import { torsionUi } from './torsion'
 import type { ModelUi } from './types'
@@ -91,6 +92,7 @@ describe('model UI registry', () => {
       ['sdofBaseIsolation', vibrationUi],
       ['plateFinHeatSink', heatSinkUi],
       ['steppedBarBracket', bracketUi],
+      ['pinJointedBracedFrame', bracedFrameUi],
     ])
     expect(modelUiFor({ id: 'steppedBarBracket', version: 1 })).toBe(bracketUi)
     expect(bracketUi.copy.prediction.title).toBe('Predict peak stress')
@@ -100,7 +102,8 @@ describe('model UI registry', () => {
     expect(modelUiFor({ id: 'eulerBernoulliCantileverTipForce', version: 1 })).toBe(beamUi)
     expect(modelUiFor({ id: 'sdofBaseIsolation', version: 1 })).toBe(vibrationUi)
     expect(modelUiFor({ id: 'plateFinHeatSink', version: 1 })).toBe(heatSinkUi)
-    expect(modelUiFor({ id: 'pinJointedBracedFrame', version: 1 })).toBeUndefined()
+    expect(modelUiFor({ id: 'pinJointedBracedFrame', version: 1 })).toBe(bracedFrameUi)
+    expect(modelUiFor({ id: 'notARegisteredModel', version: 1 })).toBeUndefined()
     expect(beamUi.copy.limitsNotice).toBe('Idealized beam approximation, not a structural certification')
     expect(beamUi.copy.prediction.title).toBe('Predict deflection')
     expect(beamUi.copy.prediction.question('the Baseline')).toBe('Compared with the Baseline, how will your new section change tip deflection?')

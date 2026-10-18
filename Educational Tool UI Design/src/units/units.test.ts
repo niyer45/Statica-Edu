@@ -20,6 +20,7 @@ import {
   mToMm,
   mmToM,
   nPerMToKnPerM,
+  nToKn,
   paToMpa,
   parseDecimalInput,
   parseMmInput,
@@ -81,6 +82,7 @@ describe("conversions (Req 2.2)", () => {
     expect(m4ToMm4(1)).toBe(1e12);
     expect(m2ToMm2(1)).toBe(1e6);
     expect(kgToG(0.215)).toBe(0.215 * 1e3);
+    expect(nToKn(75000)).toBe(75);
     // Same as multiplying/dividing by the literal power of ten, bit for bit.
     for (const v of [0.06, -3.7e-5, 123.456, 2.5e9, Number.MIN_VALUE]) {
       expect(mToMm(v)).toBe(v * 1e3);
@@ -88,6 +90,7 @@ describe("conversions (Req 2.2)", () => {
       expect(paToMpa(v)).toBe(v / 1e6);
       expect(m4ToMm4(v)).toBe(v * 1e12);
       expect(m2ToMm2(v)).toBe(v * 1e6);
+      expect(nToKn(v)).toBe(v / 1e3);
       expect(kgToG(v)).toBe(v * 1e3);
     }
   });

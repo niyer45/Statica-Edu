@@ -2,6 +2,8 @@ import { loadHeatSinkChallenge } from '../challenge/heatSink/loader'
 import type { HeatSinkChallenge } from '../challenge/heatSink/types'
 import { loadBracketChallenge } from '../challenge/bracket/loader'
 import type { BracketChallenge } from '../challenge/bracket/types'
+import { loadBracedFrameChallenge } from '../challenge/bracedFrame/loader'
+import type { BracedFrameChallenge } from '../challenge/bracedFrame/types'
 import { loadChallenge } from '../challenge/loader'
 import { loadTorsionChallenge } from '../challenge/torsion/loader'
 import type { TorsionChallenge } from '../challenge/torsion/types'
@@ -9,6 +11,7 @@ import { loadVibrationChallenge } from '../challenge/vibration/loader'
 import type { VibrationChallenge } from '../challenge/vibration/types'
 import type { Challenge, InteractionMode, ModelRef, Result, SchemaIssue } from '../challenge/types'
 import { bracketModel, bracketPersistence, bracketReducer, type BracketAction, type BracketSession } from './bracketModel'
+import { bracedFrameModel, bracedFramePersistence, bracedFrameReducer, type BracedFrameAction, type BracedFrameSession } from './bracedFrameModel'
 import { initSessionWith } from './engine'
 import { heatSinkModel, heatSinkPersistence, heatSinkReducer, type HeatSinkAction, type HeatSinkSession } from './heatSinkModel'
 import { beamModel, modelFor, modelOf } from './models'
@@ -107,6 +110,16 @@ export const bracketRuntime: ModelRuntime<BracketSession, BracketAction, Bracket
   deserialize: (raw: string, ch: BracketChallenge) => deserializeSessionV2(bracketModel, bracketPersistence, raw, ch),
 })
 
+export const bracedFrameRuntime: ModelRuntime<BracedFrameSession, BracedFrameAction, BracedFrameChallenge> = Object.freeze({
+  ref: bracedFrameModel.ref,
+  load: loadBracedFrameChallenge,
+  init: (ch: BracedFrameChallenge, now: string, id: string, mode?: InteractionMode) => initSessionWith(bracedFrameModel, ch, now, id, mode),
+  reduce: bracedFrameReducer,
+  key: sessionKey,
+  serialize: (s: BracedFrameSession, savedAt: string) => serializeSessionV2(bracedFrameModel.ref, s, savedAt),
+  deserialize: (raw: string, ch: BracedFrameChallenge) => deserializeSessionV2(bracedFrameModel, bracedFramePersistence, raw, ch),
+})
+
 /** Erased runtime type for dispatch; callers only pass values the same runtime produced. */
 export type AnyRuntime = ModelRuntime<LoopSession, { type: string }, LoopChallenge>
 
@@ -116,6 +129,7 @@ const RUNTIMES: ReadonlyMap<string, AnyRuntime> = new Map<string, AnyRuntime>([
   [vibrationRuntime.ref.id, vibrationRuntime as unknown as AnyRuntime],
   [heatSinkRuntime.ref.id, heatSinkRuntime as unknown as AnyRuntime],
   [bracketRuntime.ref.id, bracketRuntime as unknown as AnyRuntime],
+  [bracedFrameRuntime.ref.id, bracedFrameRuntime as unknown as AnyRuntime],
 ])
 
 /** Runtime for an exact registered model identity, or undefined (never a substitute, MM-07). */

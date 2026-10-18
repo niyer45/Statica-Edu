@@ -5,6 +5,7 @@ import { useModelStore } from '../state/store'
 import { beamUi } from './beam'
 import { heatSinkUi } from './heatSink'
 import { bracketUi } from './bracket'
+import { bracedFrameUi } from './bracedFrame'
 import { torsionUi } from './torsion'
 import type { ModelUi } from './types'
 import { vibrationUi } from './vibration'
@@ -28,6 +29,7 @@ export function defaultModelUis(): ReadonlyMap<string, ModelUi> {
     ['sdofBaseIsolation', vibrationUi],
     ['plateFinHeatSink', heatSinkUi],
     ['steppedBarBracket', bracketUi],
+    ['pinJointedBracedFrame', bracedFrameUi],
   ])
   return defaults
 }

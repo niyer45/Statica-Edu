@@ -267,3 +267,50 @@
 .bracket-sections th, .bracket-sections td { padding: 2px 8px 2px 0; text-align: left; white-space: nowrap; }
 .bracket-step-note, .bracket-peak { margin: 0 0 8px; font-size: 11px; color: #46583b; }
 .field-note { grid-column: 1 / -1; margin: 0; font-size: 10px; color: #5c6a55; }
+/* Braced Frame I (task 49.3): main-bundle SVG frame view, bracing toggles and member sections.
+   Member stroke widths are SVG presentation attributes (by section), so these rules set no
+   stroke-width for present members. Patterns, not colours alone, carry tension/compression. */
+.frame-view { display: flex; flex-direction: column; flex: 1; padding: 0 12px 12px; min-width: 0; }
+.frame-view .frame-scene { width: 100%; height: auto; min-height: 0; max-height: 360px; cursor: default; touch-action: auto; user-select: auto; }
+.frame-support polygon { fill: #dfe4d8; stroke: #4f653e; stroke-width: 1; }
+.frame-support line { stroke: #4f653e; stroke-width: 1.5; }
+.frame-joint { fill: #fff; stroke: #26352b; stroke-width: 1.2; }
+.frame-member-tension, .frame-member-neutral, .frame-member-zero, .frame-member-compression { stroke: #34543c; stroke-linecap: round; }
+.frame-member-neutral { stroke: #7a8670; }
+.frame-member-zero { stroke-dasharray: 1 4; }
+.frame-member-compression-core { stroke: #f4f6ef; stroke-linecap: round; }
+.frame-member-absent { stroke: #9aa48f; stroke-width: 1; stroke-dasharray: 6 5; opacity: 0.8; }
+.frame-label { font-size: 9px; fill: #26352b; paint-order: stroke; stroke: #f4f6ef; stroke-width: 3px; font-variant-numeric: tabular-nums; }
+.frame-load line { stroke: #76552c; stroke-width: 1.6; }
+.frame-load polygon { fill: #76552c; }
+.frame-load-label { font-size: 8px; fill: #5c3f1d; }
+.frame-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; list-style: none; margin: 4px 0 0; padding: 0; font-size: 10px; color: #46583b; }
+.frame-legend li { display: flex; align-items: center; gap: 5px; }
+.frame-legend svg { width: 24px; height: 8px; }
+.frame-summary { margin: 8px 0 0; letter-spacing: 0; text-transform: none; font-weight: 500; line-height: 1.6; }
+.frame-mechanism { margin: 10px 0 0; padding: 10px; border: 1px solid #eee1c8; border-radius: 5px; background: #fcf7ed; color: #5c3f1d; font-size: 11px; font-weight: 600; }
+.frame-table-wrap { margin-top: 10px; overflow-x: auto; }
+.frame-table-wrap table { width: 100%; border-collapse: collapse; font-size: 10px; color: #26352b; font-variant-numeric: tabular-nums; }
+.frame-table-wrap caption { text-align: left; font-size: 10px; font-weight: 600; color: #46583b; padding-bottom: 4px; }
+.frame-table-wrap th, .frame-table-wrap td { padding: 4px 3px; text-align: left; vertical-align: top; border-bottom: 1px solid #dfe4d8; }
+.frame-reactions { font-size: 10px; color: #46583b; line-height: 1.6; margin: 8px 0 0; }
+.frame-tools .dimensions-heading { margin: 18px 0 10px; }
+.frame-toggles { display: grid; gap: 10px; margin: 10px 0 0; }
+.frame-storey-title { margin: 0 0 4px; font-size: 10px; font-weight: 600; color: #46583b; }
+.frame-toggle { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; margin-bottom: 5px; padding: 7px 8px; border: 1px solid #c9d2bf; border-radius: 5px; background: #fff; color: #46583b; font-size: 10px; text-align: left; transition: none; }
+.frame-toggle.on { border-color: #345640; background: #f0f4e9; }
+.frame-toggle small { font-size: 9px; font-weight: 600; color: #58664a; }
+.frame-sections { display: grid; gap: 8px; }
+.frame-section-field { display: grid; gap: 3px; }
+.frame-section-field label { font-size: 10px; color: #46583b; }
+.frame-section-field small { display: inline; color: #58664a; }
+.frame-section-field select { width: 100%; min-width: 0; padding: 4px 5px; font: inherit; font-size: 10px; border: 1px solid #8a977d; border-radius: 4px; background: #fff; color: #26352b; }
+.frame-load-list { margin: 0; padding-left: 14px; }
+.challenge-body .frame-governing { font-size: 10px; line-height: 1.6; color: #46583b; margin: 10px 0 0; }
+.frame-metrics { flex-wrap: wrap; row-gap: 12px; }
+.frame-glyph rect, .frame-glyph line { fill: none; stroke: currentColor; stroke-width: 1.4; }
+@media (max-width: 620px) {
+  .tools-body > .frame-tools { grid-column: 1 / -1; }
+  .frame-tools .dimensions-heading { margin: 16px 0 10px; }
+  .frame-metrics .metric { flex: 1 1 40%; }
+}

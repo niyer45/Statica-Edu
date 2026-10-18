@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { bundledChallenge } from '../../test/arbitraries'
 import { heatSinkChallenge } from '../../test/fixtures/heatSink'
 import { bracketChallenge } from '../../test/fixtures/bracket'
+import { bracedFrameChallenge } from '../../test/fixtures/bracedFrame'
 import { torsionChallenge } from '../../test/fixtures/torsion'
 import { cantileverBeam1Json } from '../challenge/content'
 import { bracketModel } from './bracketModel'
@@ -9,7 +10,8 @@ import { initSessionWith } from './engine'
 import { heatSinkModel } from './heatSinkModel'
 import { beamModel } from './models'
 import { sessionKey } from './persistence'
-import { beamRuntime, bracketRuntime, heatSinkRuntime, runtimeFor, runtimeForJson, torsionRuntime, vibrationRuntime } from './runtimes'
+import { bracedFrameModel } from './bracedFrameModel'
+import { beamRuntime, bracedFrameRuntime, bracketRuntime, heatSinkRuntime, runtimeFor, runtimeForJson, torsionRuntime, vibrationRuntime } from './runtimes'
 import { torsionModel } from './torsionModel'
 import { vibrationModel } from './vibrationModel'
 import { vibrationChallenge } from '../../test/fixtures/vibration'
@@ -31,6 +33,8 @@ describe('runtime dispatch', () => {
     expect(runtimeFor({ id: 'plateFinHeatSink', version: 2 })).toBeUndefined()
     expect(runtimeFor(bracketModel.ref)).toBe(bracketRuntime)
     expect(runtimeFor({ id: 'steppedBarBracket', version: 2 })).toBeUndefined()
+    expect(runtimeFor(bracedFrameModel.ref)).toBe(bracedFrameRuntime)
+    expect(runtimeFor({ id: 'pinJointedBracedFrame', version: 2 })).toBeUndefined()
   })
 
   it.each([
@@ -41,6 +45,7 @@ describe('runtime dispatch', () => {
     ['an unregistered model version', { model: { id: 'sdofBaseIsolation', version: 2 } }, undefined],
     ['an explicit heat sink model', { model: { id: 'plateFinHeatSink', version: 1 } }, heatSinkRuntime],
     ['an explicit bracket model', { model: { id: 'steppedBarBracket', version: 1 } }, bracketRuntime],
+    ['an explicit braced-frame model', { model: { id: 'pinJointedBracedFrame', version: 1 } }, bracedFrameRuntime],
     ['a malformed model', { model: 'circularShaftTorsion' }, undefined],
     ['a model with a non-numeric version', { model: { id: 'circularShaftTorsion', version: '1' } }, undefined],
     ['a non-object config', [1, 2], beamRuntime],
@@ -109,6 +114,28 @@ describe('runtime persistence', () => {
     const t = torsionRuntime.init(tch, T0, 't0')
     if (!t.ok) throw new Error(t.error.message)
     expect(bracketRuntime.deserialize(torsionRuntime.serialize(t.value, T0), ch).ok).toBe(false)
+  })
+
+  it('braced-frame runtime round-trips a v2 envelope with a mechanism result and refuses other formats', () => {
+    const ch = bracedFrameChallenge()
+    const s = bracedFrameRuntime.init(ch, T0, 'f0', 'guided')
+    if (!s.ok) throw new Error(s.error.message)
+    expect(bracedFrameRuntime.key(ch)).toBe('ei:session:braced-frame-1:v1')
+    // Remove the upper diagonal (a mechanism), predict and test, so the saved history holds a mechanism.
+    let next = bracedFrameRuntime.reduce(s.value, { type: 'edit', edit: { type: 'toggleDiagonal', memberId: 'diag2b' } }, ch)
+    next = bracedFrameRuntime.reduce(next, { type: 'setPrediction', direction: 'increase', now: T0 }, ch)
+    next = bracedFrameRuntime.reduce(next, { type: 'runTest', now: T0, id: 'f1' }, ch)
+    expect(next.history[1]!.analysis.status).toBe('mechanism')
+    const raw = bracedFrameRuntime.serialize(next, T0)
+    expect(JSON.parse(raw)).toMatchObject({ schemaVersion: 2, model: bracedFrameModel.ref })
+    const back = bracedFrameRuntime.deserialize(raw, ch)
+    if (!back.ok) throw new Error(back.error)
+    expect(back.value).toEqual(next)
+    expect(bracedFrameRuntime.load(JSON.parse(JSON.stringify(ch))).ok).toBe(true)
+    const tch = torsionChallenge()
+    const t = torsionRuntime.init(tch, T0, 't0')
+    if (!t.ok) throw new Error(t.error.message)
+    expect(bracedFrameRuntime.deserialize(torsionRuntime.serialize(t.value, T0), ch).ok).toBe(false)
   })
 })
 
