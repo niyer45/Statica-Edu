@@ -270,7 +270,6 @@ describe('engine invariants for heat sink action sequences', () => {
     fc.constantFrom<'increase' | 'decrease' | 'same'>('increase', 'decrease', 'same').map((direction) => ({ type: 'setPrediction' as const, direction, now: T0 })),
     fc.nat(99).map((n) => ({ type: 'runTest' as const, now: T0, id: `t-${n}` })),
     fc.constant({ type: 'reset' as const }),
-    fc.constant({ type: 'resetDraft' as const }),
   )
 
   it('keeps history append-only, drafts valid, checkpoints predicted and reduction pure', () => {

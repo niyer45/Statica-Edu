@@ -9,7 +9,7 @@ import type { Analysis } from '../physics/types'
 import { heatSinkModel, type HeatSinkModelDefinition } from './heatSinkModel'
 import { bracketModel, type BracketModelDefinition } from './bracketModel'
 import { bracedFrameModel, type BracedFrameModelDefinition } from './bracedFrameModel'
-import type { ChallengeBase, DesignBase, DesignError, EngineModel, EvaluationBase } from './engine'
+import { isFreshSessionWith, type ChallengeBase, type DesignBase, type DesignError, type EngineModel, type EvaluationBase } from './engine'
 import { exportDesign, importDesign } from './importExport'
 import { cloneDesign, sameDesignIgnoringId } from './session'
 import { torsionModel, type TorsionModelDefinition } from './torsionModel'
@@ -100,12 +100,13 @@ export function requireModel(ch: { model?: Readonly<ModelRef> }): RegisteredMode
 }
 
 /**
- * Task 60: whether a draft already equals the challenge's baseline (initial) design, ignoring
- * the design id, for the challenge's own registered model. The shared workbench uses it to make
- * Reset to baseline unavailable; the engine's `resetDraft` applies the same rule.
+ * Task 60: whether a session already equals a fresh start of its challenge (baseline draft, only
+ * the Baseline in history, nothing archived, compared, pending, reflected or submitted), using
+ * the challenge's own registered model to compare designs. The shared workbench makes Reset to
+ * baseline unavailable then; the engine's `resetDraft` applies the same rule.
  */
-export function isDraftAtBaseline(ch: { model?: Readonly<ModelRef>; initialDesign: unknown }, draft: unknown): boolean {
+export function isFreshSession(ch: { model?: Readonly<ModelRef>; initialDesign: unknown }, s: Parameters<typeof isFreshSessionWith<unknown>>[1]): boolean {
   // Each definition compares its own design type; the challenge's model identity selects it.
   const def = requireModel(ch) as unknown as { sameDesignIgnoringId(a: unknown, b: unknown): boolean }
-  return def.sameDesignIgnoringId(draft, ch.initialDesign)
+  return isFreshSessionWith(def.sameDesignIgnoringId, s, ch as { initialDesign: Readonly<unknown> })
 }

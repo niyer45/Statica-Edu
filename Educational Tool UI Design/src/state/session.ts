@@ -85,8 +85,8 @@ export type Action =
   | { type: 'submit'; testResultId: string; now: string }
   | { type: 'importDesign'; json: unknown }
   | { type: 'reset' }
-  /** Task 60: draft back to the challenge baseline; history and submission kept (engine.ts). */
-  | { type: 'resetDraft' }
+  /** Task 60: start the challenge over as a fresh session in the same mode (engine.ts). */
+  | { type: 'resetDraft'; now: string; id: string }
 
 export const BASELINE_LABEL = 'Baseline'
 
