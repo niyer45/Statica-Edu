@@ -23,8 +23,8 @@ describe('catalog availability guard', () => {
     expect(modelFor(modelOf(loaded.value))).toBeDefined()
   })
 
-  it('keeps exactly Cantilever Beam I and Torsion Shaft I available today', () => {
-    expect(available.map((e) => e.title)).toEqual(['Cantilever Beam I', 'Torsion Shaft I'])
+  it('keeps exactly the owner-activated challenges available', () => {
+    expect(available.map((e) => e.title)).toEqual(['Cantilever Beam I', 'Torsion Shaft I', 'Vibration Isolation I'])
   })
 
   it('bundles only challenges an available card links to (no dormant Beam II)', () => {

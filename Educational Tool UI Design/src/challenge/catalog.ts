@@ -106,7 +106,8 @@ export const catalog: readonly CatalogEntry[] = deepFreeze<CatalogEntry[]>([
     difficulty: 'advanced',
     time: '30–40 min',
     concepts: ['Natural frequency', 'Vibration'],
-    available: false,
+    available: true,
+    challengeId: 'vibration-isolation-1',
     art: 'spring',
   },
 ])
