@@ -64,7 +64,16 @@ The subsequent documentation-only head `eee795cd6aeed69526e8aef1cd0033b64bff9db4
 - **46.2 complete (parallel agent, `2d72cdf`).** All five models are now implemented. Bracket, heat sink, frame and vibration remain unregistered until their 4x.3.
   CI for `3acd077`: [run 39078354891](https://github.com/niyer45/Statica-Edu/actions/runs/39078354891) passed.
 - **47.3 complete: Torsion Shaft I is openable (owner-approved activation, D-42).** UI in `src/ui/models/torsion/` (diameter tools, SVG shaft view, challenge panel, results/compare with v2 design files, reference dialog, Guided steps). The challenge is bundled and card 003 is available. `StoreProvider` now applies and saves a pre-entry mode at creation, fixing a brief Guided render on challenge switch. New `e2e/torsion.spec.ts`: 4 cases on desktop/Pixel 7. Local: 2351 tests/225 files, 28/28 E2E (torsion 12/12 on repeat). If lint suddenly reports thousands of errors, a failed Playwright run has left a trace viewer in `playwright-report/`; delete that generated, git-ignored folder.
-- **Next:** 50.3 Vibration Isolation I workbench (register the runtime and UI, chart with table equivalent, activation after browser gates and owner approval), then 48.3, 46.3, 49.3 in D-38 order.
+  CI for `0180066` (activation): [run 39081602702](https://github.com/niyer45/Statica-Edu/actions/runs/39081602702) passed, including the 4 torsion E2E cases.
+- **Workbenches merged, cards not activated (session paused here, 2026-10-17):**
+  - Vibration Isolation I 50.3 `da32094`.
+  - Heat Sink I 48.3 `3662124`. That agent's own commit and E2E run were blocked by the permission system; it was merged by the coordinator with owner approval.
+  - Mounting Bracket I 46.3 `75a103d`.
+
+  All three are registered (runtime, model, UI) and component-tested through the production registry. Their E2E specs (`e2e/{vibration,heatSink,bracket}.spec.ts`) skip until each card is activated and **have never run unskipped**: expect fixes on first activation. Local gate on `75a103d`: lint 0 errors, typecheck, **2403 tests/228 files** with coverage, build, schema unchanged, **28/28 E2E plus 12 skipped**.
+- **Braced Frame I 49.3 is NOT merged.** The work is uncommitted in worktree `.claude/worktrees/agent-a00f1ee2f5141f3db`. The agent's lint, commit and E2E were blocked by the permission system (auto mode also flagged its report). Do not merge it without owner approval; if approved, review the diff and run the full gate as was done for the heat sink.
+- **Parallel-agent caveat:** Playwright `reuseExistingServer` will test whatever server holds ports 4173/4174, so check `lsof -iTCP:4173 -iTCP:4174` before E2E when several worktrees run at once.
+- **Next, when resumed:** owner decisions on activating cards 006/004/002 (one at a time; each spec runs then), on merging the 49.3 worktree, and on the copy/limit questions in each model's design.md. Then gate 51.
 - Local gate on `6ae2231`: lint 0 errors (10 existing), typecheck, **2351 tests/225 files** with coverage, build, schema unchanged, 24/24 E2E.
 
 The contracts define shared model/config/result identity/versioning, validation, model-specific units/metrics/evaluation/explanations, visualization/fallback, prediction/reflection, imports/save migrations. **34.1–34.2** generalize selection/session integration against those contracts; **46–50** specify, implement, numerically verify and integrate each model. Follow the numeric dependency graph. No new model is chosen by merely listing these tasks.

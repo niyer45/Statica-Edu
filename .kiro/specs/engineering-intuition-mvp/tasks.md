@@ -640,7 +640,7 @@ All seven maintenance tasks are complete. [CI run 38936927907](https://github.co
 
 Added at the user's request after Milestone 3 passed. Tasks 1–28 and their completion evidence remain unchanged. Requirements 1–35 and the existing design describe the completed M0–M3 baseline; their statements that M4+ is outside MVP implementation scope remain historical boundaries, not specifications for these new features. New feature requirements and acceptance criteria must be written as scoped extensions before implementation, without regenerating the completed MVP specifications or inventing requirement IDs.
 
-Tasks 29.1, 31.1 and configuration-development tasks 33.1–33.2 are complete; tasks 29 and 31 remain in progress for human evidence. Tasks 45.1 (original-catalog scoping) and 45.2 (shared multi-model contracts) are complete as specifications. All five track specifications (46.1–50.1), all five models (46.2–50.2) and shared integration 34 are complete. Torsion Shaft I (47) is complete and openable. Next: 50.3 Vibration Isolation workbench (D-38 order), then 48.3, 46.3, 49.3. Human QA is deferred until before customer deployment, not checked complete (D-34). The roadmap schedules future work; it does not start development, recruit participants, publish the app, or enable network services. No new testing task is optional. Update supporting documentation after each completed task and push verified batches. Preserve the existing architecture, solver-backed results, D-26/D-27 and the complete MVP regression suite. Feature-specific backend, model, provider and challenge choices remain decisions to make in the tasks below.
+Tasks 29.1, 31.1 and configuration-development tasks 33.1–33.2 are complete; tasks 29 and 31 remain in progress for human evidence. Tasks 45.1 (original-catalog scoping) and 45.2 (shared multi-model contracts) are complete as specifications. All five track specifications (46.1–50.1), all five models (46.2–50.2) and shared integration 34 are complete. Torsion Shaft I (47) is complete and openable. Workbenches for 50.3, 48.3 and 46.3 are merged but unactivated (owner approval required per card); 49.3 is uncommitted in an agent worktree pending an owner decision. Human QA is deferred until before customer deployment, not checked complete (D-34). The roadmap schedules future work; it does not start development, recruit participants, publish the app, or enable network services. No new testing task is optional. Update supporting documentation after each completed task and push verified batches. Preserve the existing architecture, solver-backed results, D-26/D-27 and the complete MVP regression suite. Feature-specific backend, model, provider and challenge choices remain decisions to make in the tasks below.
 
 Owner sequencing update (2026-10-16, D-34): develop software before human QA. Nikhil is the nominated owner engineering reviewer; 29.2 is owner-conducted review, not external independent review. Tasks 29.2, 30, 31.2 and 32 remain required before customer deployment. Scoped configuration/specification work may proceed from 29.1 without completed pilot evidence; feature release checkpoints still require 32.2. No deployment is authorized or performed by this sequencing change.
 
@@ -737,8 +737,9 @@ Priority update (2026-10-16, D-35): implement the six existing catalog entries b
   - [x] 46.2 Implement and numerically verify the scoped bracket model
     - Validate geometry/units, benchmarks, boundaries, applicability and failure behavior; record limitations and human review still required. Depends on 46.1 and 45.2.
     - Completed 2026-10-17 (parallel agent; integrated 2d72cdf). Pure `*/bracket/` modules: the Kt table in `physics/bracket/constants.ts` matches design.md digit for digit; nine screens, including K-4 `KT_SMALL_STEP`; analysis status `solved | ktFitUndefined` with peak/Kt absent when the fit is undefined; the model-limits text discloses the secondary-copy Kt source. Also the `state/bracketModel.ts` engine definition (v2) and 297 tests: all 16 worksheet rows plus the K-4 fixtures; trapezoid and Gauss deflection cross-checks; uniform-bar limit; Kt spot, chart and monotonicity checks; inclusive boundaries. Not yet registered (46.3) and not in the production bundle.
-  - [ ] 46.3 Integrate and verify the bracket learning loop
+  - [-] 46.3 Integrate and verify the bracket learning loop
     - Add model-specific controls/results, grounded guidance, saved workspace isolation, accessible visualization and full desktop/mobile/keyboard/fallback regressions. Keep unavailable until the complete supported flow is verified; customer release still requires owner QA. Depends on 46.2 and 34.2.
+    - In progress 2026-10-17 (75a103d, parallel agent): bracket runtime/model/UI registered (elevation + moment strip, Kt disclosure, not-applicable display without numbers); 14 component tests; `e2e/bracket.spec.ts` skips until card 002 is activated (owner approval required; spec has not yet run unskipped).
 
 - [x] 47. Develop Torsion Shaft I
   - [x] 47.1 Specify the torsion model and independent benchmark cases
@@ -759,8 +760,9 @@ Priority update (2026-10-16, D-35): implement the six existing catalog entries b
   - [x] 48.2 Implement and numerically verify the scoped thermal model
     - Validate thermal balances, reference cases, geometry/units, applicability and failure behavior; no beam stress/deflection placeholders. Depends on 48.1 and 45.2.
     - Completed 2026-10-17 (parallel agent; integrated f12a6a9). Pure `*/heatSink/` modules, the `state/heatSinkModel.ts` engine definition (v2) and 294 tests: all 11 worksheet rows at 1e-9, energy balance within 1e-12, second-order FD fin, corrected-length bound and limits. A local inclusive `withinLowerLimit` handles the gap. The spec's thick-fin count was corrected from 23 to 27 (inclusive gap rule; coordinator recount agrees). The model is not yet registered for dispatch (48.3) and not in the production bundle.
-  - [ ] 48.3 Integrate and verify the thermal learning loop
+  - [-] 48.3 Integrate and verify the thermal learning loop
     - Supply appropriate geometry tools/visualization, thermal results/constraints, prediction/reflection, isolated saves and accessible desktop/mobile/keyboard/fallback regressions. Depends on 48.2 and 34.2.
+    - In progress 2026-10-17 (3662124): heat sink runtime/model/UI registered (fin-array SVG with profile table); 11 component tests; `e2e/heatSink.spec.ts` skips until card 004 is activated. The agent's own commit and browser run were blocked by the permission system; merged by the coordinator with owner approval.
 
 - [-] 49. Develop Braced Frame I
   - [x] 49.1 Specify the frame model and independent benchmark cases
@@ -769,8 +771,9 @@ Priority update (2026-10-16, D-35): implement the six existing catalog entries b
   - [x] 49.2 Implement and numerically verify the scoped frame model
     - Verify equilibrium/compatibility, units, reference cases, mechanisms/invalid topology and model limits. Depends on 49.1 and 45.2.
     - Completed 2026-10-17 (parallel agent; integrated 8e238c3). Pure `*/bracedFrame/` modules include a dependency-free direct-stiffness solver and pivoted Cholesky; a mechanism stores no displacements or forces. Also the `state/bracedFrameModel.ts` engine definition (v2) and 299 tests: worksheet rows; method-of-joints, virtual-work and force-method checks; equilibrium, linearity, 1/E scaling and symmetry; mechanism iff an unbraced storey across all 16 layouts. Not yet registered (49.3) and not in the production bundle.
-  - [ ] 49.3 Integrate and verify the frame learning loop
+  - [-] 49.3 Integrate and verify the frame learning loop
     - Provide accessible topology/parameter editing, appropriate visualization/results, stored predictions/reflections, isolated saves and complete browser regressions. Depends on 49.2 and 34.2.
+    - In progress 2026-10-17: the frame workbench exists only as UNCOMMITTED work in worktree `.claude/worktrees/agent-a00f1ee2f5141f3db` (agent's commit/lint/E2E were blocked by the permission system; its report says Vitest 2363/226, typecheck and build passed). Not merged: owner decision required before merging blocked work.
 
 - [-] 50. Develop Vibration Isolation I
   - [x] 50.1 Specify the vibration model and independent benchmark cases
@@ -779,8 +782,9 @@ Priority update (2026-10-16, D-35): implement the six existing catalog entries b
   - [x] 50.2 Implement and numerically verify the scoped vibration model
     - Verify units, independent reference/limiting cases, resonance/damping boundaries, numerical behavior and unsupported cases. Depends on 50.1 and 45.2.
     - Completed 2026-10-17 (parallel agent; integrated 6306d0c). Pure `*/vibration/` modules with exact (not sampled) peak evaluation, the `state/vibrationModel.ts` engine definition (v2) and 291 tests: all 15 worksheet rows at 1e-9, the 125-design grid, golden-section/dense-grid/RK4 cross-checks and limiting cases. Not yet registered (50.3) and not in the production bundle.
-  - [ ] 50.3 Integrate and verify the vibration learning loop
+  - [-] 50.3 Integrate and verify the vibration learning loop
     - Provide appropriate controls, accessible response visualization/results, prediction/reflection, isolated saves and full browser regressions. Do not imply time simulation where only a frequency/steady-state model is implemented. Depends on 50.2 and 34.2.
+    - In progress 2026-10-17 (da32094): vibration runtime/model/UI registered (schematic + frequency-response chart with table); 12 component tests; `e2e/vibration.spec.ts` skips until card 006 is activated.
 
 - [ ] 51. Verify original six-challenge catalog completion
   - Confirm Cantilever Beam I and all five original preview challenges have implemented, numerically validated and integrated learning loops, correctly attributed/isolation-tested saves, truthful model limits and no placeholder results. Retain original regressions and record owner engineering/manual QA before customer release. Depends on 46.3–50.3 and 44.3. Do not mark complete merely because cards are clickable.
