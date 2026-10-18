@@ -272,7 +272,10 @@
 .bracket-wall-face { stroke: #3d4a3f; stroke-width: 1.5; }
 .bracket-plate { fill: #7d8a7e; stroke: #2f3a31; stroke-width: 1; }
 .bracket-bolt { fill: #3d4a3f; }
-.bracket-bolt-shank { stroke: #3d4a3f; stroke-width: 2; stroke-dasharray: 3 2; }
+.bracket-washer { fill: #6f7c70; stroke: #2f3a31; stroke-width: 0.6; }
+.bracket-body-side { fill: #c7cfbb; stroke: #4f653e; stroke-width: 0.6; stroke-linejoin: round; }
+.bracket-wall-side { fill: #b9c0b1; stroke: #3d4a3f; stroke-width: 1; }
+.bracket-body-side-smooth { stroke: #c7cfbb; }
 .bracket-body-back { fill: #c7cfbb; stroke: #4f653e; stroke-width: 1; }
 .bracket-cable { stroke: #3d4a3f; stroke-width: 1.5; }
 .bracket-weight { fill: #cf744b; stroke: #7a3f14; stroke-width: 1; }

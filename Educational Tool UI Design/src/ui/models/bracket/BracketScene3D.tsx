@@ -32,8 +32,8 @@ const MARK = '#7a3f14'
 const DARK = '#3d4a3f'
 
 /** Scene framing: centre and half-extent of the region the camera keeps in view, m. */
-const FOCUS: [number, number, number] = [0.045, 0.03, 0]
-const RADIUS = 0.14
+const FOCUS: [number, number, number] = [0.045, 0.01, 0]
+const RADIUS = 0.15
 
 function CameraRig({ zoom, reset }: { zoom: number; reset: number }) {
   const { camera, size, invalidate } = useThree()
