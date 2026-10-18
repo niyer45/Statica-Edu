@@ -58,7 +58,7 @@ export const torsionUi: ModelUi = {
   Help: TorsionHelp,
   guidance: {
     steps: [
-      { id: 'inspect', title: 'Inspect', instruction: 'Read the challenge and its limits. Find which limit the solid baseline shaft misses before editing.', hint: 'Expand Some things are fixed. to see the length, torque, material and support. Accepted applies to this idealized model, not a real-world safety approval.' },
+      { id: 'inspect', title: 'Inspect', instruction: 'Read the challenge and its limits. Find which limits the solid baseline shaft misses before editing.', hint: 'Expand Some things are fixed. to see the length, torque, material and support. Accepted applies to this idealized model, not a real-world safety approval.' },
       { id: 'experiment', title: 'Experiment', instruction: 'Change one diameter at a time. Predict how the twist angle will change, then Run Test to record the result.', hint: 'Try both a larger solid shaft and a hollow tube. The view keeps the latest tested twist until you run another test.' },
       { id: 'compare', title: 'Compare', instruction: 'Choose designs in Design history, then open Compare results. Compare twist and mass between solid and hollow shafts.', hint: 'Look at how much twist each design removes per kilogram. Like the beam, the gain comes from placing material far from the center, but torsion uses the polar moment rather than bending stiffness.' },
       { id: 'explain', title: 'Explain', instruction: 'Use your tested values to explain how the polar moment, twist and mass changed. Open Explain & submit to record a design and reflection.', hint: 'A submitted attempt can still be Not accepted. Name one effect the idealized shaft model does not include.' },

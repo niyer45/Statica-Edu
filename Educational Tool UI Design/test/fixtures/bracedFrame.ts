@@ -157,8 +157,29 @@ const REFERENCE_FIXED: FixedSizes = [48, 89, 60, 76, 76, 76]
 
 export const BRACED_FRAME_WORKSHEET: readonly BracedFrameFixture[] = [
   {
+    // Challenge v2 baseline (task 59): light lower columns and compression diagonals under heavy
+    // upper columns and beams. It fails roof drift, utilization and mass, the most checks any
+    // applicable design fails (exhaustive search). Values from an independent direct-stiffness
+    // calculation that reproduces the uniform60 row exactly; the topology matches uniform60, so
+    // the determinate forces and reactions are the same.
     name: 'baseline',
-    design: frameDesign('baseline', [60, 60, 60, 60, 60, 60], { diag1b: 60, diag2b: 60 }),
+    design: frameDesign('baseline', [48, 48, 89, 89, 89, 89], { diag1b: 48, diag2b: 48 }),
+    expected: {
+      status: 'solved', massKg: 201.783371449902, evaluation: 'notAccepted', failures: ['roofDrift', 'utilization', 'mass'], warningCodes: [], notApplicableCodes: [],
+      solved: {
+        roofDriftM: 0.0126110214225009, floorDriftM: 0.00634129986093538, maxStoreyDriftRatio: 0.00211376662031179,
+        maxUtilization: 8.19881559821664, governingMemberId: 'diag1b', maxInelasticRatio: 0.179253108943073,
+        displacementsM: [0.00603778626266716, 0.00115793161201836, 0.00664481345920359, -0.00231586322403672, 0.0126110214225009, 0.00104411401266778, 0.0126110214225009, -0.00277113362143905],
+        forcesN: { col1L: 35000, col1R: -70000, col2L: -10000, col2R: -40000, beam1: 40000, beam2: 0, diag1b: -75000, diag2b: -50000 },
+        utilizations: { col1L: 0.308781763204896, col1R: 2.75480204100079, col2L: 0.0391793580956294, col2R: 0.156717432382517, beam1: 0.121405439307286, beam2: 0, diag1b: 8.19881559821664, diag2b: 5.46587706547775 },
+        reactionsN: reactions(0, -60000),
+      },
+    },
+  },
+  {
+    // The challenge v1 baseline (every member CHS60.3x4.0), kept as a worksheet row.
+    name: 'uniform60',
+    design: frameDesign('uniform60', [60, 60, 60, 60, 60, 60], { diag1b: 60, diag2b: 60 }),
     expected: {
       status: 'solved', massKg: 166.613109746073, evaluation: 'notAccepted', failures: ['utilization'], warningCodes: [], notApplicableCodes: [],
       solved: {
@@ -326,15 +347,16 @@ export const SCREEN_FIXTURES = {
   mixedLightLoads112: { loadFactor: 1.12, maxUtilization: 0.994416481403267, governingMemberId: 'col1R', maxInelasticRatio: 1.01035652574291, roofDriftM: 0.00976027367680685 },
   /** uniformS3Tension with loads × 1.12: u_J 1.01035652574291, modelNotApplicable (mass also fails). */
   uniformLoads112: { loadFactor: 1.12, maxInelasticRatio: 1.01035652574291 },
-  /** baseline with E = 20 GPa: LARGE_DRIFT warning. */
-  baselineE20: { elasticModulusPa: 20e9, maxStoreyDriftRatio: 0.0147823751909657 },
-  /** baseline with E = 10 GPa: modelNotApplicable (LARGE_DRIFT). */
-  baselineE10: { elasticModulusPa: 10e9, maxStoreyDriftRatio: 0.0295647503819314 },
+  /** uniform60 with E = 20 GPa: LARGE_DRIFT warning. */
+  uniform60E20: { elasticModulusPa: 20e9, maxStoreyDriftRatio: 0.0147823751909657 },
+  /** uniform60 with E = 10 GPa: modelNotApplicable (LARGE_DRIFT). */
+  uniform60E10: { elasticModulusPa: 10e9, maxStoreyDriftRatio: 0.0295647503819314 },
 } as const
 
 /** Prediction fixtures: |roof drift| ratios (band 0.98/1.02). */
 export const PREDICTION_FIXTURES = [
-  { prev: 'baseline', next: 'reference', ratio: 1.19085727739501, actual: 'increase' },
+  { prev: 'baseline', next: 'reference', ratio: 0.823357342362207, actual: 'decrease' },
+  { prev: 'uniform60', next: 'reference', ratio: 1.19085727739501, actual: 'increase' },
   { prev: 'reference', next: 'bucklingBeam', ratio: 1.01193232101171, actual: 'same' },
   { prev: 'reference', next: 'lightLowerDiagonal', ratio: 1.24871656426668, actual: 'increase' },
   { prev: 'reference', next: 'bruteForce', ratio: 0.284542799471949, actual: 'decrease' },

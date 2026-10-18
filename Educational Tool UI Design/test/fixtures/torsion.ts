@@ -64,7 +64,22 @@ const row = (
 ): TorsionFixture => ({ name, design: shaft(name, section), expected })
 
 export const TORSION_WORKSHEET: readonly TorsionFixture[] = [
-  row('baseline', solid(0.03), {
+  // Challenge v2 baseline (task 59): fails both twist and shear stress, the most checks any
+  // applicable in-range shaft can fail. Values from an independent 40-digit decimal calculation.
+  row('baseline', solid(0.0265), {
+    polarMomentM4: 4.84153850447067e-8,
+    twistRad: 0.0836641680666601,
+    twistDeg: 4.79360372669282,
+    maxShearStressPa: 109469334.904721,
+    massKg: 3.46370800234399,
+    plasticityRatio: 0.754960930377383,
+    status: 'notAccepted',
+    failures: ['twist', 'shearStress'],
+    warningCodes: [],
+    notApplicableCodes: [],
+  }),
+  // The challenge v1 baseline (Ø30 mm solid), kept as a worksheet row.
+  row('solid30', solid(0.03), {
     polarMomentM4: 7.95215640439916e-8,
     twistRad: 0.0509375407801534,
     twistDeg: 2.91850610547831,
@@ -179,8 +194,10 @@ export const TORSION_DERIVED = {
   minSolidDiameterM: 0.0392113,
   /** Mass of that solid (quoted to 0.01 kg) exceeds the 4.5 kg limit, kg. */
   minSolidMassKg: 7.58,
-  /** Prediction fixture: baseline → reference twist ratio (a decrease). */
-  baselineToReferenceTwistRatio: 0.3237534293881777,
+  /** Prediction fixture: v2 baseline (Ø26.5 solid) → reference twist ratio (a decrease). */
+  baselineToReferenceTwistRatio: 0.197111904573477,
+  /** Prediction fixture: Ø30 solid (the v1 baseline) → reference twist ratio (a decrease). */
+  solid30ToReferenceTwistRatio: 0.3237534293881777,
 } as const
 
 /** Thin-wall check (worksheet): 2π r_m³ t / J − 1 for D = 50 mm at t = 4, 2, 1, 0.5 mm. */

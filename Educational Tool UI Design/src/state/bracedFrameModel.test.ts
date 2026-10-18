@@ -42,7 +42,10 @@ const size = (memberId: string, sectionId: string) => edit({ type: 'setMemberSec
 const at = (d: unknown, path: string): Record<string, unknown> =>
   (path === '' ? d : path.split('.').reduce<unknown>((o, k) => (o as Record<string, unknown>)[k], d)) as Record<string, unknown>
 
-/** Baseline (diag1b + diag2b, all 60) → the reference design, by toggles and resizes. */
+/**
+ * Baseline (diag1b + diag2b of CHS48.3, lower columns 48.3, upper columns and beams 88.9) → the
+ * reference design, by toggles and resizes.
+ */
 const toReference: BracedFrameAction[] = [
   toggle('diag1b'),
   toggle('diag2b'),
@@ -50,6 +53,7 @@ const toReference: BracedFrameAction[] = [
   toggle('diag2a'),
   size('col1L', 'CHS48.3x3.2'),
   size('col1R', 'CHS88.9x5.0'),
+  size('col2L', 'CHS60.3x4.0'),
   size('col2R', 'CHS76.1x4.0'),
   size('beam1', 'CHS76.1x4.0'),
   size('beam2', 'CHS76.1x4.0'),
@@ -65,7 +69,7 @@ const toReference: BracedFrameAction[] = [
 function looped(): BracedFrameSession {
   return run(fresh(), [
     ...toReference,
-    { type: 'setPrediction', direction: 'increase', now: T0 },
+    { type: 'setPrediction', direction: 'decrease', now: T0 },
     { type: 'runTest', now: T0, id: 'bf-1' },
     toggle('diag2a'),
     { type: 'runTest', now: T0, id: 'bf-2' },
@@ -89,10 +93,10 @@ describe('braced-frame learning loop through the engine', () => {
     expect(bracedFrameModel.primaryMetric.label).toBe('roof drift')
   })
 
-  it('stores the worksheet baseline, stable but failing utilization only', () => {
+  it('stores the worksheet baseline, stable but failing roof drift, utilization and mass', () => {
     const base = fresh().history[0]!
     expect(base.analysis.status).toBe('solved')
-    expect(base.failures).toEqual(['utilization'])
+    expect(base.failures).toEqual(['roofDrift', 'utilization', 'mass'])
     expect(base.evaluation.status).toBe('notAccepted')
     expect(base.analysis.massKg).toBeCloseTo(worksheetFixture('baseline').expected.massKg, 9)
   })
@@ -106,8 +110,8 @@ describe('braced-frame learning loop through the engine', () => {
     expect(r.predictionOutcome).toEqual({
       metric: 'roofDriftM',
       scorable: true,
-      predicted: 'increase',
-      actual: 'increase',
+      predicted: 'decrease',
+      actual: 'decrease',
       ratio: expect.closeTo(PREDICTION_FIXTURES[0].ratio, 12) as unknown as number,
       matched: true,
     })

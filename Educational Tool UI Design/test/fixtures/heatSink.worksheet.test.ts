@@ -34,9 +34,10 @@ const expectRel = (actual: number, expected: number, what: string, rel = HEAT_SI
   expect(relClose(actual, expected, rel), `${what}: ${actual} vs ${expected}`).toBe(true)
 
 describe('Heat Sink I worksheet (HSK-13)', () => {
-  it('covers all eleven worksheet rows', () => {
+  it('covers all twelve worksheet rows', () => {
     expect(HEAT_SINK_WORKSHEET.map((f) => f.name)).toEqual([
       'baseline',
+      'shortFins',
       'reference',
       'eightFins',
       'thickerFins',
@@ -130,6 +131,20 @@ describe('derived targets', () => {
     expect(classifyRatio(r)).toBe('decrease')
   })
 
+  it('prediction fixture: shortFins → reference rise ratio is a decrease', () => {
+    const prev = run(worksheetFixture('shortFins')).analysis
+    const next = run(worksheetFixture('reference')).analysis
+    const r = (HEAT_SINK_PRIMARY_METRIC.read(next) as number) / (HEAT_SINK_PRIMARY_METRIC.read(prev) as number)
+    expectRel(r, HEAT_SINK_DERIVED.shortFinsToReferenceRiseRatio, 'r')
+    expect(classifyRatio(r)).toBe('decrease')
+  })
+
+  it('the bundled baseline is the worksheet baseline row', () => {
+    const row = worksheetFixture('baseline').design
+    const d = ch.initialDesign
+    expect([d.finCount, d.finThicknessM, d.finHeightM, d.materialId]).toEqual([row.finCount, row.finThicknessM, row.finHeightM, row.materialId])
+  })
+
   it('reference fin parameter, corrected length, root excess and stored profile at 1e-9', () => {
     const a = run(worksheetFixture('reference')).analysis
     expectRel(a.finParameterPerM, HEAT_SINK_DERIVED.referenceFinParameterPerM, 'm')
@@ -147,8 +162,9 @@ describe('derived targets', () => {
     expectRel(a.finProfile[a.finProfile.length - 1].excessRatio, ratio, 'tip')
   })
 
-  it('fin heat share at the baseline and reference', () => {
+  it('fin heat share at the baseline, shortFins and reference', () => {
     expectRel(run(worksheetFixture('baseline')).analysis.finHeatShare, HEAT_SINK_DERIVED.finHeatShare.baseline, 'baseline share')
+    expectRel(run(worksheetFixture('shortFins')).analysis.finHeatShare, HEAT_SINK_DERIVED.finHeatShare.shortFins, 'shortFins share')
     expectRel(run(worksheetFixture('reference')).analysis.finHeatShare, HEAT_SINK_DERIVED.finHeatShare.reference, 'reference share')
   })
 

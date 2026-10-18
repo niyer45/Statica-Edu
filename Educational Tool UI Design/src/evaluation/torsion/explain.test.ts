@@ -16,7 +16,7 @@ function tested(name: string): TorsionComparable {
 
 describe('explainShaftSingle', () => {
   it('gives one utilization fact per numeric constraint, then the model fact', () => {
-    const r = tested('baseline')
+    const r = tested('solid30')
     const facts = r.evaluation.facts
     expect(facts.map((f) => f.id)).toEqual([
       'single.utilization.twist',
@@ -47,8 +47,8 @@ describe('explainShaftSingle', () => {
 })
 
 describe('explainTorsionChange', () => {
-  it('baseline → reference compares J, twist and mass ratios and the pass changes', () => {
-    const prev = tested('baseline')
+  it('solid30 → reference compares J, twist and mass ratios and the pass changes', () => {
+    const prev = tested('solid30')
     const next = tested('reference')
     const facts = explainTorsionChange(prev, next)
     const rJ = next.analysis.polarMomentM4 / prev.analysis.polarMomentM4
@@ -78,8 +78,8 @@ describe('explainTorsionChange', () => {
     expect(facts[3].text).toBe('Angle of twist: fail → pass.')
   })
 
-  it('baseline → tubeEqualMass adds the same-mass fact', () => {
-    const facts = explainTorsionChange(tested('baseline'), tested('tubeEqualMass'))
+  it('solid30 → tubeEqualMass adds the same-mass fact', () => {
+    const facts = explainTorsionChange(tested('solid30'), tested('tubeEqualMass'))
     const same = facts.find((f) => f.id === 'change.sameMass')
     expect(same?.text).toBe(
       "Mass stayed about the same (×1.00) while twist dropped (×0.22): in this model, material moved farther from the shaft's axis.",
@@ -96,7 +96,7 @@ describe('explainTorsionChange', () => {
       'change.constraint.outerDiameter',
       TORSION_MODEL_LIMITS_FACT_ID,
     ])
-    const solids = explainTorsionChange(tested('baseline'), tested('heavySolid')).map((f) => f.id)
+    const solids = explainTorsionChange(tested('solid30'), tested('heavySolid')).map((f) => f.id)
     expect(solids).not.toContain('change.section')
     expect(solids).toEqual([
       'change.torsionalStiffness',

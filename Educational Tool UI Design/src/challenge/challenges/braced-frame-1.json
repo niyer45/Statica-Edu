@@ -1,11 +1,11 @@
 {
   "id": "braced-frame-1",
-  "version": 1,
+  "version": 2,
   "model": { "id": "pinJointedBracedFrame", "version": 1 },
   "title": "Braced Frame I",
   "difficulty": "advanced",
   "allowedModes": ["guided", "parametric"],
-  "statement": "Sideways load pushes on a two-storey steel frame, and some of its members are overloaded. Choose which diagonals brace each storey and size every member so that the frame is stable, its roof drift stays within the limit, no member exceeds its capacity, and the mass stays within budget. The frame geometry, supports, loads and material are fixed. This frame is modeled as pin-jointed: every joint is a hinge, so members carry only tension or compression. Without a diagonal, a storey of this idealized frame cannot resist sideways load. Real frames with welded or bolted joints have some bending resistance that this model ignores.",
+  "statement": "Sideways load pushes on a two-storey steel frame: some of its members are overloaded, its roof drifts too far and it is over its mass budget. Choose which diagonals brace each storey and size every member so that the frame is stable, its roof drift stays within the limit, no member exceeds its capacity, and the mass stays within budget. The frame geometry, supports, loads and material are fixed. This frame is modeled as pin-jointed: every joint is a hinge, so members carry only tension or compression. Without a diagonal, a storey of this idealized frame cannot resist sideways load. Real frames with welded or bolted joints have some bending resistance that this model ignores.",
   "material": {
     "id": "steel-educational",
     "name": "Steel (educational nominal)",
@@ -30,16 +30,16 @@
     "id": "baseline",
     "materialId": "steel-educational",
     "members": {
-      "col1L": { "sectionId": "CHS60.3x4.0" },
-      "col1R": { "sectionId": "CHS60.3x4.0" },
-      "col2L": { "sectionId": "CHS60.3x4.0" },
-      "col2R": { "sectionId": "CHS60.3x4.0" },
-      "beam1": { "sectionId": "CHS60.3x4.0" },
-      "beam2": { "sectionId": "CHS60.3x4.0" },
+      "col1L": { "sectionId": "CHS48.3x3.2" },
+      "col1R": { "sectionId": "CHS48.3x3.2" },
+      "col2L": { "sectionId": "CHS88.9x5.0" },
+      "col2R": { "sectionId": "CHS88.9x5.0" },
+      "beam1": { "sectionId": "CHS88.9x5.0" },
+      "beam2": { "sectionId": "CHS88.9x5.0" },
       "diag1a": { "present": false, "sectionId": "CHS60.3x4.0" },
-      "diag1b": { "present": true, "sectionId": "CHS60.3x4.0" },
+      "diag1b": { "present": true, "sectionId": "CHS48.3x3.2" },
       "diag2a": { "present": false, "sectionId": "CHS60.3x4.0" },
-      "diag2b": { "present": true, "sectionId": "CHS60.3x4.0" }
+      "diag2b": { "present": true, "sectionId": "CHS48.3x3.2" }
     }
   },
   "referenceDesign": {

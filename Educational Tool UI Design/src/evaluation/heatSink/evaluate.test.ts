@@ -93,11 +93,20 @@ describe('evaluateHeatSink', () => {
     expect(Object.isFrozen(e.constraints[0])).toBe(true)
   })
 
-  it('gives the baseline a negative temperature margin and baseTemperature as its only failure', () => {
-    const { e } = run('baseline')
+  it('gives shortFins a negative temperature margin and baseTemperature as its only failure', () => {
+    const { e } = run('shortFins')
     expect(e.failures).toEqual(['baseTemperature'])
     expect(e.efficiency.temperatureMarginK).toBeLessThan(0)
     expect(e.efficiency.massUsage).toBeLessThan(1)
+  })
+
+  it('gives the baseline a negative temperature margin and fails temperature, mass and fin height', () => {
+    const { e } = run('baseline')
+    expect(e.status).toBe('notAccepted')
+    expect(e.failures).toEqual(['baseTemperature', 'mass', 'finHeight'])
+    expect(e.efficiency.temperatureMarginK).toBeLessThan(0)
+    expect(e.efficiency.massUsage).toBeGreaterThan(1)
+    expect(e.efficiency.gapMarginM).toBeGreaterThan(0)
   })
 
   it('gives denseFins a negative gap margin', () => {

@@ -1,7 +1,7 @@
 import fc from 'fast-check'
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { torsionChallenge, worksheetFixture } from '../../test/fixtures/torsion'
+import { TORSION_DERIVED, torsionChallenge, worksheetFixture } from '../../test/fixtures/torsion'
 import { assertProperty } from '../../test/pbt'
 import { bundledChallenge } from '../../test/arbitraries'
 import { scorePredictionByMetric } from '../evaluation/prediction'
@@ -51,10 +51,11 @@ describe('torsion learning loop through the engine', () => {
     expect(modelFor(ch.model)).toBe(torsionModel)
   })
 
-  it('stores the worksheet baseline and fails twist only', () => {
+  it('stores the worksheet baseline and fails twist and shear stress', () => {
     const base = fresh().history[0]!
     expect(base.analysis.twistRad).toBeCloseTo(worksheetFixture('baseline').expected.twistRad, 12)
-    expect(base.failures).toEqual(['twist'])
+    expect(base.analysis.maxShearStressPa).toBeCloseTo(worksheetFixture('baseline').expected.maxShearStressPa, 3)
+    expect(base.failures).toEqual(['twist', 'shearStress'])
     expect(base.evaluation.status).toBe('notAccepted')
   })
 
@@ -65,7 +66,7 @@ describe('torsion learning loop through the engine', () => {
     const s = looped()
     const r = s.history[1]!
     expect(r.accepted).toBe(true)
-    expect(r.predictionOutcome).toEqual({ metric: 'twistRad', scorable: true, predicted: 'decrease', actual: 'decrease', ratio: expect.closeTo(0.3237534293881777, 12) as unknown as number, matched: true })
+    expect(r.predictionOutcome).toEqual({ metric: 'twistRad', scorable: true, predicted: 'decrease', actual: 'decrease', ratio: expect.closeTo(TORSION_DERIVED.baselineToReferenceTwistRatio, 12) as unknown as number, matched: true })
     expect(s.submission).toMatchObject({ testResultId: 'tor-1', status: 'accepted', efficiency: r.evaluation.efficiency })
   })
 
