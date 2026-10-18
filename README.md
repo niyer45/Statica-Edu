@@ -55,7 +55,7 @@ The dotted deformation outline represents the **latest tested design**. Editing 
 | Engineering and student QA | Review plan and pilot materials are prepared. Owner engineering review, manual accessibility/readiness checks and actual student sessions remain open before customer deployment. |
 | Guided / Parametric distinction | Implemented and browser-verified: staged Guided instructions/optional hints versus direct Parametric editing, sharing controls, predictions and results. Owner manual release QA remains open under 44.3. |
 | Multiple challenge workspaces | Implemented: each challenge has its own saved session, mode and history, and My designs attributes each workspace to its challenge |
-| User accounts and saved information | Planned authentication, minimal profile information, owned projects and cross-device resume |
+| User accounts and saved information | Device-only accounts and a Home progress page are implemented (D-50); cloud authentication and cross-device resume are planned |
 | Challenge completion history | Planned per-user, per-challenge progress with explicit completion rules and versioned evidence |
 | Freeform design and advanced physics | Future scoped extensions requiring their own specifications, benchmarks and validation |
 | Optional AI learning assistance | Future coaching capability; deterministic numerical analysis remains authoritative |

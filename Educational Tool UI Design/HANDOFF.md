@@ -2,18 +2,15 @@
 
 Last updated: **2026-10-17** (Claude Code: task 54 3D views complete; next gate 51). Specification batch `ba1dc2d` passed [CI run 39071816823](https://github.com/niyer45/Statica-Edu/actions/runs/39071816823), all steps including the 2 responsive cases and full E2E. 34.1 step 1 adds the model registry with no user-visible change.
 
-## PAUSED 2026-10-18: owner feedback batch (tasks 55, 56, 38, 58, 59, 60) in progress
+## 2026-10-18 owner feedback batch (complete, owner review pending)
 
-Owner requests (2026-10-18): (1) Mounting Bracket I as a real L-bracket; (2) declutter Braced Frame and Vibration pages; (3) accounts + homepage; (4) a real Guided vs Parametric difference; (5) every baseline fails as many checks as possible; (6) Reset-to-baseline buttons. Work paused at owner request before integration verification.
+Owner requests: L-bracket (57, D-46), declutter frame/vibration (56, D-48), accounts + Home (38.0, D-50), a real Guided vs Parametric difference (58, D-49), hardest baselines (59, D-47), Reset to baseline (60). Six parallel agents; integrated on `integrate-55-60` and fast-forwarded to `main`. Verified on the integrated tree: lint 0 errors (10 old warnings), typecheck, 2540 tests/239 files, build, schema no drift, 64/64 E2E desktop + Pixel 7 without retries. CI link is recorded in tasks/HANDOFF on the next docs commit.
 
-- `main` is unchanged apart from 04fa406 (configurable E2E ports `PW_DEV_PORT`/`PW_PREVIEW_PORT`, CI 39135461804 green).
-- Branch `integrate-55-60` (pushed, NOT verified as a whole, NOT on main) merges:
-  - task 55 L-bracket (`boltedLBracket` v1, challenge v2; agent: unit/lint/typecheck/build green; catalog E2E only partly green under host load),
-  - task 59 hardest baselines (beam/torsion/heat sink/frame bumped to v2; vibration already maximal; supersedes MVP Req 3.6/3.7 for the beam on owner instruction; regression test `test/challenges/baselineDifficulty.test.ts`),
-  - task 56 frame/vibration declutter (goal card + disclosures; frame workbench words 585→249, vibration 420→256).
-  Merge conflicts resolved by the lead in `e2e/catalog.spec.ts`, `bracedFrame.test.tsx`, `e2e/bracedFrame.spec.ts`; only typecheck and the frame/vibration unit tests were rerun after merging.
-- Not yet merged (local agent worktree branches): task 60 reset (`worktree-agent-a8b6366b02df77652`), task 58 Guided/Parametric (`worktree-agent-af88bf8e1d5ec93e8`), task 38 local-first accounts/homepage (`worktree-agent-a57218c1431197387`).
-- To resume: merge the three branches into `integrate-55-60`, run lint/typecheck/test/build/schema and the full E2E on a quiet machine, update tasks.md/DECISIONS.md (proposed D-46+ text is in the agent reports in the session transcript), then fast-forward main and watch CI. Accounts are device-local only; real cross-device sync needs an owner backend decision.
+- Content versions: beam, torsion, heat sink, frame and bracket are now version 2 (new `:v2` storage keys; version-1 saves untouched and never re-scored). Bracket is a new model id `boltedLBracket`.
+- `/` is now Home; E2E open the library at `/#challenges`. `PW_DEV_PORT`/`PW_PREVIEW_PORT` select E2E ports (04fa406) so parallel worktrees don't reuse each other's servers.
+- Guided progress is derived from history (no new persisted fields). Unit tests that edit freely enter in Parametric.
+- Not done / known gaps: Guided vs Parametric screenshots not taken; the 2D bracket fallback leaves empty space above the drawing; no password recovery or cross-tab session sync for local accounts; the goal card exists only for frame and vibration. Owner questions are in OWNER_REVIEW_CHECKLIST.md §8.
+- Next: owner review of §8 and the backend decision for 38.1; then 44.3/51 manual checks; then 52 or 36 on owner direction.
 
 ## Repository and local locations
 
