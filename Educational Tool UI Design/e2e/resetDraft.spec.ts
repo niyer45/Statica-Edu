@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, openWorkbench, readState, runAnyTest, tabTo, uprightSection } from './helpers'
+import { audit, openWorkbench, readState, runAnyTest, setDimension, tabTo } from './helpers'
 
 // Task 60 (owner amendment): Reset to baseline starts a challenge over. For each of the six
 // workbenches the learner edits the design, records a test, edits again, then resets through the
@@ -144,7 +144,8 @@ test('Guided: reset returns experiments to step 1 and clears the submission', as
   await openWorkbench(page, true, false, 'Guided')
   const guide = page.getByRole('region', { name: 'Guided experiments' })
   await expect(guide).toContainText(/Step 1 of \d+/)
-  await uprightSection(page)
+  // Step 1 grows the Ø31 mm circle baseline (D-47 amendment).
+  await setDimension(page, 'diameterM', '34')
   await runAnyTest(page)
   await expect(guide).not.toContainText(/Step 1 of \d+/)
   await page.getByRole('button', { name: 'Explain & submit' }).click()
