@@ -47,7 +47,7 @@ The dotted deformation outline represents the **latest tested design**. Editing 
 
 ## In development and planned
 
-**Priority: complete the six challenges already displayed in the library before second editions.** Cantilever Beam I, Torsion Shaft I, Vibration Isolation I, Heat Sink I and Mounting Bracket I work today. Braced Frame I is implemented and integrated, but its card awaits owner-approved activation. Their scoped requirements, proposed models and delivery order (Torsion Shaft → Vibration Isolation → Heat Sink → Mounting Bracket → Braced Frame) are specified in `.kiro/specs/original-catalog/`; none is implemented yet. The shared multi-model architecture (task 45.2) is specified in `.kiro/specs/multi-model-architecture/`; next is task 34.1, implementing its registry and per-challenge integration. See the [catalog roadmap](Educational%20Tool%20UI%20Design/CATALOG_ROADMAP.md).
+**Priority: complete the six challenges already displayed in the library before second editions.** All six original challenges work today: Cantilever Beam I, Mounting Bracket I, Torsion Shaft I, Heat Sink I, Braced Frame I and Vibration Isolation I. Their scoped requirements, proposed models and delivery order (Torsion Shaft → Vibration Isolation → Heat Sink → Mounting Bracket → Braced Frame) are specified in `.kiro/specs/original-catalog/`; none is implemented yet. The shared multi-model architecture (task 45.2) is specified in `.kiro/specs/multi-model-architecture/`; next is task 34.1, implementing its registry and per-challenge integration. See the [catalog roadmap](Educational%20Tool%20UI%20Design/CATALOG_ROADMAP.md).
 
 | Area | Status |
 | --- | --- |
@@ -60,7 +60,7 @@ The dotted deformation outline represents the **latest tested design**. Editing 
 | Freeform design and advanced physics | Future scoped extensions requiring their own specifications, benchmarks and validation |
 | Optional AI learning assistance | Future coaching capability; deterministic numerical analysis remains authoritative |
 
-The Braced Frame I card is still a preview until its activation is approved. Freeform mode is unavailable. Vibration Isolation I uses a steady-state single-degree-of-freedom isolation model (no time simulation), Heat Sink I a steady plate-fin model with a specified effective convection coefficient, and Mounting Bracket I nominal bending with a published shoulder-fillet stress-concentration fit whose coefficients come from cross-checked secondary copies pending printed-edition verification. Each challenge lists its model limits in the app.
+Freeform mode is unavailable. Braced Frame I uses a pin-jointed (truss) idealization of a braced frame; an unbraced storey is reported as an unstable mechanism. Vibration Isolation I uses a steady-state single-degree-of-freedom isolation model (no time simulation), Heat Sink I a steady plate-fin model with a specified effective convection coefficient, and Mounting Bracket I nominal bending with a published shoulder-fillet stress-concentration fit whose coefficients come from cross-checked secondary copies pending printed-edition verification. Each challenge lists its model limits in the app.
 
 ## Model and storage limits
 

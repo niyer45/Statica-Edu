@@ -155,7 +155,7 @@ Sources: [requirements][mb-r] and [design][mb-d]; `mounting-bracket-1.json`; [`s
 - [ ] **Chart rows recorded, not asserted.** The digitized-chart rows at D/d = 3 and ≤ 1.05 are recorded for review only ([design][mb-d] §Alternative-method (c)).
 - [ ] **View.** MBR-18 deferred an optional 3D extrusion to a 46.3 decision. That is now task 54.1 (see §7).
 
-## 6. Braced Frame I (`braced-frame-1`, card 005, workbench merged but card NOT activated)
+## 6. Braced Frame I (`braced-frame-1`, card 005, available since D-44)
 
 Sources: [requirements][bf-r] and [design][bf-d] (§Integration notes, owner questions 1–8); `braced-frame-1.json`; [`src/ui/models/bracedFrame/index.tsx`][bf-ui].
 
