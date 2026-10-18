@@ -147,7 +147,7 @@ test('guest work can move into a new account, and deleting the account removes i
   await referenceDesign(page)
   await runTest(page)
   const work = await readState(page)
-  expect(await storageKeys(page)).toContain(`ei:session:${BEAM}:v2`)
+  expect(await storageKeys(page)).toContain(`ei:session:${BEAM}:v3`)
 
   await navigate(page, 'Home')
   await expect(row(page, 'Cantilever Beam I')).toContainText('In progress')
@@ -160,7 +160,7 @@ test('guest work can move into a new account, and deleting the account removes i
   await expect(row(page, 'Cantilever Beam I')).toContainText('In progress')
   const keys = await storageKeys(page)
   expect(keys.filter((k) => k.startsWith('ei:session:'))).toEqual([])
-  expect(keys.some((k) => /^ei:user:[^:]+:session:cantilever-beam-1:v2$/.test(k))).toBe(true)
+  expect(keys.some((k) => /^ei:user:[^:]+:session:cantilever-beam-1:v3$/.test(k))).toBe(true)
   await page.getByRole('button', { name: 'Continue Cantilever Beam I' }).click()
   expect((await readState(page)).history).toEqual(work.history)
 
