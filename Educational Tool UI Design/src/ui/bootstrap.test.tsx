@@ -85,6 +85,7 @@ describe('bootstrap error page', () => {
     render(<App loaded={loadChallenge(structuredClone(cantileverBeam1Json))} clock={clock} newId={newId} />)
     expect(screen.queryByRole('alert')).toBeNull()
     expect(screen.getAllByRole('button', { name: 'Statica home' }).length).toBeGreaterThan(0)
-    expect(screen.getByRole('heading', { level: 1, name: 'Challenges' })).toBeTruthy()
+    // The app starts on Home (task 38); Challenges is one navigation step away.
+    expect(screen.getByRole('heading', { level: 1, name: 'Welcome to Statica' })).toBeTruthy()
   })
 })

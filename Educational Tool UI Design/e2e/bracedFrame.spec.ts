@@ -78,7 +78,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     if (mode === 'Parametric') {
       await page.addInitScript(() => { Object.defineProperty(window, 'WebGL2RenderingContext', { configurable: true, value: undefined }) })
     }
-    await page.goto('/')
+    await page.goto('/#challenges')
     await openFrame(page, mode, keyboard)
     const initial = await readState(page)
     expect(initial.challengeId).toBe('braced-frame-1')

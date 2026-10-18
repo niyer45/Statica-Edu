@@ -1,18 +1,22 @@
 import { useContext, useEffect, useState } from 'react'
 import { catalog, type CatalogEntry } from '../../challenge/catalog'
 import type { InteractionMode, ModelRef } from '../../challenge/types'
-import { selectTestCount, selectWorkspaceStarted } from '../../state/selectors'
+import { selectProgress, selectTestCount, selectWorkspaceStarted, type ChallengeProgress } from '../../state/selectors'
+import { useAccount } from '../account/AccountContext'
+import AccountPage from '../account/AccountPage'
 import Icon from '../icons/Icon'
 import { useChallenge, useSession, useStore } from '../state/store'
 import { modelUiFor, ModelUiContext, useModelUi } from '../models/registry'
 import Workbench from '../workbench/Workbench'
 import { MODE_LABELS } from '../workbench/WorkbenchChrome'
 import ChallengeDrawer from './ChallengeDrawer'
+import HomePage, { storageStatement, type ProgressRow } from './HomePage'
 import LearningPathsPage from './LearningPathsPage'
 import LibraryPage from './LibraryPage'
 import MyDesignsPage from './MyDesignsPage'
 import NotebookPage from './NotebookPage'
 import ResourceDialog, { ABOUT_TITLE } from './ResourceDialog'
+import { pushRoute, routeFromHash, type AccountView, type Page } from './routes'
 import '../../platform-base.css'
 import '../../platform.css'
 
@@ -31,12 +35,16 @@ import '../../platform.css'
 //   the active challenge's StoreProvider. Other runnable challenges arrive as `others` with a
 //   read-only saved summary; opening one asks the host (CatalogHost) to switch stores. With no
 //   `others` the shell behaves exactly as the single-challenge shell.
+// - Home and accounts (task 38): Home summarizes each runnable challenge's progress and offers
+//   account / guest entry. With `routed`, the page lives in the URL fragment (routes.ts) and the
+//   app starts on Home; without it (isolated tests) the shell starts on Challenges as before.
 
 export const PRODUCT_NAME = 'Statica'
 
-export type Page = 'Challenges' | 'Learning paths' | 'My designs' | 'Notebook'
+export type { Page }
 
 const PAGES: readonly [Page, string][] = [
+  ['Home', 'home'],
   ['Challenges', 'grid'],
   ['Learning paths', 'chart'],
   ['My designs', 'cube'],
@@ -51,7 +59,7 @@ export interface OtherChallenge {
   model: Readonly<ModelRef>
   allowedModes: readonly InteractionMode[]
   /** Saved workspace summary, read without touching the active store. */
-  saved?: { mode: InteractionMode; started: boolean }
+  saved?: { mode: InteractionMode; started: boolean; progress?: ChallengeProgress }
 }
 
 export interface PlatformShellProps {
@@ -67,6 +75,8 @@ export interface PlatformShellProps {
   onSavedChange?: (saved: string[]) => void
   notes?: string
   onNotesChange?: (notes: string) => void
+  /** Keep the page in the URL fragment and start on Home (the app); otherwise start on Challenges. */
+  routed?: boolean
 }
 
 interface Detail {
@@ -88,14 +98,18 @@ export default function PlatformShell({
   onSavedChange,
   notes: notesProp,
   onNotesChange,
+  routed = false,
 }: PlatformShellProps = {}) {
   const { selectMode } = useStore()
   const session = useSession()
   const challenge = useChallenge()
   const activeUi = useModelUi()
   const uiRegistry = useContext(ModelUiContext)
+  const account = useAccount()
 
-  const [page, setPage] = useState<Page>('Challenges')
+  const [route] = useState(() => (routed && typeof window !== 'undefined' ? routeFromHash(window.location.hash) : { page: 'Challenges' as Page, view: 'sign-up' as AccountView }))
+  const [page, setPage] = useState<Page>(route.page === 'Account' && account === null ? 'Home' : route.page)
+  const [accountView, setAccountView] = useState<AccountView>(route.view)
   const [workspace, setWorkspace] = useState(enterOnMount !== undefined)
   const [opened, setOpened] = useState(enterOnMount !== undefined)
   const [detail, setDetail] = useState<Detail | null>(null)
@@ -118,6 +132,23 @@ export default function PlatformShell({
   useEffect(() => {
     if (enterOnMount !== undefined && !selectMode(enterOnMount)) setWorkspace(false)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  // Back/Forward and edited fragments switch pages like the navigation does.
+  useEffect(() => {
+    if (!routed) return
+    const onHash = () => {
+      const next = routeFromHash(window.location.hash)
+      setPage(next.page === 'Account' && account === null ? 'Home' : next.page)
+      setAccountView(next.view)
+      setWorkspace(false)
+      setDetail(null)
+    }
+    window.addEventListener('hashchange', onHash)
+    window.addEventListener('popstate', onHash)
+    return () => {
+      window.removeEventListener('hashchange', onHash)
+      window.removeEventListener('popstate', onHash)
+    }
+  }, [routed, account === null]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const otherFor = (e: CatalogEntry) => (e.available ? others.find((o) => o.challengeId === e.challengeId) : undefined)
   const isActive = (e: CatalogEntry) => e.available && e.challengeId === challenge.id
@@ -128,10 +159,12 @@ export default function PlatformShell({
   const testCount = selectTestCount(session)
   const started = opened || selectWorkspaceStarted(session)
 
-  const go = (p: Page) => {
+  const go = (p: Page, view?: AccountView) => {
     setPage(p)
+    if (view !== undefined) setAccountView(view)
     setWorkspace(false)
     setDetail(null)
+    if (routed) pushRoute(p, p === 'Account' ? (view ?? accountView) : undefined)
   }
 
   /** Opens the loaded challenge in `mode`; rejected modes keep the current mode (Req 35.4). */
@@ -163,13 +196,31 @@ export default function PlatformShell({
     if (!openWorkbench(mode)) setDetail({ ...detail, error: rejectedModeMessage(mode) })
   }
 
+  // Home progress: every runnable challenge, from the live session (active) or its own saved session.
+  const progressRows: ProgressRow[] = entries.filter((e): e is Extract<CatalogEntry, { available: true }> => e.available && isRunnable(e)).map((entry) => {
+    if (isActive(entry)) {
+      const progress = selectProgress(session)
+      return { challengeId: entry.challengeId, title: entry.title, ...progress, onContinue: () => (progress.status === 'notStarted' ? showDetail(entry) : resume()) }
+    }
+    const other = otherFor(entry)!
+    const progress = other.saved?.progress ?? { status: 'notStarted' as const, testsRun: 0 }
+    const savedMode = other.saved?.mode
+    return {
+      challengeId: entry.challengeId,
+      title: entry.title,
+      ...progress,
+      onContinue: () => (progress.status === 'notStarted' || savedMode === undefined ? showDetail(entry) : onOpenOther?.(other.challengeId, savedMode)),
+    }
+  })
+  const pages = account ? [...PAGES, ['Account', 'user'] as [Page, string]] : PAGES
+
   const toggleSaved = (id: string) =>
     setSaved((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]))
 
   return (
     <div className={`platform${workspace ? ' workbench-open' : ''}`}>
       <aside className="platform-sidebar">
-        <button type="button" className="brand" onClick={() => go('Challenges')} aria-label={`${PRODUCT_NAME} home`}>
+        <button type="button" className="brand" onClick={() => go('Home')} aria-label={`${PRODUCT_NAME} home`}>
           <span className="brand-mark">
             <i />
             <i />
@@ -214,22 +265,39 @@ export default function PlatformShell({
             <Icon name="help" />
             <span>Help & resources</span>
           </button>
-          <div className="profile">
-            <div className="avatar">Y</div>
-            <div>
-              Your workspace<span>Explore at your own pace</span>
+          {account ? (
+            <button
+              type="button"
+              className="profile"
+              aria-label={account.user ? `Account: ${account.user.displayName}` : 'Account: guest'}
+              aria-current={page === 'Account' && !workspace ? 'page' : undefined}
+              onClick={() => go('Account', account.user ? undefined : 'sign-in')}
+            >
+              <div className="avatar" aria-hidden="true">{(account.user?.displayName.trim()[0] ?? 'G').toUpperCase()}</div>
+              <div>
+                {account.user ? account.user.displayName : 'Guest'}
+                <span>{account.user ? 'Saved on this device' : 'Sign in or create account'}</span>
+              </div>
+              <Icon name="user" size={14} />
+            </button>
+          ) : (
+            <div className="profile">
+              <div className="avatar">Y</div>
+              <div>
+                Your workspace<span>Explore at your own pace</span>
+              </div>
+              <Icon name="tune" size={14} />
             </div>
-            <Icon name="tune" size={14} />
-          </div>
+          )}
         </div>
       </aside>
       <div className="platform-main">
         <div className="mobile-platform-nav">
-          <button type="button" className="brand" onClick={() => go('Challenges')} aria-label={`${PRODUCT_NAME} home`}>
+          <button type="button" className="brand" onClick={() => go('Home')} aria-label={`${PRODUCT_NAME} home`}>
             statica.
           </button>
           <select aria-label="Navigate workspace" value={page} onChange={(e) => go(e.target.value as Page)}>
-            {PAGES.map(([p]) => (
+            {pages.map(([p]) => (
               <option key={p}>{p}</option>
             ))}
           </select>
@@ -246,16 +314,27 @@ export default function PlatformShell({
                 <span>/</span>
                 <strong>{page}</strong>
               </div>
-              <div className="local-indicator">
+              <div className="local-indicator" title={storageStatement(account)}>
                 <span className="tiny-dot" />
-                Personal learning space <span className="platform-top-divider" />{' '}
+                {account?.user ? `${account.user.displayName} · saved on this device` : account ? 'Guest · saved on this device' : 'Personal learning space'}{' '}
+                <span className="platform-top-divider" />{' '}
                 <button type="button" onClick={() => setResource(ABOUT_TITLE)} aria-label="About your workspace">
                   <Icon name="help" size={16} />
                 </button>
               </div>
             </header>
             <main className="platform-content">
-              {page === 'Challenges' ? (
+              {page === 'Home' ? (
+                <HomePage account={account} rows={progressRows} onBrowse={() => go('Challenges')} onAccount={(view) => go('Account', view)} />
+              ) : page === 'Account' && account ? (
+                <AccountPage
+                  account={account}
+                  view={accountView}
+                  onViewChange={(view) => go('Account', view)}
+                  guestWork={progressRows.filter((r) => r.status !== 'notStarted').map((r) => r.title)}
+                  onBrowse={() => go('Challenges')}
+                />
+              ) : page === 'Challenges' || page === 'Account' ? (
                 <LibraryPage
                   featured={featured}
                   isRunnable={isRunnable}

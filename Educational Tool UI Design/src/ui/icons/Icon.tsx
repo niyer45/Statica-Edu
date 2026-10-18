@@ -7,6 +7,8 @@ export default function Icon({ name, size = 18 }: {
 }) {
   const paths: Record<string, string> = {
     grid: "M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z",
+    home: "M3 11 12 4l9 7M5 10v10h5v-6h4v6h5V10",
+    user: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0",
     book: "M3 4h7l2 2 2-2h7v15h-7l-2 2-2-2H3zM12 6v15",
     arrow: "M5 12h14m-5-5 5 5-5 5",
     back: "m14 6-6 6 6 6",

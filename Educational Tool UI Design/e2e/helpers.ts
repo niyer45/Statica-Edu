@@ -18,7 +18,7 @@ export async function tabTo(page: Page, target: Locator) {
   throw new Error(`Control not reachable by Tab: ${await target.getAttribute('aria-label') ?? await target.textContent()}`)
 }
 export async function openWorkbench(page: Page, navigate = true, keyboard = false) {
-  if (navigate) await page.goto('/')
+  if (navigate) await page.goto('/#challenges')
   const open = page.getByRole('button', { name: /^(Open|Continue) challenge$/ }).first()
   if (keyboard) { await tabTo(page, open); await page.keyboard.press('Enter') }
   else await open.click()

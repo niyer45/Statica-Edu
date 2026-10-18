@@ -7,7 +7,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     if (mode === 'Parametric') {
       await page.addInitScript(() => { Object.defineProperty(window, 'WebGL2RenderingContext', { configurable: true, value: undefined }) })
     }
-    await page.goto('/')
+    await page.goto('/#challenges')
     const view = page.getByRole('button', { name: 'View Cantilever Beam I', exact: true })
     await tabTo(page, view)
     await page.keyboard.press('Enter')

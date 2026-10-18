@@ -1,7 +1,7 @@
 import Icon from '../icons/Icon'
 
 // Help & resources dialog (task 13.5; Req 34.8, 34.9). Names the product "Statica" and
-// describes work as local to this session (no account or cloud sync).
+// describes where work is saved: this browser on this device (no cloud sync; task 38).
 
 export const ABOUT_TITLE = 'About Statica'
 
@@ -36,8 +36,9 @@ export default function ResourceDialog({ title, onClose, onExplore }: ResourceDi
           the available cantilever challenge to inspect, predict, modify, test, compare, and explain.
         </p>
         <p>
-          Preview challenges and freeform tools show how this learning space can grow. They do not yet include validated
-          simulations. All current work is local to this session; no account or cloud sync is required.
+          Freeform tools show how this learning space can grow; they do not yet include validated simulations. Your work
+          is saved in this browser on this device. An optional account keeps each person's progress separate on a
+          shared browser; there is no cloud sync yet, so progress does not move between devices.
         </p>
         <button type="button" className="primary modal-primary" onClick={onExplore}>
           Explore challenges

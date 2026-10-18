@@ -62,7 +62,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
         Object.defineProperty(window, 'WebGL2RenderingContext', { configurable: true, value: undefined })
       })
     }
-    await page.goto('/')
+    await page.goto('/#challenges')
     await openBracket(page, mode, keyboard)
     const initial = await readState(page)
     expect(initial.challengeId).toBe('mounting-bracket-1')

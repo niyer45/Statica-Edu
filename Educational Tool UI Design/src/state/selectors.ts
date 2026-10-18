@@ -48,6 +48,29 @@ export function selectWorkspaceStarted(s: HistoryView<{ id: string; iteration: n
   return selectTestCount(s) > 0 || s.draftStatus === 'draft' || (s.deletedIterationIds?.length ?? 0) > 0 || s.reflectionAnswer.length > 0 || s.submission !== undefined
 }
 
+/** Challenge progress shown on the homepage (task 38). */
+export type ProgressStatus = 'notStarted' | 'inProgress' | 'completed'
+export interface ChallengeProgress {
+  status: ProgressStatus
+  /** Visible non-baseline tests. */
+  testsRun: number
+  /** Status of the recorded submission, if any (a Not accepted submission is not completion). */
+  submission?: string
+}
+
+/**
+ * Not started / in progress / completed from stored session data only. Completed means a recorded
+ * submission whose result was Accepted (submissions are always a tested non-Baseline result with a
+ * nonblank reflection); an unsuccessful submission stays in progress (MILESTONE4 account inputs).
+ */
+export function selectProgress(s: Parameters<typeof selectWorkspaceStarted>[0]): ChallengeProgress {
+  const testsRun = selectTestCount(s)
+  const recorded = s.submission as { status?: unknown } | undefined
+  const submission = typeof recorded?.status === 'string' ? recorded.status : undefined
+  const status: ProgressStatus = submission === 'accepted' ? 'completed' : selectWorkspaceStarted(s) ? 'inProgress' : 'notStarted'
+  return submission === undefined ? { status, testsRun } : { status, testsRun, submission }
+}
+
 /** Iteration number the next Run Test would produce. */
 export function selectNextIteration(s: SessionState): number {
   return selectLatestResult(s).iteration + 1
