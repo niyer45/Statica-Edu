@@ -1,5 +1,11 @@
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
+import { BEAM_GUIDED_PLAN } from '../../evaluation/guided/beam'
+import { BRACED_FRAME_GUIDED_PLAN } from '../../evaluation/guided/bracedFrame'
+import { BRACKET_GUIDED_PLAN } from '../../evaluation/guided/bracket'
+import { HEAT_SINK_GUIDED_PLAN } from '../../evaluation/guided/heatSink'
+import { TORSION_GUIDED_PLAN } from '../../evaluation/guided/torsion'
+import { VIBRATION_GUIDED_PLAN } from '../../evaluation/guided/vibration'
 import { torsionChallenge } from '../../../test/fixtures/torsion'
 import type { TorsionChallenge } from '../../challenge/torsion/types'
 import type { TorsionEfficiency } from '../../evaluation/torsion/types'
@@ -45,9 +51,6 @@ function TestTools() {
 const testUi: ModelUi = {
   copy: {
     tagline: 'Limit twist within stress, mass and packaging limits.',
-    guidedContext: 'Guided shaft context.',
-    parametricContext: 'Parametric shaft context.',
-    parametricLabel: 'Direct shaft diameter editing',
     solverLabel: 'Saint-Venant · Circular shaft torsion',
     limitsNotice: 'Idealized circular-shaft torsion, not a certification',
     drawerAvailable: 'Available with an idealized torsion model.',
@@ -59,14 +62,14 @@ const testUi: ModelUi = {
   ChallengePanel: () => <p>Torsion challenge panel</p>,
   Results: () => <p>Torsion results</p>,
   Help: ({ open }) => (open ? <p>Torsion help</p> : null),
-  guidance: {
+  guided: {
+    params: (d) => ({ section: (d as { section: { kind: string } }).section.kind }),
+    label: () => 'Shaft type',
+    metrics: {},
     steps: [
-      { id: 'inspect', title: 'Inspect', instruction: 'Find the limit the solid shaft misses.', hint: 'Shaft hint.' },
-      { id: 'experiment', title: 'Experiment', instruction: 'Change one diameter.', hint: 'One at a time.' },
-      { id: 'compare', title: 'Compare', instruction: 'Compare twist per kilogram.', hint: 'Mass hint.' },
-      { id: 'explain', title: 'Explain', instruction: 'Explain with tested values.', hint: 'Explain hint.' },
+      { id: 'one', title: 'Shaft experiment', instruction: 'Find the limit the solid shaft misses.', hint: 'Shaft hint.', focus: 'Shaft type', unlocks: ['section'], objective: { kind: 'change', params: ['section'], direction: 'any' } },
+      { id: 'open', title: 'Open', instruction: 'Pass every check.', hint: 'Open hint.', focus: 'All parameters', unlocks: 'all', objective: { kind: 'accepted' } },
     ],
-    experiment: () => undefined,
   },
 }
 
@@ -125,7 +128,7 @@ describe('model UI registry', () => {
   })
 
   it('runs the shared prediction and submission dialogs with the model wording', () => {
-    renderTorsion()
+    renderTorsion('parametric')
     for (const name of ['Use tube', 'OD 50', 'ID 44', 'Run torsion test']) fireEvent.click(screen.getByRole('button', { name }))
     const dialog = screen.getByRole('dialog', { name: 'Predict twist' })
     expect(within(dialog).getByText('Compared with the Baseline, how will twist change?')).toBeTruthy()
@@ -134,10 +137,19 @@ describe('model UI registry', () => {
     expect(screen.getByLabelText('Torsion history').textContent).toBe('2')
   })
 
-  it('shows the model parametric label and no guidance in Parametric mode', () => {
+  it('shows open design and no guided experiments in Parametric mode', () => {
     renderTorsion('parametric')
-    expect(screen.getByText('Direct shaft diameter editing')).toBeTruthy()
+    expect(screen.getByText(/Every parameter is editable from the start/)).toBeTruthy()
     expect(screen.queryByText('Find the limit the solid shaft misses.')).toBeNull()
+  })
+
+  it('gives every production model UI the same guided plan its runtime locks with (task 58)', () => {
+    expect(beamUi.guided).toBe(BEAM_GUIDED_PLAN)
+    expect(torsionUi.guided).toBe(TORSION_GUIDED_PLAN)
+    expect(vibrationUi.guided).toBe(VIBRATION_GUIDED_PLAN)
+    expect(heatSinkUi.guided).toBe(HEAT_SINK_GUIDED_PLAN)
+    expect(bracketUi.guided).toBe(BRACKET_GUIDED_PLAN)
+    expect(bracedFrameUi.guided).toBe(BRACED_FRAME_GUIDED_PLAN)
   })
 
   it('refuses to render a model that has no registered UI', () => {

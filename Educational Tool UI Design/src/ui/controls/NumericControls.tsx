@@ -6,6 +6,8 @@ import type { GeometryError, Orientation } from '../../geometry/sections'
 import { formatMm, mmToM, mToMm, parseMmInput } from '../../units/units'
 import Icon from '../icons/Icon'
 import { useChallenge, useDispatch, useSession } from '../state/store'
+import LockNote from '../workbench/LockNote'
+import { useGuided } from '../workbench/useGuided'
 
 // Numeric controls (task 17.1; Req 2.3, 4.8, 4.9, 7.4, 7.6, 28.1–28.8, 35.2).
 //
@@ -22,7 +24,9 @@ import { useChallenge, useDispatch, useSession } from '../state/store'
 // - Escape restores the draft value and clears the error without dispatching.
 // - Sliders dispatch clamp-mode `setParam` (same as handle drags).
 // - Any accepted draft change (section, orientation, kind) resyncs every field (Req 28.2).
-// - Guided and Parametric show the same fields; locked fields stay read-only in both.
+// - Guided and Parametric show the same fields. Task 58: in Guided, a field the current step does
+//   not unlock is read-only (its slider and the orientation radios disabled) with a visible
+//   reason; Parametric leaves every field editable. Challenge-fixed values stay read-only in both.
 
 export interface NumericControlsProps {
   /** Announces once through the Workbench's single live region. */
@@ -47,6 +51,7 @@ export default function NumericControls({ onAnnounce }: NumericControlsProps) {
   const section = draft.section
   const values = section as unknown as Record<SectionParam, number>
   const fields = handlesFor(section, draft.orientationDeg, challenge.sectionLimits)
+  const guided = useGuided()
 
   // Field text while the student is editing (absent = show the draft value) and inline errors.
   const [texts, setTexts] = useState<Texts>({})
@@ -83,7 +88,7 @@ export default function NumericControls({ onAnnounce }: NumericControlsProps) {
 
   const commit = (param: SectionParam) => {
     const text = texts[param]
-    if (text === undefined) return // untouched: never round the draft to display precision
+    if (text === undefined || guided.locked(param)) return // untouched: never round the draft to display precision
     // Enter then blur on the same rejected text: already reported and announced once.
     if (errors[param] !== undefined && rejected.current[param] === text) return
     rejected.current[param] = text
@@ -114,6 +119,8 @@ export default function NumericControls({ onAnnounce }: NumericControlsProps) {
   }
 
   const round = ROUND_KINDS.has(section.kind)
+  const orientationLocked = !round && guided.locked('orientationDeg')
+  const noOrientation = round || orientationLocked
   const setOrientation = (o: Orientation) => dispatch({ type: 'setOrientation', orientationDeg: o })
 
   return (
@@ -128,6 +135,8 @@ export default function NumericControls({ onAnnounce }: NumericControlsProps) {
         const minMm = mToMm(range.minM)
         const maxMm = mToMm(range.maxM)
         const stepMm = mToMm(range.stepM)
+        const locked = guided.locked(param)
+        const lockId = `${id}-locked`
         return (
           <div className="dimension-field" key={`${section.kind}-${param}`}>
             <label htmlFor={id}>
@@ -143,8 +152,9 @@ export default function NumericControls({ onAnnounce }: NumericControlsProps) {
                 max={maxMm}
                 step={stepMm}
                 value={shown(param)}
+                readOnly={locked}
                 aria-invalid={error !== undefined ? true : undefined}
-                aria-describedby={error !== undefined ? errorId : undefined}
+                aria-describedby={error !== undefined ? errorId : locked ? lockId : undefined}
                 onChange={(e) => {
                   const text = e.target.value
                   setTexts((prev) => ({ ...prev, [param]: text }))
@@ -160,6 +170,7 @@ export default function NumericControls({ onAnnounce }: NumericControlsProps) {
               max={maxMm}
               step={stepMm}
               value={mToMm(values[param])}
+              disabled={locked}
               aria-label={`${label} slider`}
               aria-valuetext={`${formatMm(values[param])} mm`}
               onChange={(e) => {
@@ -169,6 +180,7 @@ export default function NumericControls({ onAnnounce }: NumericControlsProps) {
                 }
               }}
             />
+            {locked && <LockNote id={lockId} reason={guided.lockReason} />}
             {error !== undefined && (
               <p id={errorId} className="col-span-full m-0 text-[9px] leading-snug text-[#a3392b]">
                 {error}
@@ -177,21 +189,21 @@ export default function NumericControls({ onAnnounce }: NumericControlsProps) {
           </div>
         )
       })}
-      <div className="rotate-button" role="radiogroup" aria-labelledby="orientation-label" aria-disabled={round || undefined}>
+      <div className="rotate-button" role="radiogroup" aria-labelledby="orientation-label" aria-disabled={noOrientation || undefined}>
         <Icon name="reset" size={14} />
         <span id="orientation-label" className="ml-0!">
           Section orientation
         </span>
         <span className="flex gap-2">
           {([0, 90] as const).map((o) => (
-            <label key={o} className={`flex items-center gap-1 ${round ? 'opacity-60' : 'cursor-pointer'}`}>
+            <label key={o} className={`flex items-center gap-1 ${noOrientation ? 'opacity-60' : 'cursor-pointer'}`}>
               <input
                 type="radio"
                 name="orientation"
                 value={o}
                 checked={draft.orientationDeg === o}
-                disabled={round}
-                tabIndex={round ? -1 : undefined}
+                disabled={noOrientation}
+                tabIndex={noOrientation ? -1 : undefined}
                 onChange={() => setOrientation(o)}
               />
               {o}°
@@ -199,6 +211,7 @@ export default function NumericControls({ onAnnounce }: NumericControlsProps) {
           ))}
         </span>
       </div>
+      {orientationLocked && <LockNote id="orientation-locked" reason={guided.lockReason} />}
       <LockedFields />
     </>
   )

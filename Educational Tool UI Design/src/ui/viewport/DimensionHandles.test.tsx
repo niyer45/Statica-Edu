@@ -21,7 +21,7 @@ afterEach(async () => {
   root = undefined
   vi.unstubAllGlobals()
 })
-async function setup() {
+async function setup(mode: 'guided' | 'parametric' = 'parametric') {
   vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true)
   const frames = new Map<number, FrameRequestCallback>()
   let next = 0
@@ -34,7 +34,7 @@ async function setup() {
   const renderer = { domElement: canvas, render: vi.fn(), setSize: vi.fn(), setPixelRatio: vi.fn(), getPixelRatio: () => 1, xr: { isPresenting: false, addEventListener: vi.fn(), removeEventListener: vi.fn(), setAnimationLoop: vi.fn() }, shadowMap: { enabled: false } }
   root = createRoot(canvas)
   await root.configure({ gl: renderer as unknown as WebGLRenderer, frameloop: 'never', size: { width: 500, height: 400, top: 0, left: 0 } })
-  const boot = bootstrap(bundledChallengeResult, () => '2026-10-15T00:00:00.000Z', () => 'baseline')
+  const boot = bootstrap(bundledChallengeResult, () => '2026-10-15T00:00:00.000Z', () => 'baseline', mode)
   if (!boot.ok) throw new Error('Invalid session')
   const dragActive = vi.fn()
   const feedback = vi.fn()
@@ -100,5 +100,19 @@ describe('dimension handle/store integration (16.1/16.2)', () => {
     const before = t.handle('heightM').position.toArray()
     await act(async () => dispatch({ type: 'setOrientation', orientationDeg: 90 }))
     expect(t.handle('heightM').position.toArray()).not.toEqual(before)
+  })
+
+  it('shows no handle for a parameter the current Guided step locks (task 58)', async () => {
+    const t = await setup('guided')
+    // Step 1 unlocks the depth: the diameter handle is present.
+    expect(t.handle('diameterM')).toBeTruthy()
+    await act(async () => {
+      dispatch({ type: 'setParam', param: 'diameterM', valueM: 0.04, mode: 'strict' })
+      dispatch({ type: 'setPrediction', direction: 'decrease', now: 't' })
+      dispatch({ type: 'runTest', now: 't', id: 'r1' })
+    })
+    // Step 2 locks every dimension (only the shape is editable): no handles remain.
+    expect(session.history).toHaveLength(2)
+    expect(t.handle('diameterM')).toBeUndefined()
   })
 })

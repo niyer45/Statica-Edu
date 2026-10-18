@@ -50,9 +50,9 @@ function exposedText(node: Node): string {
   return Array.from(node.childNodes).map(exposedText).join('')
 }
 
-/** Visible label plus the visually hidden state text of each stepper item. */
+/** Visible label plus the visually hidden state text of each Guided experiment step. */
 function stepTexts() {
-  return within(screen.getByRole('list', { name: 'Workflow' }))
+  return within(screen.getByRole('list', { name: 'Experiment steps' }))
     .getAllByRole('listitem')
     .map(exposedText)
 }
@@ -130,50 +130,36 @@ describe('Workbench layout', () => {
     expect(document.querySelector('.modal')).not.toBeNull()
   })
 
-  it('shows stepper states as text (Req 35.5)', () => {
+  it('shows Guided experiment step states as text (Req 35.5, task 58)', () => {
     const { session } = bootSession()
     const baseline = session.history[0]
     if (baseline === undefined) throw new Error('baseline missing')
 
-    // Baseline only: Inspect complete, Modify & predict current.
+    // Baseline only: the first experiment is current, the rest locked.
     const { unmount } = renderWorkbench(session)
     expect(stepTexts()).toEqual([
-      'Inspect, complete',
-      'Modify & predict, current step',
-      'Test & compare, not started',
-      'Explain & submit, not started',
+      '1. Make it deeper, current step',
+      '2. Try another shape, locked',
+      '3. Tune one dimension, locked',
+      '4. Meet every check, locked',
     ])
-    expect(screen.getByRole('listitem', { current: 'step' }).textContent).toContain('Modify & predict')
+    expect(screen.getByRole('listitem', { current: 'step' }).textContent).toContain('Make it deeper')
     unmount()
 
-    // One non-baseline Test_Result: Test & compare complete, Explain & submit current.
+    // A stored test that increased only the depth completes the first step.
+    const deeper = { ...baseline.designSnapshot, section: { kind: 'circle' as const, diameterM: 0.04 } }
     const tested: SessionState = {
       ...session,
-      history: [...session.history, { ...baseline, id: 'run-1', iteration: 1 }],
+      history: [...session.history, { ...baseline, id: 'run-1', iteration: 1, designSnapshot: deeper }],
     }
-    const second = renderWorkbench(tested)
+    renderWorkbench(tested)
     expect(stepTexts()).toEqual([
-      'Inspect, complete',
-      'Modify & predict, complete',
-      'Test & compare, complete',
-      'Explain & submit, current step',
+      '1. Make it deeper, complete',
+      '2. Try another shape, current step',
+      '3. Tune one dimension, locked',
+      '4. Meet every check, locked',
     ])
-    second.unmount()
-
-    // Submission recorded: every step complete, none current.
-    const submitted: SessionState = {
-      ...tested,
-      submission: {
-        testResultId: 'run-1',
-        status: baseline.evaluation.status,
-        reflection: 'Taller section',
-        efficiency: baseline.evaluation.efficiency,
-        submittedAt: clock(),
-      },
-    }
-    renderWorkbench(submitted)
-    expect(stepTexts().every((t) => t?.endsWith(', complete'))).toBe(true)
-    expect(screen.queryByRole('listitem', { current: 'step' })).toBeNull()
+    expect(screen.getByRole('listitem', { current: 'step' }).textContent).toContain('Try another shape')
   })
 
   it('always shows the model-limits notice in the footer (Req 29.7)', () => {

@@ -10,7 +10,7 @@ it('announces section, recorded test and restore once per event without moving f
   const announce = vi.fn()
   let store: Store
   function Probe() { store = useStore(); useAnnouncements(announce); return <button>Focused</button> }
-  const view = render(<StoreProvider challenge={bundledChallenge()} initialSession={createHarness(bundledChallenge()).real.state}><Probe /></StoreProvider>)
+  const view = render(<StoreProvider challenge={bundledChallenge()} initialSession={{ ...createHarness(bundledChallenge()).real.state, mode: 'parametric' }}><Probe /></StoreProvider>)
   const button = view.getByRole('button'); button.focus()
   act(() => store!.dispatch({ type: 'applySection', kind: 'iSection' }))
   expect(announce).toHaveBeenLastCalledWith('Section applied: I-section.')
@@ -20,4 +20,16 @@ it('announces section, recorded test and restore once per event without moving f
   act(() => store!.dispatch({ type: 'restore', testResultId: 'model:baseline' }))
   expect(announce).toHaveBeenLastCalledWith('Restored Baseline.')
   expect(announce).toHaveBeenCalledTimes(3)
+})
+
+it('adds Guided step completion to the test announcement (task 58)', () => {
+  const announce = vi.fn()
+  let store: Store
+  function Probe() { store = useStore(); useAnnouncements(announce); return null }
+  render(<StoreProvider challenge={bundledChallenge()} initialSession={{ ...createHarness(bundledChallenge()).real.state, mode: 'guided' }}><Probe /></StoreProvider>)
+  act(() => store!.dispatch({ type: 'applySection', kind: 'iSection' }))
+  expect(announce).toHaveBeenLastCalledWith('Section shape is locked in this Guided step. Editable now: Depth (diameter or height).')
+  act(() => store!.dispatch({ type: 'setParam', param: 'diameterM', valueM: 0.04, mode: 'strict' }))
+  act(() => { store!.dispatch({ type: 'setPrediction', direction: 'decrease', now: 't' }); store!.runTest() })
+  expect(announce.mock.lastCall![0]).toMatch(/^Test 1: .*failed constraints\. Guided step 1 complete: Make it deeper\. Next: Try another shape\.$/)
 })

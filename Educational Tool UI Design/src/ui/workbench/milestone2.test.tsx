@@ -29,7 +29,8 @@ describe('Milestone 2 component gate', () => {
     vi.stubGlobal('WebGL2RenderingContext', undefined)
     const boot = bootstrap(bundledChallengeResult, () => '2026-10-15T00:00:00.000Z', () => 'baseline')
     if (!boot.ok) throw new Error(boot.error.message)
-    render(<StoreProvider challenge={boot.value.challenge} initialSession={boot.value.session}>
+    // Free editing of every parameter: Parametric (Guided locks parameters by step, task 58).
+    render(<StoreProvider challenge={boot.value.challenge} initialSession={{ ...boot.value.session, mode: 'parametric' }}>
       <Workbench onExit={() => {}} /><Probe />
     </StoreProvider>)
     await screen.findByRole('img', { name: '2D section view' }, { timeout: 5000 })

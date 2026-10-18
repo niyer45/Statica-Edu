@@ -4,17 +4,25 @@ import type { SectionKind } from '../../challenge/types'
 import Icon from '../icons/Icon'
 import SectionIcon from '../icons/SectionIcon'
 import { useChallenge, useDispatch, useSession } from '../state/store'
+import LockNote from '../workbench/LockNote'
+import { useGuided } from '../workbench/useGuided'
 import { SECTION_DRAG_MIME } from './useSectionDrop'
 
 // Section_Palette (task 15.1; Req 26.1, 26.4–26.6, 26.8, 32.1): the template `design-panel`
 // `.shape-grid`. One tile per allowedSections entry, in order. Click, Enter/Space, and drop onto
 // the viewport all dispatch `applySection`, which replaces the draft section via convertSection.
+// Task 58: while a Guided step locks the section shape, tiles are aria-disabled, inert and not
+// draggable, with a visible reason (a viewport drop is still rejected by the runtime lock).
 
 export default function SectionPalette() {
   const challenge = useChallenge()
   const dispatch = useDispatch()
   const active = useSession().draft.section.kind
-  const apply = (kind: SectionKind) => dispatch({ type: 'applySection', kind })
+  const guided = useGuided()
+  const locked = guided.locked('section')
+  const apply = (kind: SectionKind) => {
+    if (!locked) dispatch({ type: 'applySection', kind })
+  }
 
   const onKeyDown = (kind: SectionKind) => (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key !== 'Enter' && e.key !== ' ') return
@@ -39,9 +47,11 @@ export default function SectionPalette() {
               key={kind}
               role="button"
               tabIndex={0}
-              draggable
+              draggable={!locked}
               aria-pressed={isActive}
-              className={`shape-tile ${isActive ? 'selected' : ''}`}
+              aria-disabled={locked || undefined}
+              aria-describedby={locked ? 'section-locked' : undefined}
+              className={`shape-tile ${isActive ? 'selected' : ''} ${locked ? 'locked' : ''}`}
               onClick={() => apply(kind)}
               onKeyDown={onKeyDown(kind)}
               onDragStart={onDragStart(kind)}
@@ -60,10 +70,14 @@ export default function SectionPalette() {
           )
         })}
       </div>
-      <div className="drag-caption">
-        <Icon name="cube" size={12} />
-        Click to apply, or drag onto the beam
-      </div>
+      {locked ? (
+        <LockNote id="section-locked" reason={guided.lockReason} />
+      ) : (
+        <div className="drag-caption">
+          <Icon name="cube" size={12} />
+          Click to apply, or drag onto the beam
+        </div>
+      )}
     </>
   )
 }

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { handlesFor, type HandleDescriptor } from '../../geometry/handles'
 import type { SectionParam } from '../../geometry/params'
 import { useChallenge, useDispatch, useSession } from '../state/store'
+import { useGuided } from '../workbench/useGuided'
 import { createFrameQueue, dragLimit, parameterDeltaScale, projectToAxis } from './handleDrag'
 import { localToGlobalYZ, type Vec3 } from './sceneLayout'
 
@@ -86,7 +87,9 @@ export default function DimensionHandles({ onDragActive, onFeedback }: Dimension
       finishRef.current()
     }
   }, [session.draft.section.kind, session.draft.orientationDeg])
-  const handles = handlesFor(session.draft.section, session.draft.orientationDeg, ch.sectionLimits)
+  // Task 58: no handle for a parameter the current Guided step locks.
+  const guided = useGuided()
+  const handles = handlesFor(session.draft.section, session.draft.orientationDeg, ch.sectionLimits).filter((h) => !guided.locked(h.param))
   const position = (h: HandleDescriptor): Vec3 => {
     const { y, z } = localToGlobalYZ(h.anchorM.u, h.anchorM.v, session.draft.orientationDeg)
     return [session.draft.lengthM + 0.004, y, z]

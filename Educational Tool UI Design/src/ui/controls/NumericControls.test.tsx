@@ -24,7 +24,7 @@ function Probe() {
 }
 
 function setup() {
-  const boot = bootstrap(bundledChallengeResult, clock, newId)
+  const boot = bootstrap(bundledChallengeResult, clock, newId, 'parametric')
   if (!boot.ok) throw new Error(boot.error.message)
   const onAnnounce = vi.fn()
   render(

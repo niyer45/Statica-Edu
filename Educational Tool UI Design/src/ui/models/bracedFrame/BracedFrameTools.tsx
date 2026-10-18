@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react'
-import { FRAME_MEMBER_IDS, isDiagonalId, STOREY_DIAGONALS, type FrameJointId, type FrameMemberId } from '../../../geometry/bracedFrame/template'
+import { DIAGONAL_IDS, FRAME_MEMBER_IDS, isDiagonalId, STOREY_DIAGONALS, type FrameJointId, type FrameMemberId } from '../../../geometry/bracedFrame/template'
 import Icon from '../../icons/Icon'
+import LockNote from '../../workbench/LockNote'
+import { useGuided } from '../../workbench/useGuided'
 import { diagonalToggleName, formatKn, memberName, useFrameStore } from './shared'
 
 // Braced frame design tools (task 49.3; BFR-04, BFR-16, MM-22, MODE-04). Four diagonal toggles
@@ -9,6 +11,8 @@ import { diagonalToggleName, formatKn, memberName, useFrameStore } from './share
 // (toggleDiagonal / setMemberSection); a rejected edit keeps the draft and its reason is
 // announced once. Fixed values (geometry, supports, loads, material) stay read-only in a
 // collapsed disclosure. An absent diagonal keeps its section choice for when it is re-enabled.
+// Task 58: in Guided, controls the current step does not unlock are read-only or disabled
+// with a visible reason; Parametric leaves every control editable.
 
 const JOINT_NAMES: Readonly<Record<FrameJointId, string>> = {
   j1: 'left base',
@@ -30,6 +34,9 @@ function loadText(fxN: number, fyN: number): string {
 export default function BracedFrameTools({ onAnnounce }: { onAnnounce: (message: string) => void }) {
   const { state, challenge: ch, dispatch } = useFrameStore()
   const members = state.draft.members
+  const guided = useGuided()
+  const bracingLocked = DIAGONAL_IDS.every((id) => guided.locked(`${id}.present`))
+  const sectionsLocked = FRAME_MEMBER_IDS.every((id) => guided.locked(`${id}.section`))
   const pending = useRef(false)
   useEffect(() => {
     if (!pending.current) return
@@ -38,10 +45,12 @@ export default function BracedFrameTools({ onAnnounce }: { onAnnounce: (message:
   }, [state.draftErrors, onAnnounce])
 
   const toggle = (memberId: string) => {
+    if (guided.locked(`${memberId}.present`)) return
     pending.current = true
     dispatch({ type: 'edit', edit: { type: 'toggleDiagonal', memberId } })
   }
   const setSection = (memberId: FrameMemberId, sectionId: string) => {
+    if (guided.locked(`${memberId}.section`)) return
     pending.current = true
     dispatch({ type: 'edit', edit: { type: 'setMemberSection', memberId, sectionId } })
   }
@@ -51,7 +60,7 @@ export default function BracedFrameTools({ onAnnounce }: { onAnnounce: (message:
       <div className="section-heading">
         BRACING <span>01</span>
       </div>
-      <div className="frame-toggles" role="group" aria-label="Diagonal bracing">
+      <div className="frame-toggles" role="group" aria-label="Diagonal bracing" aria-describedby={bracingLocked ? 'frame-bracing-locked' : undefined}>
         {([2, 1] as const).map((storey) => (
           <div className="frame-storey" key={storey}>
             <p className="frame-storey-title">
@@ -60,7 +69,7 @@ export default function BracedFrameTools({ onAnnounce }: { onAnnounce: (message:
             {STOREY_DIAGONALS[storey].map((id) => {
               const present = members[id].present
               return (
-                <button key={id} type="button" className={`frame-toggle ${present ? 'on' : ''}`} aria-pressed={present} onClick={() => toggle(id)}>
+                <button key={id} type="button" className={`frame-toggle ${present ? 'on' : ''}`} aria-pressed={present} disabled={guided.locked(`${id}.present`)} onClick={() => toggle(id)}>
                   <span>{diagonalToggleName(id)}</span>
                   <small aria-hidden="true">{present ? '✓ Present' : 'Not present'}</small>
                 </button>
@@ -69,9 +78,11 @@ export default function BracedFrameTools({ onAnnounce }: { onAnnounce: (message:
           </div>
         ))}
       </div>
+      {bracingLocked && <LockNote id="frame-bracing-locked" reason={guided.lockReason} />}
       <div className="section-heading dimensions-heading">
         MEMBER SECTIONS <span>02</span>
       </div>
+      {sectionsLocked && <LockNote id="frame-sections-locked" reason={guided.lockReason} />}
       <div className="frame-sections">
         {FRAME_MEMBER_IDS.map((id) => {
           const selectId = `frame-section-${id}`
@@ -82,7 +93,13 @@ export default function BracedFrameTools({ onAnnounce }: { onAnnounce: (message:
                 {memberName(id)}
                 {absent && <small> (not present; choice kept)</small>}
               </label>
-              <select id={selectId} value={members[id].sectionId} onChange={(e) => setSection(id, e.target.value)}>
+              <select
+                id={selectId}
+                value={members[id].sectionId}
+                disabled={guided.locked(`${id}.section`)}
+                aria-describedby={guided.locked(`${id}.section`) ? 'frame-sections-locked' : undefined}
+                onChange={(e) => setSection(id, e.target.value)}
+              >
                 {ch.sections.map((s) => (
                   <option key={s.id} value={s.id}>
                     {s.label}

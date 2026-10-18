@@ -4,6 +4,7 @@ import { bundledChallenge } from '../../../test/arbitraries'
 import { createHarness } from '../../../test/state/model'
 import { reference, tinyCircle, wideI } from '../../../test/fixtures/designs'
 import { sessionReducer } from '../../state/reducer'
+import type { SessionState } from '../../state/session'
 import { exportDesign } from '../../state/importExport'
 import StoreProvider from '../state/StoreProvider'
 import { useStore, type Store } from '../state/store'
@@ -12,7 +13,7 @@ import PredictionDialog from '../dialogs/PredictionDialog'
 const ch = bundledChallenge()
 afterEach(cleanup)
 function mount(design?: typeof reference.design, details = true) {
-  let s = createHarness(ch).real.state
+  let s: SessionState = { ...createHarness(ch).real.state, mode: 'parametric' }
   if (design) {
     s = sessionReducer(s, { type: 'importDesign', json: exportDesign(design, ch) }, ch)
     s = sessionReducer(s, { type: 'setPrediction', direction: 'decrease', now: 'p' }, ch)

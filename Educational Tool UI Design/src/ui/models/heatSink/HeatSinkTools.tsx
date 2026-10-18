@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { heatSinkPermissibleRange } from '../../../geometry/heatSink/edit'
 import { formatMm, mmToM, mToMm, parseMmInput } from '../../../units/units'
 import Icon from '../../icons/Icon'
+import LockNote from '../../workbench/LockNote'
+import { useGuided } from '../../workbench/useGuided'
 import { FIN_PARAM_LABELS, formatCelsius, formatLength, useHeatSinkStore } from './shared'
 
 // Heat sink design tools (task 48.3; HSK-03, HSK-04, HSK-14, MODE-04, MODE-07). An integer fin
@@ -11,6 +13,8 @@ import { FIN_PARAM_LABELS, formatCelsius, formatLength, useHeatSinkStore } from 
 // sliders dispatch clamp edits (snapped to the grid by the model). The reducer's verdict returns
 // through `draftErrors`; a rejection keeps the draft and shows an inline error announced once.
 // Fixed values stay read-only in a collapsed disclosure.
+// Task 58: in Guided, controls the current step does not unlock are read-only or disabled
+// with a visible reason; Parametric leaves every control editable.
 
 type Param = 'finCount' | 'finThicknessM' | 'finHeightM'
 const LENGTH_PARAMS = ['finThicknessM', 'finHeightM'] as const
@@ -18,6 +22,7 @@ const LENGTH_PARAMS = ['finThicknessM', 'finHeightM'] as const
 export default function HeatSinkTools({ onAnnounce }: { onAnnounce: (message: string) => void }) {
   const { state, challenge: ch, dispatch } = useHeatSinkStore()
   const draft = state.draft
+  const guided = useGuided()
   const [texts, setTexts] = useState<Partial<Record<Param, string>>>({})
   const [errors, setErrors] = useState<Partial<Record<Param, string>>>({})
   const [synced, setSynced] = useState(state.draft)
@@ -40,6 +45,7 @@ export default function HeatSinkTools({ onAnnounce }: { onAnnounce: (message: st
 
   /** Strict edit; the model validates integrality, range, step and the geometric gap. */
   const strict = (param: Param, value: number) => {
+    if (guided.locked(param)) return
     pending.current = param
     dispatch({ type: 'edit', edit: { type: 'setParam', param, value, mode: 'strict' } })
   }
@@ -67,17 +73,21 @@ export default function HeatSinkTools({ onAnnounce }: { onAnnounce: (message: st
   const field = (param: Param, shown: string, unit: string) => {
     const id = `fins-${param}`
     const error = errors[param]
+    const locked = guided.locked(param)
     return {
       id,
       error,
+      locked,
+      note: locked && <LockNote id={`${id}-locked`} reason={guided.lockReason} />,
       input: (
         <div className="number-field">
           <input
             id={id}
             inputMode={param === 'finCount' ? 'numeric' : 'decimal'}
             value={texts[param] ?? shown}
+            readOnly={locked}
             aria-invalid={error !== undefined}
-            aria-describedby={error ? `${id}-error` : undefined}
+            aria-describedby={error ? `${id}-error` : locked ? `${id}-locked` : undefined}
             onChange={(e) => setTexts((prev) => ({ ...prev, [param]: e.target.value }))}
             onBlur={() => commit(param)}
             onKeyDown={keys(param)}
@@ -105,13 +115,14 @@ export default function HeatSinkTools({ onAnnounce }: { onAnnounce: (message: st
         <label htmlFor={count.id}>{FIN_PARAM_LABELS.finCount}</label>
         {count.input}
         <div className="fin-stepper">
-          <button type="button" onClick={() => strict('finCount', draft.finCount - 1)}>
+          <button type="button" disabled={count.locked} onClick={() => strict('finCount', draft.finCount - 1)}>
             Remove a fin
           </button>
-          <button type="button" onClick={() => strict('finCount', draft.finCount + 1)}>
+          <button type="button" disabled={count.locked} onClick={() => strict('finCount', draft.finCount + 1)}>
             Add a fin
           </button>
         </div>
+        {count.note}
         {errorText(count.id, count.error)}
       </div>
       <div className="section-heading dimensions-heading">DIMENSIONS</div>
@@ -129,8 +140,10 @@ export default function HeatSinkTools({ onAnnounce }: { onAnnounce: (message: st
               max={mToMm(range.max)}
               step={mToMm(ch.designLimits[param].stepM)}
               value={mToMm(draft[param])}
+              disabled={f.locked}
               onChange={(e) => dispatch({ type: 'edit', edit: { type: 'setParam', param, value: mmToM(Number(e.target.value)), mode: 'clamp' } })}
             />
+            {f.note}
             {errorText(f.id, f.error)}
           </div>
         )

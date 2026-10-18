@@ -82,7 +82,7 @@ describe('StoreProvider', () => {
   })
 
   it('dispatches reducer actions', () => {
-    const { store } = setup()
+    const { store } = setup('parametric')
     const orientation = store().state.draft.orientationDeg === 0 ? 90 : 0
     act(() => store().dispatch({ type: 'setOrientation', orientationDeg: orientation }))
     expect(store().state.draft.orientationDeg).toBe(orientation)

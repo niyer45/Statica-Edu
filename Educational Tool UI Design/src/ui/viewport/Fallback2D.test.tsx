@@ -36,7 +36,7 @@ function Probe() {
   </>
 }
 function setup(children: ReactNode, tiny = false) {
-  const initial = initSession(tiny ? { ...ch, initialDesign: tinyCircle.design } : ch, '2026-10-15T00:00:00.000Z', 'baseline')
+  const initial = initSession(tiny ? { ...ch, initialDesign: tinyCircle.design } : ch, '2026-10-15T00:00:00.000Z', 'baseline', 'parametric')
   if (!initial.ok) throw new Error('Invalid initial session')
   return render(<StoreProvider challenge={ch} initialSession={initial.value}><Probe />{children}</StoreProvider>)
 }

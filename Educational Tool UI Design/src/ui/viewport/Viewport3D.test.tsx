@@ -40,7 +40,7 @@ function Probe() {
   )
 }
 function setup() {
-  const boot = bootstrap(bundledChallengeResult, clock, () => 'baseline')
+  const boot = bootstrap(bundledChallengeResult, clock, () => 'baseline', 'parametric')
   if (!boot.ok) throw new Error(boot.error.message)
   return render(
     <StoreProvider

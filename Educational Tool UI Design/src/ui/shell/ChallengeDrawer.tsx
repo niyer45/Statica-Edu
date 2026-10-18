@@ -2,7 +2,7 @@ import type { CatalogEntry } from '../../challenge/catalog'
 import { DIFFICULTY_LABELS } from '../../challenge/catalog'
 import type { InteractionMode } from '../../challenge/types'
 import Icon from '../icons/Icon'
-import { MODE_LABELS } from '../workbench/WorkbenchChrome'
+import { MODE_LABELS, MODE_SENTENCES } from '../workbench/WorkbenchChrome'
 import TechnicalArt from './TechnicalArt'
 
 // Challenge detail drawer with the design-mode cards (task 13.5; Req 34.2–34.4, 35.4).
@@ -25,14 +25,14 @@ export const MODE_INFO: readonly ModeInfo[] = [
   {
     mode: 'guided',
     icon: 'tune',
-    summary: 'Explore designs with step-by-step guidance.',
-    detail: 'Step-by-step instructions, hints and suggested experiments',
+    summary: 'Structured experiments: change one variable per step, then design freely.',
+    detail: MODE_SENTENCES.guided,
   },
   {
     mode: 'parametric',
     icon: 'cube',
-    summary: 'Edit sections and dimensions directly, with less guidance.',
-    detail: 'Direct section and dimension editing with shared test results',
+    summary: 'Open design: every parameter editable from the start.',
+    detail: MODE_SENTENCES.parametric,
   },
   {
     mode: 'freeform',

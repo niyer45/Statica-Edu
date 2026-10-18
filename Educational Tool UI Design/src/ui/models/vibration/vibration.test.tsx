@@ -24,7 +24,8 @@ function memory() {
   return { values, storage }
 }
 
-function renderMount(mode: 'guided' | 'parametric' = 'guided', storage?: SessionStorage) {
+// Default Parametric: free editing. Guided locks parameters by step (task 58); see the mode test.
+function renderMount(mode: 'guided' | 'parametric' = 'parametric', storage?: SessionStorage) {
   const init = vibrationRuntime.init(ch, clock(), 'base', mode)
   if (!init.ok) throw new Error('vibration challenge must initialize')
   return render(
@@ -160,20 +161,27 @@ describe('Vibration Isolation I workbench', () => {
     expect(within(dialog).getByText(/not a simulation of motion over time/)).toBeTruthy()
   })
 
-  it('Guided shows the staged steps without revealing the reference design', () => {
-    renderMount()
-    expect(screen.getByRole('region', { name: 'Guided instructions' })).toBeTruthy()
-    for (const step of vibrationUi.guidance.steps) {
+  it('Guided shows structured experiments without revealing the reference design', () => {
+    renderMount('guided')
+    expect(within(screen.getByRole('region', { name: 'Guided experiments' })).getByRole('heading', { name: 'Soften the mount' })).toBeTruthy()
+    for (const step of vibrationUi.guided.steps) {
       const text = `${step.instruction} ${step.hint}`
       expect(text).not.toMatch(/\d/)
       expect(text).not.toMatch(/neoprene|butyl/i)
     }
   })
 
-  it('Parametric omits guidance and shows the direct-edit label', () => {
+  it('Guided locks the material until its step; Parametric is open design (task 58)', () => {
+    renderMount('guided')
+    expect((screen.getByLabelText('Stiffness') as HTMLInputElement).readOnly).toBe(false)
+    const neoprene = screen.getByRole('radio', { name: /Neoprene/ }) as HTMLInputElement
+    expect(neoprene.disabled).toBe(true)
+    expect(screen.getByText('Locked in this step. Editable now: Stiffness.')).toBeTruthy()
+    cleanup()
     renderMount('parametric')
-    expect(screen.getByText('Direct mount stiffness and material editing')).toBeTruthy()
-    expect(screen.queryByRole('region', { name: 'Guided instructions' })).toBeNull()
+    expect(screen.queryByRole('region', { name: 'Guided experiments' })).toBeNull()
+    expect(screen.getByText(/Every parameter is editable from the start/)).toBeTruthy()
+    expect((screen.getByRole('radio', { name: /Neoprene/ }) as HTMLInputElement).disabled).toBe(false)
   })
 
   it('labels the stored submission margins', () => {
@@ -186,12 +194,12 @@ describe('Vibration Isolation I workbench', () => {
 
   it('persists the tested workspace under its own key in the v2 envelope', () => {
     const { values, storage } = memory()
-    renderMount('guided', storage)
+    renderMount('parametric', storage)
     testReference()
     const saved = JSON.parse(values.get('ei:session:vibration-isolation-1:v1')!)
     expect(saved).toMatchObject({ schemaVersion: 2, model: { id: 'sdofBaseIsolation', version: 1 } })
     cleanup()
-    renderMount('guided', storage)
+    renderMount('parametric', storage)
     expect(screen.getByRole('button', { name: /^Iteration 1/ })).toBeTruthy()
     expect(within(screen.getByRole('list', { name: 'Design requirements' })).getByText('0.0929')).toBeTruthy()
   })

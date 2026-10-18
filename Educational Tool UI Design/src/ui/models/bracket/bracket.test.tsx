@@ -2,11 +2,12 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { bracket, bracketChallenge } from '../../../../test/fixtures/bracket'
 import { bracketModel, bracketReducer, type BracketAction, type BracketSession } from '../../../state/bracketModel'
-import { bracketRuntime, type LoopSession, type ModelRuntime } from '../../../state/runtimes'
+import { bracketRuntime, type ModelRuntime } from '../../../state/runtimes'
 import type { SessionStorage } from '../../../state/persistence'
 import StoreProvider from '../../state/StoreProvider'
 import Workbench from '../../workbench/Workbench'
 import { modelUiFor } from '../registry'
+import { BRACKET_PARAM_LABELS } from '../../../geometry/bracket/validate'
 import { bracketUi, BRACKET_LIMITS_NOTICE } from '.'
 import { STRIP_LABEL } from './BracketDetails'
 import { ELEVATION_LABEL } from './BracketElevation'
@@ -36,7 +37,8 @@ function memory() {
   return { values, storage }
 }
 
-function renderBracket(mode: 'guided' | 'parametric' = 'guided', storage?: SessionStorage) {
+// Default Parametric: free editing. Guided locks parameters by step (task 58); see the mode test.
+function renderBracket(mode: 'guided' | 'parametric' = 'parametric', storage?: SessionStorage) {
   const init = bracketRuntime.init(ch, clock(), 'base', mode)
   if (!init.ok) throw new Error('bracket challenge must initialize')
   return render(
@@ -206,28 +208,36 @@ describe('Mounting Bracket I workbench', () => {
     expect(within(dialog).getByText(/not a\s+real-world approval/)).toBeTruthy()
   })
 
-  it('Parametric omits guidance and shows the direct-edit label', () => {
+  it('Guided locks every dimension but the step one; Parametric is open design (task 58)', () => {
+    renderBracket('guided')
+    const step = bracketUi.guided.steps[0]!
+    const unlocked = step.unlocks as readonly string[]
+    for (const [param, label] of Object.entries(BRACKET_PARAM_LABELS)) {
+      expect((screen.getByLabelText(label) as HTMLInputElement).readOnly).toBe(!unlocked.includes(param))
+    }
+    cleanup()
     renderBracket('parametric')
-    expect(screen.getByText('Direct depth, step and fillet editing')).toBeTruthy()
-    expect(screen.queryByRole('region', { name: 'Guided instructions' })).toBeNull()
+    expect(screen.getByText(/Every parameter is editable from the start/)).toBeTruthy()
+    expect(screen.queryByRole('region', { name: 'Guided experiments' })).toBeNull()
+    for (const label of Object.values(BRACKET_PARAM_LABELS)) expect((screen.getByLabelText(label) as HTMLInputElement).readOnly).toBe(false)
   })
 
   it('Guided steps never reveal the reference dimensions', () => {
-    renderBracket()
-    const guidance = screen.getByRole('region', { name: 'Guided instructions' })
-    expect(within(guidance).getByRole('heading', { name: 'Inspect' })).toBeTruthy()
-    const text = bracketUi.guidance.steps.map((s) => `${s.instruction} ${s.hint}`).join(' ')
+    renderBracket('guided')
+    const guidance = screen.getByRole('region', { name: 'Guided experiments' })
+    expect(within(guidance).getByRole('heading', { name: bracketUi.guided.steps[0]!.title })).toBeTruthy()
+    const text = bracketUi.guided.steps.map((s) => `${s.instruction} ${s.hint}`).join(' ')
     expect(text).not.toMatch(/\d/)
   })
 
   it('persists the tested workspace under its own key in the v2 envelope', () => {
     const { values, storage } = memory()
-    renderBracket('guided', storage)
+    renderBracket('parametric', storage)
     testReference()
     const saved = JSON.parse(values.get('ei:session:mounting-bracket-1:v1')!)
     expect(saved).toMatchObject({ schemaVersion: 2, model: { id: 'steppedBarBracket', version: 1 } })
     cleanup()
-    renderBracket('guided', storage)
+    renderBracket('parametric', storage)
     expect(screen.getByRole('button', { name: /^Iteration 1/ })).toBeTruthy()
     expect(within(peakRequirement()).getByText('90.8 MPa')).toBeTruthy()
   })
@@ -258,19 +268,6 @@ describe('Mounting Bracket I workbench', () => {
     ])
     expect(na!.evaluation.efficiency.stressMargin).toBeUndefined()
     expect(bracketUi.copy.efficiency(na!.evaluation.efficiency).map((e) => e.label)).toEqual(['Mass usage', 'Deflection margin'])
-  })
-
-  it('suggests a Guided experiment from the stored peak location only', () => {
-    const experiment = (s: BracketSession) => bracketUi.guidance.experiment(s as unknown as LoopSession)
-    // Baseline (step governs), rootGoverned (28/24/170/4 mm), fitShallowNA.
-    expect(experiment(testedSession())).toMatch(/peaks at the step/)
-    expect(experiment(testedSession([0.028, 0.024, 0.17, 0.004]))).toMatch(/peaks at the root/)
-    expect(experiment(testedSession([0.03, 0.0295, 0.15, 0.005]))).toMatch(/outside the fillet curve fit/)
-    for (const s of [testedSession(), testedSession([0.028, 0.024, 0.17, 0.004])]) expect(experiment(s)).not.toMatch(/\d/)
-    renderBracket()
-    fireEvent.click(screen.getByRole('button', { name: '2. Experiment' }))
-    fireEvent.click(screen.getByText('Hint & suggested experiment'))
-    expect(screen.getByText(/Your latest test peaks at the step/)).toBeTruthy()
   })
 })
 

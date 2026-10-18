@@ -12,7 +12,7 @@ function mount(storage: SessionStorage) {
   const ref: { current?: Store } = {}
   function Probe() { ref.current = useStore(); return null }
   let n = 0
-  const view = render(<StoreProvider challenge={ch} initialSession={createHarness(ch).real.state} storage={storage} clock={clock} newId={() => `test-${++n}`}><Probe /></StoreProvider>)
+  const view = render(<StoreProvider challenge={ch} initialSession={{ ...createHarness(ch).real.state, mode: 'parametric' }} storage={storage} clock={clock} newId={() => `test-${++n}`}><Probe /></StoreProvider>)
   return { ...view, store: () => ref.current! }
 }
 it('loads before children render and persists every action synchronously, including batched actions', () => {

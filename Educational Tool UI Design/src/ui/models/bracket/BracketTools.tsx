@@ -4,6 +4,8 @@ import { bracketPermissibleRange } from '../../../geometry/bracket/edit'
 import { BRACKET_PARAM_LABELS } from '../../../geometry/bracket/validate'
 import { formatMm, mmToM, mToMm, parseMmInput } from '../../../units/units'
 import Icon from '../../icons/Icon'
+import LockNote from '../../workbench/LockNote'
+import { useGuided } from '../../workbench/useGuided'
 import { useBracketStore } from './shared'
 
 // Bracket design tools (task 46.3; MBR-04, MBR-05, MBR-12, MODE-04, MODE-07, MM-22). One numeric
@@ -14,10 +16,13 @@ import { useBracketStore } from './shared'
 // inline error announced once. With equal depths the bar has no step: the step location and
 // fillet radius stay editable (K-5) and a note says they have no effect. Fixed values stay
 // read-only in a collapsed disclosure.
+// Task 58: in Guided, controls the current step does not unlock are read-only or disabled
+// with a visible reason; Parametric leaves every control editable.
 
 export default function BracketTools({ onAnnounce }: { onAnnounce: (message: string) => void }) {
   const { state, challenge: ch, dispatch } = useBracketStore()
   const draft = state.draft
+  const guided = useGuided()
   const [texts, setTexts] = useState<Partial<Record<BracketParam, string>>>({})
   const [errors, setErrors] = useState<Partial<Record<BracketParam, string>>>({})
   const [synced, setSynced] = useState(draft)
@@ -40,7 +45,7 @@ export default function BracketTools({ onAnnounce }: { onAnnounce: (message: str
 
   const commit = (param: BracketParam) => {
     const text = texts[param]
-    if (text === undefined) return
+    if (text === undefined || guided.locked(param)) return
     const mm = parseMmInput(text)
     if (mm === null) {
       const message = `${BRACKET_PARAM_LABELS[param]}: enter a number in millimetres.`
@@ -76,6 +81,7 @@ export default function BracketTools({ onAnnounce }: { onAnnounce: (message: str
         const id = `bracket-${param}`
         const error = errors[param]
         const inactive = uniform && (param === 'stepLocationM' || param === 'filletRadiusM')
+        const locked = guided.locked(param)
         return (
           <div className="dimension-field" key={param}>
             <label htmlFor={id}>{BRACKET_PARAM_LABELS[param]}</label>
@@ -84,8 +90,9 @@ export default function BracketTools({ onAnnounce }: { onAnnounce: (message: str
                 id={id}
                 inputMode="decimal"
                 value={texts[param] ?? formatMm(draft[param], 1)}
+                readOnly={locked}
                 aria-invalid={error !== undefined}
-                aria-describedby={error ? `${id}-error` : inactive ? `${id}-inactive` : undefined}
+                aria-describedby={error ? `${id}-error` : locked ? `${id}-locked` : inactive ? `${id}-inactive` : undefined}
                 onChange={(e) => setTexts((prev) => ({ ...prev, [param]: e.target.value }))}
                 onBlur={() => commit(param)}
                 onKeyDown={keys(param)}
@@ -99,8 +106,10 @@ export default function BracketTools({ onAnnounce }: { onAnnounce: (message: str
               max={mToMm(range.maxM)}
               step={mToMm(ch.designLimits[param].stepM)}
               value={mToMm(draft[param])}
+              disabled={locked}
               onChange={(e) => dispatch({ type: 'edit', edit: { type: 'setParam', param, valueM: mmToM(Number(e.target.value)), mode: 'clamp' } })}
             />
+            {locked && <LockNote id={`${id}-locked`} reason={guided.lockReason} />}
             {inactive && !error && (
               <p id={`${id}-inactive`} className="field-note">
                 No step: no effect

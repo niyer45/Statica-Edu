@@ -24,7 +24,8 @@ function memory() {
   return { values, storage }
 }
 
-function renderFrame(mode: 'guided' | 'parametric' = 'guided', storage?: SessionStorage) {
+// Default Parametric: free editing. Guided locks parameters by step (task 58); see the mode test.
+function renderFrame(mode: 'guided' | 'parametric' = 'parametric', storage?: SessionStorage) {
   const init = bracedFrameRuntime.init(ch, clock(), 'base', mode)
   if (!init.ok) throw new Error('braced frame challenge must initialize')
   return render(
@@ -184,26 +185,29 @@ describe('Braced Frame I workbench', () => {
     expect(within(dialog).getByText(/does not include: rigid or semi-rigid joints/)).toBeTruthy()
   })
 
-  it('Guided shows frame steps without reference values; Parametric omits guidance and shows the direct-edit label', () => {
-    renderFrame()
-    const guided = screen.getByRole('region', { name: 'Guided instructions' })
-    expect(within(guided).getByRole('heading', { name: 'Inspect' })).toBeTruthy()
-    const allGuidance = bracedFrameUi.guidance.steps.map((s) => `${s.instruction} ${s.hint}`).join(' ')
+  it('Guided shows frame experiments without reference values and locks sections at first; Parametric is open design (task 58)', () => {
+    renderFrame('guided')
+    const guided = screen.getByRole('region', { name: 'Guided experiments' })
+    expect(within(guided).getByRole('heading', { name: 'Rearrange the bracing' })).toBeTruthy()
+    const allGuidance = bracedFrameUi.guided.steps.map((s) => `${s.instruction} ${s.hint}`).join(' ')
     expect(allGuidance).not.toMatch(/\d|CHS|always best/)
+    expect((screen.getByLabelText(/^Lower left column/) as HTMLSelectElement).disabled).toBe(true)
+    expect((screen.getByRole('button', { name: /^Storey 1 diagonal, bottom left to top right/ }) as HTMLButtonElement).disabled).toBe(false)
     cleanup()
     renderFrame('parametric')
-    expect(screen.getByText('Direct bracing and member section editing')).toBeTruthy()
-    expect(screen.queryByRole('region', { name: 'Guided instructions' })).toBeNull()
+    expect(screen.getByText(/Every parameter is editable from the start/)).toBeTruthy()
+    expect(screen.queryByRole('region', { name: 'Guided experiments' })).toBeNull()
+    expect((screen.getByLabelText(/^Lower left column/) as HTMLSelectElement).disabled).toBe(false)
   })
 
   it('persists the tested workspace under its own key in the v2 envelope', () => {
     const { values, storage } = memory()
-    renderFrame('guided', storage)
+    renderFrame('parametric', storage)
     testReference()
     const saved = JSON.parse(values.get('ei:session:braced-frame-1:v1')!)
     expect(saved).toMatchObject({ schemaVersion: 2, model: { id: 'pinJointedBracedFrame', version: 1 } })
     cleanup()
-    renderFrame('guided', storage)
+    renderFrame('parametric', storage)
     expect(screen.getByRole('button', { name: /^Iteration 1/ })).toBeTruthy()
     expect(within(requirements()).getByText('10.38 mm')).toBeTruthy()
   })

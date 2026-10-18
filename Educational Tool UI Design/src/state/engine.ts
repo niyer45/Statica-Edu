@@ -89,6 +89,11 @@ export type SharedAction =
 
 const SHARED_TYPES: ReadonlySet<string> = new Set(['setPrediction', 'cancelPrediction', 'runTest', 'deleteIteration', 'restore', 'toggleCompare', 'setReflection', 'submit', 'importDesign', 'reset'])
 
+/** True for an action the engine handles for every model (not a model edit). */
+export function isSharedAction(a: { type: string }): boolean {
+  return SHARED_TYPES.has(a.type)
+}
+
 /** Session type for a model's design, analysis, evaluation, outcome and error types. */
 export type AnySession<D, A, E extends EvaluationBase, O, Err> = SessionStateOf<D, TestResultOf<D, A, E, O>, Err, E['efficiency']>
 

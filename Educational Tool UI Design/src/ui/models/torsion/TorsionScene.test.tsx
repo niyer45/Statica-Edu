@@ -38,7 +38,7 @@ async function renderScene(twisted: boolean) {
   }
   root = createRoot(canvas)
   await root.configure({ gl: renderer as unknown as WebGLRenderer, orthographic: true, frameloop: 'never', size: { width: 500, height: 400, top: 0, left: 0 } })
-  const init = torsionRuntime.init(ch, '2026-10-17T00:00:00.000Z', 'base', 'guided')
+  const init = torsionRuntime.init(ch, '2026-10-17T00:00:00.000Z', 'base', 'parametric')
   if (!init.ok) throw new Error('torsion challenge must initialize')
   let r3f: RootStore
   await act(async () => {

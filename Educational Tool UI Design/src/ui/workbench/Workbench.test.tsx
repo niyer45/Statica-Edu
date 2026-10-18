@@ -6,7 +6,6 @@ import { bootstrap } from '../state/bootstrap'
 import StoreProvider from '../state/StoreProvider'
 import { MODEL_LIMITS_NOTICE } from './PageFooter'
 import Workbench, { VIEWPORT_LOADING_TEXT } from './Workbench'
-import { workflowSteps } from './WorkflowStepper'
 
 // Task 13.3 smoke tests: Workbench regions and LiveRegion behaviour (fuller tests: 13.4).
 
@@ -39,19 +38,13 @@ describe('Workbench', () => {
     expect(screen.getByText(MODEL_LIMITS_NOTICE)).toBeTruthy()
     // Explain & submit disabled until a non-baseline test exists (Req 35.6).
     expect(screen.getByRole('button', { name: /Explain & submit/ }).hasAttribute('disabled')).toBe(true)
-    // Stepper states conveyed by text.
-    expect(screen.getByRole('list', { name: 'Workflow' }).textContent).toContain('Modify & predict, current step')
+    // Guided experiment step states conveyed by text (task 58).
+    expect(screen.getByRole('list', { name: 'Experiment steps' }).textContent).toContain('1. Make it deeper, current step')
     expect(document.querySelector('[aria-live="polite"]')).not.toBeNull()
 
     // The lazy viewport resolves into the same region.
     expect(await screen.findByRole('button', { name: 'Zoom in' }, { timeout: 5000 })).toBeTruthy()
     expect(screen.queryByText(VIEWPORT_LOADING_TEXT)).toBeNull()
-  })
-
-  it('derives stepper states from tests and submission', () => {
-    expect(workflowSteps(0, false).map((s) => s.state)).toEqual(['complete', 'active', 'upcoming', 'upcoming'])
-    expect(workflowSteps(1, false).map((s) => s.state)).toEqual(['complete', 'complete', 'complete', 'active'])
-    expect(workflowSteps(2, true).map((s) => s.state)).toEqual(['complete', 'complete', 'complete', 'complete'])
   })
 })
 

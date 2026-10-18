@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { formatHz, formatKnPerM, knPerMToNPerM, parseDecimalInput } from '../../../units/units'
 import Icon from '../../icons/Icon'
+import LockNote from '../../workbench/LockNote'
+import { useGuided } from '../../workbench/useGuided'
 import { formatVibration, sliderToStiffness, STIFFNESS_SLIDER_STEPS, stiffnessToSlider, useVibrationStore } from './shared'
 
 // Vibration design tools (task 50.3; VIB-04, VIB-14, MODE-04, MODE-07). One numeric stiffness
@@ -9,6 +11,8 @@ import { formatVibration, sliderToStiffness, STIFFNESS_SLIDER_STEPS, stiffnessTo
 // the slider dispatches clamp edits. The reducer's verdict returns through `draftErrors`; a
 // rejection keeps the draft and shows an inline error announced once. Fixed values stay
 // read-only in a collapsed disclosure.
+// Task 58: in Guided, controls the current step does not unlock are read-only or disabled
+// with a visible reason; Parametric leaves every control editable.
 
 const FIELD_ID = 'isolator-stiffness'
 
@@ -16,6 +20,9 @@ export default function VibrationTools({ onAnnounce }: { onAnnounce: (message: s
   const { state, challenge: ch, dispatch } = useVibrationStore()
   const draft = state.draft
   const limits = ch.stiffnessLimits
+  const guided = useGuided()
+  const stiffnessLocked = guided.locked('stiffnessNPerM')
+  const materialLocked = guided.locked('materialId')
   const [text, setText] = useState<string | undefined>()
   const [error, setError] = useState<string | undefined>()
   const [synced, setSynced] = useState(draft)
@@ -36,7 +43,7 @@ export default function VibrationTools({ onAnnounce }: { onAnnounce: (message: s
   }, [state.draftErrors, onAnnounce])
 
   const commit = () => {
-    if (text === undefined) return
+    if (text === undefined || stiffnessLocked) return
     const kn = parseDecimalInput(text)
     if (kn === null) {
       const message = 'Stiffness: enter a number in kN/m.'
@@ -67,8 +74,9 @@ export default function VibrationTools({ onAnnounce }: { onAnnounce: (message: s
             id={FIELD_ID}
             inputMode="decimal"
             value={text ?? formatKnPerM(draft.stiffnessNPerM)}
+            readOnly={stiffnessLocked}
             aria-invalid={error !== undefined}
-            aria-describedby={error ? `${FIELD_ID}-error` : `${FIELD_ID}-range`}
+            aria-describedby={error ? `${FIELD_ID}-error` : stiffnessLocked ? `${FIELD_ID}-range ${FIELD_ID}-locked` : `${FIELD_ID}-range`}
             onChange={(e) => setText(e.target.value)}
             onBlur={commit}
             onKeyDown={keys}
@@ -83,6 +91,7 @@ export default function VibrationTools({ onAnnounce }: { onAnnounce: (message: s
           max={STIFFNESS_SLIDER_STEPS}
           step={1}
           value={stiffnessToSlider(draft.stiffnessNPerM, limits)}
+          disabled={stiffnessLocked}
           onChange={(e) =>
             dispatch({ type: 'edit', edit: { type: 'setStiffness', valueNPerM: sliderToStiffness(Number(e.target.value), limits), mode: 'clamp' } })
           }
@@ -90,13 +99,14 @@ export default function VibrationTools({ onAnnounce }: { onAnnounce: (message: s
         <p id={`${FIELD_ID}-range`} className="field-hint">
           {formatKnPerM(limits.minNPerM)}–{formatKnPerM(limits.maxNPerM)} kN/m
         </p>
+        {stiffnessLocked && <LockNote id={`${FIELD_ID}-locked`} reason={guided.lockReason} />}
         {error && (
           <p id={`${FIELD_ID}-error`} className="field-error">
             {error}
           </p>
         )}
       </div>
-      <fieldset className="material-choice">
+      <fieldset className="material-choice" disabled={materialLocked} aria-describedby={materialLocked ? 'isolator-material-locked' : undefined}>
         <legend className="section-heading">
           ISOLATOR MATERIAL <span>02</span>
         </legend>
@@ -107,12 +117,14 @@ export default function VibrationTools({ onAnnounce }: { onAnnounce: (message: s
               name="isolator-material"
               value={m.id}
               checked={draft.materialId === m.id}
+              disabled={materialLocked}
               onChange={() => dispatch({ type: 'edit', edit: { type: 'setMaterial', materialId: m.id } })}
             />
             <span>{m.name}</span>
             <small>ζ {formatVibration(m.dampingRatio, 'zeta')}</small>
           </label>
         ))}
+        {materialLocked && <LockNote id="isolator-material-locked" reason={guided.lockReason} />}
       </fieldset>
       <details className="locked-features">
         <summary>

@@ -49,7 +49,7 @@ async function renderScene(ch: BracedFrameChallenge): Promise<RootStore> {
   }
   root = createRoot(canvas)
   await root.configure({ gl: renderer as unknown as WebGLRenderer, orthographic: true, frameloop: 'never', size: { width: 500, height: 400, top: 0, left: 0 } })
-  const init = bracedFrameRuntime.init(ch, '2026-10-17T00:00:00.000Z', 'base', 'guided')
+  const init = bracedFrameRuntime.init(ch, '2026-10-17T00:00:00.000Z', 'base', 'parametric')
   if (!init.ok) throw new Error('braced frame challenge must initialize')
   let store: RootStore
   await act(async () => {
@@ -141,7 +141,7 @@ describe('Braced Frame I 3D scene (task 54.3)', () => {
 
   it('frames every scene element inside the camera sphere', () => {
     const ch = bracedFrameChallenge()
-    const init = bracedFrameRuntime.init(ch, '2026-10-17T00:00:00.000Z', 'base', 'guided')
+    const init = bracedFrameRuntime.init(ch, '2026-10-17T00:00:00.000Z', 'base', 'parametric')
     if (!init.ok) throw new Error('braced frame challenge must initialize')
     const layout = frameSceneLayout(ch, init.value.draft, init.value.history[0]!.analysis)
     const inside = (p: readonly number[]) => Math.hypot(p[0]! - layout.center[0], p[1]! - layout.center[1], p[2]! - layout.center[2]) <= layout.radiusM + 1e-9

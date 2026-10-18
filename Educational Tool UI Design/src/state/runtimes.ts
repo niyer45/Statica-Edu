@@ -13,11 +13,18 @@ import type { Challenge, InteractionMode, ModelRef, Result, SchemaIssue } from '
 import { bracketModel, bracketPersistence, bracketReducer, type BracketAction, type BracketSession } from './bracketModel'
 import { bracedFrameModel, bracedFramePersistence, bracedFrameReducer, type BracedFrameAction, type BracedFrameSession } from './bracedFrameModel'
 import { initSessionWith } from './engine'
+import { withGuidedLocks } from './guided'
 import { heatSinkModel, heatSinkPersistence, heatSinkReducer, type HeatSinkAction, type HeatSinkSession } from './heatSinkModel'
 import { beamModel, modelFor, modelOf } from './models'
 import { deserializeSession, deserializeSessionV2, serializeSession, serializeSessionV2, sessionKey } from './persistence'
 import { sessionReducer } from './reducer'
 import { initSession, type Action, type InitSessionError, type SessionState } from './session'
+import { BEAM_GUIDED_PLAN } from '../evaluation/guided/beam'
+import { BRACED_FRAME_GUIDED_PLAN } from '../evaluation/guided/bracedFrame'
+import { BRACKET_GUIDED_PLAN } from '../evaluation/guided/bracket'
+import { HEAT_SINK_GUIDED_PLAN } from '../evaluation/guided/heatSink'
+import { TORSION_GUIDED_PLAN } from '../evaluation/guided/torsion'
+import { VIBRATION_GUIDED_PLAN } from '../evaluation/guided/vibration'
 import { torsionModel, torsionPersistence, torsionReducer, type TorsionAction, type TorsionSession } from './torsionModel'
 import { vibrationModel, vibrationPersistence, vibrationReducer, type VibrationAction, type VibrationSession } from './vibrationModel'
 
@@ -26,7 +33,8 @@ import { vibrationModel, vibrationPersistence, vibrationReducer, type VibrationA
 // challenge's explicit model identity: load the config, start a session, reduce actions and
 // read/write the model's own persistence envelope (v1 for the beam, v2 otherwise). Shared,
 // model-independent fields (mode, history, reflection, …) keep the same shape for every model,
-// so shell code reads them through `LoopSession` without knowing the model.
+// so shell code reads them through `LoopSession` without knowing the model. Every reducer is
+// wrapped with the Guided parameter locks of its model's guided plan (task 58, state/guided.ts).
 
 /** Model-independent session fields the shell and shared UI read. */
 export interface LoopSession {
@@ -64,7 +72,7 @@ export const beamRuntime: ModelRuntime<SessionState, Action, Challenge> = Object
   ref: beamModel.ref,
   load: loadChallenge,
   init: initSession,
-  reduce: sessionReducer,
+  reduce: withGuidedLocks(BEAM_GUIDED_PLAN, sessionReducer),
   key: sessionKey,
   serialize: serializeSession,
   deserialize: deserializeSession,
@@ -74,7 +82,7 @@ export const torsionRuntime: ModelRuntime<TorsionSession, TorsionAction, Torsion
   ref: torsionModel.ref,
   load: loadTorsionChallenge,
   init: (ch: TorsionChallenge, now: string, id: string, mode?: InteractionMode) => initSessionWith(torsionModel, ch, now, id, mode),
-  reduce: torsionReducer,
+  reduce: withGuidedLocks(TORSION_GUIDED_PLAN, torsionReducer),
   key: sessionKey,
   serialize: (s: TorsionSession, savedAt: string) => serializeSessionV2(torsionModel.ref, s, savedAt),
   deserialize: (raw: string, ch: TorsionChallenge) => deserializeSessionV2(torsionModel, torsionPersistence, raw, ch),
@@ -84,7 +92,7 @@ export const vibrationRuntime: ModelRuntime<VibrationSession, VibrationAction, V
   ref: vibrationModel.ref,
   load: loadVibrationChallenge,
   init: (ch: VibrationChallenge, now: string, id: string, mode?: InteractionMode) => initSessionWith(vibrationModel, ch, now, id, mode),
-  reduce: vibrationReducer,
+  reduce: withGuidedLocks(VIBRATION_GUIDED_PLAN, vibrationReducer),
   key: sessionKey,
   serialize: (s: VibrationSession, savedAt: string) => serializeSessionV2(vibrationModel.ref, s, savedAt),
   deserialize: (raw: string, ch: VibrationChallenge) => deserializeSessionV2(vibrationModel, vibrationPersistence, raw, ch),
@@ -94,7 +102,7 @@ export const heatSinkRuntime: ModelRuntime<HeatSinkSession, HeatSinkAction, Heat
   ref: heatSinkModel.ref,
   load: loadHeatSinkChallenge,
   init: (ch: HeatSinkChallenge, now: string, id: string, mode?: InteractionMode) => initSessionWith(heatSinkModel, ch, now, id, mode),
-  reduce: heatSinkReducer,
+  reduce: withGuidedLocks(HEAT_SINK_GUIDED_PLAN, heatSinkReducer),
   key: sessionKey,
   serialize: (s: HeatSinkSession, savedAt: string) => serializeSessionV2(heatSinkModel.ref, s, savedAt),
   deserialize: (raw: string, ch: HeatSinkChallenge) => deserializeSessionV2(heatSinkModel, heatSinkPersistence, raw, ch),
@@ -104,7 +112,7 @@ export const bracketRuntime: ModelRuntime<BracketSession, BracketAction, Bracket
   ref: bracketModel.ref,
   load: loadBracketChallenge,
   init: (ch: BracketChallenge, now: string, id: string, mode?: InteractionMode) => initSessionWith(bracketModel, ch, now, id, mode),
-  reduce: bracketReducer,
+  reduce: withGuidedLocks(BRACKET_GUIDED_PLAN, bracketReducer),
   key: sessionKey,
   serialize: (s: BracketSession, savedAt: string) => serializeSessionV2(bracketModel.ref, s, savedAt),
   deserialize: (raw: string, ch: BracketChallenge) => deserializeSessionV2(bracketModel, bracketPersistence, raw, ch),
@@ -114,7 +122,7 @@ export const bracedFrameRuntime: ModelRuntime<BracedFrameSession, BracedFrameAct
   ref: bracedFrameModel.ref,
   load: loadBracedFrameChallenge,
   init: (ch: BracedFrameChallenge, now: string, id: string, mode?: InteractionMode) => initSessionWith(bracedFrameModel, ch, now, id, mode),
-  reduce: bracedFrameReducer,
+  reduce: withGuidedLocks(BRACED_FRAME_GUIDED_PLAN, bracedFrameReducer),
   key: sessionKey,
   serialize: (s: BracedFrameSession, savedAt: string) => serializeSessionV2(bracedFrameModel.ref, s, savedAt),
   deserialize: (raw: string, ch: BracedFrameChallenge) => deserializeSessionV2(bracedFrameModel, bracedFramePersistence, raw, ch),

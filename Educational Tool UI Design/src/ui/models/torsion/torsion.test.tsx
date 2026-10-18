@@ -22,7 +22,8 @@ function memory() {
   return { values, storage }
 }
 
-function renderShaft(mode: 'guided' | 'parametric' = 'guided', storage?: SessionStorage) {
+// Default Parametric: free editing. Guided locks parameters by step (task 58); see the mode test.
+function renderShaft(mode: 'guided' | 'parametric' = 'parametric', storage?: SessionStorage) {
   const init = torsionRuntime.init(ch, clock(), 'base', mode)
   if (!init.ok) throw new Error('torsion challenge must initialize')
   return render(
@@ -112,20 +113,33 @@ describe('Torsion Shaft I workbench', () => {
     expect(screen.getByRole('dialog', { name: 'Torsional stiffness' })).toBeTruthy()
   })
 
-  it('Parametric omits guidance and shows the direct-edit label', () => {
+  it('Guided runs structured experiments with locked controls; Parametric is open design (task 58)', () => {
+    renderShaft('guided')
+    const guide = screen.getByRole('region', { name: 'Guided experiments' })
+    expect(within(guide).getByRole('heading', { name: 'Thicken the shaft' })).toBeTruthy()
+    expect((screen.getByLabelText('Diameter') as HTMLInputElement).readOnly).toBe(false)
+    const hollow = screen.getByRole('button', { name: /Hollow tube/ })
+    expect(hollow.getAttribute('aria-disabled')).toBe('true')
+    fireEvent.click(hollow)
+    expect(screen.getByLabelText('Diameter')).toBeTruthy()
+    expect(screen.queryByLabelText('Outer diameter')).toBeNull()
+    expect(screen.getByText('Locked in this step. Editable now: Outside diameter.')).toBeTruthy()
+    cleanup()
     renderShaft('parametric')
-    expect(screen.getByText('Direct shaft diameter editing')).toBeTruthy()
-    expect(screen.queryByRole('region', { name: 'Guided instructions' })).toBeNull()
+    expect(screen.queryByRole('region', { name: 'Guided experiments' })).toBeNull()
+    expect(screen.getByText(/Every parameter is editable from the start/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: /Hollow tube/ }))
+    expect((screen.getByLabelText('Outer diameter') as HTMLInputElement).readOnly).toBe(false)
   })
 
   it('persists the tested workspace under its own key in the v2 envelope', () => {
     const { values, storage } = memory()
-    renderShaft('guided', storage)
+    renderShaft('parametric', storage)
     testReference()
     const saved = JSON.parse(values.get('ei:session:torsion-shaft-1:v1')!)
     expect(saved).toMatchObject({ schemaVersion: 2, model: { id: 'circularShaftTorsion', version: 1 } })
     cleanup()
-    renderShaft('guided', storage)
+    renderShaft('parametric', storage)
     expect(screen.getByRole('button', { name: /^Iteration 1/ })).toBeTruthy()
   })
 })

@@ -16,6 +16,13 @@ export const MODE_LABELS: Record<InteractionMode, string> = {
   freeform: 'Freeform',
 }
 
+/** One sentence per mode (task 58), shared by the challenge drawer and the workspace context. */
+export const MODE_SENTENCES: Record<InteractionMode, string> = {
+  guided: 'Structured experiments: change one variable per step while the rest stay locked, then design freely once every step is met.',
+  parametric: 'Open design: every parameter is editable from the start, with just the goal and the checks.',
+  freeform: 'Sketch, extrude, and edit geometry.',
+}
+
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   introductory: 'Introductory',
   intermediate: 'Intermediate',
@@ -31,7 +38,8 @@ export interface WorkbenchChromeProps {
 
 export default function WorkbenchChrome({ onExit, onOpenHelp, onShowDesigns, children }: WorkbenchChromeProps) {
   const ch = useChallenge()
-  const mode = MODE_LABELS[useSession().mode]
+  const sessionMode = useSession().mode
+  const mode = MODE_LABELS[sessionMode]
   const difficulty = DIFFICULTY_LABELS[ch.difficulty]
   const { copy } = useModelUi()
   // Card metadata for the open challenge (number, discipline, time); defaults match the beam card.
@@ -138,13 +146,14 @@ export default function WorkbenchChrome({ onExit, onOpenHelp, onShowDesigns, chi
               All challenges
             </button>
           </section>
-          <div className="workspace-context">
-            <span>
-              <Icon name="cube" size={15} />
-              {mode} design
+          <div className="workspace-context" aria-label="Design mode">
+            <span className="mode-badge">
+              <Icon name={sessionMode === 'guided' ? 'tune' : 'cube'} size={15} />
+              {mode} mode
             </span>
             <span>
-              {mode === 'Guided' ? copy.guidedContext : copy.parametricContext}
+              {MODE_SENTENCES[sessionMode]}
+              {copy.contextNote !== undefined && ` ${copy.contextNote}`}
             </span>
             <span className="solver-label">{copy.solverLabel}</span>
           </div>

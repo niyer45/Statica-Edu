@@ -22,7 +22,8 @@ function memory() {
   return { values, storage }
 }
 
-function renderHeatSink(mode: 'guided' | 'parametric' = 'guided', storage?: SessionStorage) {
+// Default Parametric: free editing. Guided locks parameters by step (task 58); see the mode test.
+function renderHeatSink(mode: 'guided' | 'parametric' = 'parametric', storage?: SessionStorage) {
   const init = heatSinkRuntime.init(ch, clock(), 'base', mode)
   if (!init.ok) throw new Error('heat sink challenge must initialize')
   return render(
@@ -153,26 +154,35 @@ describe('Heat Sink I workbench', () => {
   })
 
   it('Guided content never reveals reference values', () => {
-    for (const step of heatSinkUi.guidance.steps) {
+    for (const step of heatSinkUi.guided.steps) {
       expect(`${step.instruction} ${step.hint}`).not.toMatch(/\d/)
     }
   })
 
-  it('Parametric omits guidance and shows the direct-edit label and the given coefficient', () => {
-    renderHeatSink('parametric')
-    expect(screen.getByText('Direct fin array editing')).toBeTruthy()
+  it('Guided locks all but the step parameter; Parametric is open design; both disclose the given coefficient (task 58)', () => {
+    renderHeatSink('guided')
+    expect(within(screen.getByRole('region', { name: 'Guided experiments' })).getByRole('heading', { name: 'Taller fins' })).toBeTruthy()
+    expect((screen.getByLabelText('Fin height') as HTMLInputElement).readOnly).toBe(false)
+    expect((screen.getByLabelText('Fin count') as HTMLInputElement).readOnly).toBe(true)
+    expect((screen.getByLabelText('Fin thickness') as HTMLInputElement).readOnly).toBe(true)
+    expect((screen.getByRole('button', { name: 'Add a fin' }) as HTMLButtonElement).disabled).toBe(true)
     expect(screen.getByText(/convection coefficient is a given fan-assisted value/)).toBeTruthy()
-    expect(screen.queryByRole('region', { name: 'Guided instructions' })).toBeNull()
+    cleanup()
+    renderHeatSink('parametric')
+    expect(screen.getByText(/Every parameter is editable from the start/)).toBeTruthy()
+    expect(screen.getByText(/convection coefficient is a given fan-assisted value/)).toBeTruthy()
+    expect(screen.queryByRole('region', { name: 'Guided experiments' })).toBeNull()
+    expect((screen.getByRole('button', { name: 'Add a fin' }) as HTMLButtonElement).disabled).toBe(false)
   })
 
   it('persists the tested workspace under its own key in the v2 envelope', () => {
     const { values, storage } = memory()
-    renderHeatSink('guided', storage)
+    renderHeatSink('parametric', storage)
     testReference()
     const saved = JSON.parse(values.get('ei:session:heat-sink-1:v1')!)
     expect(saved).toMatchObject({ schemaVersion: 2, model: { id: 'plateFinHeatSink', version: 1 } })
     cleanup()
-    renderHeatSink('guided', storage)
+    renderHeatSink('parametric', storage)
     expect(screen.getByRole('button', { name: /^Iteration 1/ })).toBeTruthy()
     expect(within(screen.getByRole('list', { name: 'Design requirements' })).getByText('48.5 °C')).toBeTruthy()
   })

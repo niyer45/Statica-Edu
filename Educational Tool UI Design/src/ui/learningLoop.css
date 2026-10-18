@@ -165,17 +165,22 @@
   clip-path: inset(50%);
 }
 
-/* Task 44: compact mode scaffolding outside challenge text and Canvas. */
+/* Task 58 (replaces the task 44 prompts): Guided structured experiments outside challenge text and Canvas. */
 .guided-instructions { min-width: 0; border: 1px solid #dce3d4; border-radius: 7px; padding: 12px; margin-bottom: 14px; background: #fafbf7; color: #46583b; font-size: 11px; line-height: 1.6; overflow-wrap: break-word; }
-.guidance-steps { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-.guidance-steps button { border: 1px solid #a4b496; border-radius: 5px; padding: 5px 9px; background: #fff; color: #345640; font: inherit; }
-.guidance-steps button[aria-pressed="true"] { background: #345640; color: #fff; border-color: #345640; }
-/* Pressed state changes instantly: the template button colour transition briefly shows low-contrast intermediate colours. */
-.guidance-steps button { transition: none; }
+.guided-mode-label { margin: 0 0 6px; }
+.guidance-steps { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; padding: 0; list-style: none; }
+.guidance-steps li { display: inline-flex; align-items: center; gap: 4px; border: 1px solid #a4b496; border-radius: 5px; padding: 4px 9px; background: #fff; color: #345640; }
+.guidance-steps li.current { background: #345640; color: #fff; border-color: #345640; font-weight: 600; }
+.guidance-steps li.locked { border-style: dashed; color: #53614b; }
 .guided-instructions h2 { font-size: 12px; margin: 0 0 4px; }
 .guided-instructions p { margin: 4px 0; }
 .guided-instructions details { margin-top: 6px; }
 .guided-instructions summary { cursor: pointer; font-weight: 600; }
+.guided-focus { font-weight: 500; }
+.guided-result { border-top: 1px solid #dce3d4; padding-top: 6px; }
+.guided-lock { display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+.shape-tile.locked { cursor: not-allowed; opacity: .6; }
+.workspace-context .mode-badge { font-weight: 650; }
 
 .parametric-context { margin: 0 0 12px; color: #46583b; font-size: 11px; }
 

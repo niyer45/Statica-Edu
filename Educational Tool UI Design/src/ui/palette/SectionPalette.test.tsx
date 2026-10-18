@@ -20,7 +20,7 @@ function Probe() {
 }
 
 function setup() {
-  const boot = bootstrap(bundledChallengeResult, clock, newId)
+  const boot = bootstrap(bundledChallengeResult, clock, newId, 'parametric')
   if (!boot.ok) throw new Error(boot.error.message)
   const { container } = render(
     <StoreProvider challenge={boot.value.challenge} initialSession={boot.value.session} clock={clock} newId={newId}>

@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react'
+import type { GuidedPlan } from '../../evaluation/guided/plan'
 import type { LoopSession } from '../../state/runtimes'
 
 // Model UI contract (task 34.2; multi-model-architecture MM-20, MM-21). A model fills the
@@ -6,21 +7,11 @@ import type { LoopSession } from '../../state/runtimes'
 // single live region and footer stay shared. Components render inside the active challenge's
 // StoreProvider and read their typed store with `useModelStore`.
 
-export interface GuidanceStep {
-  id: 'inspect' | 'experiment' | 'compare' | 'explain'
-  title: string
-  instruction: string
-  hint: string
-}
-
 export interface ModelCopy {
   /** Page heading subtitle under the challenge title. */
   tagline: string
-  /** Workspace context line for each mode. */
-  guidedContext: string
-  parametricContext: string
-  /** Short Parametric direct-edit description shown above the workbench (MODE-04). */
-  parametricLabel: string
+  /** Optional model disclosure shown after the mode sentence in the workspace context. */
+  contextNote?: string
   solverLabel: string
   /** Always-visible model limits notice in the footer. */
   limitsNotice: string
@@ -47,11 +38,11 @@ export interface ModelUi {
   /** History and comparison of stored results. */
   Results: ComponentType
   Help: ComponentType<{ open: boolean; onClose: () => void }>
-  guidance: {
-    steps: readonly GuidanceStep[]
-    /** Extra suggested experiment for the Experiment step, from stored state only. */
-    experiment(session: LoopSession): string | undefined
-  }
+  /**
+   * Guided structured experiments (task 58): the model's pure step plan. Guided locks every
+   * parameter the current step does not unlock; Parametric ignores the plan.
+   */
+  guided: GuidedPlan<never, never>
   /** Announcement for a successful model edit action, if any. */
   announceEdit?(session: LoopSession, lastAction: { type: string }): string | undefined
 }

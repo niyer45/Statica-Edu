@@ -31,11 +31,15 @@ describe('makeStoreReducer model binding', () => {
 
   it('applies the torsion reducer and mode selection through the runtime reducer', () => {
     const tch = torsionChallenge()
-    const init = torsionRuntime.init(tch, '2026-10-17T00:00:00.000Z', 't0')
+    const init = torsionRuntime.init(tch, '2026-10-17T00:00:00.000Z', 't0', 'parametric')
     if (!init.ok) throw new Error('torsion challenge must initialize')
     const reduce = makeRuntimeReducer(tch, torsionRuntime as unknown as ModelRuntime)
     const edited = reduce(init.value, { type: 'edit', edit: { type: 'setSection', kind: 'tube' } })
     expect(edited.draftStatus).toBe('draft')
-    expect(reduce(edited, { type: 'selectMode', mode: 'parametric' }).mode).toBe('parametric')
+    const guided = reduce(edited, { type: 'selectMode', mode: 'guided' })
+    expect(guided.mode).toBe('guided')
+    // Task 58: the runtime reducer applies the Guided locks (the shaft type is locked in step 1).
+    const blocked = reduce(guided, { type: 'edit', edit: { type: 'setSection', kind: 'circle' } }) as typeof init.value
+    expect(blocked.draft).toBe((guided as typeof init.value).draft)
   })
 })

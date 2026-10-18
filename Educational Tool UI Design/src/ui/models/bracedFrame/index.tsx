@@ -5,6 +5,7 @@ import BracedFrameHelp from './BracedFrameHelp'
 import BracedFrameResults from './BracedFrameResults'
 import BracedFrameTools from './BracedFrameTools'
 import BracedFrameView from './BracedFrameView'
+import { BRACED_FRAME_GUIDED_PLAN } from '../../../evaluation/guided/bracedFrame'
 
 // Braced Frame I UI (task 49.3; braced-frame-1 BFR-16, BFR-17; MM-20, MM-21). Registered in the
 // production model UI registry; the catalog card stays unavailable until owner-approved
@@ -16,9 +17,6 @@ export const BRACED_FRAME_LIMITS_NOTICE = 'Idealized pin-jointed frame, not a st
 export const bracedFrameUi: ModelUi = {
   copy: {
     tagline: 'Brace a two-storey frame and size its members within drift, capacity and mass limits.',
-    guidedContext: 'Diagonal toggles, member section choices, and step-by-step prompts.',
-    parametricContext: 'Direct bracing and member section editing with the same validated frame model.',
-    parametricLabel: 'Direct bracing and member section editing',
     solverLabel: 'Direct stiffness · Pin-jointed frame',
     limitsNotice: BRACED_FRAME_LIMITS_NOTICE,
     drawerAvailable:
@@ -42,36 +40,5 @@ export const bracedFrameUi: ModelUi = {
   ChallengePanel: BracedFrameChallengePanel,
   Results: BracedFrameResults,
   Help: BracedFrameHelp,
-  guidance: {
-    steps: [
-      {
-        id: 'inspect',
-        title: 'Inspect',
-        instruction:
-          'Read the challenge, its limits and the pin-jointed idealization. Find the governing member of the baseline frame: is it in tension or compression, and why does it fail?',
-        hint: 'Expand Some things are fixed. to see the loads and supports. The member force table under the drawing lists each member’s force, capacity and utilization from the latest test. Accepted applies to this idealized model, not a real-world safety approval.',
-      },
-      {
-        id: 'experiment',
-        title: 'Experiment',
-        instruction:
-          'Remove one diagonal, predict how the roof drift will change, then Run Test and see what happens to a storey without a diagonal. Restore it, flip a diagonal’s direction and predict the change in roof drift again.',
-        hint: 'A storey with no diagonal is a mechanism in this model, so its roof drift is not defined and that prediction cannot be scored. Change one thing at a time so you can tell what caused each change.',
-      },
-      {
-        id: 'compare',
-        title: 'Compare',
-        instruction: 'Choose designs in Design history, then open Compare results. Compare the governing members, roof drift and mass of two designs.',
-        hint: 'With one diagonal per storey, change only member sections and compare the member forces. Strengthen the members that govern instead of every member.',
-      },
-      {
-        id: 'explain',
-        title: 'Explain',
-        instruction:
-          'Use your tested values to describe how the sideways load travels through the diagonals to the supports. Open Explain & submit to record a design and reflection.',
-        hint: 'A submitted attempt can still be Not accepted. Name one effect the pin-jointed model does not include, such as rigid joints or load reversal.',
-      },
-    ],
-    experiment: () => undefined,
-  },
+  guided: BRACED_FRAME_GUIDED_PLAN,
 }
