@@ -7,10 +7,11 @@ Last updated: **2026-10-17** (Claude Code: task 54 3D views complete; next gate 
 Owner requests: L-bracket (57, D-46), declutter frame/vibration (56, D-48), accounts + Home (38.0, D-50), a real Guided vs Parametric difference (58, D-49), hardest baselines (59, D-47), Reset to baseline (60). Six parallel agents; integrated on `integrate-55-60` and fast-forwarded to `main`. Verified on the integrated tree: lint 0 errors (10 old warnings), typecheck, 2540 tests/239 files, build, schema no drift, 64/64 E2E desktop + Pixel 7 without retries. CI link is recorded in tasks/HANDOFF on the next docs commit.
 
 - Follow-up (owner): Reset now restarts the challenge and clears history/submission (D-51); the beam starts as a solid Ø31 mm circle, content version 3 (D-47 amendment). Verified by agents on the merged tree: 2564 tests, 66/66 E2E.
+- Follow-up (owner): goal card withdrawn; frame/vibration challenge panels now match the Cantilever's (D-48 amendment).
 - Content versions: torsion, heat sink, frame and bracket are now version 2, the beam version 3 (new `:v2` storage keys; version-1 saves untouched and never re-scored). Bracket is a new model id `boltedLBracket`.
 - `/` is now Home; E2E open the library at `/#challenges`. `PW_DEV_PORT`/`PW_PREVIEW_PORT` select E2E ports (04fa406) so parallel worktrees don't reuse each other's servers.
 - Guided progress is derived from history (no new persisted fields). Unit tests that edit freely enter in Parametric.
-- Not done / known gaps: Guided vs Parametric screenshots not taken; the 2D bracket fallback leaves empty space above the drawing; no password recovery or cross-tab session sync for local accounts; the goal card exists only for frame and vibration. Owner questions are in OWNER_REVIEW_CHECKLIST.md §8.
+- Not done / known gaps: Guided vs Parametric screenshots not taken; the 2D bracket fallback leaves empty space above the drawing; no password recovery or cross-tab session sync for local accounts; Owner questions are in OWNER_REVIEW_CHECKLIST.md §8.
 - Next: owner review of §8 and the backend decision for 38.1; then 44.3/51 manual checks; then 52 or 36 on owner direction.
 
 ## Repository and local locations

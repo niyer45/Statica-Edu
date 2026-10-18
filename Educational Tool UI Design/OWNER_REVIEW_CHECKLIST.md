@@ -229,7 +229,8 @@ Sources: [requirements][bf-r] and [design][bf-d] (§Integration notes, owner que
 Automated gates passed; none of this is human review.
 - [ ] Mounting Bracket I reads as an L-bracket in 3D and the 2D fallback; check the Winkler–Bach, bolt-heel and deflection assumptions, constants (P 200 N, a 120 mm, 300 N/bolt, 175 g) and the Roark k_i spot values against a printed copy (D-46).
 - [ ] The new hardest baselines are acceptable starting points, especially the beam's Ø31 mm circle (owner chose a circle start; D-47 amendment) and the frame's mixed sections (D-47). Vibration kept its baseline.
-- [ ] Braced Frame I and Vibration Isolation I: is the goal card clear enough? Apply the same pattern to the other four challenges? (D-48)
+- [x] Presentation: keep the Cantilever-style challenge paragraph and checks; goal card withdrawn (owner 2026-10-18, D-48 amendment).
+- [ ] Braced Frame statement still carries the BFR-01 pin-jointed sentences verbatim (~2× the beam's length); approve shorter equivalent wording if wanted.
 - [ ] Guided step plans per challenge are sensible teaching sequences, and locks feel helpful rather than obstructive (D-49). Redo the 44.3 manual mode checks against this design.
 - [x] Reset to baseline clears test history and submission (owner decision 2026-10-18, D-51).
 - [ ] Accounts are device-only. Choose a backend for cross-device sync (recommended: Supabase Auth + Postgres with row-level security behind the existing `AccountProvider`), the personal data to collect, retention, and whether users include minors/schools (D-50, 38.1).
