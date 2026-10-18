@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test'
 import { readFileSync, readdirSync } from 'node:fs'
 import path from 'node:path'
 import { audit, normalizeState, openWorkbench, readState, recordOtherOrigins, referenceDesign, runTest } from './helpers'
+import { DEV_URL, PREVIEW_URL } from '../playwright.config'
 
 test('responsive layout preserves state across breakpoints and has no horizontal overflow', async ({ page }) => {
   test.setTimeout(90_000) // Both sides of every layout boundary plus five axe audits.
@@ -66,7 +67,7 @@ test('WebGL-disabled flow reaches the same normalized session as the 3D flow', a
   const context = await browser.newContext({ viewport: { width: 1280, height: 1000 } })
   await context.addInitScript(() => { Object.defineProperty(window, 'WebGL2RenderingContext', { configurable: true, value: undefined }) })
   const fallback = await context.newPage()
-  await fallback.goto('http://127.0.0.1:4174')
+  await fallback.goto(DEV_URL)
   await openWorkbench(fallback, false)
   await expect(fallback.locator('canvas')).toHaveCount(0)
   await referenceDesign(fallback)
@@ -77,10 +78,10 @@ test('WebGL-disabled flow reaches the same normalized session as the 3D flow', a
 })
 
 test('production obeys CSP, makes no other-origin requests, and exposes no state hook', async ({ page }) => {
-  const other = recordOtherOrigins(page, 'http://127.0.0.1:4173')
+  const other = recordOtherOrigins(page, PREVIEW_URL)
   const csp: string[] = []
   page.on('console', (message) => { if (/content security policy|violates.*directive/i.test(message.text())) csp.push(message.text()) })
-  await page.goto('http://127.0.0.1:4173')
+  await page.goto(PREVIEW_URL)
   await openWorkbench(page, false)
   await referenceDesign(page)
   await runTest(page)
