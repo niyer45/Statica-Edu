@@ -61,7 +61,8 @@ export const catalog: readonly CatalogEntry[] = deepFreeze<CatalogEntry[]>([
     difficulty: 'intermediate',
     time: '25–35 min',
     concepts: ['Load paths', 'Stress concentrations'],
-    available: false,
+    available: true,
+    challengeId: 'mounting-bracket-1',
     art: 'bracket',
   },
   {

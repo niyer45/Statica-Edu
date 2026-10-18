@@ -1,5 +1,6 @@
 import cantileverBeam1 from './challenges/cantilever-beam-1.json'
 import heatSink1 from './challenges/heat-sink-1.json'
+import mountingBracket1 from './challenges/mounting-bracket-1.json'
 import torsionShaft1 from './challenges/torsion-shaft-1.json'
 import vibrationIsolation1 from './challenges/vibration-isolation-1.json'
 
@@ -15,6 +16,8 @@ export const BUNDLED_CHALLENGE_JSON: Readonly<Record<string, unknown>> = Object.
   'vibration-isolation-1': vibrationIsolation1 as unknown,
   // Task 48.3, owner-approved activation 2026-10-17.
   'heat-sink-1': heatSink1 as unknown,
+  // Task 46.3, owner-approved activation 2026-10-17 (Kt source disclosed per D-41).
+  'mounting-bracket-1': mountingBracket1 as unknown,
 })
 
 /** Raw config for a bundled challenge id, or undefined when none is bundled. */

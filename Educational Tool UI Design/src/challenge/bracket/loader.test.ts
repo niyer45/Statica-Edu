@@ -102,12 +102,13 @@ describe('loadBracketChallenge: bundled-format config', () => {
     expect(s.ok && s.value).toEqual(ch)
   })
 
-  it('stays unlinked: not bundled, not runnable from the catalog, its config never imported by UI code (MM-06, MBR-20)', () => {
-    expect(Object.keys(BUNDLED_CHALLENGE_JSON)).not.toContain('mounting-bracket-1')
-    expect(catalog.some((e) => e.available && e.challengeId === 'mounting-bracket-1')).toBe(false)
+  it('is bundled and linked from catalog card 002 (owner-approved activation), its config never imported by UI code (MM-06, MBR-20)', () => {
+    expect(Object.keys(BUNDLED_CHALLENGE_JSON)).toContain('mounting-bracket-1')
+    expect(catalog.find((e) => e.id === '002')).toMatchObject({ available: true, challengeId: 'mounting-bracket-1' })
+    // Only the bundled registry imports the raw config; the catalog links it by id.
     const bundled = readFileSync(new URL('../bundled.ts', import.meta.url), 'utf8')
     const catalogSource = readFileSync(new URL('../catalog.ts', import.meta.url), 'utf8')
-    expect(bundled).not.toContain('mounting-bracket-1.json')
+    expect(bundled).toContain('mounting-bracket-1.json')
     expect(catalogSource).not.toContain('mounting-bracket-1.json')
     const uiRoot = fileURLToPath(new URL('../../ui', import.meta.url))
     const uiFiles = readdirSync(uiRoot, { recursive: true, encoding: 'utf8' }).filter((f) => /\.tsx?$/.test(f))

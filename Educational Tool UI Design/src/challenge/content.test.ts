@@ -128,8 +128,8 @@ describe('catalog', () => {
   it('lists the six template challenges with the activated ones available', () => {
     expect(catalog.map((c) => c.id)).toEqual(['001', '002', '003', '004', '005', '006'])
     const available = catalog.filter((c) => c.available)
-    expect(available.map((c) => c.challengeId)).toEqual(['cantilever-beam-1', 'torsion-shaft-1', 'heat-sink-1', 'vibration-isolation-1'])
-    expect(available[1]).toMatchObject({ id: '003', title: 'Torsion Shaft I', challengeId: 'torsion-shaft-1', difficulty: 'intermediate' })
+    expect(available.map((c) => c.challengeId)).toEqual(['cantilever-beam-1', 'mounting-bracket-1', 'torsion-shaft-1', 'heat-sink-1', 'vibration-isolation-1'])
+    expect(available.find((c) => c.id === '003')).toMatchObject({ title: 'Torsion Shaft I', challengeId: 'torsion-shaft-1', difficulty: 'intermediate' })
     expect(available[0]).toMatchObject({ title: 'Cantilever Beam I', challengeId: CANTILEVER_BEAM_1_ID })
     expect(available[0].title).toBe(bundled().title)
     expect(available[0].difficulty).toBe(bundled().difficulty)
