@@ -140,7 +140,7 @@ describe('Torsion design view slot (task 54.2)', () => {
     const Broken = lazy(async () => { throw new Error('3D chunk failed to load') })
     const notify = vi.fn()
     setup(
-      <ViewportBoundary onUnavailable={notify} fallback={<TorsionFallback onUnavailable={notify} />}>
+      <ViewportBoundary onUnavailable={notify} fallback={TorsionFallback}>
         <Suspense fallback="Loading"><Broken /></Suspense>
       </ViewportBoundary>,
     )

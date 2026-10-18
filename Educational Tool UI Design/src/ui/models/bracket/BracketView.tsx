@@ -1,5 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
-import ModelViewBoundary from '../../viewport/ModelViewBoundary'
+import type { ViewportProps } from '../../viewport/FallbackViewport'
+import ViewportBoundary from '../../viewport/ViewportBoundary'
 import ViewportLoading from '../../viewport/ViewportLoading'
 import { supportsWebGL2 } from '../../viewport/webgl'
 import BracketDetails from './BracketDetails'
@@ -17,12 +18,12 @@ const BracketScene3D = lazy(() => import('./BracketScene3D'))
 
 export const BRACKET_FALLBACK_NOTICE = '3D view is unavailable. Showing the 2D side view of the bracket instead.'
 
-function Fallback({ onUnavailable }: { onUnavailable: (message: string) => void }) {
+function BracketFallback({ onUnavailable }: ViewportProps) {
   const announced = useRef(false)
   useEffect(() => {
     if (announced.current) return
     announced.current = true
-    onUnavailable(BRACKET_FALLBACK_NOTICE)
+    onUnavailable?.(BRACKET_FALLBACK_NOTICE)
   }, [onUnavailable])
   return (
     <>
@@ -35,17 +36,16 @@ function Fallback({ onUnavailable }: { onUnavailable: (message: string) => void 
 export default function BracketView({ onUnavailable }: { onUnavailable: (message: string) => void }) {
   const [lost, setLost] = useState(false)
   const onContextLost = useCallback(() => setLost(true), [])
-  const fallback = <Fallback onUnavailable={onUnavailable} />
   return (
     <div className="bracket-view">
       {supportsWebGL2() && !lost ? (
-        <ModelViewBoundary fallback={fallback}>
+        <ViewportBoundary onUnavailable={onUnavailable} fallback={BracketFallback}>
           <Suspense fallback={<ViewportLoading />}>
             <BracketScene3D onContextLost={onContextLost} />
           </Suspense>
-        </ModelViewBoundary>
+        </ViewportBoundary>
       ) : (
-        fallback
+        <BracketFallback onUnavailable={onUnavailable} />
       )}
       <BracketDetails />
     </div>

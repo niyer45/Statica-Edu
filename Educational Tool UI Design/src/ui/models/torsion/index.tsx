@@ -45,7 +45,7 @@ export const torsionUi: ModelUi = {
   Tools: TorsionTools,
   View: ({ onUnavailable }) =>
     supportsWebGL2() ? (
-      <ViewportBoundary onUnavailable={onUnavailable} fallback={<TorsionFallback onUnavailable={onUnavailable} />}>
+      <ViewportBoundary onUnavailable={onUnavailable} fallback={TorsionFallback}>
         <Suspense fallback={<ViewportLoading />}>
           <TorsionViewport3D onUnavailable={onUnavailable} />
         </Suspense>

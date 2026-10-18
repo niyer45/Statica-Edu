@@ -158,7 +158,7 @@ export default function BracketScene3D({ onContextLost: onLost }: { onContextLos
           <Scene zoom={zoom} reset={reset} />
         </Canvas>
       </div>
-      <div className="model-scene-controls" role="group" aria-label="3D view controls">
+      <div className="bracket-scene-controls" role="group" aria-label="3D view controls">
         <button type="button" aria-label="Zoom in" title="Zoom in" onClick={() => setZoom((v) => Math.min(1.8, v + 0.15))}>
           <Icon name="plus" size={15} />
         </button>
@@ -168,7 +168,7 @@ export default function BracketScene3D({ onContextLost: onLost }: { onContextLos
         <button type="button" aria-label="Reset view" title="Reset view" onClick={() => { setZoom(1); setReset((n) => n + 1) }}>
           <Icon name="reset" size={15} />
         </button>
-        <span className="model-scene-hint">Drag to rotate</span>
+        <span className="bracket-scene-hint">Drag to rotate</span>
       </div>
     </>
   )

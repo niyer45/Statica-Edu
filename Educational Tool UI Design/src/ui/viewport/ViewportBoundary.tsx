@@ -1,16 +1,18 @@
-import { Component, type ReactNode } from 'react'
+import { Component, type ComponentType, type ReactNode } from 'react'
 import FallbackViewport, { type ViewportProps } from './FallbackViewport'
 
-/**
- * Outside Suspense: catches lazy import rejection as well as Canvas/context creation errors.
- * `fallback` lets a model supply its own main-bundle view (task 54.2); the beam's typed SVG
- * fallback is the default.
- */
-export default class ViewportBoundary extends Component<ViewportProps & { children: ReactNode; fallback?: ReactNode }, { failed: boolean }> {
+export interface ViewportBoundaryProps extends ViewportProps {
+  children: ReactNode
+  /** Main-bundle fallback view (tasks 54.2, 54.3): the beam's 2D viewport unless a model supplies its own. */
+  fallback?: ComponentType<ViewportProps>
+}
+
+/** Outside Suspense: catches lazy import rejection as well as Canvas/context creation errors. */
+export default class ViewportBoundary extends Component<ViewportBoundaryProps, { failed: boolean }> {
   state = { failed: false }
   static getDerivedStateFromError() { return { failed: true } }
   render() {
-    if (!this.state.failed) return this.props.children
-    return this.props.fallback ?? <FallbackViewport onUnavailable={this.props.onUnavailable} />
+    const Fallback = this.props.fallback ?? FallbackViewport
+    return this.state.failed ? <Fallback onUnavailable={this.props.onUnavailable} /> : this.props.children
   }
 }

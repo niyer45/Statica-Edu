@@ -276,11 +276,11 @@
 .bracket-cable { stroke: #3d4a3f; stroke-width: 1.5; }
 .bracket-weight { fill: #cf744b; stroke: #7a3f14; stroke-width: 1; }
 .bracket-fallback-notice { margin: 0 0 4px; letter-spacing: 0; text-transform: none; font-weight: 500; }
-/* Task 54: lazy 3D model views (bracket, torsion, frame) share a control row below the canvas. */
+/* Bracket 3D (task 54.1): canvas host and the control row below it (never over the model). */
 .bracket-scene { min-height: 300px; }
-.model-scene-controls { display: flex; align-items: center; gap: 2px; align-self: flex-end; margin-top: 6px; background: #fcfdf8; border: 1px solid #e1e6d7; border-radius: 5px; padding: 4px; }
-.model-scene-controls button { display: grid; place-items: center; width: 28px; height: 26px; color: #4f653e; }
-.model-scene-hint { font-size: 10px; color: #5c6a55; padding: 0 6px; }
+.bracket-scene-controls { display: flex; align-items: center; gap: 2px; align-self: flex-end; margin-top: 6px; background: #fcfdf8; border: 1px solid #e1e6d7; border-radius: 5px; padding: 4px; }
+.bracket-scene-controls button { display: grid; place-items: center; width: 28px; height: 26px; color: #4f653e; }
+.bracket-scene-hint { font-size: 10px; color: #5c6a55; padding: 0 6px; }
 .field-note { grid-column: 1 / -1; margin: 0; font-size: 10px; color: #5c6a55; }
 /* Braced Frame I (task 49.3): main-bundle SVG frame view, bracing toggles and member sections.
    Member stroke widths are SVG presentation attributes (by section), so these rules set no
@@ -324,7 +324,18 @@
 .challenge-body .frame-governing { font-size: 10px; line-height: 1.6; color: #46583b; margin: 10px 0 0; }
 .frame-metrics { flex-wrap: wrap; row-gap: 12px; }
 .frame-glyph rect, .frame-glyph line { fill: none; stroke: currentColor; stroke-width: 1.4; }
+/* Braced Frame I 3D view (task 54.3): a definite-height Canvas host, the shared scene
+   controls below it (never over the model), a fallback notice, and pattern-key glyphs for the 3D tube patterns. */
+.frame-view .frame-scene-3d { position: relative; flex: none; width: 100%; height: 360px; cursor: grab; touch-action: none; user-select: none; }
+.frame-view .frame-scene-3d:active { cursor: grabbing; }
+.frame-view .frame-scene-controls { position: static; align-self: flex-end; margin: 6px 0 2px; }
+.frame-fallback-notice { margin: 0 0 4px; font-size: 10px; color: #345640; }
+.frame-glyph-core { stroke: #eef1e6; }
+.frame-glyph-bands { stroke: #22301f; stroke-dasharray: 3 3; }
+.frame-glyph-beads { stroke: #4f653e; stroke-linecap: round; stroke-dasharray: 0 5; }
+.frame-glyph-plain { stroke: #c2c9b7; stroke-linecap: round; }
 @media (max-width: 620px) {
+  .frame-view .frame-scene-3d { height: 280px; }
   .tools-body > .frame-tools { grid-column: 1 / -1; }
   .frame-tools .dimensions-heading { margin: 16px 0 10px; }
   .frame-metrics .metric { flex: 1 1 40%; }
