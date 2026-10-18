@@ -4,7 +4,6 @@ import type { ViewportProps } from '../../viewport/FallbackViewport'
 import ViewportBoundary from '../../viewport/ViewportBoundary'
 import ViewportLoading from '../../viewport/ViewportLoading'
 import BracedFrameFallback from './BracedFrameFallback'
-import BracedFrameGoal from './BracedFrameGoal'
 import './bracedFrame.css'
 import { formatFrame, formatKn, forceText, FRAME_SUMMARY_ID, MECHANISM_TEXT, memberName, MODE_LABELS, unstableText, useFrameStore } from './shared'
 
@@ -12,8 +11,8 @@ import { formatFrame, formatKn, forceText, FRAME_SUMMARY_ID, MECHANISM_TEXT, mem
 // drawing is the interactive 3D scene, a separate lazy chunk wrapped in the shared
 // `ViewportBoundary` exactly like the beam: without WebGL2, on context loss, or when the chunk
 // or Canvas fails, the main-bundle SVG elevation (`BracedFrameFallback`) is shown instead. The
-// goal card (task 56) sits above the drawing; the latest-test text summary (screen-reader
-// description of the drawing), and the member force table and reactions (collapsed, task 56)
+// latest-test text summary (screen-reader description of the drawing; the challenge panel shows
+// the same stored checks visibly) and the member force table and reactions (collapsed, task 56)
 // below it are main-bundle text equivalents shown with either view. A mechanism shows
 // "Unstable mechanism" in text and no force or drift number.
 
@@ -40,7 +39,7 @@ function BracedFrameDetails() {
   return (
     <>
       {/* Text equivalent of the drawing for assistive technology (canvas/SVG aria-describedby);
-          the goal card shows the same stored values visibly. */}
+          the challenge panel shows the same stored checks visibly. */}
       <p id={FRAME_SUMMARY_ID} className="sr-only" aria-live="off">
         {summary}
         {state.draftStatus === 'draft' && ' Forces shown are from the latest test; Run Test to update them for your current design.'}
@@ -104,7 +103,6 @@ function BracedFrameDetails() {
 export default function BracedFrameView({ onUnavailable }: ViewportProps) {
   return (
     <div className="frame-view">
-      <BracedFrameGoal />
       <ViewportBoundary onUnavailable={onUnavailable} fallback={BracedFrameFallback}>
         <Suspense fallback={<ViewportLoading />}>
           <BracedFrameViewport3D onUnavailable={onUnavailable} />

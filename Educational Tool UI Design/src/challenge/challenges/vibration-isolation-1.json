@@ -5,7 +5,7 @@
   "title": "Vibration Isolation I",
   "difficulty": "advanced",
   "allowedModes": ["guided", "parametric"],
-  "statement": "A rigid component sits on isolation mounts on a vibrating base. The mounts are so stiff that the component's natural frequency falls inside its operating frequency band, so the base vibration is amplified. Choose the mount stiffness and material to keep the vibration transmitted in the operating band low while meeting the sag, resonance peak and rattle space limits. The component mass, operating band, base vibration amplitude and mount stroke are fixed. The model computes steady-state frequency response; it does not simulate motion over time.",
+  "statement": "A rigid component sits on mounts so stiff that its natural frequency falls inside the operating band, so base vibration is amplified. Choose the mount stiffness and material to keep vibration in the band low while meeting the sag, resonance peak and rattle space limits. Mass, band, base vibration and mount stroke are fixed. The model computes steady-state frequency response; it does not simulate motion over time.",
   "component": { "massKg": 50 },
   "excitation": {
     "kind": "baseDisplacement",

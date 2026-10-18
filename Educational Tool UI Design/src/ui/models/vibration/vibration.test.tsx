@@ -9,7 +9,6 @@ import StoreProvider from '../../state/StoreProvider'
 import Workbench from '../../workbench/Workbench'
 import { modelUiFor } from '../registry'
 import { vibrationUi, VIBRATION_LIMITS_NOTICE } from '.'
-import { VIBRATION_CHANGE, VIBRATION_GOAL } from './VibrationGoal'
 
 // Vibration Isolation I workbench (task 50.3) through the PRODUCTION model UI registry. The
 // challenge is booted directly here; card activation is a separate, owner-approved step.
@@ -68,17 +67,16 @@ describe('Vibration Isolation I workbench', () => {
     expect(within(requirements).getAllByText('10.1')).toHaveLength(2)
     expect(within(requirements).getByText('2.00 mm')).toBeTruthy()
     expect(within(requirements).getAllByText('✗ Fail')).toHaveLength(3)
-    // Task 56 goal card: short check labels, a pass count and where fₙ sits; full labels stay in Test details.
-    const goal = screen.getByRole('region', { name: 'Goal' })
-    expect(within(goal).getByText(VIBRATION_GOAL)).toBeTruthy()
-    expect(within(goal).getByText(VIBRATION_CHANGE)).toBeTruthy()
-    expect(within(goal).getByText('1 of 4 pass')).toBeTruthy()
-    expect(within(requirements).getByText('Vibration in band')).toBeTruthy()
-    expect(within(goal).getByText('Natural frequency 30.20 Hz is inside the operating band (25.00–50.00 Hz).')).toBeTruthy()
+    // Task 56 follow-up: the challenge panel matches Cantilever Beam I: visible statement, then the
+    // value/limit checks with short names; full labels stay in Test details.
+    const panel = screen.getByRole('complementary', { name: 'The challenge' })
+    const statement = within(panel).getByText(/it does not simulate motion over time\./)
+    expect(statement.tagName).toBe('P')
+    expect(statement.closest('details')).toBeNull()
+    expect(requirements.closest('aside')).toBe(panel)
+    expect(within(requirements).getAllByRole('listitem').map((li) => li.firstElementChild!.textContent)).toEqual(['Vibration in band', 'Sag', 'Resonance peak', 'Rattle space'])
+    expect(screen.getByText(/Natural frequency 30\.20 Hz, inside the operating band \(25\.00–50\.00 Hz\)/)).toBeTruthy()
     expect(within(screen.getByRole('table', { name: 'Latest tested results' })).getByText('Worst vibration transmitted in the operating band')).toBeTruthy()
-    const brief = screen.getByText('Full brief and model assumptions').closest('details')!
-    expect(brief.open).toBe(false)
-    expect(within(brief).getByText(/it does not simulate motion over time/)).toBeTruthy()
     expect(screen.getByText(VIBRATION_LIMITS_NOTICE)).toBeTruthy()
     expect(screen.getByRole('img', { name: /Static schematic: component mass on a Natural rubber mount/ })).toBeTruthy()
     expect(screen.getByRole('img', { name: /Steady-state frequency response/ })).toBeTruthy()

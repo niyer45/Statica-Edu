@@ -1,27 +1,56 @@
 import { STATUS_LABELS } from '../../panels/resultPresentation'
 import Icon from '../../icons/Icon'
-import { formatVibration, useVibrationStore } from './shared'
+import { CHECK_LABELS, formatVibration, useVibrationStore } from './shared'
 
-// Vibration challenge panel (task 50.3, decluttered in task 56; VIB-06, VIB-07, VIB-10). The goal,
-// stored pass/fail checks, applicability reasons and warnings are in the goal card at the top of
-// the design view (VibrationGoal); this panel keeps the full statement (collapsed), the
-// table-only Test details disclosure (D-30), draft errors, the reference link and Run Test.
+// Vibration challenge panel (task 50.3; task 56 follow-up: same structure and styling as
+// Cantilever Beam I's RequirementsPanel; VIB-06, VIB-07, VIB-10). The visible statement, the
+// stored value/limit list of the latest test with Pass/Fail marks (short check names; full
+// labels in Test details), applicability reasons/warnings, a table-only Test details disclosure
+// (D-30), draft errors, the reference link and Run Test.
 
 export default function VibrationChallengePanel({ onOpenHelp }: { onOpenHelp: () => void }) {
   const { state, challenge: ch, runTest } = useVibrationStore()
   const latest = state.history[state.history.length - 1]!
-  const { evaluation } = latest
+  const { analysis, evaluation } = latest
+  const outside = evaluation.status === 'modelNotApplicable'
   return (
     <>
       <div className="panel-title">
         <Icon name="book" size={16} />
         <h2>The challenge</h2>
+        <span className="challenge-number">01 / 01</span>
       </div>
-      <div className="challenge-body model-challenge-body">
-        <details className="result-details challenge-brief">
-          <summary>Full brief and model assumptions</summary>
-          <p>{ch.statement}</p>
-        </details>
+      <div className="challenge-body">
+        <p>{ch.statement}</p>
+        <div className="section-heading requirements-title">
+          VALUE / LIMIT <Icon name="lock" size={11} />
+        </div>
+        <ul aria-label="Design requirements">
+          {evaluation.constraints.map((c) =>
+            c.id === 'applicability' ? null : (
+              <li className="requirement" key={c.id}>
+                <span>{CHECK_LABELS[c.id]}</span>
+                <strong>
+                  <span>{formatVibration(c.value, c.unit)}</span> / <span>{formatVibration(c.limit, c.unit)}</span>
+                  {outside && <small>Outside model assumptions</small>}
+                </strong>
+                <span className={c.passed ? 'pass-mark' : 'fail-mark'}>{c.passed ? '✓ Pass' : '✗ Fail'}</span>
+              </li>
+            ),
+          )}
+        </ul>
+        {outside && (
+          <ul aria-label="Model applicability reasons">
+            {analysis.notApplicableReasons.map((r) => (
+              <li key={r.code}>{r.message}</li>
+            ))}
+          </ul>
+        )}
+        <ul aria-label="Model warnings">
+          {analysis.warnings.map((w) => (
+            <li key={w.code}>{w.message}</li>
+          ))}
+        </ul>
         <details className="result-details">
           <summary>Test details</summary>
           <table aria-label="Latest tested results">

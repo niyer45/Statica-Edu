@@ -5,7 +5,7 @@
   "title": "Braced Frame I",
   "difficulty": "advanced",
   "allowedModes": ["guided", "parametric"],
-  "statement": "Sideways load pushes on a two-storey steel frame: some of its members are overloaded, its roof drifts too far and it is over its mass budget. Choose which diagonals brace each storey and size every member so that the frame is stable, its roof drift stays within the limit, no member exceeds its capacity, and the mass stays within budget. The frame geometry, supports, loads and material are fixed. This frame is modeled as pin-jointed: every joint is a hinge, so members carry only tension or compression. Without a diagonal, a storey of this idealized frame cannot resist sideways load. Real frames with welded or bolted joints have some bending resistance that this model ignores.",
+  "statement": "Under sideways load, this two-storey steel frame has overloaded members, too much roof drift and too much mass. Choose the diagonals and member sizes so the frame is stable and meets the drift, member capacity and mass limits. Geometry, supports, loads and material are fixed. This frame is modeled as pin-jointed: every joint is a hinge, so members carry only tension or compression. Without a diagonal, a storey of this idealized frame cannot resist sideways load. Real frames with welded or bolted joints have some bending resistance that this model ignores.",
   "material": {
     "id": "steel-educational",
     "name": "Steel (educational nominal)",

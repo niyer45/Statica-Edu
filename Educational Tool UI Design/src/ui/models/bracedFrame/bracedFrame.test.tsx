@@ -8,7 +8,6 @@ import StoreProvider from '../../state/StoreProvider'
 import Workbench from '../../workbench/Workbench'
 import { modelUiFor } from '../registry'
 import { bracedFrameUi, BRACED_FRAME_LIMITS_NOTICE } from '.'
-import { FRAME_CHANGE, FRAME_GOAL } from './BracedFrameGoal'
 
 // Braced Frame I workbench (task 49.3) through the PRODUCTION model UI registry. The challenge
 // is booted directly here; card activation is a separate, explicitly approved step. Expected
@@ -87,17 +86,15 @@ describe('Braced Frame I workbench', () => {
     expect(within(list).getByText('819.9%')).toBeTruthy()
     expect(within(list).getByText('201.8 kg')).toBeTruthy()
     expect(within(list).getAllByText('✗ Fail')).toHaveLength(3)
-    // Task 56 goal card: one goal, what to change, short check labels and a pass count.
-    const goal = screen.getByRole('region', { name: 'Goal' })
-    expect(within(goal).getByText(FRAME_GOAL)).toBeTruthy()
-    expect(within(goal).getByText(FRAME_CHANGE)).toBeTruthy()
-    expect(within(goal).getByText('1 of 4 pass')).toBeTruthy()
-    expect(within(list).getAllByRole('listitem').map((li) => li.querySelector('.goal-label')!.textContent)).toEqual(['Stability', 'Roof drift', 'Member utilization', 'Mass'])
-    expect(within(goal).getByText('Governing member: Lower diagonal (bottom right to top left), compression, Euler buckling.')).toBeTruthy()
-    // The full statement with the pin-jointed idealization is kept behind a disclosure.
-    const brief = screen.getByText('Full brief and model assumptions').closest('details')!
-    expect(brief.open).toBe(false)
-    expect(within(brief).getByText(/This frame is modeled as pin-jointed: every joint is a hinge/)).toBeTruthy()
+    // Task 56 follow-up: the challenge panel matches Cantilever Beam I: visible statement with the
+    // pin-jointed idealization (BFR-01), then the value/limit checks with short names.
+    const panel = screen.getByRole('complementary', { name: 'The challenge' })
+    const statement = within(panel).getByText(/This frame is modeled as pin-jointed: every joint is a hinge/)
+    expect(statement.tagName).toBe('P')
+    expect(statement.closest('details')).toBeNull()
+    expect(list.closest('aside')).toBe(panel)
+    expect(within(list).getAllByRole('listitem').map((li) => li.firstElementChild!.textContent)).toEqual(['Stability', 'Roof drift', 'Member utilization', 'Mass'])
+    expect(within(panel).getByText('Governing member: Lower diagonal (bottom right to top left), compression, Euler buckling.')).toBeTruthy()
     // Full constraint labels stay in the Test details table.
     expect(within(screen.getByRole('table', { name: 'Latest tested results' })).getByText('Maximum member utilization')).toBeTruthy()
     expect(screen.getByText(BRACED_FRAME_LIMITS_NOTICE)).toBeTruthy()
@@ -144,8 +141,7 @@ describe('Braced Frame I workbench', () => {
     expect(within(list).queryByText(/mm$|%$/)).toBeNull()
     expect(within(list).getByText('184.0 kg')).toBeTruthy()
     expect(screen.getByText(/Unstable mechanism\. Unstable: storey 2 has no diagonal\. Member forces and drift are not defined/)).toBeTruthy()
-    expect(within(screen.getByRole('region', { name: 'Goal' })).getByText('Unstable: storey 2 has no diagonal.')).toBeTruthy()
-    expect(within(screen.getByRole('region', { name: 'Goal' })).getByText('1 of 4 pass')).toBeTruthy()
+    expect(within(screen.getByRole('complementary', { name: 'The challenge' })).getByText('Unstable: storey 2 has no diagonal.')).toBeTruthy()
     expect(forceTable()).toBeNull()
     expect(document.querySelectorAll('.frame-label')).toHaveLength(0)
     expect(screen.getByRole('list', { name: 'Model applicability reasons' }).textContent).toMatch(/mechanism/)

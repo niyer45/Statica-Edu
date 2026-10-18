@@ -2,7 +2,6 @@ import { useId, useMemo } from 'react'
 import { transmissibilityCurve } from '../../../physics/vibration/response'
 import { formatHz, formatPercent, mToMm } from '../../../units/units'
 import { formatVibration, materialName, useVibrationStore } from './shared'
-import VibrationGoal from './VibrationGoal'
 import './vibration.css'
 
 // Vibration design view (task 50.3; VIB-14, MM-22). Main-bundle SVG with no Three.js dependency,
@@ -14,9 +13,9 @@ import './vibration.css'
 //      (display only, never persisted). It marks the operating band, both transmissibility
 //      limits, the natural frequency and the worst in-band and peak points, using patterns,
 //      marker shapes and text rather than colour alone.
-// Every labelled number comes from the stored analysis or the challenge config. The goal card
-// (task 56) sits above the figures; the table below the chart (collapsed, task 56) is the text
-// equivalent.
+// Every labelled number comes from the stored analysis or the challenge config. One line under
+// the figures says where the natural frequency sits relative to the band; the table below it
+// (collapsed, task 56) is the full text equivalent.
 
 /** Chart frame (SVG user units). */
 const W = 420
@@ -78,7 +77,6 @@ export default function VibrationView() {
 
   return (
     <div className="vibration-view">
-      <VibrationGoal />
       <div className="vibration-figures">
         <svg
           viewBox="0 0 140 230"
@@ -157,6 +155,10 @@ export default function VibrationView() {
           </text>
         </svg>
       </div>
+      <p className="vibration-position">
+        Natural frequency {formatVibration(a.naturalFrequencyHz, 'Hz')}, {fnPosition} ({formatHz(band.minHz)}–{formatHz(band.maxHz)} Hz). Transmissibility 1 passes vibration
+        straight through; below 1 isolates it.
+      </p>
       {sagPx < sagMm * SAG_PX_PER_MM && <p className="vibration-note">Drawn sag is capped; the stored sag is {formatVibration(a.staticDeflectionM, 'm')}.</p>}
       <details className="vibration-more">
         <summary>All response values</summary>
