@@ -98,7 +98,7 @@ export default function VibrationTools({ onAnnounce }: { onAnnounce: (message: s
       </div>
       <fieldset className="material-choice">
         <legend className="section-heading">
-          ISOLATOR MATERIAL <span>02</span>
+          MATERIAL · DAMPING ζ <span>02</span>
         </legend>
         {ch.materials.map((m) => (
           <label key={m.id} className={`material-option ${draft.materialId === m.id ? 'selected' : ''}`}>

@@ -13,8 +13,8 @@ import { FRAME_SUMMARY_ID, MECHANISM_TEXT, memberName, useFrameStore } from './s
 // a lost context, it renders the main-bundle SVG fallback; a chunk or Canvas creation failure
 // is caught by the boundary, which renders the same fallback. Camera controls (below the Canvas) are local view
 // state and never dispatch session actions. The canvas is named and described (scene
-// description plus the latest-test summary); the pattern key below the Canvas states every
-// pattern in words, so nothing relies on color alone and nothing is written on the model (D-26).
+// description plus the latest-test summary); the pattern key below the Canvas (collapsed, task 56) states
+// every pattern in words, so nothing relies on color alone and nothing is written on the model (D-26).
 
 export const FRAME_SCENE_LABEL = '3D braced frame view'
 export const FRAME_SCENE_DESCRIPTION_ID = 'frame-scene-description'
@@ -42,40 +42,43 @@ function SceneDescription() {
 
 function PatternKey() {
   return (
-    <ul className="frame-legend" aria-label="3D pattern key">
-      <li>
-        <svg viewBox="0 0 24 8" aria-hidden="true">
-          <line x1={1} y1={4} x2={23} y2={4} className="frame-member-tension" strokeWidth={4} />
-        </svg>
-        Solid tube: tension
-      </li>
-      <li>
-        <svg viewBox="0 0 24 8" aria-hidden="true">
-          <line x1={1} y1={4} x2={23} y2={4} className="frame-glyph-core" strokeWidth={3} />
-          <line x1={2} y1={4} x2={22} y2={4} className="frame-glyph-bands" strokeWidth={6} />
-        </svg>
-        Striped tube: compression
-      </li>
-      <li>
-        <svg viewBox="0 0 24 8" aria-hidden="true">
-          <line x1={1} y1={4} x2={23} y2={4} className="frame-glyph-beads" strokeWidth={5} />
-        </svg>
-        Beaded: ≈ 0
-      </li>
-      <li>
-        <svg viewBox="0 0 24 8" aria-hidden="true">
-          <rect x={1} y={1.5} width={22} height={5} className="frame-glyph-plain" />
-        </svg>
-        Open mesh tube: no tested force
-      </li>
-      <li>
-        <svg viewBox="0 0 24 8" aria-hidden="true">
-          <line x1={1} y1={4} x2={23} y2={4} className="frame-member-absent" />
-        </svg>
-        Dashed: not present
-      </li>
-      <li>Tube widths ×{TUBE_DIAMETER_EXAGGERATION}, proportional to each section</li>
-    </ul>
+    <details className="frame-key">
+      <summary>Drawing key</summary>
+      <ul className="frame-legend" aria-label="3D pattern key">
+        <li>
+          <svg viewBox="0 0 24 8" aria-hidden="true">
+            <line x1={1} y1={4} x2={23} y2={4} className="frame-member-tension" strokeWidth={4} />
+          </svg>
+          Solid tube: tension
+        </li>
+        <li>
+          <svg viewBox="0 0 24 8" aria-hidden="true">
+            <line x1={1} y1={4} x2={23} y2={4} className="frame-glyph-core" strokeWidth={3} />
+            <line x1={2} y1={4} x2={22} y2={4} className="frame-glyph-bands" strokeWidth={6} />
+          </svg>
+          Striped tube: compression
+        </li>
+        <li>
+          <svg viewBox="0 0 24 8" aria-hidden="true">
+            <line x1={1} y1={4} x2={23} y2={4} className="frame-glyph-beads" strokeWidth={5} />
+          </svg>
+          Beaded: ≈ 0
+        </li>
+        <li>
+          <svg viewBox="0 0 24 8" aria-hidden="true">
+            <rect x={1} y={1.5} width={22} height={5} className="frame-glyph-plain" />
+          </svg>
+          Open mesh tube: no tested force
+        </li>
+        <li>
+          <svg viewBox="0 0 24 8" aria-hidden="true">
+            <line x1={1} y1={4} x2={23} y2={4} className="frame-member-absent" />
+          </svg>
+          Dashed: not present
+        </li>
+        <li>Tube widths ×{TUBE_DIAMETER_EXAGGERATION}, proportional to each section</li>
+      </ul>
+    </details>
   )
 }
 

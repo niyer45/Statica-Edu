@@ -110,6 +110,14 @@ export function constraintRows(e: Readonly<BracedFrameEvaluation>): { id: Braced
   return BRACED_FRAME_CONSTRAINT_ORDER.map((id) => ({ id, result: e.constraints.find((c) => c.id === id) }))
 }
 
+/** Short check names for the goal card and history metrics (task 56); full labels stay in Test details. */
+export const CHECK_LABELS: Readonly<Record<Exclude<BracedFrameConstraintId, 'applicability'>, string>> = {
+  stability: 'Stability',
+  roofDrift: 'Roof drift',
+  utilization: 'Member utilization',
+  mass: 'Mass',
+}
+
 /** Display value of a stored bool constraint. */
 export function boolText(c: Readonly<BracedFrameConstraintResult>): string {
   if (c.id === 'stability') return c.passed ? 'Stable' : MECHANISM_TEXT

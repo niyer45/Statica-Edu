@@ -1,0 +1,7 @@
+/* Vibration Isolation I decluttered presentation (task 56). Imported by the main-bundle view, so
+   it precedes learningLoop.css: rules that restyle older vibration classes are scoped deeper. */
+.vibration-view .goal-card { margin-top: 2px; }
+.vibration-note { margin: 4px 0 0; font-size: 10px; color: #46583b; }
+.vibration-more { margin: 6px 0 0; font-size: 10px; color: #46583b; }
+.vibration-more > summary { cursor: pointer; padding: 4px 0; font-weight: 600; color: #345640; }
+.vibration-view .vibration-more .vibration-summary { margin: 4px 0 0; font-size: 10px; color: #46583b; }

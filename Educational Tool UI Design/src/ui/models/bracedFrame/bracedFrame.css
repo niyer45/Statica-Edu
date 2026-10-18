@@ -1,0 +1,31 @@
+/* Braced Frame I decluttered presentation (task 56). Imported by the main-bundle view, so it
+   precedes learningLoop.css in the cascade: rules that restyle older frame classes are scoped one
+   level deeper (.frame-tools / .frame-view) to win. */
+
+/* Bracing: one row per storey, two glyph toggles. */
+.frame-tools .frame-toggles { gap: 6px; }
+.frame-tools .frame-storey { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 6px; }
+.frame-tools .frame-storey-title { margin: 0; font-size: 10px; }
+.frame-tools .frame-toggle { flex-direction: row; align-items: center; gap: 5px; width: auto; min-width: 62px; margin: 0; padding: 5px 7px; }
+.frame-tools .frame-toggle small { font-size: 10px; }
+.frame-diagonal-glyph { flex: none; width: 16px; height: 16px; }
+.frame-diagonal-glyph rect { fill: none; stroke: #8a977d; stroke-width: 1; }
+.frame-diagonal-glyph line { stroke: #26352b; stroke-width: 2; stroke-linecap: round; }
+.frame-diagonal-glyph line.absent { stroke: #8a977d; stroke-width: 1.2; stroke-dasharray: 2 2; }
+
+/* Member sizes: three small groups, short label left and select right. */
+.frame-tools .frame-sections { gap: 5px; min-width: 0; margin: 0 0 10px; padding: 0; border: 0; }
+.frame-tools .frame-sections > legend { padding: 0; margin: 0 0 4px; font-size: 10px; font-weight: 600; color: #46583b; }
+.frame-tools .frame-section-field { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px; }
+.frame-tools .frame-section-field label { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.frame-tools .frame-section-field label small { font-size: 9px; color: #76552c; }
+.frame-tools .frame-section-field select { width: auto; max-width: 100%; }
+
+/* View: goal card above the drawing, compact notes and disclosures below it. */
+.frame-view .goal-card { margin-top: 2px; }
+.frame-view .frame-mechanism { padding: 8px 10px; font-size: 11px; }
+.frame-draft-note { margin: 4px 0 0; font-size: 10px; font-weight: 600; color: #76552c; }
+.frame-key, .frame-more { margin: 6px 0 0; font-size: 10px; color: #46583b; }
+.frame-key > summary, .frame-more > summary { cursor: pointer; padding: 4px 0; font-weight: 600; color: #345640; }
+.frame-key .frame-legend { margin: 4px 0 2px; }
+.frame-more .frame-table-wrap { margin-top: 4px; }

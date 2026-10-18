@@ -2,6 +2,8 @@ import { useId, useMemo } from 'react'
 import { transmissibilityCurve } from '../../../physics/vibration/response'
 import { formatHz, formatPercent, mToMm } from '../../../units/units'
 import { formatVibration, materialName, useVibrationStore } from './shared'
+import VibrationGoal from './VibrationGoal'
+import './vibration.css'
 
 // Vibration design view (task 50.3; VIB-14, MM-22). Main-bundle SVG with no Three.js dependency,
 // so it is also the non-WebGL view. Two static parts, both for the LATEST TESTED design:
@@ -12,8 +14,9 @@ import { formatVibration, materialName, useVibrationStore } from './shared'
 //      (display only, never persisted). It marks the operating band, both transmissibility
 //      limits, the natural frequency and the worst in-band and peak points, using patterns,
 //      marker shapes and text rather than colour alone.
-// Every labelled number comes from the stored analysis or the challenge config; the visible
-// table below the chart is the text equivalent.
+// Every labelled number comes from the stored analysis or the challenge config. The goal card
+// (task 56) sits above the figures; the table below the chart (collapsed, task 56) is the text
+// equivalent.
 
 /** Chart frame (SVG user units). */
 const W = 420
@@ -75,6 +78,7 @@ export default function VibrationView() {
 
   return (
     <div className="vibration-view">
+      <VibrationGoal />
       <div className="vibration-figures">
         <svg
           viewBox="0 0 140 230"
@@ -153,79 +157,83 @@ export default function VibrationView() {
           </text>
         </svg>
       </div>
-      <p className="viewport-label vibration-summary" aria-live="off">
-        Latest test: {materialName(ch, latest.designSnapshot.materialId)} mount · {formatVibration(a.stiffnessNPerM, 'N/m')} · natural frequency{' '}
-        {formatVibration(a.naturalFrequencyHz, 'Hz')}, {fnPosition} · sag {formatVibration(a.staticDeflectionM, 'm')}
-        {sagPx < sagMm * SAG_PX_PER_MM ? ' (drawn sag capped)' : ''}. Steady-state response at each frequency, not motion over time.
-      </p>
-      <div className="vibration-table">
-        <table aria-label="Frequency response values">
-          <thead>
-            <tr>
-              <th scope="col">Quantity</th>
-              <th scope="col">Latest tested value</th>
-              <th scope="col">Limit or reference</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">Operating band</th>
-              <td>
-                {formatHz(band.minHz)}–{formatHz(band.maxHz)} Hz
-              </td>
-              <td>Fixed</td>
-            </tr>
-            <tr>
-              <th scope="row">Natural frequency fₙ</th>
-              <td>{formatVibration(a.naturalFrequencyHz, 'Hz')}</td>
-              <td>{fnPosition}</td>
-            </tr>
-            <tr>
-              <th scope="row">Frequency ratio at band minimum</th>
-              <td>{formatVibration(a.frequencyRatioAtBandMin, 'ratio')}</td>
-              <td>Isolation needs more than √2</td>
-            </tr>
-            <tr>
-              <th scope="row">Worst vibration transmitted in the band</th>
-              <td>
-                {formatVibration(a.worstInBandTransmissibility, 'ratio')} at {formatVibration(a.worstInBandFrequencyHz, 'Hz')}
-              </td>
-              <td>{formatVibration(limits.maxWorstInBandTransmissibility, 'ratio')}</td>
-            </tr>
-            <tr>
-              <th scope="row">Isolation efficiency at that frequency</th>
-              <td>{a.isolationEfficiency === undefined ? 'None: the band is amplified' : `${formatPercent(a.isolationEfficiency, 1)} %`}</td>
-              <td>—</td>
-            </tr>
-            <tr>
-              <th scope="row">Peak transmissibility (resonance)</th>
-              <td>
-                {formatVibration(a.peakTransmissibility, 'ratio')} at {formatVibration(a.peakTransmissibilityFrequencyHz, 'Hz')}
-              </td>
-              <td>{formatVibration(limits.maxPeakTransmissibility, 'ratio')}</td>
-            </tr>
-            <tr>
-              <th scope="row">Static deflection (sag)</th>
-              <td>{formatVibration(a.staticDeflectionM, 'm')}</td>
-              <td>{formatVibration(limits.maxStaticDeflectionM, 'm')}</td>
-            </tr>
-            <tr>
-              <th scope="row">Peak relative displacement</th>
-              <td>
-                {formatVibration(a.peakRelativeDisplacementM, 'm')} at {formatVibration(a.peakRelativeDisplacementFrequencyHz, 'Hz')}
-              </td>
-              <td>{formatVibration(limits.maxRelativeDisplacementM, 'm')}</td>
-            </tr>
-            <tr>
-              <th scope="row">Damping</th>
-              <td>
-                ζ {formatVibration(a.dampingRatio, 'zeta')} · c {formatVibration(a.dampingCoefficientNsPerM, 'Ns/m')}
-              </td>
-              <td>{materialName(ch, latest.designSnapshot.materialId)}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      {sagPx < sagMm * SAG_PX_PER_MM && <p className="vibration-note">Drawn sag is capped; the stored sag is {formatVibration(a.staticDeflectionM, 'm')}.</p>}
+      <details className="vibration-more">
+        <summary>All response values</summary>
+        <p className="vibration-summary">
+          Latest test: {materialName(ch, latest.designSnapshot.materialId)} mount · {formatVibration(a.stiffnessNPerM, 'N/m')} · natural frequency{' '}
+          {formatVibration(a.naturalFrequencyHz, 'Hz')}, {fnPosition} · sag {formatVibration(a.staticDeflectionM, 'm')}. Steady-state response at each frequency,
+          not motion over time.
+        </p>
+        <div className="vibration-table">
+          <table aria-label="Frequency response values">
+            <thead>
+              <tr>
+                <th scope="col">Quantity</th>
+                <th scope="col">Latest tested value</th>
+                <th scope="col">Limit or reference</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Operating band</th>
+                <td>
+                  {formatHz(band.minHz)}–{formatHz(band.maxHz)} Hz
+                </td>
+                <td>Fixed</td>
+              </tr>
+              <tr>
+                <th scope="row">Natural frequency fₙ</th>
+                <td>{formatVibration(a.naturalFrequencyHz, 'Hz')}</td>
+                <td>{fnPosition}</td>
+              </tr>
+              <tr>
+                <th scope="row">Frequency ratio at band minimum</th>
+                <td>{formatVibration(a.frequencyRatioAtBandMin, 'ratio')}</td>
+                <td>Isolation needs more than √2</td>
+              </tr>
+              <tr>
+                <th scope="row">Worst vibration transmitted in the band</th>
+                <td>
+                  {formatVibration(a.worstInBandTransmissibility, 'ratio')} at {formatVibration(a.worstInBandFrequencyHz, 'Hz')}
+                </td>
+                <td>{formatVibration(limits.maxWorstInBandTransmissibility, 'ratio')}</td>
+              </tr>
+              <tr>
+                <th scope="row">Isolation efficiency at that frequency</th>
+                <td>{a.isolationEfficiency === undefined ? 'None: the band is amplified' : `${formatPercent(a.isolationEfficiency, 1)} %`}</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <th scope="row">Peak transmissibility (resonance)</th>
+                <td>
+                  {formatVibration(a.peakTransmissibility, 'ratio')} at {formatVibration(a.peakTransmissibilityFrequencyHz, 'Hz')}
+                </td>
+                <td>{formatVibration(limits.maxPeakTransmissibility, 'ratio')}</td>
+              </tr>
+              <tr>
+                <th scope="row">Static deflection (sag)</th>
+                <td>{formatVibration(a.staticDeflectionM, 'm')}</td>
+                <td>{formatVibration(limits.maxStaticDeflectionM, 'm')}</td>
+              </tr>
+              <tr>
+                <th scope="row">Peak relative displacement</th>
+                <td>
+                  {formatVibration(a.peakRelativeDisplacementM, 'm')} at {formatVibration(a.peakRelativeDisplacementFrequencyHz, 'Hz')}
+                </td>
+                <td>{formatVibration(limits.maxRelativeDisplacementM, 'm')}</td>
+              </tr>
+              <tr>
+                <th scope="row">Damping</th>
+                <td>
+                  ζ {formatVibration(a.dampingRatio, 'zeta')} · c {formatVibration(a.dampingCoefficientNsPerM, 'Ns/m')}
+                </td>
+                <td>{materialName(ch, latest.designSnapshot.materialId)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
     </div>
   )
 }

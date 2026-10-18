@@ -83,7 +83,11 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     const initial = await readState(page)
     expect(initial.challengeId).toBe('braced-frame-1')
     expect(initial.mode).toBe(mode.toLowerCase())
-    const requirements = page.getByRole('list', { name: 'Design requirements' })
+    // Task 56: the goal card at the top of the design view states the goal and the four checks.
+    const goal = page.getByRole('region', { name: 'Goal', exact: true })
+    await expect(goal.getByText('Brace and size the frame so every check passes.', { exact: true })).toBeVisible()
+    await expect(goal.getByText('1 of 4 pass', { exact: true })).toBeVisible()
+    const requirements = goal.getByRole('list', { name: 'Design requirements' })
     // The baseline fails roof drift, member utilization and mass (task 59).
     await expect(requirements.getByText('12.61 mm', { exact: true })).toBeVisible()
     await expect(requirements.getByText('819.9%', { exact: true })).toBeVisible()
@@ -98,6 +102,9 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       const box = (await canvas.boundingBox())!
       expect(box.width).toBeGreaterThan(200)
       expect(box.height).toBeGreaterThan(200)
+      // The pattern key is collapsed by default (task 56).
+      await expect(page.getByRole('list', { name: '3D pattern key' })).toBeHidden()
+      await page.getByText('Drawing key', { exact: true }).click()
       await expect(page.getByRole('list', { name: '3D pattern key' })).toContainText('Striped tube: compression')
       await expect(elevation).toHaveCount(0)
     } else {
@@ -105,6 +112,9 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await expect(page.getByText('3D view is unavailable. Use the 2D elevation and the member force table instead.', { exact: true }).first()).toBeVisible()
       await expect(page.locator('canvas')).toHaveCount(0)
     }
+    // Member forces are collapsed by default (task 56); open them to read the table.
+    await expect(page.getByRole('table', { name: 'Latest tested member forces' })).toBeHidden()
+    await page.getByText('Member forces and reactions', { exact: true }).click()
     await expect(page.getByRole('table', { name: 'Latest tested member forces' })).toBeVisible()
     if (mode === 'Guided') {
       await expect(page.getByRole('region', { name: 'Guided instructions' }).getByRole('heading', { name: 'Inspect', exact: true })).toBeVisible()
