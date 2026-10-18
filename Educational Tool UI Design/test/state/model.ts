@@ -6,7 +6,7 @@ import type { Orientation } from '../../src/geometry/sections'
 import { validateDesign } from '../../src/geometry/validate'
 import { exportDesign, importDesign } from '../../src/state/importExport'
 import { sessionReducer } from '../../src/state/reducer'
-import { initSession, type Action, type SessionState } from '../../src/state/session'
+import { initSession, sameDesignIgnoringId, type Action, type SessionState } from '../../src/state/session'
 import { arbAnyJson, arbDesign, arbHostileNumber, SECTION_KINDS } from '../arbitraries'
 
 // Task 19.3 infrastructure. Dedicated Properties 28–37 are added by 19.4–19.15.
@@ -116,6 +116,10 @@ function advanceModel(model: SessionModel, action: Action, ch: Challenge): void 
       model.pending = false
       model.reflection = ''
       break
+    // resetDraft (task 60) clears a pending prediction only when it changes the draft; that
+    // depends on the draft, so SessionCommand.run decides it from the public model definition.
+    case 'resetDraft':
+      break
     // Import success is determined separately by the public domain validator; it is not
     // inferred from the reducer's output, which would conceal a broken import transition.
     case 'importDesign':
@@ -148,6 +152,7 @@ export class SessionCommand implements fc.Command<SessionModel, SessionReal> {
     const before = real.state
     const after = real.reduce(before, action, real.challenge)
     if (action.type === 'importDesign' && importDesign(action.json, real.challenge).ok) model.pending = false
+    if (action.type === 'resetDraft' && !sameDesignIgnoringId(before.draft, real.challenge.initialDesign)) model.pending = false
     advanceModel(model, action, real.challenge)
     real.state = after
     real.trace.push(action)
@@ -198,6 +203,7 @@ export function commandInputs(ch: Challenge): fc.Arbitrary<CommandInput>[] {
     fc.constantFrom('{', '{"__proto__":{}}', '').map((json) => literal({ type: 'importDesign', json })),
     arbDesign(ch).map((design) => literal({ type: 'importDesign', json: { format: 'ei-design', schemaVersion: 1, challengeId: ch.id, design: { ...design, lengthM: -1, materialId: 'wrong' } } })),
     fc.constant(literal({ type: 'reset' })),
+    fc.constant(literal({ type: 'resetDraft' })),
   ]
 }
 

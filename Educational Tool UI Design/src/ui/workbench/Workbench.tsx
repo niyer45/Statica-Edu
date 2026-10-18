@@ -12,6 +12,7 @@ import { useSession } from '../state/store'
 import PageFooter from './PageFooter'
 import WorkbenchChrome, { MODE_LABELS } from './WorkbenchChrome'
 import ModeExperience from './ModeExperience'
+import ResetDraftControl from './ResetDraftControl'
 export { default as ViewportLoading, VIEWPORT_LOADING_TEXT } from '../viewport/ViewportLoading'
 
 // Workbench layout (task 13.3; Req 24.1–24.7, 24.9–24.11).
@@ -23,8 +24,8 @@ export { default as ViewportLoading, VIEWPORT_LOADING_TEXT } from '../viewport/V
 //
 // Regions are filled by the active model's UI (task 34.2; ui/models registry): design tools,
 // design view (with its own lazy chunk, loading placeholder and fallback boundary), challenge
-// panel, results and help. Chrome, toast, prediction/submit dialogs and the single live region
-// stay shared.
+// panel, results and help. Chrome, toast, prediction/submit dialogs, Reset to baseline (task 60)
+// and the single live region stay shared.
 
 type Modal = 'submit' | 'help' | null
 
@@ -66,6 +67,7 @@ export default function Workbench({ onExit }: WorkbenchProps) {
               <h2>Design tools</h2>
               <span className="guided">{MODE_LABELS[session.mode]}</span>
             </div>
+            <ResetDraftControl />
             <div className="tools-body">
               <ui.Tools onAnnounce={notify} />
             </div>
