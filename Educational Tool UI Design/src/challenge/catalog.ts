@@ -97,7 +97,8 @@ export const catalog: readonly CatalogEntry[] = deepFreeze<CatalogEntry[]>([
     difficulty: 'advanced',
     time: '35–45 min',
     concepts: ['Frame analysis', 'Stability'],
-    available: false,
+    available: true,
+    challengeId: 'braced-frame-1',
     art: 'frame',
   },
   {

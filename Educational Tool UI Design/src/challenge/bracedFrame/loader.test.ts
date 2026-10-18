@@ -98,10 +98,9 @@ describe('loadBracedFrameChallenge: bundled-format config', () => {
     expect(s.ok && s.value).toEqual(ch)
   })
 
-  it('stays unlinked: not bundled, not in the catalog, not imported by runtime code (MM-06, BFR-18)', () => {
-    expect(Object.keys(BUNDLED_CHALLENGE_JSON)).not.toContain('braced-frame-1')
-    expect(catalog.some((e) => e.available && e.challengeId === 'braced-frame-1')).toBe(false)
-    expect(JSON.stringify(catalog)).not.toContain('braced-frame-1')
+  it('is bundled and linked from catalog card 005 (owner-approved activation); only the bundled registry imports the raw config (MM-06, BFR-18)', () => {
+    expect(Object.keys(BUNDLED_CHALLENGE_JSON)).toContain('braced-frame-1')
+    expect(catalog.find((e) => e.id === '005')).toMatchObject({ available: true, challengeId: 'braced-frame-1' })
     const src = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
     const runtime: string[] = []
     const walk = (dir: string) => {
@@ -112,7 +111,11 @@ describe('loadBracedFrameChallenge: bundled-format config', () => {
       }
     }
     walk(src)
-    for (const file of runtime) expect(readFileSync(file, 'utf8'), file).not.toContain('braced-frame-1.json')
+    const registry = path.join(src, 'challenge', 'bundled.ts')
+    for (const file of runtime) {
+      if (file === registry) expect(readFileSync(file, 'utf8')).toContain('braced-frame-1.json')
+      else expect(readFileSync(file, 'utf8'), file).not.toContain('braced-frame-1.json')
+    }
   })
 
   it('is not a beam or torsion config, and those are not braced-frame configs (MM-02)', () => {

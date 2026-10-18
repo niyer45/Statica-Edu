@@ -86,7 +86,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await expect(page.getByRole('region', { name: 'Guided instructions' }).getByRole('heading', { name: 'Inspect', exact: true })).toBeVisible()
     } else {
       await expect(page.getByRole('region', { name: 'Guided instructions' })).toHaveCount(0)
-      await expect(page.getByText('Direct bracing and member section editing')).toBeVisible()
+      await expect(page.getByText('Direct bracing and member section editing', { exact: true })).toBeVisible()
     }
     await audit(page)
 

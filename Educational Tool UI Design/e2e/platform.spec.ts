@@ -98,16 +98,15 @@ test('production obeys CSP, makes no other-origin requests, and exposes no state
   expect(built).not.toMatch(/fonts\.googleapis\.com|fonts\.gstatic\.com/)
 })
 
-test('preview challenges and Freeform cannot open a workbench', async ({ page }) => {
+test('Freeform cannot open a workbench, and every catalog challenge is runnable', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'View Cantilever Beam I', exact: true }).click()
   await page.getByRole('dialog', { name: 'Cantilever Beam I', exact: true }).getByRole('button', { name: /Freeform/ }).click()
   await expect(page.getByRole('button', { name: 'Not available yet', exact: true })).toBeDisabled()
-  await page.getByRole('button', { name: 'Close challenge details' }).click()
-  const previews = page.locator('.challenge-card').filter({ hasText: 'Concept preview' })
-  const preview = previews.first().locator('.card-art')
-  await preview.click()
-  await expect(page.getByRole('button', { name: 'Not available yet', exact: true })).toBeDisabled()
   await expect(page.getByRole('button', { name: 'Run Test', exact: true })).not.toBeVisible()
+  await page.getByRole('button', { name: 'Close challenge details' }).click()
+  // All six original challenges are activated (D-42, D-43, D-44): no card remains a concept preview.
+  await expect(page.locator('.challenge-card')).toHaveCount(6)
+  await expect(page.locator('.challenge-card').filter({ hasText: 'Concept preview' })).toHaveCount(0)
   await audit(page)
 })
