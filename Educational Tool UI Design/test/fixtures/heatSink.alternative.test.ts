@@ -105,7 +105,7 @@ describe('(b) finite-difference fin with the exact convective tip', () => {
     expect(Number(error.toPrecision(3))).toBe(f.expected.correctedLengthError)
   })
 
-  it('the corrected-length error is largest for the short, thick baseline and smallest for deepChannels', () => {
+  it('the corrected-length error is largest for the 5 mm thick baseline and smallest for deepChannels', () => {
     const errs = HEAT_SINK_WORKSHEET.map((f) => Math.abs(f.expected.correctedLengthError))
     expect(Math.max(...errs)).toBe(Math.abs(worksheetFixture('baseline').expected.correctedLengthError))
     expect(Math.min(...errs)).toBe(Math.abs(worksheetFixture('deepChannels').expected.correctedLengthError))

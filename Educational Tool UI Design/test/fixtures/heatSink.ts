@@ -69,7 +69,19 @@ const row = (
 ): HeatSinkFixture => ({ name, design: heatSink(name, N, t, H), expected })
 
 export const HEAT_SINK_WORKSHEET: readonly HeatSinkFixture[] = [
-  row('baseline', [4, 0.003, 0.015], {
+  // Challenge v2 baseline (task 59): three thick, tall fins that fail base temperature, mass and
+  // fin height, the most checks any applicable in-range design fails. Values from an independent
+  // calculation of the same worksheet equations (it reproduces the shortFins row exactly).
+  row('baseline', [3, 0.005, 0.04], {
+    finGapM: 0.0225, channelAspectRatio: 1.77777777777778, finAreaM2: 0.0051, exposedBaseAreaM2: 0.0027, totalAreaM2: 0.018,
+    mLc: 0.300520382004283, finBiotNumber: 3.125e-4,
+    finEfficiency: 0.970944995769534, overallEfficiency: 0.975303246404104, convectionResistanceKPerW: 2.27849361766758,
+    baseTemperatureK: 355.251229330578, baseTemperatureC: 82.1012293305784, baseTemperatureRiseK: 57.1012293305784, massKg: 0.13608,
+    status: 'notAccepted', failures: ['baseTemperature', 'mass', 'finHeight'], warningCodes: [], notApplicableCodes: [],
+    correctedLengthError: -5.77e-6,
+  }),
+  // The challenge v1 baseline (four short 3 mm fins), kept as a worksheet row.
+  row('shortFins', [4, 0.003, 0.015], {
     finGapM: 0.016, channelAspectRatio: 0.9375, finAreaM2: 0.00198, exposedBaseAreaM2: 0.00288, totalAreaM2: 0.0108,
     mLc: 0.150623703313921, finBiotNumber: 1.875e-4,
     finEfficiency: 0.992505505199928, overallEfficiency: 0.994504037146614, convectionResistanceKPerW: 3.72417161254589,
@@ -170,8 +182,10 @@ export function worksheetFixture(name: string): HeatSinkFixture {
 
 /** Derived targets (worksheet "Derived targets and solvability"). */
 export const HEAT_SINK_DERIVED = {
-  /** Prediction fixture: baseline → reference base temperature rise ratio (a decrease). */
-  baselineToReferenceRiseRatio: 0.252106995672254,
+  /** Prediction fixture: v2 baseline → reference base temperature rise ratio (a decrease). */
+  baselineToReferenceRiseRatio: 0.411676912235803,
+  /** Prediction fixture: shortFins (the v1 baseline) → reference rise ratio (a decrease). */
+  shortFinsToReferenceRiseRatio: 0.252106995672254,
   /** Reference fin parameter, 1/m. */
   referenceFinParameterPerM: 12.9099444873581,
   /** Reference corrected length, m. */
@@ -187,7 +201,7 @@ export const HEAT_SINK_DERIVED = {
     { xOverH: 1, excessRatio: 0.902236138537931, temperatureK: 319.233786908349 },
   ],
   /** Tip excess ratios θ(H)/θ_b for other rows. */
-  tipRatios: { baseline: 0.98885520147097, acceptedWarning: 0.860826225361443, deepChannels: 0.787341319087578 },
+  tipRatios: { baseline: 0.956632239814936, shortFins: 0.98885520147097, acceptedWarning: 0.860826225361443, deepChannels: 0.787341319087578 },
   /** Grid enumeration (N 2–20, t 1.0–5.0 mm by 0.5, H 5–45 mm by 1). */
   grid: { valid: 5289, accepted: 80, notAccepted: 3894, modelNotApplicable: 1315 },
   /** With N = 7 at H = 35 mm the best base temperature over all thicknesses, °C. */
@@ -200,7 +214,7 @@ export const HEAT_SINK_DERIVED = {
   /** reference → thickerFins: T_base drop (K, quoted to 8 decimals) and mass added (g). */
   thickerTrade: { temperatureDropK: 0.33170535, massAddedG: 28.35 },
   /** Fin heat share N η_f h A_f θ_b / Q. */
-  finHeatShare: { baseline: 0.731859643896696, reference: 0.936905404005661 },
+  finHeatShare: { baseline: 0.846201680807438, shortFins: 0.731859643896696, reference: 0.936905404005661 },
 } as const
 
 /** |actual − expected| ≤ rel · |expected|. */

@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
+import { readFileSync } from 'node:fs'
 import { catalog } from '../src/challenge/catalog'
 import { readState, referenceDesign } from './helpers'
 
@@ -88,9 +89,11 @@ test('all six original challenges keep separate saved work in one browser profil
   }
 
   const keys = await page.evaluate(() => Object.keys(window.localStorage).filter((k) => k.startsWith('ei:session:')).sort())
-  // Each key carries its own challenge's current version (Mounting Bracket I is version 2, task 55).
-  expect(keys).toEqual(ENTRIES.map((e) => `ei:session:${e.id}:v${versions.get(e.id)}`).sort())
-  expect(versions.get('mounting-bracket-1')).toBe(2)
+  // Each key carries that challenge's own content version (a content change bumps it, MM-04),
+  // and the live session reports the same version.
+  const version = (id: string) => (JSON.parse(readFileSync(new URL(`../src/challenge/challenges/${id}.json`, import.meta.url), 'utf8')) as { version: number }).version
+  for (const e of ENTRIES) expect(versions.get(e.id)).toBe(version(e.id))
+  expect(keys).toEqual(ENTRIES.map((e) => `ei:session:${e.id}:v${version(e.id)}`).sort())
 
   await page.reload()
   for (const entry of ENTRIES) {

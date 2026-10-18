@@ -33,6 +33,17 @@ export function bundledChallenge(): Challenge {
   return bundledChallengeResult.value
 }
 
+/**
+ * The bundled challenge started from a solid Ø30 mm circle at 0° (its version 1 baseline).
+ * Task 59 made the bundled baseline a sideways I-section; component tests whose subject is circle
+ * and tube editing from a circle draft start here instead, with every assertion unchanged. Tests
+ * of the bundled content itself use bundledChallenge().
+ */
+export function circleStartChallenge(): Challenge {
+  const ch = bundledChallenge()
+  return { ...ch, initialDesign: { ...ch.initialDesign, section: { kind: 'circle', diameterM: 0.03 }, orientationDeg: 0 } }
+}
+
 /** Finite double in [lo, hi] (inclusive). Throws if the interval is empty (infeasible limits). */
 function between(lo: number, hi: number): fc.Arbitrary<number> {
   if (!(Number.isFinite(lo) && Number.isFinite(hi) && lo <= hi)) {

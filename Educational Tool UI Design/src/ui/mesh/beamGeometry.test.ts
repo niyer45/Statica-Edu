@@ -3,7 +3,7 @@ import { bundledChallengeResult } from '../../challenge/content'
 import type { Challenge } from '../../challenge/types'
 import type { BeamDesign, Section } from '../../geometry/sections'
 import { analyze } from '../../physics/analyze'
-import { baseline, rectTall, tubeSameMass } from '../../../test/fixtures/designs'
+import { rectTall, solid30, tubeSameMass } from '../../../test/fixtures/designs'
 import {
   BEAM_LENGTH_SEGMENTS,
   buildBeamGeometry,
@@ -38,7 +38,7 @@ describe('sectionShape', () => {
   })
 
   it('has no holes for solid sections', () => {
-    expect(sectionShape(baseline.design.section).holes).toHaveLength(0)
+    expect(sectionShape(solid30.design.section).holes).toHaveLength(0)
     expect(sectionShape(rectTall.design.section).holes).toHaveLength(0)
   })
 })

@@ -110,7 +110,7 @@ describe('FIN_BIOT (h t / 2k, warning above 0.01, not applicable above 0.1)', ()
 
   it('is evaluated through analyzeHeatSink with a configured coefficient', () => {
     // Bi = h t/(2k): t = 3 mm, k = 200 → h = 1333.3 gives Bi = 0.01 exactly on the safe side.
-    const withH = (h: number) => analyzeHeatSink(ch.initialDesign, { ...ch, convection: { ...ch.convection, coefficientWPerM2K: h } })
+    const withH = (h: number) => analyzeHeatSink(worksheetFixture('shortFins').design, { ...ch, convection: { ...ch.convection, coefficientWPerM2K: h } })
     const at01 = withH((0.01 * 2 * 200) / 0.003)
     expect(at01.warnings.map((i) => i.code)).not.toContain('FIN_BIOT')
     expect(withH(((0.01 * 2 * 200) / 0.003) * (1 + 4 * REL_TOL)).warnings.map((i) => i.code)).toContain('FIN_BIOT')

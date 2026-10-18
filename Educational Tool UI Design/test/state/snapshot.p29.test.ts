@@ -73,7 +73,7 @@ describe('Property 29: snapshot isolation', () => {
   }, 30_000) // Allow the supported PBT_RUNS=2000 deep run without lowering coverage.
 
   const corruptions: { name: string; corrupt: (result: TestResult) => TestResult }[] = [
-    { name: 'design snapshot', corrupt: (result) => ({ ...result, designSnapshot: { ...result.designSnapshot, orientationDeg: 90 } }) },
+    { name: 'design snapshot', corrupt: (result) => ({ ...result, designSnapshot: { ...result.designSnapshot, orientationDeg: result.designSnapshot.orientationDeg === 90 ? 0 : 90 } }) },
     { name: 'analysis', corrupt: (result) => ({ ...result, analysis: { ...result.analysis, tipDeflectionM: result.analysis.tipDeflectionM + 1 } }) },
     { name: 'evaluation', corrupt: (result) => ({ ...result, evaluation: { ...result.evaluation, accepted: !result.evaluation.accepted } }) },
     { name: 'stored prediction', corrupt: (result) => ({ ...result, prediction: { ...result.prediction!, explanation: 'tampered' } }) },

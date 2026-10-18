@@ -32,9 +32,10 @@ const expectRel = (actual: number, expected: number, what: string) =>
   expect(relClose(actual, expected), `${what}: ${actual} vs ${expected}`).toBe(true)
 
 describe('Torsion Shaft I worksheet (TSH-13)', () => {
-  it('covers all eight worksheet rows', () => {
+  it('covers all nine worksheet rows', () => {
     expect(TORSION_WORKSHEET.map((f) => f.name)).toEqual([
       'baseline',
+      'solid30',
       'reference',
       'tubeEqualMass',
       'heavySolid',
@@ -87,8 +88,12 @@ describe('Torsion Shaft I worksheet (TSH-13)', () => {
     }
   })
 
-  it('baseline mass equals tubeEqualMass mass (equal-area designs)', () => {
-    expect(relClose(run(worksheetFixture('baseline')).analysis.massKg, run(worksheetFixture('tubeEqualMass')).analysis.massKg, 1e-12)).toBe(true)
+  it('the bundled baseline is the worksheet baseline row', () => {
+    expect(ch.initialDesign.section).toEqual(worksheetFixture('baseline').design.section)
+  })
+
+  it('solid30 mass equals tubeEqualMass mass (equal-area designs)', () => {
+    expect(relClose(run(worksheetFixture('solid30')).analysis.massKg, run(worksheetFixture('tubeEqualMass')).analysis.massKg, 1e-12)).toBe(true)
   })
 })
 
@@ -127,6 +132,14 @@ describe('derived targets', () => {
     const next = run(worksheetFixture('reference')).analysis
     const r = (TORSION_PRIMARY_METRIC.read(next) as number) / (TORSION_PRIMARY_METRIC.read(prev) as number)
     expect(relClose(r, TORSION_DERIVED.baselineToReferenceTwistRatio, TORSION_WORKSHEET_REL_TOL)).toBe(true)
+    expect(classifyRatio(r)).toBe('decrease')
+  })
+
+  it('prediction fixture: solid30 → reference twist ratio is a decrease', () => {
+    const prev = run(worksheetFixture('solid30')).analysis
+    const next = run(worksheetFixture('reference')).analysis
+    const r = (TORSION_PRIMARY_METRIC.read(next) as number) / (TORSION_PRIMARY_METRIC.read(prev) as number)
+    expect(relClose(r, TORSION_DERIVED.solid30ToReferenceTwistRatio, TORSION_WORKSHEET_REL_TOL)).toBe(true)
     expect(classifyRatio(r)).toBe('decrease')
   })
 })

@@ -70,9 +70,20 @@ export async function runTest(page: Page, keyboard = false) {
     await expect(dialog).not.toBeVisible()
   }
 }
+/**
+ * Selects the 0° section orientation. The Cantilever Beam I baseline is an I-section turned 90°
+ * (task 59). By keyboard, Tab reaches the checked 90° radio and an arrow key moves to 0°.
+ */
+export async function uprightSection(page: Page, keyboard = false) {
+  const upright = page.getByRole('radio', { name: '0°', exact: true })
+  if (await upright.isChecked()) return
+  if (keyboard) { await tabTo(page, page.getByRole('radio', { name: '90°', exact: true })); await page.keyboard.press('ArrowLeft') } else await upright.check()
+  await expect(upright).toBeChecked()
+}
 export async function referenceDesign(page: Page, keyboard = false) {
   const tile = page.getByRole('button', { name: /I-section/ }).filter({ has: page.locator('svg') }).first()
   if (keyboard) { await tabTo(page, tile); await tile.press('Enter') } else await tile.click()
+  await uprightSection(page, keyboard)
   for (const [param, value] of [['heightM', '60'], ['widthM', '40'], ['flangeThicknessM', '4'], ['webThicknessM', '3']] as const) await setDimension(page, param, value, keyboard)
 }
 /** Use the same default camera framing as BeamView, without inspecting renderer internals. */

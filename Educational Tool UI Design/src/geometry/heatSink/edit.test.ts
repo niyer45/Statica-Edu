@@ -117,7 +117,7 @@ describe('applyHeatSinkEdit', () => {
   it('keeps the draft on a rejected strict edit and reports every error', () => {
     const r = applyHeatSinkEdit(draft, { type: 'setParam', param: 'finCount', value: 1, mode: 'strict' }, ch)
     expect(!r.ok && r.error.map((e) => `${e.param} ${e.code}`)).toEqual(['finCount BELOW_MIN'])
-    expect(draft.finCount).toBe(4)
+    expect(draft.finCount).toBe(3)
   })
 
   it('a non-finite clamp value returns an equal, fresh design', () => {

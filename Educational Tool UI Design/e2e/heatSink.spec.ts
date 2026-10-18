@@ -55,9 +55,12 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     expect(initial.challengeId).toBe('heat-sink-1')
     expect(initial.mode).toBe(mode.toLowerCase())
     const requirements = page.getByRole('list', { name: 'Design requirements' })
-    await expect(requirements.getByText('118.2 °C', { exact: true })).toBeVisible()
+    // The baseline fails base temperature, mass and fin height (task 59).
+    await expect(requirements.getByText('82.1 °C', { exact: true })).toBeVisible()
+    await expect(requirements.getByText('136.1 g', { exact: true })).toBeVisible()
+    await expect(requirements.getByText('✗ Fail', { exact: true })).toHaveCount(3)
     await expect(page.getByText('Idealized plate-fin heat sink model, not a thermal certification')).toBeVisible()
-    await expect(page.getByRole('img', { name: /Front view across the heat sink: 4 fins/ })).toBeVisible()
+    await expect(page.getByRole('img', { name: /Front view across the heat sink: 3 fins/ })).toBeVisible()
     if (mode === 'Guided') {
       await expect(page.getByRole('region', { name: 'Guided instructions' }).getByRole('heading', { name: 'Inspect', exact: true })).toBeVisible()
     } else {

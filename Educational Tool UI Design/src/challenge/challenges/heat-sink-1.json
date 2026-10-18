@@ -1,11 +1,11 @@
 {
   "id": "heat-sink-1",
-  "version": 1,
+  "version": 2,
   "model": { "id": "plateFinHeatSink", "version": 1 },
   "title": "Heat Sink I",
   "difficulty": "intermediate",
   "allowedModes": ["guided", "parametric"],
-  "statement": "The aluminum heat sink under an electronic component runs too hot. Redesign its fins (how many, how thick and how tall) to keep the base temperature within its limit while staying within the mass, fin height and fin gap limits. The base, material, heat load and air temperature are fixed, and the convection coefficient is a given value for low-speed fan-assisted airflow, not computed by the model.",
+  "statement": "The aluminum heat sink under an electronic component runs too hot, and its few thick, tall fins are over the mass and fin height limits. Redesign its fins (how many, how thick and how tall) to keep the base temperature within its limit while staying within the mass, fin height and fin gap limits. The base, material, heat load and air temperature are fixed, and the convection coefficient is a given value for low-speed fan-assisted airflow, not computed by the model.",
   "material": {
     "id": "aluminum-educational",
     "name": "Aluminum (educational nominal)",
@@ -22,9 +22,9 @@
   },
   "initialDesign": {
     "id": "baseline",
-    "finCount": 4,
-    "finThicknessM": 0.003,
-    "finHeightM": 0.015,
+    "finCount": 3,
+    "finThicknessM": 0.005,
+    "finHeightM": 0.04,
     "materialId": "aluminum-educational"
   },
   "referenceDesign": {

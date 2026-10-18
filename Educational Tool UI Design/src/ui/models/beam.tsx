@@ -60,7 +60,7 @@ export const beamUi: ModelUi = {
   Help: HelpDialog,
   guidance: {
     steps: [
-      { id: 'inspect', title: 'Inspect', instruction: 'Read the challenge and its limits. Find which requirement the Baseline misses before editing.', hint: 'Expand Some things are fixed. to inspect the load, span, material and support. Accepted applies to this idealized model, not a real-world safety approval.' },
+      { id: 'inspect', title: 'Inspect', instruction: 'Read the challenge and its limits. Find which requirements the Baseline misses before editing.', hint: 'Expand Some things are fixed. to inspect the load, span, material and support. Accepted applies to this idealized model, not a real-world safety approval.' },
       { id: 'experiment', title: 'Experiment', instruction: 'Change one section dimension or orientation. Predict what will happen, then Run Test to record the result.', hint: 'Change one thing at a time so you can explain its effect. The dotted outline stays on the latest tested design until you run another test.' },
       { id: 'compare', title: 'Compare', instruction: 'Choose designs in Design history, then open Compare results. Select a design to inspect its values against Baseline.', hint: 'Look for a stiffness and mass tradeoff. Restore copies a tested design into the draft; the recorded results remain unchanged.' },
       { id: 'explain', title: 'Explain', instruction: 'Use your tested values to explain one design decision. Open Explain & submit to record a design and reflection.', hint: 'A submitted attempt can still be Not accepted. Explain remaining failures and one effect the idealized beam model does not include.' },

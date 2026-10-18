@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import type { SectionKind } from '../../challenge/types'
 import { SECTION_PARAMS, PARAM_LABELS } from '../../geometry/params'
 import { bundledChallengeResult } from '../../challenge/content'
+import { circleStartChallenge } from '../../../test/arbitraries'
 import { formatMm, mToMm } from '../../units/units'
 import { bootstrap } from '../state/bootstrap'
 import StoreProvider from '../state/StoreProvider'
@@ -23,8 +24,9 @@ function Probe() {
   return null
 }
 
-function setup() {
-  const boot = bootstrap(bundledChallengeResult, clock, newId)
+/** Starts from a Ø30 mm circle (these tests exercise circle/tube editing); see bundled() below. */
+function setup(challenge: typeof bundledChallengeResult = { ok: true, value: circleStartChallenge() }) {
+  const boot = bootstrap(challenge, clock, newId)
   if (!boot.ok) throw new Error(boot.error.message)
   const onAnnounce = vi.fn()
   render(
@@ -46,6 +48,13 @@ const section = () => latest!.draft.section as unknown as Record<string, number>
 const field = (name: RegExp) => screen.getByLabelText(name, { selector: 'input[type="number"]' }) as HTMLInputElement
 
 describe('NumericControls', () => {
+  it('starts the bundled challenge on its sideways I-section baseline with 90° selected', () => {
+    setup(bundledChallengeResult)
+    for (const [name, mm] of [[/^Width/, '36.50'], [/^Height/, '84.00'], [/^Flange thickness/, '3.00'], [/^Web thickness/, '7.00']] as const) expect(field(name).value).toBe(mm)
+    expect((screen.getByRole('radio', { name: '90°' }) as HTMLInputElement).checked).toBe(true)
+    expect((screen.getByRole('radio', { name: '90°' }) as HTMLInputElement).disabled).toBe(false)
+  })
+
   it('renders one mm field per draft parameter with challenge min/max/step', () => {
     const { challenge } = setup()
     const d = field(/^Diameter/)

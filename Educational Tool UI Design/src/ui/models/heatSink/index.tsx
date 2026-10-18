@@ -47,7 +47,7 @@ export const heatSinkUi: ModelUi = {
       {
         id: 'inspect',
         title: 'Inspect',
-        instruction: 'Read the challenge and its limits. Find which limit the baseline heat sink misses, and use Test details to see how much of its heat leaves through the fins.',
+        instruction: 'Read the challenge and its limits. Find which limits the baseline heat sink misses, and use Test details to see how much of its heat leaves through the fins.',
         hint: 'Expand Some things are fixed. to see the base, heat load, air temperature and the given convection coefficient. Accepted applies to this idealized model, not a real-world thermal approval.',
       },
       {

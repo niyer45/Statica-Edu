@@ -1,10 +1,12 @@
 import { expect, test } from '@playwright/test'
-import { audit, dragHeightHandle, normalizeState, openWorkbench, projectScenePoint, readState, referenceDesign, runTest, setDimension, tabTo } from './helpers'
+import { audit, dragHeightHandle, normalizeState, openWorkbench, projectScenePoint, readState, referenceDesign, runTest, setDimension, tabTo, uprightSection } from './helpers'
 
 test('happy path: edit, drag a height handle, predict, compare, restore, reflect and submit', async ({ page }) => {
   await openWorkbench(page)
   await expect(page.getByLabel('Result status')).toContainText('Not accepted')
+  // The baseline is an I-section turned 90° (task 59): stand it upright, then drag its height.
   await page.getByRole('button', { name: /I-section/ }).first().click()
+  await uprightSection(page)
   await dragHeightHandle(page)
   await referenceDesign(page)
   for (let i = 0; i < 4; i++) {
@@ -40,7 +42,8 @@ test('HTML5 palette drag-drop applies the section without recording a result', a
   await openWorkbench(page)
   // Preserve the target width while giving the stacked mobile layout room for a native drag.
   await page.setViewportSize({ width: page.viewportSize()!.width, height: 2400 })
-  const tile = page.getByRole('button', { name: /I-section/ }).first()
+  // The baseline is an I-section (task 59), so drop the solid circle to make a real change.
+  const tile = page.getByRole('button', { name: /Solid circle/ }).first()
   const state = await readState(page)
   const destination = await projectScenePoint(page, [state.draft.lengthM / 2, 0, 0])
   const source = await tile.boundingBox()
@@ -55,7 +58,7 @@ test('HTML5 palette drag-drop applies the section without recording a result', a
   await expect(target).toHaveAttribute('data-section-drop-target', 'active')
   await page.mouse.up()
   await expect(target).toHaveAttribute('data-section-drop-target', 'idle')
-  await expect.poll(async () => (await readState(page)).draft.section.kind).toBe('iSection')
+  await expect.poll(async () => (await readState(page)).draft.section.kind).toBe('circle')
   await expect(tile).toHaveAttribute('aria-pressed', 'true')
   await expect(tile).toContainText('Active')
   expect((await readState(page)).history).toHaveLength(1)

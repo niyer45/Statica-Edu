@@ -68,12 +68,15 @@ describe('evaluate: design fixtures (Req 12.7–12.9)', () => {
     })
   }
 
-  it('baseline numbers and negative deflection margin', () => {
+  it('baseline numbers, negative deflection and stress margins and mass over budget', () => {
     const { a, e } = run(ch.initialDesign)
-    relClose(a.tipDeflectionM, 7.87e-3)
-    relClose(a.massKg, 1.145)
-    relClose(a.nominalMaxStressPa, 67.9e6)
+    relClose(a.tipDeflectionM, 11.794e-3)
+    relClose(a.massKg, 1.2393)
+    relClose(a.nominalMaxStressPa, 123.76e6)
+    expect(e.failures).toEqual(['deflection', 'stress', 'mass', 'envelopeWidth'])
     expect(e.efficiency.deflectionMargin).toBeLessThan(0)
+    expect(e.efficiency.stressMargin).toBeLessThan(0)
+    expect(e.efficiency.massUsage).toBeGreaterThan(1)
   })
 
   it('reference has no warnings and is accepted', () => {
@@ -93,8 +96,9 @@ describe('evaluate: constraint results (Req 11.1–11.7)', () => {
     expect([defl.value, defl.limit, defl.unit]).toEqual([a.tipDeflectionM, k.maxDeflectionM, 'm'])
     expect([stress.value, stress.limit, stress.unit]).toEqual([a.nominalMaxStressPa, k.maxStressPa, 'Pa'])
     expect([mass.value, mass.limit, mass.unit]).toEqual([a.massKg, k.maxMassKg, 'kg'])
-    expect([w.value, w.limit, w.unit]).toEqual([0.03, k.maxWidthM, 'm'])
-    expect([h.value, h.limit, h.unit]).toEqual([0.03, k.maxHeightM, 'm'])
+    // The baseline I-section is turned 90°: its 84 mm height is the envelope width.
+    expect([w.value, w.limit, w.unit]).toEqual([0.084, k.maxWidthM, 'm'])
+    expect([h.value, h.limit, h.unit]).toEqual([0.0365, k.maxHeightM, 'm'])
     for (const c of [defl, stress, mass, w, h]) expect(c.utilization).toBe(c.value / c.limit)
     expect(geom).toMatchObject({ unit: 'bool', value: 1, limit: 1, passed: true, utilization: 1 })
     expect(app).toMatchObject({ unit: 'bool', value: 1, limit: 1, passed: true, utilization: 1 })

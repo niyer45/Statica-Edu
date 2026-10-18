@@ -39,7 +39,8 @@ describe('loadBracedFrameChallenge: bundled-format config', () => {
 
   it('defines the identity and learning settings (BFR-01, BFR-08, BFR-09)', () => {
     expect(ch.id).toBe('braced-frame-1')
-    expect(ch.version).toBe(1)
+    // Version 2 (task 59): the baseline changed, so saves move to a new storage key (MM-04).
+    expect(ch.version).toBe(2)
     expect(ch.title).toBe('Braced Frame I')
     expect(ch.model).toEqual(BRACED_FRAME_MODEL_REF)
     expect(ch.model).toEqual({ id: 'pinJointedBracedFrame', version: 1 })
@@ -73,7 +74,10 @@ describe('loadBracedFrameChallenge: bundled-format config', () => {
     ])
     const m = ch.initialDesign.members
     expect([m.diag1a.present, m.diag1b.present, m.diag2a.present, m.diag2b.present]).toEqual([false, true, false, true])
-    expect(Object.values(m).every((x) => x.sectionId === 'CHS60.3x4.0')).toBe(true)
+    expect(Object.fromEntries(Object.entries(m).map(([id, x]) => [id, x.sectionId]))).toEqual({
+      col1L: 'CHS48.3x3.2', col1R: 'CHS48.3x3.2', col2L: 'CHS88.9x5.0', col2R: 'CHS88.9x5.0', beam1: 'CHS88.9x5.0', beam2: 'CHS88.9x5.0',
+      diag1a: 'CHS60.3x4.0', diag1b: 'CHS48.3x3.2', diag2a: 'CHS60.3x4.0', diag2b: 'CHS48.3x3.2',
+    })
     const ref = ch.referenceDesign!.members
     expect([ref.diag1a.present, ref.diag1b.present, ref.diag2a.present, ref.diag2b.present]).toEqual([true, false, true, false])
   })
