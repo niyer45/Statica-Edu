@@ -4,8 +4,8 @@ import { useModelUi } from '../models/registry'
 import { useStore } from '../state/store'
 import { STATUS_LABELS } from '../panels/resultPresentation'
 
-/** Task 60: spoken and shown once after Reset to baseline replaces the draft. */
-export const RESET_DRAFT_ANNOUNCEMENT = 'Design reset to the baseline. Tested history is unchanged.'
+/** Task 60: spoken and shown once after Reset to baseline starts the challenge over. */
+export const RESET_DRAFT_ANNOUNCEMENT = 'Challenge reset to the baseline. Design, test history and submission were cleared.'
 
 export const AnnounceContext = createContext<(message: string) => void>(() => {})
 export const useAnnounce = () => useContext(AnnounceContext)

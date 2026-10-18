@@ -87,11 +87,12 @@ export type SharedAction =
   | { type: 'importDesign'; json: unknown }
   | { type: 'reset' }
   /**
-   * Task 60: replace the draft with a fresh copy of the challenge's baseline design. History,
-   * deletions, comparison, reflection and submission are kept; a no-op when the draft already
-   * equals the baseline (ignoring id).
+   * Task 60 (owner amendment): Reset to baseline. The session starts over exactly as if the
+   * challenge were first opened in the same mode: baseline draft, history with only a new
+   * Baseline record, no archived/deleted entries, comparison, pending prediction, reflection or
+   * submission. Time and the new Baseline id are injected like runTest. A no-op on a fresh session.
    */
-  | { type: 'resetDraft' }
+  | { type: 'resetDraft'; now: string; id: string }
 
 const SHARED_TYPES: ReadonlySet<string> = new Set(['setPrediction', 'cancelPrediction', 'runTest', 'deleteIteration', 'restore', 'toggleCompare', 'setReflection', 'submit', 'importDesign', 'reset', 'resetDraft'])
 
@@ -102,6 +103,28 @@ export function isSharedAction(a: { type: string }): boolean {
 
 /** Session type for a model's design, analysis, evaluation, outcome and error types. */
 export type AnySession<D, A, E extends EvaluationBase, O, Err> = SessionStateOf<D, TestResultOf<D, A, E, O>, Err, E['efficiency']>
+
+/**
+ * Task 60: true when a session equals a fresh start (as built by initSessionWith) apart from ids
+ * and timestamps: baseline draft, only the Baseline in history, nothing archived, compared,
+ * pending, reflected or submitted. Reset to baseline is unavailable and a no-op then.
+ */
+export function isFreshSessionWith<D>(
+  same: (a: Readonly<D>, b: Readonly<D>) => boolean,
+  s: {
+    draft: Readonly<D>
+    history: ReadonlyArray<unknown>
+    deletedIterationIds?: readonly string[]
+    compareSelection: readonly string[]
+    pendingPrediction?: unknown
+    reflectionAnswer: string
+    submission?: unknown
+  },
+  ch: { initialDesign: Readonly<D> },
+): boolean {
+  return same(s.draft, ch.initialDesign) && s.history.length === 1 && (s.deletedIterationIds?.length ?? 0) === 0 &&
+    s.compareSelection.length === 0 && s.pendingPrediction === undefined && s.reflectionAnswer === '' && s.submission === undefined
+}
 
 /** Draft status against the latest Test_Result, ignoring the design id (Req 16.1). */
 export function draftStatusWith<D>(same: (a: Readonly<D>, b: Readonly<D>) => boolean, draft: Readonly<D>, history: ReadonlyArray<{ designSnapshot: Readonly<D> }>): DraftStatus {
@@ -336,13 +359,11 @@ export function makeSessionReducer<Ch extends ChallengeBase<D>, D extends Design
         return { ...s, draft: imported.value, draftStatus: statusOf(imported.value, s.history), draftErrors: [], pendingPrediction: undefined, ui: { predictionDialogOpen: false } }
       }
       case 'resetDraft': {
-        // Task 60: the baseline comes from the challenge content (persistence guarantees that
-        // history[0] holds the same design). Tested history, deletions, comparison, reflection
-        // and submission are the learner's evidence and stay untouched. draftStatus follows the
-        // same rule as restore: 'tested' only if the latest recorded test is the baseline design.
-        if (def.sameDesignIgnoringId(s.draft, ch.initialDesign)) return s
-        const draft = copyForRestore(ch.initialDesign, s)
-        return { ...s, draft, draftStatus: statusOf(draft, s.history), draftErrors: [], pendingPrediction: undefined, ui: { predictionDialogOpen: false } }
+        // Reuses the fresh-session constructor so a reset session is indistinguishable from a
+        // first opening in the same mode (Guided progress, derived from history, returns to step 1).
+        if (isFreshSessionWith(def.sameDesignIgnoringId, s, ch)) return s
+        const fresh = initSessionWith(def, ch, action.now, action.id, s.mode)
+        return fresh.ok ? fresh.value : s
       }
       case 'reset': {
         // History is append-only even on reset (Req 18.1); no baseline is regenerated.
