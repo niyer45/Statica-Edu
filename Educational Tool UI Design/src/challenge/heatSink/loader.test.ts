@@ -102,10 +102,9 @@ describe('loadHeatSinkChallenge: bundled-format config', () => {
     expect(s.ok && s.value).toEqual(ch)
   })
 
-  it('stays unlinked: not bundled, not runnable from the catalog (MM-06, HSK-16)', () => {
-    expect(Object.keys(BUNDLED_CHALLENGE_JSON)).not.toContain('heat-sink-1')
-    expect(catalog.some((e) => e.available && e.challengeId === 'heat-sink-1')).toBe(false)
-    expect(catalog.find((e) => e.title === 'Heat Sink I')?.available).toBe(false)
+  it('is bundled and linked from catalog card 004 since owner-approved activation (task 48.3, HSK-16)', () => {
+    expect(Object.keys(BUNDLED_CHALLENGE_JSON)).toContain('heat-sink-1')
+    expect(catalog.find((e) => e.title === 'Heat Sink I')).toMatchObject({ id: '004', available: true, challengeId: 'heat-sink-1' })
   })
 
   it('is neither a beam nor a torsion config, and they are not heat sink configs (MM-02)', () => {

@@ -84,7 +84,8 @@ export const catalog: readonly CatalogEntry[] = deepFreeze<CatalogEntry[]>([
     difficulty: 'intermediate',
     time: '25–35 min',
     concepts: ['Heat transfer', 'Surface area'],
-    available: false,
+    available: true,
+    challengeId: 'heat-sink-1',
     art: 'thermal',
   },
   {
