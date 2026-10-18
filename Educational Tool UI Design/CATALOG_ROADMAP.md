@@ -1,15 +1,15 @@
 # Original catalog development priority
 
-Owner direction, 2026-10-16 (D-35): complete the six existing library challenges before second editions. Cantilever Beam I and, since 2026-10-17 (D-42), Torsion Shaft I are runnable; the other four cards stay unavailable until their own integration track is verified and the owner approves activation.
+Owner direction, 2026-10-16 (D-35): complete the six existing library challenges before second editions. As of 2026-10-17, five cards are runnable: Cantilever Beam I, Torsion Shaft I (D-42), Vibration Isolation I, Heat Sink I and Mounting Bracket I (D-43). Braced Frame I is integrated, but its card stays unavailable until the owner approves activation.
 
 | Existing card | Current status | Development work |
 | --- | --- | --- |
 | Cantilever Beam I | Implemented learning loop | Guided/Parametric distinction implemented and CI verified; preserve regressions and complete manual release-mode QA (44.3) |
-| Mounting Bracket I | Preview only | Scope supported geometry/load paths and stress assumptions; implement/benchmark appropriate model and integrate (46) |
+| Mounting Bracket I | **Runnable (D-43)** | Scope supported geometry/load paths and stress assumptions; implement/benchmark appropriate model and integrate (46) |
 | Torsion Shaft I | **Runnable (D-42)** | Scope torsional deformation/stress, implement/benchmark appropriate shaft model and integrate (47) |
-| Heat Sink I | Preview only | Scope thermal assumptions/boundaries, implement/benchmark heat-transfer model and integrate (48) |
-| Braced Frame I | Preview only | Scope joint/member/support idealization, implement/benchmark frame/truss model and integrate (49) |
-| Vibration Isolation I | Preview only | Scope excitation/damping/response, implement/benchmark appropriate dynamics model and integrate (50) |
+| Heat Sink I | **Runnable (D-43)** | Scope thermal assumptions/boundaries, implement/benchmark heat-transfer model and integrate (48) |
+| Braced Frame I | Integrated, activation pending | Scope joint/member/support idealization, implement/benchmark frame/truss model and integrate (49) |
+| Vibration Isolation I | **Runnable (D-43)** | Scope excitation/damping/response, implement/benchmark appropriate dynamics model and integrate (50) |
 
 45.1 is complete as specification (2026-10-17): see [`.kiro/specs/original-catalog/`](../.kiro/specs/original-catalog/requirements.md) and D-38. Proposed models and delivery order:
 

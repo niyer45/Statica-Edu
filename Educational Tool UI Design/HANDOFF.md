@@ -15,7 +15,7 @@ Last updated: **2026-10-17** (Claude Code: tasks 45.1, 45.2 and 47.1 specified; 
 
 ## Verified implementation
 
-**Cantilever Beam I and Torsion Shaft I are runnable** (Torsion activated 2026-10-17, D-42). Cantilever Beam I includes section presets (circle/tube/rectangle/I-section), numeric editing/orientation, 3D handles and SVG fallback, predictions, deterministic analysis/evaluation, immutable history, comparison/restore/deletion, reflection/submission, validated browser persistence and design import/export.
+**Cantilever Beam I, Torsion Shaft I, Vibration Isolation I, Heat Sink I and Mounting Bracket I are runnable** (D-42, D-43); Braced Frame I is integrated but not activated. Cantilever Beam I includes section presets (circle/tube/rectangle/I-section), numeric editing/orientation, 3D handles and SVG fallback, predictions, deterministic analysis/evaluation, immutable history, comparison/restore/deletion, reflection/submission, validated browser persistence and design import/export.
 
 **Guided and Parametric now differ.** Guided provides four browsable instruction steps and optional hints/experiments. Parametric exposes direct editing without that scaffolding. Choose the mode **before entering** from the library/challenge details; there is **no in-workbench switch**. Resume/reload preserves the selected mode. Leaving to the library permits a new entry choice with the same shared saved workspace; there is no permanent account/project mode lock (D-37).
 
@@ -65,15 +65,11 @@ The subsequent documentation-only head `eee795cd6aeed69526e8aef1cd0033b64bff9db4
   CI for `3acd077`: [run 39078354891](https://github.com/niyer45/Statica-Edu/actions/runs/39078354891) passed.
 - **47.3 complete: Torsion Shaft I is openable (owner-approved activation, D-42).** UI in `src/ui/models/torsion/` (diameter tools, SVG shaft view, challenge panel, results/compare with v2 design files, reference dialog, Guided steps). The challenge is bundled and card 003 is available. `StoreProvider` now applies and saves a pre-entry mode at creation, fixing a brief Guided render on challenge switch. New `e2e/torsion.spec.ts`: 4 cases on desktop/Pixel 7. Local: 2351 tests/225 files, 28/28 E2E (torsion 12/12 on repeat). If lint suddenly reports thousands of errors, a failed Playwright run has left a trace viewer in `playwright-report/`; delete that generated, git-ignored folder.
   CI for `0180066` (activation): [run 39081602702](https://github.com/niyer45/Statica-Edu/actions/runs/39081602702) passed, including the 4 torsion E2E cases.
-- **Workbenches merged, cards not activated (session paused here, 2026-10-17):**
-  - Vibration Isolation I 50.3 `da32094`.
-  - Heat Sink I 48.3 `3662124`. That agent's own commit and E2E run were blocked by the permission system; it was merged by the coordinator with owner approval.
-  - Mounting Bracket I 46.3 `75a103d`.
-
-  All three are registered (runtime, model, UI) and component-tested through the production registry. Their E2E specs (`e2e/{vibration,heatSink,bracket}.spec.ts`) skip until each card is activated and **have never run unskipped**: expect fixes on first activation. Local gate on `75a103d`: lint 0 errors, typecheck, **2403 tests/228 files** with coverage, build, schema unchanged, **28/28 E2E plus 12 skipped**.
-- **Braced Frame I 49.3 is NOT merged.** The work is uncommitted in worktree `.claude/worktrees/agent-a00f1ee2f5141f3db`. The agent's lint, commit and E2E were blocked by the permission system (auto mode also flagged its report). Do not merge it without owner approval; if approved, review the diff and run the full gate as was done for the heat sink.
+- **Five of six original challenges are openable (D-43).** Vibration Isolation I (`8fbb61f`), Heat Sink I (`049147a`) and Mounting Bracket I (`766e1c7`) were activated one at a time with owner approval; each browser spec passed on its first unskipped run. Pre-activation CI for the merged workbenches: [run 39084951759](https://github.com/niyer45/Statica-Edu/actions/runs/39084951759) passed.
+- **Braced Frame I is merged but not activated (`a4878d2`).** The agent's blocked work was reviewed and merged with owner approval; card 005 awaits an explicit activation request, after which `e2e/bracedFrame.spec.ts` runs for the first time.
+- Local gate on `766e1c7`: lint 0 errors (10 existing warnings), typecheck, **2415 tests/229 files** with coverage, build, schema unchanged, **40/40 E2E plus 4 skipped** (frame).
 - **Parallel-agent caveat:** Playwright `reuseExistingServer` will test whatever server holds ports 4173/4174, so check `lsof -iTCP:4173 -iTCP:4174` before E2E when several worktrees run at once.
-- **Next, when resumed:** owner decisions on activating cards 006/004/002 (one at a time; each spec runs then), on merging the 49.3 worktree, and on the copy/limit questions in each model's design.md. Then gate 51.
+- **Next:** owner decision on activating Braced Frame I (card 005); owner answers to the open copy/limit questions in each model's design.md; then original-catalog gate 51 (confirm all six loops, isolation, truthful limits). Customer release still requires 29.2/30/31/32 human QA.
 - Local gate on `6ae2231`: lint 0 errors (10 existing), typecheck, **2351 tests/225 files** with coverage, build, schema unchanged, 24/24 E2E.
 
 The contracts define shared model/config/result identity/versioning, validation, model-specific units/metrics/evaluation/explanations, visualization/fallback, prediction/reflection, imports/save migrations. **34.1–34.2** generalize selection/session integration against those contracts; **46–50** specify, implement, numerically verify and integrate each model. Follow the numeric dependency graph. No new model is chosen by merely listing these tasks.

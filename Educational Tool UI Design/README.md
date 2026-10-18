@@ -2,7 +2,7 @@
 
 Statica Edu helps students build engineering intuition by changing a design, predicting its behavior, testing constraints and explaining results. See the [repository README](../README.md) for the product overview, current features, roadmap and model/storage limitations.
 
-Current UI: Cantilever Beam I and Torsion Shaft I (since 2026-10-17) with Guided/Parametric modes, section editing, 3D/SVG visualization, prediction, tested history, comparison/restore/deletion, reflection/submission and validated local saving/design import/export. Cantilever Beam II has a tested configuration but is not available in the UI yet. Accounts, cloud saves and completed-challenge history remain planned.
+Current UI: Cantilever Beam I, Torsion Shaft I, Vibration Isolation I, Heat Sink I and Mounting Bracket I (Braced Frame I integrated, activation pending) with Guided/Parametric modes, section editing, 3D/SVG visualization, prediction, tested history, comparison/restore/deletion, reflection/submission and validated local saving/design import/export. Cantilever Beam II has a tested configuration but is not available in the UI yet. Accounts, cloud saves and completed-challenge history remain planned.
 
 ## Setup
 
@@ -53,7 +53,7 @@ Keep the existing Figma Make shell/plugins and external styling architecture. Pr
 
 Read [AGENTS.md](AGENTS.md) and [HANDOFF.md](HANDOFF.md) before editing. Update those files and the [task list](../.kiro/specs/engineering-intuition-mvp/tasks.md) after completed work; preserve numeric task IDs and truthful evidence.
 
-Done: original-catalog scoping (45), multi-challenge infrastructure with model runtimes and UI slots (34), all five model implementations (46.2–50.2), and the openable Torsion Shaft I (47). Next: 50.3 Vibration Isolation I workbench, then 48.3, 46.3, 49.3. See [MILESTONE5.md](MILESTONE5.md). Nikhil is the nominated owner engineering reviewer; human engineering/manual/student QA remains required before customer deployment under D-34. [MILESTONE4.md](MILESTONE4.md) and [PILOT_PROTOCOL.md](PILOT_PROTOCOL.md) contain prepared materials, not completed review/pilot evidence.
+Done: original-catalog scoping (45), multi-challenge infrastructure with model runtimes and UI slots (34), all five model implementations (46.2–50.2), and the openable Torsion Shaft I (47). Five challenges are openable (D-42/D-43); next: Braced Frame I activation decision, then gate 51. See [MILESTONE5.md](MILESTONE5.md). Nikhil is the nominated owner engineering reviewer; human engineering/manual/student QA remains required before customer deployment under D-34. [MILESTONE4.md](MILESTONE4.md) and [PILOT_PROTOCOL.md](PILOT_PROTOCOL.md) contain prepared materials, not completed review/pilot evidence.
 
 The app remains browser-local with no backend, sign-in or cloud sync. Future account work must explicitly specify the required network/CSP changes and user ownership rules; do not describe current local storage as account-backed saving.
 
