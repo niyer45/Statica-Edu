@@ -8,7 +8,7 @@ import { useAnnounce } from '../../a11y/useAnnouncements'
 import Dialog from '../../dialogs/Dialog'
 import Icon from '../../icons/Icon'
 import { STATUS_LABELS } from '../../panels/resultPresentation'
-import { formatVibration, materialName, useVibrationStore, type VibrationDisplayUnit } from './shared'
+import { CHECK_LABELS, formatVibration, materialName, useVibrationStore, type VibrationDisplayUnit } from './shared'
 
 // Vibration history and comparison (task 50.3; VIB-06, VIB-08, MM-14, MM-19). Same list/detail
 // layout, compare limit, restore and confirmed deletion as the beam and torsion (D-29–D-31),
@@ -189,7 +189,7 @@ export default function VibrationResults() {
               .filter((c) => c.unit !== 'bool')
               .map((c) => (
                 <div className="metric" key={c.id}>
-                  <div>{c.label}</div>
+                  <div>{c.id === 'applicability' ? c.label : CHECK_LABELS[c.id]}</div>
                   <strong>{formatVibration(c.value, c.unit)}</strong>
                   <small>
                     {c.passed ? 'Pass' : 'Fail'} · Limit: {formatVibration(c.limit, c.unit)}

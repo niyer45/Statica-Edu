@@ -1,4 +1,5 @@
 import type { VibrationChallenge } from '../../../challenge/vibration/types'
+import type { VibrationConstraintId } from '../../../evaluation/vibration/types'
 import type { VibrationAction, VibrationSession } from '../../../state/vibrationModel'
 import { formatFixed, formatHz, formatKnPerM, formatMm, formatSignificant } from '../../../units/units'
 import { useModelStore } from '../../state/store'
@@ -23,6 +24,14 @@ export function formatVibration(value: number, unit: VibrationDisplayUnit): stri
   if (unit === 'zeta') return formatFixed(value, 2)
   if (unit === 'Ns/m') return `${formatFixed(value, 0)} N·s/m`
   return ''
+}
+
+/** Short check names for the goal card and history metrics (task 56); full labels stay in Test details. */
+export const CHECK_LABELS: Readonly<Record<Exclude<VibrationConstraintId, 'applicability'>, string>> = {
+  worstInBandTransmissibility: 'Vibration in band',
+  staticDeflection: 'Sag',
+  peakTransmissibility: 'Resonance peak',
+  relativeDisplacement: 'Rattle space',
 }
 
 /** The student-facing name of a material id, from the challenge config. */

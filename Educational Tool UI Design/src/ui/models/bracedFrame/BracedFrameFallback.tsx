@@ -130,33 +130,36 @@ function BracedFrameElevation() {
           return <circle key={j} cx={x} cy={y} r={3} className="frame-joint" />
         })}
       </svg>
-      <ul className="frame-legend" aria-label="Line pattern key">
-        <li>
-          <svg viewBox="0 0 24 8" aria-hidden="true">
-            <line x1={1} y1={4} x2={23} y2={4} className="frame-member-tension" strokeWidth={2} />
-          </svg>
-          Solid: tension (T)
-        </li>
-        <li>
-          <svg viewBox="0 0 24 8" aria-hidden="true">
-            <line x1={1} y1={4} x2={23} y2={4} className="frame-member-compression" strokeWidth={5} />
-            <line x1={1} y1={4} x2={23} y2={4} className="frame-member-compression-core" strokeWidth={2.4} />
-          </svg>
-          Double: compression (C)
-        </li>
-        <li>
-          <svg viewBox="0 0 24 8" aria-hidden="true">
-            <line x1={1} y1={4} x2={23} y2={4} className="frame-member-zero" strokeWidth={2} />
-          </svg>
-          Dotted: ≈ 0
-        </li>
-        <li>
-          <svg viewBox="0 0 24 8" aria-hidden="true">
-            <line x1={1} y1={4} x2={23} y2={4} className="frame-member-absent" />
-          </svg>
-          Faint dashed: not present
-        </li>
-      </ul>
+      <details className="frame-key">
+        <summary>Drawing key</summary>
+        <ul className="frame-legend" aria-label="Line pattern key">
+          <li>
+            <svg viewBox="0 0 24 8" aria-hidden="true">
+              <line x1={1} y1={4} x2={23} y2={4} className="frame-member-tension" strokeWidth={2} />
+            </svg>
+            Solid: tension (T)
+          </li>
+          <li>
+            <svg viewBox="0 0 24 8" aria-hidden="true">
+              <line x1={1} y1={4} x2={23} y2={4} className="frame-member-compression" strokeWidth={5} />
+              <line x1={1} y1={4} x2={23} y2={4} className="frame-member-compression-core" strokeWidth={2.4} />
+            </svg>
+            Double: compression (C)
+          </li>
+          <li>
+            <svg viewBox="0 0 24 8" aria-hidden="true">
+              <line x1={1} y1={4} x2={23} y2={4} className="frame-member-zero" strokeWidth={2} />
+            </svg>
+            Dotted: ≈ 0
+          </li>
+          <li>
+            <svg viewBox="0 0 24 8" aria-hidden="true">
+              <line x1={1} y1={4} x2={23} y2={4} className="frame-member-absent" />
+            </svg>
+            Faint dashed: not present
+          </li>
+        </ul>
+      </details>
     </>
   )
 }

@@ -73,10 +73,17 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     const initial = await readState(page)
     expect(initial.challengeId).toBe('vibration-isolation-1')
     expect(initial.mode).toBe(mode.toLowerCase())
-    const requirements = page.getByRole('list', { name: 'Design requirements' })
+    // Task 56: the goal card at the top of the design view states the goal and the four checks.
+    const goal = page.getByRole('region', { name: 'Goal', exact: true })
+    await expect(goal.getByText('Choose a mount that passes every check.', { exact: true })).toBeVisible()
+    await expect(goal.getByText(/^[0-4] of 4 pass$/)).toBeVisible()
+    const requirements = goal.getByRole('list', { name: 'Design requirements' })
     await expect(requirements.getByText('10.1', { exact: true })).toHaveCount(2)
     await expect(page.getByText('Idealized steady-state vibration isolation, not an engineering certification')).toBeVisible()
     await expect(page.getByRole('img', { name: /Steady-state frequency response/ })).toBeVisible()
+    // The full response table is collapsed by default (task 56).
+    await expect(page.getByRole('table', { name: 'Frequency response values' })).toBeHidden()
+    await page.getByText('All response values', { exact: true }).click()
     await expect(page.getByRole('table', { name: 'Frequency response values' }).getByText('30.20 Hz', { exact: true })).toBeVisible()
     if (mode === 'Guided') {
       await expect(page.getByRole('region', { name: 'Guided instructions' }).getByRole('heading', { name: 'Inspect', exact: true })).toBeVisible()

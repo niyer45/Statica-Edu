@@ -9,6 +9,7 @@ import StoreProvider from '../../state/StoreProvider'
 import Workbench from '../../workbench/Workbench'
 import { modelUiFor } from '../registry'
 import { vibrationUi, VIBRATION_LIMITS_NOTICE } from '.'
+import { VIBRATION_CHANGE, VIBRATION_GOAL } from './VibrationGoal'
 
 // Vibration Isolation I workbench (task 50.3) through the PRODUCTION model UI registry. The
 // challenge is booted directly here; card activation is a separate, owner-approved step.
@@ -66,11 +67,22 @@ describe('Vibration Isolation I workbench', () => {
     expect(within(requirements).getAllByText('10.1')).toHaveLength(2)
     expect(within(requirements).getByText('2.00 mm')).toBeTruthy()
     expect(within(requirements).getAllByText('✗ Fail')).toHaveLength(3)
-    expect(within(requirements).getByText('Worst vibration transmitted in the operating band')).toBeTruthy()
+    // Task 56 goal card: short check labels, a pass count and where fₙ sits; full labels stay in Test details.
+    const goal = screen.getByRole('region', { name: 'Goal' })
+    expect(within(goal).getByText(VIBRATION_GOAL)).toBeTruthy()
+    expect(within(goal).getByText(VIBRATION_CHANGE)).toBeTruthy()
+    expect(within(goal).getByText('1 of 4 pass')).toBeTruthy()
+    expect(within(requirements).getByText('Vibration in band')).toBeTruthy()
+    expect(within(goal).getByText('Natural frequency 30.20 Hz is inside the operating band (25.00–50.00 Hz).')).toBeTruthy()
+    expect(within(screen.getByRole('table', { name: 'Latest tested results' })).getByText('Worst vibration transmitted in the operating band')).toBeTruthy()
+    const brief = screen.getByText('Full brief and model assumptions').closest('details')!
+    expect(brief.open).toBe(false)
+    expect(within(brief).getByText(/it does not simulate motion over time/)).toBeTruthy()
     expect(screen.getByText(VIBRATION_LIMITS_NOTICE)).toBeTruthy()
     expect(screen.getByRole('img', { name: /Static schematic: component mass on a Natural rubber mount/ })).toBeTruthy()
     expect(screen.getByRole('img', { name: /Steady-state frequency response/ })).toBeTruthy()
     const table = screen.getByRole('table', { name: 'Frequency response values' })
+    expect(table.closest('details')!.open).toBe(false)
     expect(within(table).getByText('30.20 Hz')).toBeTruthy()
     expect(within(table).getByText('None: the band is amplified')).toBeTruthy()
     expect(screen.getByText(/inside the operating band ·/)).toBeTruthy()
