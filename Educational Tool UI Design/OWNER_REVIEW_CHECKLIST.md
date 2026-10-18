@@ -50,7 +50,7 @@ Sources: [requirements][ts-r] and [design][ts-d]; `torsion-shaft-1.json`; [`src/
 - [ ] Gere & Goodno, *Mechanics of Materials*, and Budynas & Nisbett, *Shigley's*: the torsion sections still need edition and equation numbers ([design][ts-d] §Model; `src/physics/torsion/shaft.ts:8–10`).
 
 **Verification items**
-- [ ] The primary view is a main-bundle SVG shaft elevation, not the 3D shaft TSH-14 specified (D-42). The replacement 3D view is task 54.2 (see §7).
+- [ ] **View.** A 3D shaft (task 54.2, D-45) is now the primary view; the SVG elevation is the fallback. Confirm the twist line exaggeration (×10, capped) reads clearly and is not mistaken for true scale.
 
 ## 3. Vibration Isolation I (`vibration-isolation-1`, card 006, available since D-43)
 
@@ -153,7 +153,7 @@ Sources: [requirements][mb-r] and [design][mb-d]; `mounting-bracket-1.json`; [`s
 - [ ] **MechaniCalc variant.** It is labelled Roark 8th ed. and differs by up to 1.72%. Its bending C1 equals its own axial C1. It is not used ([design][mb-d] §Sources 5, K-1). The design says it "may be a later revision"; confirm during the printed check that it stays unused.
 - [ ] **Body-force results.** Noda et al. (abstracts only) report that Peterson's photoelastic flat-bar charts may under-predict Kt by about 10–13%. The design says "Owner review should consider this (K-4)".
 - [ ] **Chart rows recorded, not asserted.** The digitized-chart rows at D/d = 3 and ≤ 1.05 are recorded for review only ([design][mb-d] §Alternative-method (c)).
-- [ ] **View.** MBR-18 deferred an optional 3D extrusion to a 46.3 decision. That is now task 54.1 (see §7).
+- [ ] **View.** A 3D bracket (task 54.1, D-45): wall, mounting plate with bolts, stepped bar, hanging load and a band at the governing section. Without WebGL2 a 2D side view shows the same context. Confirm both now show what the component is.
 
 ## 6. Braced Frame I (`braced-frame-1`, card 005, available since D-44)
 
@@ -188,7 +188,7 @@ Sources: [requirements][bf-r] and [design][bf-d] (§Integration notes, owner que
 
 **Verification items**
 - [ ] **Activation.** Card 005 activation has not been requested (`available: false` in `src/challenge/catalog.ts`; [D-43][dec]). The browser spec `e2e/bracedFrame.spec.ts` still skips.
-- [ ] **View.** A 3D/oblique frame view is task 54.3 (see §7).
+- [ ] **View.** A 3D frame (task 54.3, D-45). Tube diameters are drawn ×4 (not to scale) so the sections are visible; patterns: solid tension, striped compression, beaded ≈ 0, open wire mesh untested, dashed absent. Confirm the exaggeration and pattern key.
 
 ## 7. Cross-cutting
 
@@ -206,7 +206,7 @@ Sources: [requirements][bf-r] and [design][bf-d] (§Integration notes, owner que
 - [ ] The six notices end differently: "not a structural certification" (beam, torsion, bracket, frame), "not an engineering certification" (vibration) and "not a thermal certification" (heat sink). OC-06 says Accepted means "meets this educational model's constraints".
 
 **3D-view decisions (task 54, [tasks][tasks])**
-- [ ] 54.1 bracket, 54.2 torsion and 54.3 frame: the owner chose 3D models with 2D fallbacks (D-26, OC-12). None is implemented yet.
+- [ ] 54.1 bracket, 54.2 torsion and 54.3 frame are implemented as 3D views with 2D fallbacks (D-45). Open each in Safari with and without WebGL and confirm the views are clear. Automated browser checks do not count as this visual review.
 - [ ] Heat sink and vibration are outside task 54. Heat sink ships SVG where HSK-14 specified 3D. Vibration is SVG by design (VIB-14). Confirm both.
 
 **Content placement**

@@ -196,3 +196,13 @@ Mounting Bracket I ships the D-41 disclosure that its Kt coefficients come from 
 The owner approved activating catalog card 005 before going offline overnight (6853d94). Its browser spec passed on its first unskipped run on desktop and Pixel 7, after one test-selector fix: the Parametric label is a prefix of the context sentence, so the match is now exact. The full gate passed with 44/44 E2E and none skipped. The platform spec now asserts that no catalog card remains a concept preview, while Freeform stays unavailable. As with D-42 and D-43, this is repository/local availability, not customer deployment.
 
 The owner also requested better visualizations (task 54: 3D views with 2D fallbacks for Mounting Bracket I, Torsion Shaft I and Braced Frame I) and one checklist of open spec questions (task 55, `OWNER_REVIEW_CHECKLIST.md`). Open-question defaults stay as implemented until reviewed.
+
+## D-45: 3D views for Mounting Bracket I, Torsion Shaft I and Braced Frame I (2026-10-17)
+
+Task 54, from the owner's feedback that the bracket's 2D view did not show what the component is. The owner chose 3D models with clear 2D fallbacks for the bracket, and 3D views for the torsion shaft and braced frame. Each design view now loads a lazy 3D chunk. The 2D view stays in the main bundle (OC-12) and replaces the canvas, with a one-time notice, when WebGL2 is missing (checked in the main bundle, so the chunk is not downloaded), the chunk or canvas fails, or the context is lost. Results come only from stored analyses, and nothing is written on the models (D-26).
+
+- **Bracket:** wall, mounting plate and bolts, the draft outline (fillets included) extruded to the challenge thickness, the hanging tip load and a band at the tested governing section. The redrawn 2D side view carries the same context.
+- **Torsion:** a to-scale shaft with a wall clamp, a torque arrow and the tested twist line. The twist exaggeration rule (×10, capped) is shared with the SVG.
+- **Frame:** tube diameters ×4, proportional and disclosed as not to scale. Force states differ by shape: solid tension, striped compression, beaded ≈ 0, open wire-mesh untested, dashed absent.
+
+Heat Sink I and Vibration Isolation I keep their SVG views. Owner visual review is listed in OWNER_REVIEW_CHECKLIST.md §7; automated checks are not that review.

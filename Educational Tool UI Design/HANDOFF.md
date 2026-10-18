@@ -1,6 +1,6 @@
 # Statica Edu — current development handoff
 
-Last updated: **2026-10-17** (Claude Code: tasks 45.1, 45.2 and 47.1 specified; 34.1 step 1 implemented). Specification batch `ba1dc2d` passed [CI run 39071816823](https://github.com/niyer45/Statica-Edu/actions/runs/39071816823), all steps including the 2 responsive cases and full E2E. 34.1 step 1 adds the model registry with no user-visible change.
+Last updated: **2026-10-17** (Claude Code: task 54 3D views complete; next gate 51). Specification batch `ba1dc2d` passed [CI run 39071816823](https://github.com/niyer45/Statica-Edu/actions/runs/39071816823), all steps including the 2 responsive cases and full E2E. 34.1 step 1 adds the model registry with no user-visible change.
 
 ## Repository and local locations
 
@@ -68,10 +68,10 @@ The subsequent documentation-only head `eee795cd6aeed69526e8aef1cd0033b64bff9db4
 - **Five of six original challenges are openable (D-43).** Vibration Isolation I (`8fbb61f`), Heat Sink I (`049147a`) and Mounting Bracket I (`766e1c7`) were activated one at a time with owner approval; each browser spec passed on its first unskipped run. Pre-activation CI for the merged workbenches: [run 39084951759](https://github.com/niyer45/Statica-Edu/actions/runs/39084951759) passed.
 - **Braced Frame I activated (`6853d94`, D-44), so all six original challenges are runnable.** CI for `c8cd1c4`: [run 39090168010](https://github.com/niyer45/Statica-Edu/actions/runs/39090168010) passed. Local gate on `6853d94`: 2415 tests/229 files, **44/44 E2E, none skipped**.
 - **Owner review checklist (task 55):** [`OWNER_REVIEW_CHECKLIST.md`](OWNER_REVIEW_CHECKLIST.md), 120 items. All open-question defaults stay as implemented until the owner reviews them.
-- **Task 54 (owner request):** 3D views with 2D fallbacks for Mounting Bracket I (the owner found the 2D view unclear), Torsion Shaft I and Braced Frame I.
+- **Task 54 complete (D-45).** Mounting Bracket I (`cc257f3`), Torsion Shaft I (`6e7ec71`) and Braced Frame I (`d2fa208`, `403a6b6`) open a lazy 3D view; without WebGL2, on chunk/canvas failure or on context loss each shows its main-bundle 2D view with a notice. The bracket scene shows the wall, mounting plate, bolts, stepped bar and hanging load (owner: the 2D view did not show what the part is). `ViewportBoundary` takes a model fallback component; `viewport/webgl.ts` is the shared WebGL2 check. Local gate on `403a6b6`: lint 0 errors (10 existing), typecheck, **2441 tests/234 files** with coverage, build, schema unchanged, **44/44 E2E** from a cold Vite cache. New canvas-name assertions wait up to 20 s: software WebGL under parallel load can exceed 5 s. Owner visual review is in OWNER_REVIEW_CHECKLIST.md §7.
 - Local gate on `766e1c7`: lint 0 errors (10 existing warnings), typecheck, **2415 tests/229 files** with coverage, build, schema unchanged, **40/40 E2E plus 4 skipped** (frame).
 - **Parallel-agent caveat:** Playwright `reuseExistingServer` will test whatever server holds ports 4173/4174, so check `lsof -iTCP:4173 -iTCP:4174` before E2E when several worktrees run at once.
-- **Next:** finish task 54 (3D views), then original-catalog gate 51. The owner works through OWNER_REVIEW_CHECKLIST.md. Customer release still requires 29.2/30/31/32 human QA.
+- **Next:** original-catalog gate 51. The owner works through OWNER_REVIEW_CHECKLIST.md. Customer release still requires 29.2/30/31/32 human QA.
 - Local gate on `6ae2231`: lint 0 errors (10 existing), typecheck, **2351 tests/225 files** with coverage, build, schema unchanged, 24/24 E2E.
 
 The contracts define shared model/config/result identity/versioning, validation, model-specific units/metrics/evaluation/explanations, visualization/fallback, prediction/reflection, imports/save migrations. **34.1–34.2** generalize selection/session integration against those contracts; **46–50** specify, implement, numerically verify and integrate each model. Follow the numeric dependency graph. No new model is chosen by merely listing these tasks.

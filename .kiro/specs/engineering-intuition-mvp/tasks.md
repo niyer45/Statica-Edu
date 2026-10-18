@@ -636,11 +636,14 @@ All seven maintenance tasks are complete. [CI run 38936927907](https://github.co
 - [x] 53. Prepare current documentation and Claude Code handoff
   - Audited 2026-10-17: consolidate current HANDOFF/AGENTS, archive superseded snapshots in HANDOFF_HISTORY.md, add repository-root CLAUDE.md/AGENTS.md entry points and reconcile current roadmap/README/milestone pointers. Record repository/local clone layout, verified CI, next task 45.1, deferred Beam II and manual release obligations. Documentation-only checks validate paths, Markdown links, numeric IDs/dependencies and factual source availability; no feature or human-QA completion is claimed.
 
-- [ ] 54. Improve new-challenge visualizations (owner request, 2026-10-17)
+- [x] 54. Improve new-challenge visualizations (owner request, 2026-10-17)
   - Owner feedback: the Mounting Bracket I design view did not make clear what the component is. Owner chose 3D models with clear 2D fallbacks for the bracket, Torsion Shaft I and Braced Frame I. Results drawn only from stored values; D-26 (no static overlays on the 3D model) and the main-bundle non-WebGL fallback rule (OC-12) apply.
-  - [ ] 54.1 Mounting Bracket I: 3D bracket (wall plate with bolts, stepped bar with fillet, hanging tip load, tested peak-stress location) plus a redrawn 2D fallback with the same real-world context
-  - [ ] 54.2 Torsion Shaft I: 3D shaft with fixed end and latest-tested twist shown on a surface line; SVG view kept as fallback
-  - [ ] 54.3 Braced Frame I: 3D/oblique frame with members, braces, supports and loads, tension/compression by pattern; SVG view kept as fallback
+  - [x] 54.1 Mounting Bracket I: 3D bracket (wall plate with bolts, stepped bar with fillet, hanging tip load, tested peak-stress location) plus a redrawn 2D fallback with the same real-world context
+    - Done (`cc257f3`): lazy `BracketScene3D` (draft outline extruded to the challenge thickness, governing-section band from the stored analysis), main-bundle `BracketElevation` side view with notice, shared `BracketDetails`. Browser: Guided asserts the canvas, Parametric runs with WebGL2 hidden.
+  - [x] 54.2 Torsion Shaft I: 3D shaft with fixed end and latest-tested twist shown on a surface line; SVG view kept as fallback
+    - Done (parallel agent `6e7ec71`): lazy `TorsionViewport3D` (to-scale solid/hollow shaft, wall clamp, torque arrow, twist line ×10 via shared `displayedTwist`), SVG `TorsionFallback` with notice.
+  - [x] 54.3 Braced Frame I: 3D/oblique frame with members, braces, supports and loads, tension/compression by pattern; SVG view kept as fallback
+    - Done (parallel agent `d2fa208`, coordinator follow-up `403a6b6`): lazy `BracedFrameViewport3D` (tube diameters ×4, not to scale; solid tension, striped compression, beaded ≈ 0, open wire-mesh untested, dashed absent), SVG `BracedFrameFallback`; member-force table and summary outside the drawing. Shared: `ViewportBoundary` takes a fallback component; `viewport/webgl.ts`. Local gate: 2441 tests/234 files, 44/44 E2E. D-45.
 
 - [x] 55. Compile the owner review checklist (owner request, 2026-10-17)
   - Gather every open owner question from the challenge specs (copy, limits, screens, constants, references, verification items such as bracket K-1) into one checklist for pre-release engineering review (29.2). Defaults stay as implemented; nothing is changed silently.
