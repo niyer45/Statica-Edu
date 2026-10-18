@@ -191,3 +191,42 @@
 .locked-features dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; margin: 8px 0 0; font-size: 10px; }
 .locked-features dt { color: #5c6a55; }
 .locked-features dd { margin: 0; }
+
+/* Vibration Isolation I (task 50.3): stiffness/material tools, static schematic and frequency-response chart. */
+.tools-body > .vibration-tools { grid-column: 1 / -1; min-width: 0; }
+.field-hint { grid-column: 1 / -1; margin: 0; font-size: 9px; color: #5c6a55; }
+.material-choice { border: 0; margin: 18px 0 0; padding: 0; min-width: 0; }
+.material-choice > legend { width: 100%; padding: 0; margin-bottom: 8px; }
+.material-option { display: flex; align-items: center; gap: 7px; padding: 6px 7px; margin-bottom: 4px; border: 1px solid #e5e8df; border-radius: 5px; font-size: 10px; color: #53674a; background: #fcfcf9; cursor: pointer; }
+.material-option.selected { border-color: #4f653e; background: #f0f4e9; font-weight: 600; }
+.material-option input { margin: 0; accent-color: #4f653e; }
+.material-option small { margin-left: auto; font-size: 9px; color: #5c6a55; font-variant-numeric: tabular-nums; }
+.vibration-view { display: flex; flex-direction: column; flex: 1; padding: 0 12px 12px; min-width: 0; }
+.vibration-figures { display: grid; grid-template-columns: minmax(70px, 1fr) minmax(0, 3fr); gap: 8px; align-items: center; }
+.vibration-figures svg { width: 100%; height: auto; min-width: 0; }
+.vib-mass { fill: #a8b49a; stroke: #4f653e; stroke-width: 1; }
+.vib-spring { fill: none; stroke: #34543c; stroke-width: 2; stroke-linejoin: round; }
+.vib-damper { stroke: #34543c; stroke-width: 2; }
+.vib-damper-cylinder { fill: #f4f6ef; stroke: #34543c; stroke-width: 1.5; }
+.vib-base { fill: #62685c; }
+.vib-hatch-line { stroke: #62685c; stroke-width: 1.5; }
+.vib-band-hatch { stroke: #b9c6a8; stroke-width: 2; }
+.vib-band { stroke: #7f946a; stroke-width: 1; stroke-dasharray: 2 2; }
+.vib-grid { stroke: #e0e5d9; stroke-width: 1; }
+.vib-axis { stroke: #62685c; stroke-width: 1; }
+.vib-axis-text, .vib-chart-label { font-size: 9px; fill: #46583b; }
+.vib-chart-label { font-weight: 600; paint-order: stroke; stroke: #f4f6ef; stroke-width: 3px; stroke-linejoin: round; }
+.vib-limit { stroke-width: 1.5; }
+.vib-limit-band { stroke: #8a4b1c; stroke-dasharray: 6 3; }
+.vib-limit-peak { stroke: #8a4b1c; stroke-dasharray: 2 3; }
+.vib-fn { stroke: #345640; stroke-width: 1; stroke-dasharray: 1 3; }
+.vib-curve { fill: none; stroke: #34543c; stroke-width: 2; stroke-linejoin: round; }
+.vib-marker { stroke: #f4f6ef; stroke-width: 1.5; }
+.vib-marker-worst { fill: #8a4b1c; }
+.vib-marker-peak { fill: #34543c; }
+.vibration-summary { margin: 8px 0 0; letter-spacing: 0; text-transform: none; font-weight: 500; line-height: 1.6; }
+.vibration-table { overflow-x: auto; margin-top: 8px; }
+.vibration-table table { width: 100%; border-collapse: collapse; font-size: 9px; color: #46583b; font-variant-numeric: tabular-nums; }
+.vibration-table th, .vibration-table td { text-align: left; padding: 4px 6px; border-bottom: 1px solid #e0e5d9; vertical-align: top; }
+.vibration-table thead th { color: #5c6a55; font-weight: 600; }
+.vibration-table tbody th { font-weight: 500; }

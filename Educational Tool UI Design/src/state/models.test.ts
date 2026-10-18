@@ -15,8 +15,8 @@ import { cloneDesign, sameDesignIgnoringId } from './session'
 const ch = bundledChallenge()
 
 describe('model registry', () => {
-  it('registers the beam and torsion models; the beam identity matches the analysis modelId', () => {
-    expect(REGISTERED_MODEL_IDS).toEqual(['eulerBernoulliCantileverTipForce', 'circularShaftTorsion'])
+  it('registers the beam, torsion and vibration models; the beam identity matches the analysis modelId', () => {
+    expect(REGISTERED_MODEL_IDS).toEqual(['eulerBernoulliCantileverTipForce', 'circularShaftTorsion', 'sdofBaseIsolation'])
     expect(beamModel.ref).toEqual({ id: MODEL_ID, version: 1 })
     expect(beamModel.ref).toBe(BEAM_MODEL_REF)
     expect(beamModel.envelopeVersion).toBe(1)
@@ -48,8 +48,9 @@ describe('model registry', () => {
   })
 
   it.each([
-    ['unknown id', { id: 'sdofBaseIsolation', version: 1 }],
+    ['unknown id', { id: 'notARegisteredModel', version: 1 }],
     ['other torsion version', { id: 'circularShaftTorsion', version: 2 }],
+    ['other vibration version', { id: 'sdofBaseIsolation', version: 2 }],
     ['other beam version', { id: MODEL_ID, version: 2 }],
   ])('never substitutes another model for an %s', (_name, ref) => {
     expect(modelFor(ref)).toBeUndefined()

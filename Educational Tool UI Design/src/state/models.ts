@@ -10,6 +10,7 @@ import type { ChallengeBase, DesignBase, DesignError, EngineModel, EvaluationBas
 import { exportDesign, importDesign } from './importExport'
 import { cloneDesign, sameDesignIgnoringId } from './session'
 import { torsionModel, type TorsionModelDefinition } from './torsionModel'
+import { vibrationModel, type VibrationModelDefinition } from './vibrationModel'
 
 // Model registry (task 34.1 step 1; multi-model-architecture MM-01–MM-07).
 // Binds the pure domain layers of each analysis model behind one definition and dispatches
@@ -54,12 +55,13 @@ export const beamModel: BeamModelDefinition = Object.freeze({
 })
 
 /** Any registered model definition. Dispatch narrows by identity (`def === beamModel`). */
-export type RegisteredModel = BeamModelDefinition | TorsionModelDefinition
+export type RegisteredModel = BeamModelDefinition | TorsionModelDefinition | VibrationModelDefinition
 
 /** Every registered model, keyed by id. Exactly one version per id (MM-04). */
 const REGISTRY: ReadonlyMap<string, RegisteredModel> = new Map<string, RegisteredModel>([
   [beamModel.ref.id, beamModel],
   [torsionModel.ref.id, torsionModel],
+  [vibrationModel.ref.id, vibrationModel],
 ])
 
 /** The registered model ids, for guard tests. */

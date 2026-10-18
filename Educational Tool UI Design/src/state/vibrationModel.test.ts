@@ -15,8 +15,8 @@ import { torsionModel } from './torsionModel'
 import { vibrationModel, vibrationPersistence, vibrationReducer, type VibrationAction, type VibrationSession } from './vibrationModel'
 
 // Vibration through the model-generic engine (task 50.2; MM-10, MM-13, MM-15, MM-18, MM-19,
-// MM-26). The definition is complete but deliberately not registered in state/models.ts and not
-// linked from the catalog: registration and card gating belong to 50.3 (VIB-16).
+// MM-26). Registered for dispatch in state/models.ts and state/runtimes.ts (task 50.3); the
+// catalog card stays unavailable until owner-approved activation (VIB-16).
 
 const ch = vibrationChallenge()
 const T0 = '2026-10-17T10:00:00.000Z'
@@ -48,9 +48,11 @@ function looped(): VibrationSession {
 }
 
 describe('vibration learning loop through the engine', () => {
-  it('is not registered for dispatch yet: no substitution, an explicit unavailable error (MM-07, VIB-16)', () => {
-    expect(modelFor(ch.model)).toBeUndefined()
-    expect(() => requireModel(ch)).toThrow(UnregisteredModelError)
+  it('is registered for dispatch by its exact identity; another version is never substituted (MM-05, MM-07)', () => {
+    expect(modelFor(ch.model)).toBe(vibrationModel)
+    expect(requireModel(ch)).toBe(vibrationModel)
+    expect(modelFor({ id: 'sdofBaseIsolation', version: 2 })).toBeUndefined()
+    expect(() => requireModel({ model: { id: 'sdofBaseIsolation', version: 2 } })).toThrow(UnregisteredModelError)
     expect(vibrationModel.ref).toEqual({ id: 'sdofBaseIsolation', version: 1 })
     expect(vibrationModel.envelopeVersion).toBe(2)
   })

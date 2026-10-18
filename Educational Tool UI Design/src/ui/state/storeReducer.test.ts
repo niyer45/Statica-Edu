@@ -20,7 +20,7 @@ describe('makeStoreReducer model binding', () => {
   })
 
   it('refuses a challenge whose model is not registered', () => {
-    expect(() => makeStoreReducer({ ...ch, model: { id: 'sdofBaseIsolation', version: 1 } })).toThrow(UnregisteredModelError)
+    expect(() => makeStoreReducer({ ...ch, model: { id: 'sdofBaseIsolation', version: 2 } })).toThrow(UnregisteredModelError)
   })
 
   it('binds each challenge to its own registered runtime by explicit identity', () => {

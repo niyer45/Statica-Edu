@@ -5,8 +5,10 @@ import { cantileverBeam1Json } from '../challenge/content'
 import { initSessionWith } from './engine'
 import { beamModel } from './models'
 import { sessionKey } from './persistence'
-import { beamRuntime, runtimeFor, runtimeForJson, torsionRuntime } from './runtimes'
+import { beamRuntime, runtimeFor, runtimeForJson, torsionRuntime, vibrationRuntime } from './runtimes'
 import { torsionModel } from './torsionModel'
+import { vibrationModel } from './vibrationModel'
+import { vibrationChallenge } from '../../test/fixtures/vibration'
 
 // Model runtimes (task 34.2; MM-05, MM-15–MM-18): dispatch by explicit identity only, and each
 // runtime's persistence uses its own envelope.
@@ -18,13 +20,17 @@ describe('runtime dispatch', () => {
     expect(runtimeFor(beamModel.ref)).toBe(beamRuntime)
     expect(runtimeFor(torsionModel.ref)).toBe(torsionRuntime)
     expect(runtimeFor({ id: 'circularShaftTorsion', version: 2 })).toBeUndefined()
-    expect(runtimeFor({ id: 'sdofBaseIsolation', version: 1 })).toBeUndefined()
+    expect(runtimeFor(vibrationModel.ref)).toBe(vibrationRuntime)
+    expect(runtimeFor({ id: 'sdofBaseIsolation', version: 2 })).toBeUndefined()
+    expect(runtimeFor({ id: 'notARegisteredModel', version: 1 })).toBeUndefined()
   })
 
   it.each([
     ['a beam config without model', cantileverBeam1Json, beamRuntime],
     ['an explicit torsion model', { model: { id: 'circularShaftTorsion', version: 1 } }, torsionRuntime],
-    ['an unregistered model', { model: { id: 'sdofBaseIsolation', version: 1 } }, undefined],
+    ['an explicit vibration model', { model: { id: 'sdofBaseIsolation', version: 1 } }, vibrationRuntime],
+    ['an unregistered model', { model: { id: 'notARegisteredModel', version: 1 } }, undefined],
+    ['an unregistered model version', { model: { id: 'sdofBaseIsolation', version: 2 } }, undefined],
     ['a malformed model', { model: 'circularShaftTorsion' }, undefined],
     ['a model with a non-numeric version', { model: { id: 'circularShaftTorsion', version: '1' } }, undefined],
     ['a non-object config', [1, 2], beamRuntime],
@@ -73,5 +79,23 @@ describe('initSessionWith failures (MM-10)', () => {
     const throwing = { ...torsionModel, analyze: () => { throw new Error('boom') } }
     const r = initSessionWith(throwing, ch, T0, 'x')
     expect(r).toEqual({ ok: false, error: { source: 'initialDesign', message: 'The challenge initial design could not be analyzed.', details: ['boom'] } })
+  })
+
+  it('vibration runtime round-trips a v2 envelope under its own key and refuses another model', () => {
+    const ch = vibrationChallenge()
+    const s = vibrationRuntime.init(ch, T0, 'v0', 'parametric')
+    if (!s.ok) throw new Error(s.error.message)
+    expect(s.value.mode).toBe('parametric')
+    expect(vibrationRuntime.key(ch)).toBe('ei:session:vibration-isolation-1:v1')
+    const raw = vibrationRuntime.serialize(s.value, T0)
+    expect(JSON.parse(raw)).toMatchObject({ schemaVersion: 2, model: vibrationModel.ref })
+    const back = vibrationRuntime.deserialize(raw, ch)
+    if (!back.ok) throw new Error(back.error)
+    expect(back.value).toEqual(s.value)
+    expect(vibrationRuntime.load(JSON.parse(JSON.stringify(ch))).ok).toBe(true)
+    const torsion = torsionChallenge()
+    const t = torsionRuntime.init(torsion, T0, 't0')
+    if (!t.ok) throw new Error(t.error.message)
+    expect(vibrationRuntime.deserialize(torsionRuntime.serialize(t.value, T0), ch).ok).toBe(false)
   })
 })

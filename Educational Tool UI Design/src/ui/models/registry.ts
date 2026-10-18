@@ -5,6 +5,7 @@ import { useModelStore } from '../state/store'
 import { beamUi } from './beam'
 import { torsionUi } from './torsion'
 import type { ModelUi } from './types'
+import { vibrationUi } from './vibration'
 
 // Model UI registry (task 34.2; MM-20). Maps an explicit model id to its workbench UI. A model
 // with a runtime but no UI here cannot be opened (bootstrap refuses it), so no model is ever
@@ -22,6 +23,7 @@ export function defaultModelUis(): ReadonlyMap<string, ModelUi> {
   defaults ??= new Map([
     ['eulerBernoulliCantileverTipForce', beamUi],
     ['circularShaftTorsion', torsionUi],
+    ['sdofBaseIsolation', vibrationUi],
   ])
   return defaults
 }

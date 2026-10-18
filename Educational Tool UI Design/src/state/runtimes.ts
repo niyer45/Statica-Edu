@@ -1,6 +1,8 @@
 import { loadChallenge } from '../challenge/loader'
 import { loadTorsionChallenge } from '../challenge/torsion/loader'
 import type { TorsionChallenge } from '../challenge/torsion/types'
+import { loadVibrationChallenge } from '../challenge/vibration/loader'
+import type { VibrationChallenge } from '../challenge/vibration/types'
 import type { Challenge, InteractionMode, ModelRef, Result, SchemaIssue } from '../challenge/types'
 import { initSessionWith } from './engine'
 import { beamModel, modelFor, modelOf } from './models'
@@ -8,6 +10,7 @@ import { deserializeSession, deserializeSessionV2, serializeSession, serializeSe
 import { sessionReducer } from './reducer'
 import { initSession, type Action, type InitSessionError, type SessionState } from './session'
 import { torsionModel, torsionPersistence, torsionReducer, type TorsionAction, type TorsionSession } from './torsionModel'
+import { vibrationModel, vibrationPersistence, vibrationReducer, type VibrationAction, type VibrationSession } from './vibrationModel'
 
 // Model runtimes (task 34.2; multi-model-architecture MM-05, MM-15–MM-18).
 // Everything the store and shell need to run one challenge's learning loop, dispatched by the
@@ -68,12 +71,23 @@ export const torsionRuntime: ModelRuntime<TorsionSession, TorsionAction, Torsion
   deserialize: (raw: string, ch: TorsionChallenge) => deserializeSessionV2(torsionModel, torsionPersistence, raw, ch),
 })
 
+export const vibrationRuntime: ModelRuntime<VibrationSession, VibrationAction, VibrationChallenge> = Object.freeze({
+  ref: vibrationModel.ref,
+  load: loadVibrationChallenge,
+  init: (ch: VibrationChallenge, now: string, id: string, mode?: InteractionMode) => initSessionWith(vibrationModel, ch, now, id, mode),
+  reduce: vibrationReducer,
+  key: sessionKey,
+  serialize: (s: VibrationSession, savedAt: string) => serializeSessionV2(vibrationModel.ref, s, savedAt),
+  deserialize: (raw: string, ch: VibrationChallenge) => deserializeSessionV2(vibrationModel, vibrationPersistence, raw, ch),
+})
+
 /** Erased runtime type for dispatch; callers only pass values the same runtime produced. */
 export type AnyRuntime = ModelRuntime<LoopSession, { type: string }, LoopChallenge>
 
 const RUNTIMES: ReadonlyMap<string, AnyRuntime> = new Map<string, AnyRuntime>([
   [beamRuntime.ref.id, beamRuntime as unknown as AnyRuntime],
   [torsionRuntime.ref.id, torsionRuntime as unknown as AnyRuntime],
+  [vibrationRuntime.ref.id, vibrationRuntime as unknown as AnyRuntime],
 ])
 
 /** Runtime for an exact registered model identity, or undefined (never a substitute, MM-07). */

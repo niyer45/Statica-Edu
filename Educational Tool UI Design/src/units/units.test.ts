@@ -5,14 +5,67 @@ import { describe, expect, it } from "vitest";
 import { assertProperty } from "../../test/pbt";
 import {
   UNAVAILABLE_PLACEHOLDER,
+  formatFixed,
+  formatHz,
+  formatKnPerM,
   formatMm,
+  formatPercent,
+  formatSignificant,
+  knPerMToNPerM,
   m2ToMm2,
   m4ToMm4,
   mToMm,
   mmToM,
+  nPerMToKnPerM,
   paToMpa,
+  parseDecimalInput,
   parseMmInput,
 } from "./units";
+
+describe("vibration display helpers (task 50.3)", () => {
+  it("convert stiffness between N/m and kN/m by exact powers of ten", () => {
+    expect(nPerMToKnPerM(85000)).toBe(85);
+    expect(knPerMToNPerM(61.5)).toBe(61500);
+    for (const v of [0.5, 1800, 2000.5, 123.456]) {
+      expect(nPerMToKnPerM(v)).toBe(v / 1e3);
+      expect(knPerMToNPerM(v)).toBe(v * 1e3);
+    }
+  });
+
+  it("parse plain decimals with the millimetre grammar", () => {
+    expect(parseDecimalInput(" 85.5 ")).toBe(85.5);
+    for (const bad of ["", "1e3", "85kN", "1,200", "NaN"]) expect(parseDecimalInput(bad)).toBeNull();
+  });
+
+  it("format fixed decimals, frequencies and stiffness without negative zero or exponents", () => {
+    expect(formatFixed(1.005, 1)).toBe("1.0");
+    expect(formatFixed(-0.0001, 2)).toBe("0.00");
+    expect(formatHz(30.1975272626922)).toBe("30.20");
+    expect(formatHz(6.56212641207052)).toBe("6.56");
+    expect(formatKnPerM(1800000)).toBe("1800.0");
+    expect(formatKnPerM(61500, 2)).toBe("61.50");
+    expect(formatPercent(0.9071185299163516)).toBe("90.7");
+    expect(formatPercent(0.5, 0)).toBe("50");
+    for (const v of NON_FINITE) {
+      expect(formatFixed(v)).toBe(UNAVAILABLE_PLACEHOLDER);
+      expect(formatHz(v)).toBe(UNAVAILABLE_PLACEHOLDER);
+      expect(formatSignificant(v)).toBe(UNAVAILABLE_PLACEHOLDER);
+    }
+  });
+
+  it("format ratios to three significant figures in plain notation", () => {
+    expect(formatSignificant(10.0622137253413)).toBe("10.1");
+    expect(formatSignificant(0.0928814700836484)).toBe("0.0929");
+    expect(formatSignificant(0.12)).toBe("0.120");
+    expect(formatSignificant(6)).toBe("6.00");
+    expect(formatSignificant(25.0249815288429)).toBe("25.0");
+    expect(formatSignificant(9.996)).toBe("10.0");
+    expect(formatSignificant(1234.5)).toBe("1230");
+    expect(formatSignificant(0)).toBe("0.00");
+    expect(formatSignificant(-0.5, 2)).toBe("-0.50");
+    expect(formatSignificant(0.123456, 99)).toBe("0.123456");
+  });
+});
 
 const NON_FINITE = [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY];
 const PRECISIONS = [0, 1, 2, 3, 4, 5, 6] as const;

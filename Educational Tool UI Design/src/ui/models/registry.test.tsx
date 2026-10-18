@@ -10,12 +10,13 @@ import StoreProvider from '../state/StoreProvider'
 import { useModelStore } from '../state/store'
 import Workbench from '../workbench/Workbench'
 import { beamUi } from './beam'
+import { vibrationUi } from './vibration'
 import { modelUiFor, ModelUiContext } from './registry'
 import type { ModelUi } from './types'
 
 // Model UI registry contract (task 34.2; MM-20, MM-21). The workbench renders a non-beam model
 // entirely through its registered slots and wording; a model without a UI cannot render. The
-// torsion UI below is test-only: the production registry still holds the beam alone.
+// torsion UI below is test-only; the production registry entries are checked separately.
 
 const clock = () => '2026-10-17T00:00:00.000Z'
 let n = 0
@@ -81,7 +82,8 @@ afterEach(cleanup)
 describe('model UI registry', () => {
   it('keeps the beam wording unchanged and registers no UI for models without one', () => {
     expect(modelUiFor({ id: 'eulerBernoulliCantileverTipForce', version: 1 })).toBe(beamUi)
-    expect(modelUiFor({ id: 'sdofBaseIsolation', version: 1 })).toBeUndefined()
+    expect(modelUiFor({ id: 'sdofBaseIsolation', version: 1 })).toBe(vibrationUi)
+    expect(modelUiFor({ id: 'pinJointedBracedFrame', version: 1 })).toBeUndefined()
     expect(beamUi.copy.limitsNotice).toBe('Idealized beam approximation, not a structural certification')
     expect(beamUi.copy.prediction.title).toBe('Predict deflection')
     expect(beamUi.copy.prediction.question('the Baseline')).toBe('Compared with the Baseline, how will your new section change tip deflection?')

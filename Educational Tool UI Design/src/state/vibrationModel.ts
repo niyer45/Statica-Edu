@@ -19,8 +19,8 @@ import type { V2Persistence } from './persistence'
 // Vibration Isolation I model definition (task 50.2; vibration-isolation-1, MM-05, MM-13,
 // MM-18, MM-19). Binds the pure vibration modules to the learning-loop engine: v2 persistence,
 // v2 design files and a worst-in-band-transmissibility prediction that is not scorable without a
-// finite metric. Not registered in state/models.ts and not linked from the catalog: registration
-// and card gating belong to 50.3 (VIB-16).
+// finite metric. Registered in state/models.ts and state/runtimes.ts (task 50.3); the catalog card
+// stays unavailable until owner-approved activation (VIB-16).
 
 export type VibrationModelDefinition = ModelDefinition<
   VibrationChallenge,
