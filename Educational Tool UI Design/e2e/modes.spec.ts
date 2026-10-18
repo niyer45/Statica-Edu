@@ -7,7 +7,7 @@ import { audit, expectGuidedStep, normalizeState, openWorkbench, readState, refe
 
 for (const mode of ['Guided', 'Parametric'] as const) {
   test(`${mode} is selected before entry, fixed in the workbench and retained after reload`, async ({ page }) => {
-    test.setTimeout(120_000) // Entry keyboard traversal, the Guided step walk, submission, reload and axe.
+    test.setTimeout(mode === 'Guided' ? 180_000 : 120_000) // Entry keyboard traversal, the Guided step walk, submission, reload and axe.
     if (mode === 'Parametric') {
       await page.addInitScript(() => { Object.defineProperty(window, 'WebGL2RenderingContext', { configurable: true, value: undefined }) })
     }

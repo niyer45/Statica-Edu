@@ -71,7 +71,7 @@ async function noHorizontalOverflow(page: Page) {
 
 for (const mode of ['Guided', 'Parametric'] as const) {
   test(`Braced Frame I ${mode}: see a mechanism, test an Accepted frame, persist it and keep it isolated`, async ({ page }) => {
-    test.setTimeout(120_000) // Keyboard entry, two predictions, reload, cross-challenge check and axe.
+    test.setTimeout(mode === 'Guided' ? 180_000 : 120_000) // Guided experiment steps (task 58), keyboard entry, two predictions, reload, cross-challenge check and axe.
     const keyboard = mode === 'Guided'
     // Task 54.3: Guided runs the 3D view; Parametric runs with WebGL disabled (the beam's pattern)
     // and must show the main-bundle SVG elevation instead, with no canvas.

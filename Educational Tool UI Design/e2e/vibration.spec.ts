@@ -68,7 +68,8 @@ async function noHorizontalOverflow(page: Page) {
 
 for (const mode of ['Guided', 'Parametric'] as const) {
   test(`Vibration Isolation I ${mode}: test an Accepted mount, persist it and keep it isolated`, async ({ page }) => {
-    test.setTimeout(90_000) // Keyboard entry, prediction, reload, cross-challenge check and axe.
+    // Guided adds its experiment steps (task 58): three or four more tests before the final one.
+    test.setTimeout(mode === 'Guided' ? 150_000 : 90_000) // Keyboard entry, prediction, reload, cross-challenge check and axe.
     const keyboard = mode === 'Guided'
     await page.goto('/')
     await openVibration(page, mode, keyboard)
