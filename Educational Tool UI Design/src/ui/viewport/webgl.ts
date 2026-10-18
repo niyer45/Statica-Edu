@@ -1,3 +1,8 @@
-// Three's renderer requires WebGL2. Checked synchronously in the main bundle so a device without
-// it renders a model's 2D fallback immediately, without loading a 3D chunk (task 54).
-export const supportsWebGL2 = (): boolean => typeof WebGL2RenderingContext !== 'undefined'
+// WebGL2 availability (task 54): the same check Viewport3D makes before constructing three's
+// renderer, which requires WebGL2. Shared so a model view can render its main-bundle 2D fallback
+// immediately, without downloading a lazy 3D chunk. Evaluated on every call so tests can stub the
+// global.
+
+export function supportsWebGL2(): boolean {
+  return typeof WebGL2RenderingContext !== 'undefined'
+}

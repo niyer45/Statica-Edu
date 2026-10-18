@@ -1,12 +1,21 @@
+import { lazy, Suspense } from 'react'
 import type { TorsionEfficiency } from '../../../evaluation/torsion/types'
+import ViewportBoundary from '../../viewport/ViewportBoundary'
+import ViewportLoading from '../../viewport/ViewportLoading'
+import { supportsWebGL2 } from '../../viewport/webgl'
 import type { ModelUi } from '../types'
 import TorsionChallengePanel from './TorsionChallengePanel'
+import TorsionFallback from './TorsionFallback'
 import TorsionHelp from './TorsionHelp'
 import TorsionResults from './TorsionResults'
 import TorsionTools from './TorsionTools'
-import TorsionView from './TorsionView'
 
 // Torsion Shaft I UI (task 47.3; torsion-shaft-1 TSH-14, TSH-15; MM-20, MM-21).
+// Task 54.2: the design view is a lazy 3D shaft chunk inside the shared ViewportBoundary, like
+// the beam. The main-bundle SVG TorsionView (via TorsionFallback) is the boundary fallback and
+// is rendered directly, without fetching the 3D chunk, when WebGL2 is unavailable.
+
+const TorsionViewport3D = lazy(() => import('./TorsionViewport3D'))
 
 export const TORSION_LIMITS_NOTICE = 'Idealized circular-shaft torsion, not a structural certification'
 
@@ -34,7 +43,16 @@ export const torsionUi: ModelUi = {
     },
   },
   Tools: TorsionTools,
-  View: TorsionView,
+  View: ({ onUnavailable }) =>
+    supportsWebGL2() ? (
+      <ViewportBoundary onUnavailable={onUnavailable} fallback={<TorsionFallback onUnavailable={onUnavailable} />}>
+        <Suspense fallback={<ViewportLoading />}>
+          <TorsionViewport3D onUnavailable={onUnavailable} />
+        </Suspense>
+      </ViewportBoundary>
+    ) : (
+      <TorsionFallback onUnavailable={onUnavailable} />
+    ),
   ChallengePanel: TorsionChallengePanel,
   Results: TorsionResults,
   Help: TorsionHelp,
