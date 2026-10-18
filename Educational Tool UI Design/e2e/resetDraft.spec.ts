@@ -73,7 +73,7 @@ async function runWithPrediction(page: Page) {
 const resetButton = (page: Page) => page.getByRole('button', { name: 'Reset to baseline', exact: true })
 
 test('Reset to baseline restores every challenge baseline and keeps tested history', async ({ page }, info) => {
-  test.setTimeout(240_000) // Six workbenches, six tests, six resets, a reload and six restores.
+  test.setTimeout(360_000) // Six workbenches, six tests, six resets, a reload and six restores (software WebGL).
   expect(catalog.filter((e) => e.available).map((e) => e.title).sort()).toEqual(ENTRIES.map((e) => e.title).sort())
   await page.goto('/')
   const histories = new Map<string, unknown>()
