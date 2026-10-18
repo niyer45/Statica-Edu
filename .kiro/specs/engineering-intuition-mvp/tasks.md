@@ -636,6 +636,15 @@ All seven maintenance tasks are complete. [CI run 38936927907](https://github.co
 - [x] 53. Prepare current documentation and Claude Code handoff
   - Audited 2026-10-17: consolidate current HANDOFF/AGENTS, archive superseded snapshots in HANDOFF_HISTORY.md, add repository-root CLAUDE.md/AGENTS.md entry points and reconcile current roadmap/README/milestone pointers. Record repository/local clone layout, verified CI, next task 45.1, deferred Beam II and manual release obligations. Documentation-only checks validate paths, Markdown links, numeric IDs/dependencies and factual source availability; no feature or human-QA completion is claimed.
 
+- [ ] 54. Improve new-challenge visualizations (owner request, 2026-10-17)
+  - Owner feedback: the Mounting Bracket I design view did not make clear what the component is. Owner chose 3D models with clear 2D fallbacks for the bracket, Torsion Shaft I and Braced Frame I. Results drawn only from stored values; D-26 (no static overlays on the 3D model) and the main-bundle non-WebGL fallback rule (OC-12) apply.
+  - [ ] 54.1 Mounting Bracket I: 3D bracket (wall plate with bolts, stepped bar with fillet, hanging tip load, tested peak-stress location) plus a redrawn 2D fallback with the same real-world context
+  - [ ] 54.2 Torsion Shaft I: 3D shaft with fixed end and latest-tested twist shown on a surface line; SVG view kept as fallback
+  - [ ] 54.3 Braced Frame I: 3D/oblique frame with members, braces, supports and loads, tension/compression by pattern; SVG view kept as fallback
+
+- [ ] 55. Compile the owner review checklist (owner request, 2026-10-17)
+  - Gather every open owner question from the challenge specs (copy, limits, screens, constants, references, verification items such as bracket K-1) into one checklist for pre-release engineering review (29.2). Defaults stay as implemented; nothing is changed silently.
+
 ### Post-MVP roadmap: scope and execution
 
 Added at the user's request after Milestone 3 passed. Tasks 1–28 and their completion evidence remain unchanged. Requirements 1–35 and the existing design describe the completed M0–M3 baseline; their statements that M4+ is outside MVP implementation scope remain historical boundaries, not specifications for these new features. New feature requirements and acceptance criteria must be written as scoped extensions before implementation, without regenerating the completed MVP specifications or inventing requirement IDs.
@@ -1272,6 +1281,22 @@ Numeric task 41 groups the historical UI-01–UI-07 maintenance work without ren
     ],
     "52": [
       "51"
+    ],
+    "54.1": [
+      "46.3"
+    ],
+    "54.2": [
+      "47.3"
+    ],
+    "54.3": [
+      "49.3"
+    ],
+    "55": [
+      "46.1",
+      "47.1",
+      "48.1",
+      "49.1",
+      "50.1"
     ]
   }
 }
