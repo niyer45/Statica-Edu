@@ -43,6 +43,8 @@ const ENTRIES: Entry[] = [
     },
   },
   { title: 'Vibration Isolation I', id: 'vibration-isolation-1', edit: (page) => fill(page, 'Stiffness', '85') },
+  // Task 69 (D-59): owner-requested Pressure Vessel I.
+  { title: 'Pressure Vessel I', id: 'pressure-vessel-1', edit: (page) => fill(page, 'Shell thickness', '3') },
 ]
 
 async function toLibrary(page: Page) {

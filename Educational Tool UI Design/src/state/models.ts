@@ -13,6 +13,7 @@ import { isFreshSessionWith, type ChallengeBase, type DesignBase, type DesignErr
 import { exportDesign, importDesign } from './importExport'
 import { cloneDesign, sameDesignIgnoringId } from './session'
 import { torsionModel, type TorsionModelDefinition } from './torsionModel'
+import { vesselModel, type VesselModelDefinition } from './vesselModel'
 import { vibrationModel, type VibrationModelDefinition } from './vibrationModel'
 
 // Model registry (task 34.1 step 1; multi-model-architecture MM-01–MM-07).
@@ -58,7 +59,7 @@ export const beamModel: BeamModelDefinition = Object.freeze({
 })
 
 /** Any registered model definition. Dispatch narrows by identity (`def === beamModel`). */
-export type RegisteredModel = BeamModelDefinition | TorsionModelDefinition | VibrationModelDefinition | HeatSinkModelDefinition | BracketModelDefinition | BracedFrameModelDefinition
+export type RegisteredModel = BeamModelDefinition | TorsionModelDefinition | VibrationModelDefinition | HeatSinkModelDefinition | BracketModelDefinition | BracedFrameModelDefinition | VesselModelDefinition
 
 /** Every registered model, keyed by id. Exactly one version per id (MM-04). */
 const REGISTRY: ReadonlyMap<string, RegisteredModel> = new Map<string, RegisteredModel>([
@@ -68,6 +69,8 @@ const REGISTRY: ReadonlyMap<string, RegisteredModel> = new Map<string, Registere
   [heatSinkModel.ref.id, heatSinkModel],
   [bracketModel.ref.id, bracketModel],
   [bracedFrameModel.ref.id, bracedFrameModel],
+  // Task 69 (D-59): Pressure Vessel I.
+  [vesselModel.ref.id, vesselModel],
 ])
 
 /** The registered model ids, for guard tests. */

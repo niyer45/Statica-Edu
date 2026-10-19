@@ -7,6 +7,8 @@ import type { BracedFrameChallenge } from '../challenge/bracedFrame/types'
 import { loadChallenge } from '../challenge/loader'
 import { loadTorsionChallenge } from '../challenge/torsion/loader'
 import type { TorsionChallenge } from '../challenge/torsion/types'
+import { loadVesselChallenge } from '../challenge/vessel/loader'
+import type { VesselChallenge } from '../challenge/vessel/types'
 import { loadVibrationChallenge } from '../challenge/vibration/loader'
 import type { VibrationChallenge } from '../challenge/vibration/types'
 import type { Challenge, InteractionMode, ModelRef, Result, SchemaIssue } from '../challenge/types'
@@ -24,8 +26,10 @@ import { BRACED_FRAME_GUIDED_PLAN } from '../evaluation/guided/bracedFrame'
 import { BRACKET_GUIDED_PLAN } from '../evaluation/guided/bracket'
 import { HEAT_SINK_GUIDED_PLAN } from '../evaluation/guided/heatSink'
 import { TORSION_GUIDED_PLAN } from '../evaluation/guided/torsion'
+import { VESSEL_GUIDED_PLAN } from '../evaluation/guided/vessel'
 import { VIBRATION_GUIDED_PLAN } from '../evaluation/guided/vibration'
 import { torsionModel, torsionPersistence, torsionReducer, type TorsionAction, type TorsionSession } from './torsionModel'
+import { vesselModel, vesselPersistence, vesselReducer, type VesselAction, type VesselSession } from './vesselModel'
 import { vibrationModel, vibrationPersistence, vibrationReducer, type VibrationAction, type VibrationSession } from './vibrationModel'
 
 // Model runtimes (task 34.2; multi-model-architecture MM-05, MM-15–MM-18).
@@ -128,6 +132,17 @@ export const bracedFrameRuntime: ModelRuntime<BracedFrameSession, BracedFrameAct
   deserialize: (raw: string, ch: BracedFrameChallenge) => deserializeSessionV2(bracedFrameModel, bracedFramePersistence, raw, ch),
 })
 
+/** Task 69 (D-59): Pressure Vessel I. */
+export const vesselRuntime: ModelRuntime<VesselSession, VesselAction, VesselChallenge> = Object.freeze({
+  ref: vesselModel.ref,
+  load: loadVesselChallenge,
+  init: (ch: VesselChallenge, now: string, id: string, mode?: InteractionMode) => initSessionWith(vesselModel, ch, now, id, mode),
+  reduce: withGuidedLocks(VESSEL_GUIDED_PLAN, vesselReducer),
+  key: sessionKey,
+  serialize: (s: VesselSession, savedAt: string) => serializeSessionV2(vesselModel.ref, s, savedAt),
+  deserialize: (raw: string, ch: VesselChallenge) => deserializeSessionV2(vesselModel, vesselPersistence, raw, ch),
+})
+
 /** Erased runtime type for dispatch; callers only pass values the same runtime produced. */
 export type AnyRuntime = ModelRuntime<LoopSession, { type: string }, LoopChallenge>
 
@@ -138,6 +153,7 @@ const RUNTIMES: ReadonlyMap<string, AnyRuntime> = new Map<string, AnyRuntime>([
   [heatSinkRuntime.ref.id, heatSinkRuntime as unknown as AnyRuntime],
   [bracketRuntime.ref.id, bracketRuntime as unknown as AnyRuntime],
   [bracedFrameRuntime.ref.id, bracedFrameRuntime as unknown as AnyRuntime],
+  [vesselRuntime.ref.id, vesselRuntime as unknown as AnyRuntime],
 ])
 
 /** Runtime for an exact registered model identity, or undefined (never a substitute, MM-07). */

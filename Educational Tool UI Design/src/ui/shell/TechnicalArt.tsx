@@ -33,7 +33,7 @@ function TechnicalArt({kind,large=false}:{kind:string;large?:boolean}) {
     {kind==="shaft"&&<g className="art-accent" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points={torque.map(p=>p.join(",")).join(" ")}/><path d="m-6-4 6 4-6 4" transform={`translate(${torqueEnd.join(" ")}) rotate(${torqueAngle})`}/></g>}
     {kind==="thermal"&&<g className="art-accent" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">{heatOrigins.map(([x,y],i)=><path key={i} d={`M${x} ${y}q-4-7 0-14t0-14m-3 4 3-4 3 4`}/>)}</g>}
     </g>
-    <g fill="currentColor" opacity=".5" fontFamily="monospace" fontSize="7"><text x="18" y="166">FIG. {({beam:"01",bracket:"02",shaft:"03",thermal:"04",frame:"05",spring:"06"} as Record<string,string>)[kind]||"06"}</text><text x="342" y="166" textAnchor="end">STATICA LAB</text></g>
+    <g fill="currentColor" opacity=".5" fontFamily="monospace" fontSize="7"><text x="18" y="166">FIG. {({beam:"01",bracket:"02",shaft:"03",thermal:"04",frame:"05",spring:"06",vessel:"08"} as Record<string,string>)[kind]||"06"}</text><text x="342" y="166" textAnchor="end">STATICA LAB</text></g>
   </svg>
 }
 
@@ -146,6 +146,26 @@ function build(kind:string) {
     }
     for(const x of [-74,74])box(x-3,99,-29,6,7,58)
     load=[18,106,29]
+  }else if(kind==="vessel"){
+    // Pressure Vessel I (task 69): a closed cylindrical shell with a hemispherical head at each end,
+    // lying along x. Generic proportions (shell 2.2 radii long), not the challenge's reference design.
+    // Only camera-facing patches are drawn, so the convex surface sorts correctly back to front.
+    const R=34, half=38, yc=46
+    cylinder([-half,yc,0],[half,yc,0],R,false,32,true)
+    const rings=8, sectors=32
+    for(const sign of [-1,1]){
+      const at=(i:number,j:number):Point=>{
+        const theta=i/rings*Math.PI/2, phi=j/sectors*Math.PI*2
+        return [sign*(half+R*Math.sin(theta)),yc+R*Math.cos(theta)*Math.cos(phi),R*Math.cos(theta)*Math.sin(phi)]
+      }
+      for(let i=0;i<rings;i++)for(let j=0;j<sectors;j++){
+        const quad=[at(i,j),at(i+1,j),at(i+1,j+1),at(i,j+1)]
+        const c=quad.reduce((m,p)=>add(m,scale(p,1/4)),[0,0,0] as Point)
+        const n=normalize(add(c,[-sign*half,-yc,0]))
+        if(n[0]*toCamera[0]+n[1]*toCamera[1]+n[2]*toCamera[2]<0)continue
+        face(quad,30-19*n[1])
+      }
+    }
   }else{
     // A sprung instrument platform: real helical coils between two solid plates.
     box(-49,0,-35,98,9,70,true)

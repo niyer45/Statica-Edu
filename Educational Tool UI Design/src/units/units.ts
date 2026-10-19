@@ -31,6 +31,8 @@ export const kelvinToCelsius = (k: number): number => k - 273.15;
 export const kgToG = (kg: number): number => kg * 1e3;
 /** m² -> cm² (×10⁴). */
 export const m2ToCm2 = (m2: number): number => m2 * 1e4;
+/** m³ -> L (×10³), for displaying stored vessel volumes (task 69). */
+export const m3ToL = (m3: number): number => m3 * 1e3;
 
 /**
  * Plain decimal: optional sign (+ or -), digits, optional single decimal

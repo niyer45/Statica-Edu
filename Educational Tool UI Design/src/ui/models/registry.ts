@@ -8,6 +8,7 @@ import { bracketUi } from './bracket'
 import { bracedFrameUi } from './bracedFrame'
 import { torsionUi } from './torsion'
 import type { ModelUi } from './types'
+import { vesselUi } from './vessel'
 import { vibrationUi } from './vibration'
 
 // Model UI registry (task 34.2; MM-20). Maps an explicit model id to its workbench UI. A model
@@ -30,6 +31,7 @@ export function defaultModelUis(): ReadonlyMap<string, ModelUi> {
     ['plateFinHeatSink', heatSinkUi],
     ['boltedLBracket', bracketUi],
     ['pinJointedBracedFrame', bracedFrameUi],
+    ['thinWallPressureVessel', vesselUi],
   ])
   return defaults
 }

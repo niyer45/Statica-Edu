@@ -22,6 +22,7 @@ import { bracketUi } from './bracket'
 import { bracedFrameUi } from './bracedFrame'
 import { defaultModelUis, modelUiFor, ModelUiContext } from './registry'
 import { torsionUi } from './torsion'
+import { vesselUi } from './vessel'
 import type { ModelUi } from './types'
 
 // Model UI registry contract (task 34.2; MM-20, MM-21). The workbench renders a non-beam model
@@ -96,6 +97,7 @@ describe('model UI registry', () => {
       ['plateFinHeatSink', heatSinkUi],
       ['boltedLBracket', bracketUi],
       ['pinJointedBracedFrame', bracedFrameUi],
+      ['thinWallPressureVessel', vesselUi],
     ])
     expect(modelUiFor({ id: 'boltedLBracket', version: 1 })).toBe(bracketUi)
     expect(bracketUi.copy.prediction.title).toBe('Predict bend stress')
