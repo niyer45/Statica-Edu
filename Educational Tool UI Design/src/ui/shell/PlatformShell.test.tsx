@@ -155,7 +155,10 @@ describe('platform shell component suite (13.6)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Mechanics' }))
     expect(cards()).toEqual(['View Cantilever Beam I', 'View Torsion Shaft I'])
     fireEvent.change(screen.getByLabelText('Filter difficulty'), { target: { value: 'intermediate' } })
-    expect(cards()).toEqual(['View Torsion Shaft I'])
+    expect(cards()).toEqual([])
+    // Torsion Shaft I is introductory since task 71 (D-61).
+    fireEvent.change(screen.getByLabelText('Filter difficulty'), { target: { value: 'introductory' } })
+    expect(cards()).toEqual(['View Cantilever Beam I', 'View Torsion Shaft I'])
     fireEvent.change(screen.getByLabelText('Search challenges'), { target: { value: 'TORSION' } })
     fireEvent.click(screen.getByRole('button', { name: /Saved for later/ }))
     expect(cards()).toEqual(['View Torsion Shaft I'])

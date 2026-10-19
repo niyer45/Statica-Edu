@@ -1,11 +1,11 @@
 {
   "id": "torsion-shaft-1",
-  "version": 2,
+  "version": 3,
   "model": { "id": "circularShaftTorsion", "version": 1 },
   "title": "Torsion Shaft I",
-  "difficulty": "intermediate",
+  "difficulty": "introductory",
   "allowedModes": ["guided", "parametric"],
-  "statement": "The steel drive shaft twists more than its allowable angle and is overstressed in shear under a steady torque. Redesign its cross-section to meet the twist and shear stress limits while staying within the mass and packaging limits. The length, end support, material, and applied torque are fixed.",
+  "statement": "The solid steel drive shaft twists more than its allowable angle under a steady torque, and it is already over the mass limit, so making it thicker cannot fix both. Redesign its cross-section to twist less while weighing less, keeping it within the shear stress and 50 mm packaging limits. The length, end support, material, and applied torque are fixed.",
   "material": {
     "id": "steel-educational",
     "name": "Steel (educational nominal)",
@@ -19,7 +19,7 @@
   "support": "fixedEnd",
   "initialDesign": {
     "id": "baseline",
-    "section": { "kind": "circle", "diameterM": 0.0265 },
+    "section": { "kind": "circle", "diameterM": 0.0305 },
     "lengthM": 0.8,
     "materialId": "steel-educational"
   },
@@ -48,7 +48,7 @@
   "predictionPolicy": { "requiredOnIterations": [1, 3] },
   "reflectionPrompt": {
     "id": "torsion-shaft-1-reflection",
-    "text": "Using your tested designs, explain how moving material away from the shaft's center changed its twist, shear stress and mass."
+    "text": "Using your tested designs, explain how moving material away from the shaft's center changed its twist and its mass."
   },
   "visualization": { "twistExaggerationFactor": 10, "maxVisualTwistRad": 1.5707963267948966 }
 }

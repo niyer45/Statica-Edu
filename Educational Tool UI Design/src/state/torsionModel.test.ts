@@ -51,11 +51,12 @@ describe('torsion learning loop through the engine', () => {
     expect(modelFor(ch.model)).toBe(torsionModel)
   })
 
-  it('stores the worksheet baseline and fails twist and shear stress', () => {
+  it('stores the worksheet baseline and fails twist and mass (version 3, D-61)', () => {
     const base = fresh().history[0]!
     expect(base.analysis.twistRad).toBeCloseTo(worksheetFixture('baseline').expected.twistRad, 12)
     expect(base.analysis.maxShearStressPa).toBeCloseTo(worksheetFixture('baseline').expected.maxShearStressPa, 3)
-    expect(base.failures).toEqual(['twist', 'shearStress'])
+    expect(base.analysis.massKg).toBeCloseTo(worksheetFixture('baseline').expected.massKg, 12)
+    expect(base.failures).toEqual(['twist', 'mass'])
     expect(base.evaluation.status).toBe('notAccepted')
   })
 

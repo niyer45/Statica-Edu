@@ -1,0 +1,7 @@
+/* Torsion module drawings (task 71). Shares the learn.css palette; decorative, aria-hidden SVG. */
+.learn-shaft { fill: #c9d8bd; stroke: #34543c; stroke-width: 1.2; }
+.learn-bore-line { stroke: #34543c; stroke-width: 1; stroke-dasharray: 5 3; }
+.learn-bore { fill: #ffffff; stroke: #34543c; stroke-width: 1.2; }
+.learn-twist { fill: none; stroke: #b9703f; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.learn-twist-mark { stroke: #b9703f; stroke-width: 3; stroke-linecap: round; }
+.learn-dot { fill: #24402a; }

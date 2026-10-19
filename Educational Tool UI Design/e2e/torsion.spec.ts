@@ -45,7 +45,7 @@ async function noHorizontalOverflow(page: Page) {
 
 for (const mode of ['Guided', 'Parametric'] as const) {
   test(`Torsion Shaft I ${mode}: test an Accepted hollow shaft, persist it and keep it isolated`, async ({ page }) => {
-    // Guided adds its experiment steps (task 58): three or four more tests before the final one.
+    // Guided adds its experiment steps (task 58; two experiments since task 71, D-61) before the final test.
     test.setTimeout(mode === 'Guided' ? 150_000 : 90_000) // Keyboard entry, prediction, reload, cross-challenge check and axe.
     if (mode === 'Parametric') {
       await page.addInitScript(() => { Object.defineProperty(window, 'WebGL2RenderingContext', { configurable: true, value: undefined }) })
@@ -69,14 +69,16 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     expect(initial.challengeId).toBe('torsion-shaft-1')
     expect(initial.mode).toBe(mode.toLowerCase())
     const requirements = page.getByRole('list', { name: 'Design requirements' })
-    await expect(requirements.getByText('4.79°', { exact: true })).toBeVisible()
-    await expect(requirements.getByText('109.5 MPa', { exact: true })).toBeVisible()
+    // Version 3 baseline (task 71, D-61): a solid shaft that twists too much and is too heavy.
+    await expect(requirements.getByText('2.73°', { exact: true })).toBeVisible()
+    await expect(requirements.getByText('4.588 kg', { exact: true })).toBeVisible()
     await expect(page.getByText('Idealized circular-shaft torsion, not a structural certification')).toBeVisible()
     const hollow = page.getByRole('button', { name: 'Hollow tube', exact: true })
     if (mode === 'Guided') {
-      // Task 58: structured experiments, one variable per step; the shaft type starts locked.
-      await expectGuidedStep(page, 'Thicken the shaft')
-      await expect(hollow).toHaveAttribute('aria-disabled', 'true')
+      // Task 58: structured experiments; since task 71 (D-61) step 1 unlocks only the shaft type.
+      await expectGuidedStep(page, 'Hollow it out')
+      await expect(hollow).not.toHaveAttribute('aria-disabled', 'true')
+      await expect(page.getByLabel('Diameter', { exact: true })).toHaveAttribute('readonly', '')
     } else {
       await expect(page.getByRole('region', { name: 'Guided experiments' })).toHaveCount(0)
       await expect(page.getByText(/Every parameter is editable from the start/)).toBeVisible()
@@ -85,14 +87,11 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     await audit(page)
 
     if (mode === 'Guided') {
-      await setShaft(page, 'Diameter', '35')
-      await runAnyTest(page)
-      await expectGuidedStep(page, 'Solid or hollow')
-      await expect(page.getByLabel('Diameter', { exact: true })).toHaveAttribute('readonly', '')
       await hollow.click()
       await runAnyTest(page)
-      await expectGuidedStep(page, 'Tune one diameter')
-      await setShaft(page, 'Outer diameter', '50')
+      await expectGuidedStep(page, 'Move the material outward')
+      await setShaft(page, 'Outer diameter', '45')
+      await setShaft(page, 'Inner diameter', '37')
       await runAnyTest(page)
       await expectGuidedStep(page, 'Meet every check')
     }
@@ -110,7 +109,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await prediction.getByRole('button', { name: 'Run structural test' }).click()
       await expect(prediction).toBeHidden()
     }
-    const tests = mode === 'Guided' ? 5 : 2
+    const tests = mode === 'Guided' ? 4 : 2
     const tested = await readState(page)
     expect(tested.history).toHaveLength(tests)
     expect(tested.history[tests - 1].evaluation.status).toBe('accepted')

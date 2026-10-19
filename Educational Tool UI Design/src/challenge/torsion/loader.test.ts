@@ -34,15 +34,16 @@ describe('loadTorsionChallenge: bundled-format config', () => {
 
   it('defines the identity and learning settings (TSH-01, TSH-08, TSH-09)', () => {
     expect(ch.id).toBe('torsion-shaft-1')
-    // Version 2 (task 59): the baseline changed, so saves move to a new storage key (MM-04).
-    expect(ch.version).toBe(2)
+    // Version 2 (task 59) and 3 (task 71, D-61: introductory, new baseline and wording) each moved
+    // saves to a new storage key (MM-04).
+    expect(ch.version).toBe(3)
     expect(ch.title).toBe('Torsion Shaft I')
     expect(ch.model).toEqual(TORSION_MODEL_REF)
-    expect(ch.difficulty).toBe('intermediate')
+    expect(ch.difficulty).toBe('introductory')
     expect(ch.allowedModes).toEqual(['guided', 'parametric'])
     expect(ch.predictionPolicy.requiredOnIterations).toEqual([1, 3])
     expect(ch.reflectionPrompt.text).toBe(
-      "Using your tested designs, explain how moving material away from the shaft's center changed its twist, shear stress and mass.",
+      "Using your tested designs, explain how moving material away from the shaft's center changed its twist and its mass.",
     )
   })
 
@@ -68,7 +69,7 @@ describe('loadTorsionChallenge: bundled-format config', () => {
       tube: { outerDiameterM: { minM: 0.015, maxM: 0.06, stepM: 0.0005 }, minWallM: 0.002 },
     })
     expect(ch.sectionDefaults).toEqual({ tubeWallM: 0.004 })
-    expect(ch.initialDesign.section).toEqual({ kind: 'circle', diameterM: 0.0265 })
+    expect(ch.initialDesign.section).toEqual({ kind: 'circle', diameterM: 0.0305 })
     expect(ch.referenceDesign?.section).toEqual({ kind: 'tube', outerDiameterM: 0.05, innerDiameterM: 0.044 })
   })
 

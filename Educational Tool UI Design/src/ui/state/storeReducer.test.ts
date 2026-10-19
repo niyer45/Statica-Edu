@@ -38,8 +38,8 @@ describe('makeStoreReducer model binding', () => {
     expect(edited.draftStatus).toBe('draft')
     const guided = reduce(edited, { type: 'selectMode', mode: 'guided' })
     expect(guided.mode).toBe('guided')
-    // Task 58: the runtime reducer applies the Guided locks (the shaft type is locked in step 1).
-    const blocked = reduce(guided, { type: 'edit', edit: { type: 'setSection', kind: 'circle' } }) as typeof init.value
+    // Task 58: the runtime reducer applies the Guided locks (step 1 unlocks only the shaft type, D-61).
+    const blocked = reduce(guided, { type: 'edit', edit: { type: 'setParam', param: 'outerDiameterM', valueM: 0.04, mode: 'clamp' } }) as typeof init.value
     expect(blocked.draft).toBe((guided as typeof init.value).draft)
   })
 })

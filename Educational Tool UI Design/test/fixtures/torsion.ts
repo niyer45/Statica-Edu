@@ -64,9 +64,25 @@ const row = (
 ): TorsionFixture => ({ name, design: shaft(name, section), expected })
 
 export const TORSION_WORKSHEET: readonly TorsionFixture[] = [
-  // Challenge v2 baseline (task 59): fails both twist and shear stress, the most checks any
-  // applicable in-range shaft can fail. Values from an independent 40-digit decimal calculation.
-  row('baseline', solid(0.0265), {
+  // Challenge v3 baseline (task 71, D-61): an introductory solid Ø30.5 mm shaft that fails twist
+  // and mass, the most checks any applicable in-range shaft can fail (D-47), and both failures
+  // are fixed by the one idea of the challenge (a hollow section). Values from an independent
+  // 40-digit decimal calculation (worksheet "Content version 3").
+  row('baseline', solid(0.0305), {
+    polarMomentM4: 8.49570163444773e-8,
+    twistRad: 0.0476786154420514,
+    twistDeg: 2.73178343785682,
+    maxShearStressPa: 71801014.9422643,
+    massKg: 4.58827250862299,
+    plasticityRatio: 0.495179413394926,
+    status: 'notAccepted',
+    failures: ['twist', 'mass'],
+    warningCodes: [],
+    notApplicableCodes: [],
+  }),
+  // The challenge v2 baseline (task 59, Ø26.5 mm solid), kept as a worksheet row: fails twist
+  // and shear stress. Values from an independent 40-digit decimal calculation.
+  row('solid26_5', solid(0.0265), {
     polarMomentM4: 4.84153850447067e-8,
     twistRad: 0.0836641680666601,
     twistDeg: 4.79360372669282,
@@ -194,8 +210,10 @@ export const TORSION_DERIVED = {
   minSolidDiameterM: 0.0392113,
   /** Mass of that solid (quoted to 0.01 kg) exceeds the 4.5 kg limit, kg. */
   minSolidMassKg: 7.58,
-  /** Prediction fixture: v2 baseline (Ø26.5 solid) → reference twist ratio (a decrease). */
-  baselineToReferenceTwistRatio: 0.197111904573477,
+  /** Prediction fixture: v3 baseline (Ø30.5 solid) → reference twist ratio (a decrease). */
+  baselineToReferenceTwistRatio: 0.345882600811222,
+  /** Prediction fixture: Ø26.5 solid (the v2 baseline) → reference twist ratio (a decrease). */
+  solid26_5ToReferenceTwistRatio: 0.197111904573477,
   /** Prediction fixture: Ø30 solid (the v1 baseline) → reference twist ratio (a decrease). */
   solid30ToReferenceTwistRatio: 0.3237534293881777,
 } as const
