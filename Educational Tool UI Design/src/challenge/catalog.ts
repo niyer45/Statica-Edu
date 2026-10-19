@@ -7,7 +7,7 @@ import type { Difficulty } from './types'
 // a concept preview with no physics or challenge data until its track is verified.
 
 export type Discipline = 'Mechanics' | 'Structures' | 'Thermal' | 'Dynamics'
-export type ArtKind = 'beam' | 'bracket' | 'shaft' | 'thermal' | 'frame' | 'spring'
+export type ArtKind = 'beam' | 'bracket' | 'shaft' | 'thermal' | 'frame' | 'spring' | 'vessel'
 
 interface CatalogEntryBase {
   /** Library number shown on cards, e.g. "001". */
@@ -113,5 +113,18 @@ export const catalog: readonly CatalogEntry[] = deepFreeze<CatalogEntry[]>([
     available: true,
     challengeId: 'vibration-isolation-1',
     art: 'spring',
+  },
+  {
+    // Task 69, owner-requested activation 2026-10-19 (D-59).
+    id: '008',
+    title: 'Pressure Vessel I',
+    description: 'Size the shell and heads of a steel air receiver to hold its pressure safely without wasting steel.',
+    discipline: 'Structures',
+    difficulty: 'intermediate',
+    time: '25–35 min',
+    concepts: ['Thin-walled vessels', 'Hoop stress'],
+    available: true,
+    challengeId: 'pressure-vessel-1',
+    art: 'vessel',
   },
 ])

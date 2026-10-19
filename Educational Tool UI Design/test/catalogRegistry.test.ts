@@ -24,7 +24,7 @@ describe('catalog availability guard', () => {
   })
 
   it('keeps exactly the owner-activated challenges available', () => {
-    expect(available.map((e) => e.title)).toEqual(['Cantilever Beam I', 'Mounting Bracket I', 'Torsion Shaft I', 'Heat Sink I', 'Braced Frame I', 'Vibration Isolation I'])
+    expect(available.map((e) => e.title)).toEqual(['Cantilever Beam I', 'Mounting Bracket I', 'Torsion Shaft I', 'Heat Sink I', 'Braced Frame I', 'Vibration Isolation I', 'Pressure Vessel I'])
   })
 
   it('bundles only challenges an available card links to (no dormant Beam II)', () => {

@@ -1,0 +1,51 @@
+{
+  "id": "pressure-vessel-1",
+  "version": 1,
+  "model": { "id": "thinWallPressureVessel", "version": 1 },
+  "title": "Pressure Vessel I",
+  "difficulty": "intermediate",
+  "allowedModes": ["guided", "parametric"],
+  "statement": "A steel air receiver is a cylindrical shell closed by two hemispherical heads, under a fixed internal pressure. The current tank is long and narrow with thin walls: its shell and heads are overstressed, it is too long for its space, and it still holds less air than required. Redesign the inner diameter, the shell length and the two wall thicknesses so that every check passes. The pressure, the head shape, the steel and its design factor are fixed.",
+  "material": {
+    "id": "steel-educational",
+    "name": "Steel (educational nominal)",
+    "densityKgM3": 7850,
+    "yieldStressPa": 250e6
+  },
+  "designFactor": 2,
+  "pressurePa": 4e6,
+  "heads": "hemispherical",
+  "initialDesign": {
+    "id": "baseline",
+    "innerDiameterM": 0.24,
+    "shellLengthM": 1.2,
+    "shellThicknessM": 0.0025,
+    "headThicknessM": 0.0015,
+    "materialId": "steel-educational"
+  },
+  "referenceDesign": {
+    "id": "reference",
+    "innerDiameterM": 0.4,
+    "shellLengthM": 0.53,
+    "shellThicknessM": 0.0065,
+    "headThicknessM": 0.0035,
+    "materialId": "steel-educational"
+  },
+  "lockedFields": ["materialId", "pressurePa", "designFactor", "heads"],
+  "constraints": {
+    "minVolumeM3": 0.1,
+    "maxOverallLengthM": 1.0,
+    "maxMassKg": 55
+  },
+  "designLimits": {
+    "innerDiameterM": { "minM": 0.2, "maxM": 0.5, "stepM": 0.01 },
+    "shellLengthM": { "minM": 0.1, "maxM": 1.2, "stepM": 0.01 },
+    "shellThicknessM": { "minM": 0.001, "maxM": 0.012, "stepM": 0.0005 },
+    "headThicknessM": { "minM": 0.001, "maxM": 0.012, "stepM": 0.0005 }
+  },
+  "predictionPolicy": { "requiredOnIterations": [1, 3] },
+  "reflectionPrompt": {
+    "id": "pressure-vessel-1-reflection",
+    "text": "Using your tested designs, explain why the hoop stress governs the shell, how the diameter and the wall thicknesses changed the stresses, the volume and the mass, and why the heads did not need to be as thick as the shell."
+  }
+}

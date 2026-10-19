@@ -1,0 +1,146 @@
+import { Canvas, useThree } from '@react-three/fiber'
+import { Edges } from '@react-three/drei/core/Edges'
+import { OrbitControls } from '@react-three/drei/core/OrbitControls'
+import { useCallback, useEffect, useMemo, useRef, useState, type ComponentRef } from 'react'
+import { DoubleSide, LatheGeometry, OrthographicCamera, Shape, ShapeGeometry, Vector2 } from 'three'
+import { vesselProfile, vesselWallSection } from '../../../geometry/vessel/profile'
+import Icon from '../../icons/Icon'
+import { SUMMARY_ID } from './VesselDetails'
+import { useVesselStore } from './shared'
+
+// Pressure vessel 3D view (task 69; PVS-15, D-45 pattern). Lazy chunk. Scene in metres with the
+// vessel axis along x and its middle at the origin. The DRAFT vessel is the pure display
+// half-section (geometry/vessel/profile.ts: shell wall and hemispherical head walls, to scale)
+// revolved about the axis through three quarters of a turn, so the missing quarter (top front)
+// shows the inside and both cut faces show the shell and head wall thicknesses. The outer surface
+// is steel, the inner surface a lighter tone and the cut faces dark with crisp edges, so the
+// cutaway reads by tone and outline; there is no static text on the model (D-26). Orbit with the pointer; zoom and
+// reset with the buttons. If WebGL2 is missing or the context is lost, VesselView swaps in the
+// main-bundle 2D section.
+
+const STEEL = '#8f9b9f'
+const INSIDE = '#dfe6e8'
+const SECTION = '#2f3b40'
+
+/** The removed quarter runs from straight up to straight toward the viewer (see the header). */
+const PHI_LENGTH = 1.5 * Math.PI
+
+/** Scene framing: half-extent of the region the camera keeps in view, m (fits the largest vessel). */
+const RADIUS = 0.9
+
+function CameraRig({ zoom, reset }: { zoom: number; reset: number }) {
+  const { camera, size, invalidate } = useThree()
+  const controls = useRef<ComponentRef<typeof OrbitControls>>(null)
+  const baseZoom = useRef(150)
+  useEffect(() => {
+    if (!(camera instanceof OrthographicCamera)) return
+    baseZoom.current = Math.min(size.width, size.height * 1.8) / (2.1 * RADIUS)
+    camera.position.set(1.0, 1.7, 2.0)
+    controls.current?.target.set(0, 0, 0)
+    camera.lookAt(0, 0, 0)
+    camera.zoom = baseZoom.current
+    camera.updateProjectionMatrix()
+    controls.current?.update()
+    invalidate()
+  }, [camera, size.width, size.height, reset, invalidate])
+  useEffect(() => {
+    if (!(camera instanceof OrthographicCamera)) return
+    camera.zoom = baseZoom.current * zoom
+    camera.updateProjectionMatrix()
+    invalidate()
+  }, [camera, zoom, reset, size.width, size.height, invalidate])
+  return <OrbitControls ref={controls} makeDefault enableDamping={false} enableZoom={false} enablePan={false} />
+}
+
+function Scene({ zoom, reset }: { zoom: number; reset: number }) {
+  const { state } = useVesselStore()
+  const draft = state.draft
+  // Lathe and section shapes use (radius, axial position): the lathe axis is three's y axis,
+  // turned onto x by the group rotation below.
+  const section = useMemo(() => vesselWallSection(draft).map((p) => new Vector2(p.y, p.x)), [draft])
+  const surfaces = useMemo(() => {
+    const { outer, inner } = vesselProfile(draft)
+    const lathe = (pts: typeof outer) => new LatheGeometry(pts.map((p) => new Vector2(p.y, p.x)), 96, 0, PHI_LENGTH)
+    return { outer: lathe(outer), inner: lathe(inner) }
+  }, [draft])
+  const cuts = useMemo(() => {
+    const shape = new Shape(section)
+    // The lathe's meridian at angle φ points along (sin φ, 0, cos φ): a rotation about y by
+    // φ − π/2 takes the shape's x axis there.
+    return [0, PHI_LENGTH].map((phi) => {
+      const g = new ShapeGeometry(shape)
+      g.rotateY(phi - Math.PI / 2)
+      return g
+    })
+  }, [section])
+  useEffect(() => () => { surfaces.outer.dispose(); surfaces.inner.dispose() }, [surfaces])
+  useEffect(() => () => cuts.forEach((g) => g.dispose()), [cuts])
+  return (
+    <>
+      <CameraRig zoom={zoom} reset={reset} />
+      <ambientLight intensity={1.3} />
+      <directionalLight position={[1.2, 2.4, 2]} intensity={2.2} />
+      <directionalLight position={[-1.5, 0.6, -1.4]} intensity={0.6} />
+      <group rotation={[0, 0, -Math.PI / 2]}>
+        <mesh name="vessel-outer" geometry={surfaces.outer}>
+          <meshStandardMaterial color={STEEL} roughness={0.5} metalness={0.35} side={DoubleSide} />
+        </mesh>
+        <mesh name="vessel-inner" geometry={surfaces.inner}>
+          <meshStandardMaterial color={INSIDE} roughness={0.8} metalness={0.05} side={DoubleSide} />
+        </mesh>
+        {cuts.map((g, i) => (
+          <mesh key={i} name="vessel-cut" geometry={g}>
+            <meshBasicMaterial color={SECTION} side={DoubleSide} />
+            <Edges color={SECTION} threshold={30} />
+          </mesh>
+        ))}
+      </group>
+    </>
+  )
+}
+
+export default function VesselScene3D({ onContextLost: onLost }: { onContextLost: () => void }) {
+  const [zoom, setZoom] = useState(1)
+  const [reset, setReset] = useState(0)
+  const canvas = useRef<HTMLCanvasElement | null>(null)
+  const onContextLost = useCallback((event: Event) => {
+    event.preventDefault()
+    onLost()
+  }, [onLost])
+  useEffect(() => () => canvas.current?.removeEventListener('webglcontextlost', onContextLost), [onContextLost])
+  return (
+    <>
+      <div className="beam-scene vessel-scene relative flex flex-1 flex-col">
+        <Canvas
+          className="scene-canvas"
+          orthographic
+          frameloop="demand"
+          dpr={[1, 2]}
+          camera={{ position: [1.0, 1.7, 2.0], near: 0.01, far: 50, zoom: 150 }}
+          onCreated={({ gl }) => {
+            canvas.current = gl.domElement
+            gl.domElement.addEventListener('webglcontextlost', onContextLost)
+            gl.domElement.setAttribute('role', 'img')
+            gl.domElement.setAttribute('aria-label', '3D cutaway of the pressure vessel: a cylindrical shell with a hemispherical head at each end, a quarter removed to show the shell and head walls')
+            gl.domElement.setAttribute('aria-describedby', SUMMARY_ID)
+            gl.domElement.tabIndex = 0
+          }}
+        >
+          <Scene zoom={zoom} reset={reset} />
+        </Canvas>
+      </div>
+      <div className="vessel-scene-controls" role="group" aria-label="3D view controls">
+        <button type="button" aria-label="Zoom in" title="Zoom in" onClick={() => setZoom((v) => Math.min(2.4, v + 0.2))}>
+          <Icon name="plus" size={15} />
+        </button>
+        <button type="button" aria-label="Zoom out" title="Zoom out" onClick={() => setZoom((v) => Math.max(0.6, v - 0.2))}>
+          <Icon name="minus" size={15} />
+        </button>
+        <button type="button" aria-label="Reset view" title="Reset view" onClick={() => { setZoom(1); setReset((n) => n + 1) }}>
+          <Icon name="reset" size={15} />
+        </button>
+        <span className="vessel-scene-hint">Drag to rotate</span>
+      </div>
+    </>
+  )
+}
