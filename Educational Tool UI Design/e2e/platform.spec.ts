@@ -114,8 +114,9 @@ test('Freeform cannot open a workbench, and every catalog challenge is runnable'
   await expect(page.getByRole('button', { name: 'Not available yet', exact: true })).toBeDisabled()
   await expect(page.getByRole('button', { name: 'Run Test', exact: true })).not.toBeVisible()
   await page.getByRole('button', { name: 'Close challenge details' }).click()
-  // All six original challenges are activated (D-42, D-43, D-44): no card remains a concept preview.
-  await expect(page.locator('.challenge-card')).toHaveCount(6)
+  // All six original challenges are activated (D-42, D-43, D-44), plus Column Buckling I (D-58):
+  // no card remains a concept preview.
+  await expect(page.locator('.challenge-card')).toHaveCount(7)
   await expect(page.locator('.challenge-card').filter({ hasText: 'Concept preview' })).toHaveCount(0)
   await audit(page)
 })

@@ -1,0 +1,52 @@
+{
+  "id": "column-buckling-1",
+  "version": 1,
+  "model": { "id": "eulerColumnBuckling", "version": 1 },
+  "title": "Column Buckling I",
+  "difficulty": "introductory",
+  "allowedModes": ["guided", "parametric"],
+  "statement": "An aluminum column 2 m tall, pinned at both ends, must carry a 10 kN load pressing straight down on it. The current solid bar is strong enough not to crush, yet it would bow out sideways and buckle long before reaching that load, and it is already too heavy. Redesign its cross-section so that the critical buckling load is at least twice the load, while staying within the axial stress and mass limits. The length, the pinned ends, the load and the material are fixed.",
+  "material": {
+    "id": "al-educational",
+    "name": "Aluminum (educational nominal)",
+    "elasticModulusPa": 69e9,
+    "densityKgM3": 2700,
+    "allowableStressPa": 120e6,
+    "yieldStressPa": 240e6
+  },
+  "lengthM": 2,
+  "support": "pinnedPinned",
+  "load": { "forceN": 10000, "direction": "down", "location": "centroid" },
+  "initialDesign": {
+    "id": "baseline",
+    "section": { "kind": "solid", "diameterM": 0.0245 },
+    "lengthM": 2,
+    "materialId": "al-educational"
+  },
+  "referenceDesign": {
+    "id": "reference",
+    "section": { "kind": "tube", "outerDiameterM": 0.06, "wallThicknessM": 0.002 },
+    "lengthM": 2,
+    "materialId": "al-educational"
+  },
+  "lockedFields": ["lengthM", "materialId", "forceN", "support"],
+  "constraints": {
+    "minBucklingSafetyFactor": 2,
+    "maxAxialStressPa": 120e6,
+    "maxMassKg": 2.5
+  },
+  "sectionLimits": {
+    "solid": { "diameterM": { "minM": 0.01, "maxM": 0.06, "stepM": 0.0005 } },
+    "tube": {
+      "outerDiameterM": { "minM": 0.015, "maxM": 0.08, "stepM": 0.0005 },
+      "wallThicknessM": { "minM": 0.001, "maxM": 0.006, "stepM": 0.0005 }
+    }
+  },
+  "sectionDefaults": { "tubeWallM": 0.003 },
+  "allowedSections": ["solid", "tube"],
+  "predictionPolicy": { "requiredOnIterations": [1, 3] },
+  "reflectionPrompt": {
+    "id": "column-buckling-1-reflection",
+    "text": "Using your tested designs, explain why the column buckled even though its axial stress was low, and how moving material away from its center changed the critical load and the mass."
+  }
+}

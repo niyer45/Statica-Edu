@@ -35,7 +35,7 @@ export const AVAILABLE_FEATURES: readonly string[] = [
 ]
 
 export const PILLARS: readonly { title: string; readiness: Readiness; text: string }[] = [
-  { title: 'Interactive engineering simulations', readiness: 'Available now', text: 'Manipulate an engineering system and see its behavior change, with immediate visual feedback. Six models today.' },
+  { title: 'Interactive engineering simulations', readiness: 'Available now', text: 'Manipulate an engineering system and see its behavior change, with immediate visual feedback. Seven models today.' },
   { title: 'Engineering design challenges', readiness: 'Available now', text: 'An objective, performance requirements and constraints; students iterate toward a design that meets them.' },
   { title: 'Guided learning modules', readiness: 'Early', text: 'The first Learn module, Beam bending, is available: short concepts, a prediction at every step, interactive demonstrations and optional equations, leading into Cantilever Beam I. More modules are planned.' },
   { title: 'Curriculum and progression', readiness: 'Early', text: 'Learn is organized by subject, topic and module, starting with Solid Mechanics → Mechanics of Materials → Beam Bending → Cantilever Beam I. More paths are planned, and every module stays usable on its own.' },
@@ -94,7 +94,7 @@ export const AUDIENCES: Readonly<Record<Audience, AudienceContent>> = {
     intro: 'A focused platform for engineering education.',
     description: 'Statica is developing a structured engineering learning platform centered on physical simulation and iterative design.',
     items: [
-      { title: 'Today', text: 'Six working design challenges, each computed by its own engineering model, and the core learning workflow.', readiness: 'Available now' },
+      { title: 'Today', text: 'Seven working design challenges, each computed by its own engineering model, and the core learning workflow.', readiness: 'Available now' },
       { title: 'Next', text: 'Short concept lessons, more challenges and classroom workflows.', readiness: 'Planned' },
       { title: 'Long term', text: 'A connected curriculum across engineering disciplines, with increasingly independent design tools.', readiness: 'Planned' },
     ],

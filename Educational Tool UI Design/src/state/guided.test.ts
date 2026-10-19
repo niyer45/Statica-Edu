@@ -4,12 +4,13 @@ import type { InteractionMode } from '../challenge/types'
 import { BEAM_GUIDED_PLAN } from '../evaluation/guided/beam'
 import { BRACED_FRAME_GUIDED_PLAN } from '../evaluation/guided/bracedFrame'
 import { BRACKET_GUIDED_PLAN } from '../evaluation/guided/bracket'
+import { COLUMN_GUIDED_PLAN } from '../evaluation/guided/column'
 import { HEAT_SINK_GUIDED_PLAN } from '../evaluation/guided/heatSink'
 import { guidedProgress, type GuidedPlan, type GuidedStep } from '../evaluation/guided/plan'
 import { TORSION_GUIDED_PLAN } from '../evaluation/guided/torsion'
 import { VIBRATION_GUIDED_PLAN } from '../evaluation/guided/vibration'
 import { SECTION_PARAMS } from '../geometry/params'
-import { beamRuntime, bracedFrameRuntime, bracketRuntime, heatSinkRuntime, torsionRuntime, vibrationRuntime, type AnyRuntime, type LoopChallenge } from './runtimes'
+import { beamRuntime, bracedFrameRuntime, bracketRuntime, columnRuntime, heatSinkRuntime, torsionRuntime, vibrationRuntime, type AnyRuntime, type LoopChallenge } from './runtimes'
 
 // Guided structured experiments through the real runtimes (task 58). For every bundled
 // challenge: each step is completable from the Baseline by editing only that step's parameters
@@ -151,6 +152,24 @@ const CASES: Case[] = [
       ])
     },
     lockedAtStart: () => edit({ type: 'setMemberSection', memberId: 'col1L', sectionId: 'CHS88.9x5.0' }),
+  },
+  {
+    name: 'Column Buckling I',
+    id: 'column-buckling-1',
+    runtime: columnRuntime as unknown as AnyRuntime,
+    plan: COLUMN_GUIDED_PLAN as unknown as GuidedPlan<never, never>,
+    experiment: (step, d, ch) => {
+      const section = beamSection(d)
+      if (step.id === 'section') return [edit({ type: 'setSection', kind: (ch.allowedSections as string[]).find((k) => k !== section.kind)! })]
+      const param = target(step, section)
+      return [edit({ type: 'setParam', param, valueM: (section[param] as number) + 0.002, mode: 'clamp' })]
+    },
+    toReference: (_d, ch) => {
+      const ref = (ch.referenceDesign as { section: Record<string, number | string> }).section
+      const params = Object.entries(ref).filter(([k]) => k !== 'kind')
+      return [edit({ type: 'setSection', kind: ref.kind }), ...params.map(([param, v]) => edit({ type: 'setParam', param, valueM: v, mode: 'strict' }))]
+    },
+    lockedAtStart: (d) => edit({ type: 'setSection', kind: beamSection(d).kind === 'tube' ? 'solid' : 'tube' }),
   },
 ]
 

@@ -9,6 +9,7 @@ import type { Analysis } from '../physics/types'
 import { heatSinkModel, type HeatSinkModelDefinition } from './heatSinkModel'
 import { bracketModel, type BracketModelDefinition } from './bracketModel'
 import { bracedFrameModel, type BracedFrameModelDefinition } from './bracedFrameModel'
+import { columnModel, type ColumnModelDefinition } from './columnModel'
 import { isFreshSessionWith, type ChallengeBase, type DesignBase, type DesignError, type EngineModel, type EvaluationBase } from './engine'
 import { exportDesign, importDesign } from './importExport'
 import { cloneDesign, sameDesignIgnoringId } from './session'
@@ -58,7 +59,7 @@ export const beamModel: BeamModelDefinition = Object.freeze({
 })
 
 /** Any registered model definition. Dispatch narrows by identity (`def === beamModel`). */
-export type RegisteredModel = BeamModelDefinition | TorsionModelDefinition | VibrationModelDefinition | HeatSinkModelDefinition | BracketModelDefinition | BracedFrameModelDefinition
+export type RegisteredModel = BeamModelDefinition | TorsionModelDefinition | VibrationModelDefinition | HeatSinkModelDefinition | BracketModelDefinition | BracedFrameModelDefinition | ColumnModelDefinition
 
 /** Every registered model, keyed by id. Exactly one version per id (MM-04). */
 const REGISTRY: ReadonlyMap<string, RegisteredModel> = new Map<string, RegisteredModel>([
@@ -68,6 +69,7 @@ const REGISTRY: ReadonlyMap<string, RegisteredModel> = new Map<string, Registere
   [heatSinkModel.ref.id, heatSinkModel],
   [bracketModel.ref.id, bracketModel],
   [bracedFrameModel.ref.id, bracedFrameModel],
+  [columnModel.ref.id, columnModel],
 ])
 
 /** The registered model ids, for guard tests. */

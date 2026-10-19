@@ -3,6 +3,8 @@ import type { HeatSinkChallenge } from '../challenge/heatSink/types'
 import { loadBracketChallenge } from '../challenge/bracket/loader'
 import type { BracketChallenge } from '../challenge/bracket/types'
 import { loadBracedFrameChallenge } from '../challenge/bracedFrame/loader'
+import { loadColumnChallenge } from '../challenge/column/loader'
+import type { ColumnChallenge } from '../challenge/column/types'
 import type { BracedFrameChallenge } from '../challenge/bracedFrame/types'
 import { loadChallenge } from '../challenge/loader'
 import { loadTorsionChallenge } from '../challenge/torsion/loader'
@@ -12,6 +14,7 @@ import type { VibrationChallenge } from '../challenge/vibration/types'
 import type { Challenge, InteractionMode, ModelRef, Result, SchemaIssue } from '../challenge/types'
 import { bracketModel, bracketPersistence, bracketReducer, type BracketAction, type BracketSession } from './bracketModel'
 import { bracedFrameModel, bracedFramePersistence, bracedFrameReducer, type BracedFrameAction, type BracedFrameSession } from './bracedFrameModel'
+import { columnModel, columnPersistence, columnReducer, type ColumnAction, type ColumnSession } from './columnModel'
 import { initSessionWith } from './engine'
 import { withGuidedLocks } from './guided'
 import { heatSinkModel, heatSinkPersistence, heatSinkReducer, type HeatSinkAction, type HeatSinkSession } from './heatSinkModel'
@@ -22,6 +25,7 @@ import { initSession, type Action, type InitSessionError, type SessionState } fr
 import { BEAM_GUIDED_PLAN } from '../evaluation/guided/beam'
 import { BRACED_FRAME_GUIDED_PLAN } from '../evaluation/guided/bracedFrame'
 import { BRACKET_GUIDED_PLAN } from '../evaluation/guided/bracket'
+import { COLUMN_GUIDED_PLAN } from '../evaluation/guided/column'
 import { HEAT_SINK_GUIDED_PLAN } from '../evaluation/guided/heatSink'
 import { TORSION_GUIDED_PLAN } from '../evaluation/guided/torsion'
 import { VIBRATION_GUIDED_PLAN } from '../evaluation/guided/vibration'
@@ -128,6 +132,16 @@ export const bracedFrameRuntime: ModelRuntime<BracedFrameSession, BracedFrameAct
   deserialize: (raw: string, ch: BracedFrameChallenge) => deserializeSessionV2(bracedFrameModel, bracedFramePersistence, raw, ch),
 })
 
+export const columnRuntime: ModelRuntime<ColumnSession, ColumnAction, ColumnChallenge> = Object.freeze({
+  ref: columnModel.ref,
+  load: loadColumnChallenge,
+  init: (ch: ColumnChallenge, now: string, id: string, mode?: InteractionMode) => initSessionWith(columnModel, ch, now, id, mode),
+  reduce: withGuidedLocks(COLUMN_GUIDED_PLAN, columnReducer),
+  key: sessionKey,
+  serialize: (s: ColumnSession, savedAt: string) => serializeSessionV2(columnModel.ref, s, savedAt),
+  deserialize: (raw: string, ch: ColumnChallenge) => deserializeSessionV2(columnModel, columnPersistence, raw, ch),
+})
+
 /** Erased runtime type for dispatch; callers only pass values the same runtime produced. */
 export type AnyRuntime = ModelRuntime<LoopSession, { type: string }, LoopChallenge>
 
@@ -138,6 +152,7 @@ const RUNTIMES: ReadonlyMap<string, AnyRuntime> = new Map<string, AnyRuntime>([
   [heatSinkRuntime.ref.id, heatSinkRuntime as unknown as AnyRuntime],
   [bracketRuntime.ref.id, bracketRuntime as unknown as AnyRuntime],
   [bracedFrameRuntime.ref.id, bracedFrameRuntime as unknown as AnyRuntime],
+  [columnRuntime.ref.id, columnRuntime as unknown as AnyRuntime],
 ])
 
 /** Runtime for an exact registered model identity, or undefined (never a substitute, MM-07). */

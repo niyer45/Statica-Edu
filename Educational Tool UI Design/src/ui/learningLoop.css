@@ -361,3 +361,26 @@
 /* Submit dialog (task 61): the two ways out once a submission is recorded. */
 .submit-exit { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
 .submit-exit > button { flex: 1 1 160px; justify-content: center; }
+/* Column Buckling I (task 68): main-bundle 2D column view, 3D canvas host and its control row
+   (below the canvas, never over the model). Shapes and the text summary carry the meaning. */
+.column-view { display: flex; flex-direction: column; flex: 1; justify-content: center; padding: 0 12px 12px; min-width: 0; }
+.column-view .column-elevation { width: 100%; height: auto; min-height: 0; max-height: 320px; cursor: default; touch-action: auto; user-select: auto; }
+.column-body { fill: #a8b49a; stroke: #4f653e; stroke-width: 1; }
+.column-section { fill: #a8b49a; stroke: #4f653e; stroke-width: 1; }
+.column-bore { fill: #f4f6ef; stroke: #4f653e; stroke-width: 1; }
+.column-pin { fill: #f4f6ef; stroke: #2f3a31; stroke-width: 1.5; }
+.column-support { fill: #dfe4d8; stroke: #4f653e; stroke-width: 1; }
+.column-ground { stroke: #3d4a3f; stroke-width: 1.5; }
+.column-hatch-line { stroke: #8b9282; stroke-width: 1.2; }
+.column-load { stroke: #8a4b1c; stroke-width: 2; }
+.column-load-head { fill: #8a4b1c; }
+.column-mode { fill: none; stroke: #8a4b1c; stroke-width: 1.5; stroke-dasharray: 5 3; }
+.column-summary { margin: 8px 0 0; letter-spacing: 0; text-transform: none; font-weight: 500; }
+.column-fallback-notice { margin: 0 0 4px; letter-spacing: 0; text-transform: none; font-weight: 500; }
+.column-scene { min-height: 320px; }
+.column-scene-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; align-self: flex-end; margin-top: 6px; background: #fcfdf8; border: 1px solid #e1e6d7; border-radius: 5px; padding: 4px; }
+.column-scene-controls button:not(.toggle-row) { display: grid; place-items: center; width: 28px; height: 26px; color: #4f653e; }
+.column-scene-controls .toggle-row { padding: 0 6px; height: 26px; font-size: 10px; color: #4f653e; }
+.column-scene-hint { font-size: 10px; color: #5c6a55; padding: 0 6px; }
+/* Library card and drawer art tint for the column, alongside the template's .theme-* rules. */
+.theme-column { --art-background: #ecf0f2; --art-color: #7f939b; }

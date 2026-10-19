@@ -6,6 +6,7 @@ import { beamUi } from './beam'
 import { heatSinkUi } from './heatSink'
 import { bracketUi } from './bracket'
 import { bracedFrameUi } from './bracedFrame'
+import { columnUi } from './column'
 import { torsionUi } from './torsion'
 import type { ModelUi } from './types'
 import { vibrationUi } from './vibration'
@@ -30,6 +31,7 @@ export function defaultModelUis(): ReadonlyMap<string, ModelUi> {
     ['plateFinHeatSink', heatSinkUi],
     ['boltedLBracket', bracketUi],
     ['pinJointedBracedFrame', bracedFrameUi],
+    ['eulerColumnBuckling', columnUi],
   ])
   return defaults
 }

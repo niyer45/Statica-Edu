@@ -43,6 +43,8 @@ const ENTRIES: Entry[] = [
     },
   },
   { title: 'Vibration Isolation I', id: 'vibration-isolation-1', edit: (page) => fill(page, 'Stiffness', '85') },
+  // Task 68 (D-58): the owner-requested Column Buckling I joins the same isolation checks.
+  { title: 'Column Buckling I', id: 'column-buckling-1', edit: (page) => fill(page, 'Diameter', '30') },
 ]
 
 async function toLibrary(page: Page) {

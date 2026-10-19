@@ -15,8 +15,8 @@ import { cloneDesign, sameDesignIgnoringId } from './session'
 const ch = bundledChallenge()
 
 describe('model registry', () => {
-  it('registers the beam, torsion, vibration, heat sink, bracket and braced-frame models; the beam identity matches the analysis modelId', () => {
-    expect(REGISTERED_MODEL_IDS).toEqual(['eulerBernoulliCantileverTipForce', 'circularShaftTorsion', 'sdofBaseIsolation', 'plateFinHeatSink', 'boltedLBracket', 'pinJointedBracedFrame'])
+  it('registers the beam, torsion, vibration, heat sink, bracket, braced-frame and column models; the beam identity matches the analysis modelId', () => {
+    expect(REGISTERED_MODEL_IDS).toEqual(['eulerBernoulliCantileverTipForce', 'circularShaftTorsion', 'sdofBaseIsolation', 'plateFinHeatSink', 'boltedLBracket', 'pinJointedBracedFrame', 'eulerColumnBuckling'])
     expect(beamModel.ref).toEqual({ id: MODEL_ID, version: 1 })
     expect(beamModel.ref).toBe(BEAM_MODEL_REF)
     expect(beamModel.envelopeVersion).toBe(1)

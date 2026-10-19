@@ -85,23 +85,23 @@ describe('routes', () => {
 
 describe('homepage and accounts', () => {
   // Split in three (task 64): one combined case ran close to the 5 s limit under CI coverage.
-  it('starts on Home with guest actions, an on-device storage statement and six challenges', () => {
+  it('starts on Home with guest actions, an on-device storage statement and seven challenges', () => {
     setup()
     expect(screen.getByRole('heading', { level: 1, name: 'Learn engineering by designing, testing and explaining.' })).toBeTruthy()
     for (const name of ['Create account', 'Sign in', 'Continue as guest']) expect(screen.getByRole('button', { name })).toBeTruthy()
     expect(screen.getByText(/saved in this browser on this device only/)).toBeTruthy()
     // Task 62: Home is the outlook page; per-challenge progress lives in My designs.
     expect(screen.getByRole('heading', { level: 2, name: 'How students learn with Statica' })).toBeTruthy()
-    expect(within(screen.getByRole('list', { name: 'Challenges available now' })).getAllByRole('listitem')).toHaveLength(6)
+    expect(within(screen.getByRole('list', { name: 'Challenges available now' })).getAllByRole('listitem')).toHaveLength(7)
     expect(screen.queryByRole('list', { name: 'Progress on this device' })).toBeNull()
   })
 
   it('lists every challenge as not started in My designs for a new guest', () => {
     setup()
     goTo('My designs')
-    expect(screen.getByLabelText('Progress summary').textContent).toBe('0 of 6 challenges completed · 0 started')
+    expect(screen.getByLabelText('Progress summary').textContent).toBe('0 of 7 challenges completed · 0 started')
     const rows = within(screen.getByRole('list', { name: 'Not started yet' })).getAllByRole('listitem')
-    expect(rows).toHaveLength(6)
+    expect(rows).toHaveLength(7)
     for (const row of rows) expect(within(row).getByText('Not started')).toBeTruthy()
   })
 
