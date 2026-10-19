@@ -84,6 +84,9 @@ function build(kind:string) {
     wall()
     box(-68,23,-25,8,72,50)
     box(-60,23,-25,111,8,50)
+    // The rib stands on the arm and the bolt heads sit on the plates, so they are drawn after both
+    // plates; the plates' large faces would otherwise sort in front of them.
+    layer = 1
     // A triangular reinforcing rib has two faces and a visible thickness.
     const a:Point=[-60,31,-3], b:Point=[-60,76,-3], c:Point=[-5,31,-3]
     const offset:Point=[0,0,6]

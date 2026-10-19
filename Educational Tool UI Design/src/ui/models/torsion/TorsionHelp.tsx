@@ -1,5 +1,6 @@
 import { TORSION_UNSUPPORTED_EFFECTS } from '../../../physics/torsion/constants'
 import Dialog from '../../dialogs/Dialog'
+import { FinePrint, Formula, KeyPoints } from '../../dialogs/Reference'
 
 // Torsion reference (task 47.3; TSH-12). Static explanatory text only, no computed numbers.
 
@@ -7,17 +8,16 @@ export default function TorsionHelp({ open, onClose }: { open: boolean; onClose:
   if (!open) return null
   return (
     <Dialog title="Torsional stiffness" icon="book" onClose={onClose}>
-      <p>
-        A circular shaft resists twisting through its polar moment J. Material far from the center counts much more than material near
-        it, so a hollow tube can be stiff without being heavy.
-      </p>
-      <div className="formula">
-        φ = TL / GJ <span>More J → less twist</span>
-      </div>
-      <div className="formula">
-        τ = T·r / J <span>Peak shear stress at the outer surface</span>
-      </div>
-      <p>This idealized model does not include: {TORSION_UNSUPPORTED_EFFECTS.join(', ')}.</p>
+      <Formula tex={String.raw`\varphi = \dfrac{T L}{G J}`} text="φ = TL ÷ GJ" caption="Angle of twist" />
+      <Formula tex={String.raw`\tau_{\max} = \dfrac{T r}{J}`} text="τ = Tr ÷ J" caption="Peak shear stress, at the outer surface" />
+      <KeyPoints
+        points={[
+          'The polar moment J grows quickly with the distance of material from the center.',
+          'More J means less twist and lower stress.',
+          'A hollow tube can be stiff without being heavy.',
+        ]}
+      />
+      <FinePrint unsupported={TORSION_UNSUPPORTED_EFFECTS} />
       <div className="help-limits">
         Warnings and model applicability are shown for the latest tested design. These are educational screening checks, not
         certification rules.

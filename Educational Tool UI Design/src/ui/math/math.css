@@ -1,0 +1,41 @@
+/* Typeset formulas and key points in the reference dialogs (task 65). New class names, so the
+   template's `.formula span` rule never reaches KaTeX's internal spans. */
+
+.reference-formula {
+  margin: 14px 0;
+  padding: 14px 16px 12px;
+  border: 1px solid #e4e9d9;
+  border-radius: 6px;
+  background: #f4f7ef;
+}
+.reference-formula figcaption {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #56634b;
+}
+.tex {
+  display: block;
+  overflow-x: auto;
+  overflow-y: hidden;
+  font-size: 17px;
+  color: #2e4232;
+}
+.tex .katex-display { margin: 0; text-align: left; }
+.tex .katex-display > .katex { text-align: left; }
+.tex-text { font-family: Georgia, serif; font-size: 19px; }
+
+.reference-points h3 {
+  margin: 18px 0 8px;
+  font-family: Manrope, sans-serif;
+  font-size: 13px;
+  font-weight: 650;
+  color: #3c5337;
+}
+.reference-points ul { margin: 0; padding-left: 18px; list-style: disc; display: flex; flex-direction: column; gap: 6px; }
+.reference-points li { font-size: 13px; line-height: 1.6; color: #4b5644; }
+.reference-points li::marker { color: #6d8257; }
+
+.reference-fineprint { margin: 16px 0 12px; }
+.reference-fineprint summary { cursor: pointer; width: fit-content; padding: 4px 0; font-size: 12px; font-weight: 600; color: #3c5337; }
+.reference-fineprint p { margin: 6px 0 0; font-size: 11px; line-height: 1.7; color: #5d6a52; }

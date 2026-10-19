@@ -1,33 +1,31 @@
 import { BRACED_FRAME_UNSUPPORTED_EFFECTS } from '../../../physics/bracedFrame/constants'
 import Dialog from '../../dialogs/Dialog'
+import { FinePrint, Formula, KeyPoints } from '../../dialogs/Reference'
 
 // Pin-jointed frame reference (task 49.3; BFR-01, BFR-10, BFR-13). Static explanatory text only,
-// no computed numbers.
-
-export const PIN_JOINTED_IDEALIZATION =
-  'This frame is modeled as pin-jointed: every joint is a hinge, so members carry only tension or compression. Without a diagonal, a storey of this idealized frame cannot resist sideways load. Real frames with welded or bolted joints have some bending resistance that this model ignores.'
+// no computed numbers. The full BFR-01 idealization sentence is in the challenge statement.
 
 export default function BracedFrameHelp({ open, onClose }: { open: boolean; onClose: () => void }) {
   if (!open) return null
   return (
     <Dialog title="Pin-jointed frame" icon="book" onClose={onClose}>
-      <p>{PIN_JOINTED_IDEALIZATION}</p>
-      <p>
-        Sideways load travels down the frame through the diagonals to the supports. The direction of a diagonal decides whether it is pulled
-        (tension) or pushed (compression). Stability here means only whether this pin-jointed idealization is stable or a mechanism; it is
-        not a global or second-order buckling check.
-      </p>
-      <div className="formula">
-        P = A·f<sub>y</sub> <span>Tension capacity: area × yield stress</span>
-      </div>
-      <div className="formula">
-        P = min(A·f<sub>y</sub>, π²EI / L²) <span>Compression capacity: squash load or Euler buckling of the full member length</span>
-      </div>
-      <div className="formula">
-        u = |N| / P <span>Utilization: member force divided by its capacity (nominal, no safety factors)</span>
-      </div>
-      <p>Roof drift is the average sideways movement of the two roof joints.</p>
-      <p>This idealized model does not include: {BRACED_FRAME_UNSUPPORTED_EFFECTS.join(', ')}.</p>
+      <Formula tex={String.raw`P_t = A \, f_y`} text="P_t = A·f_y" caption="Tension capacity: area times yield stress" />
+      <Formula
+        tex={String.raw`P_c = \min\left(A \, f_y,\ \dfrac{\pi^{2} E I}{L^{2}}\right)`}
+        text="P_c = min(A·f_y, π²EI ÷ L²)"
+        caption="Compression capacity: squash load or Euler buckling over the full member length"
+      />
+      <Formula tex={String.raw`u = \dfrac{\lvert N \rvert}{P}`} text="u = |N| ÷ P" caption="Utilization: member force over its capacity (nominal, no safety factors)" />
+      <KeyPoints
+        points={[
+          'Pin-jointed: every joint is a hinge, so members carry only tension or compression.',
+          'Without a diagonal, a storey cannot resist sideways load; real welded or bolted joints add bending resistance this model ignores.',
+          'Sideways load reaches the supports through the diagonals; a diagonal’s direction decides whether it is pulled or pushed.',
+          'Stability here means the idealized frame is stable rather than a mechanism, not global buckling.',
+          'Roof drift is the average sideways movement of the two roof joints.',
+        ]}
+      />
+      <FinePrint unsupported={BRACED_FRAME_UNSUPPORTED_EFFECTS} />
       <div className="help-limits">
         Warnings and model applicability are shown for the latest tested design. These are educational screening checks, not
         certification rules.
