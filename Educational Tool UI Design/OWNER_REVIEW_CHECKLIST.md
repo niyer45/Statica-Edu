@@ -238,8 +238,9 @@ Automated gates passed; none of this is human review.
 - [ ] Task 61: on each challenge, open and close Test details (and other dropdowns) and confirm the page returns to its size; on Mounting Bracket I confirm the panel reads cleanly with cautions under Test details (D-52); submit once and use both Back to challenges and Return to this challenge.
 - [ ] Task 62: read the new Home as a student, a teacher and an investor would; confirm every Available now / Early / Planned label is accurate and the vision wording matches your intent (D-53). Check My designs shows each challenge's own drawing and its progress.
 - [ ] Task 63: the landing page reads as a front page (no app sidebar), its header links work, and Open Statica / the logo move between it and the app as you expect; decide later whether it should live on a separate marketing domain (D-54).
-- [ ] Task 64: compare the new Home with your Figma design (D-55). The export had no page layout, so section order, the hero facts row, the header keeping Open Statica beside Sign in, and the Investors tab copy were inferred; confirm or adjust.
-- [ ] Task 65: open each challenge's light-bulb reference; confirm the key points are the right ones and the formulas read well (D-56). The Mounting Bracket cover art still shows a reinforcing rib that the L-bracket model (D-46) does not have; decide whether to keep it or draw the plain bent L.
+- [x] Task 64: compare the new Home with your Figma design (D-55). **2026-10-19, owner: keep. "Page layout looks good to me."** The export had no page layout, so section order, the hero facts row, the header keeping Open Statica beside Sign in, and the Investors tab copy were inferred; confirm or adjust.
+- [ ] Task 65: open each challenge's light-bulb reference; confirm the key points are the right ones and the formulas read well (D-56).
+- [x] Mounting Bracket cover art. **2026-10-19, owner: "The bracket drawing should look like the bracket in the challenge."** Redrawn as the bolted L with no rib (task 65 follow-up).
 
 ## How to record decisions
 

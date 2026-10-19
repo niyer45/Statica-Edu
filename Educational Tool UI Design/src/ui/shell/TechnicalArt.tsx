@@ -81,20 +81,38 @@ function build(kind:string) {
     for(const y of [55,82])for(const z of [-17,17])bolt(-63,y,z)
     load=[107,76,0]
   }else if(kind==="bracket"){
-    wall()
-    box(-68,23,-25,8,72,50)
-    box(-60,23,-25,111,8,50)
-    // The rib stands on the arm and the bolt heads sit on the plates, so they are drawn after both
-    // plates; the plates' large faces would otherwise sort in front of them.
+    // Mounting Bracket I's bolted L (D-46): a flange flat on the wall, a bend with an inner radius,
+    // and an arm carrying the load 120 mm out; two bolts 15 mm below the top of the flange. Generic
+    // proportions (t 6, w 70, H 95, r_i 8 mm), not the challenge's reference design.
+    box(-87,0,-50,19,122,100,true) // a wall wider and taller than the flange
+    const t=6, w=70, H=95, ri=8, ro=ri+t, x0=-68, y0=12, xEnd=x0+135, zf=w/2
+    const arc=(r:number)=>Array.from({length:7},(_,i)=>{
+      const angle=Math.PI+i/6*Math.PI/2 // from the flange (left) round to the arm (bottom)
+      return [x0+ro+r*Math.cos(angle),y0+ro+r*Math.sin(angle)] as [number,number]
+    })
+    const inner=arc(ri)
+    // Body faces seen from above and in front: flange inner face and top, the inner bend, arm top and end.
     layer = 1
-    // A triangular reinforcing rib has two faces and a visible thickness.
-    const a:Point=[-60,31,-3], b:Point=[-60,76,-3], c:Point=[-5,31,-3]
-    const offset:Point=[0,0,6]
-    face([add(a,offset),add(b,offset),add(c,offset)],38)
-    face([b,add(b,offset),add(c,offset),c],22)
-    for(const y of [40,82])for(const z of [-17,17])bolt(-60,y,z)
-    for(const x of [13,37])for(const z of [-16,16])cylinder([x,31,z],[x,33,z],3.5,true,12)
-    load=[42,31,0]
+    const across=([x,y]:[number,number]):[Point,Point]=>[[x,y,-zf],[x,y,zf]]
+    face([[x0+t,y0+H,-zf],[x0+t,y0+H,zf],[x0+t,y0+ro,zf],[x0+t,y0+ro,-zf]],52)
+    face([[x0,y0+H,-zf],[x0+t,y0+H,-zf],[x0+t,y0+H,zf],[x0,y0+H,zf]],22)
+    for(let i=0;i<inner.length-1;i++){
+      const [a1,a2]=across(inner[i]!),[b1,b2]=across(inner[i+1]!)
+      face([a1,b1,b2,a2],52-30*(i+.5)/(inner.length-1))
+    }
+    face([[x0+ro,y0+t,-zf],[xEnd,y0+t,-zf],[xEnd,y0+t,zf],[x0+ro,y0+t,zf]],22)
+    face([[xEnd,y0,-zf],[xEnd,y0+t,-zf],[xEnd,y0+t,zf],[xEnd,y0,zf]],52)
+    // Bolt heads and washers on the flange's inner face sit in front of it.
+    layer = 2
+    for(const z of [-w/4,w/4]){
+      cylinder([x0+t,y0+H-15,z],[x0+t+1.2,y0+H-15,z],6,true,16)
+      bolt(x0+t+1.2,y0+H-15,z)
+    }
+    // The near side of the L, drawn last: the profile from the flange top round the bend to the arm tip.
+    layer = 3
+    const outer=arc(ro).map(([x,y])=>[x,y,zf] as Point)
+    face([[x0,y0+H,zf],...outer,[xEnd,y0,zf],[xEnd,y0+t,zf],...[...inner].reverse().map(([x,y])=>[x,y,zf] as Point),[x0+t,y0+H,zf]],38)
+    load=[x0+120,y0+t,0]
   }else if(kind==="shaft"){
     // A fixed end block restrains a single shaft; a flange receives the torque.
     box(-106,0,-34,65,9,68,true)

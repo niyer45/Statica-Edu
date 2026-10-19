@@ -686,6 +686,7 @@ Six owner requests, run as parallel agents and integrated on `integrate-55-60` (
   - The light-bulb reference of each challenge (beam, torsion, vibration, heat sink, frame, bracket) now shows formulas typeset from LaTeX with fractions (`ui/math/TeX.tsx`, KaTeX 0.18.11 as a lazy chunk with self-hosted fonts; plain text until loaded), three to five key points, and the unsupported effects (plus bracket assumptions and sources) in a collapsed "What this model leaves out" disclosure (`ui/dialogs/Reference.tsx`). Required wording kept (steady-state statement, h given not computed, pin-jointed hinge sentence, bracket sources). Vibration's frequency ratio is its own formula so the transmissibility fits a phone.
   - Bracket technical art: the rib and bolt heads are drawn after the plates, so the rib stands on the arm instead of passing behind it (library cover, drawer, Home, My designs).
   - Tests: `TeX.test.tsx`; production CSP E2E opens the beam reference and checks KaTeX fractions, MathML and fonts under `default-src 'self'` plus axe. 2571 unit tests (also under coverage), 78/78 E2E.
+  - Follow-up (owner, 2026-10-19): the bracket technical art is redrawn as the challenge's bolted L: flange on the wall, two bolts 15 mm below its top, inner bend radius, arm with the load 120 mm out, no rib; generic proportions, not the reference design. CI run 39195142214 passed on 64f207f.
 
 ### Post-MVP roadmap: scope and execution
 
