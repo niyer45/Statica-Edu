@@ -270,7 +270,7 @@
 .bracket-sections summary { cursor: pointer; font-weight: 600; }
 .bracket-sections table { border-collapse: collapse; margin-top: 6px; }
 .bracket-sections th, .bracket-sections td { padding: 2px 8px 2px 0; text-align: left; white-space: nowrap; }
-.bracket-step-note, .bracket-peak { margin: 0 0 8px; font-size: 11px; color: #46583b; }
+.bracket-step-note { margin: 0 0 8px; font-size: 11px; color: #46583b; }
 .bracket-view .bracket-elevation { min-height: 0; max-height: 300px; touch-action: auto; user-select: auto; }
 .bracket-view .bracket-moment { max-height: 96px; margin-top: 4px; }
 .bracket-hatch-line { stroke: #8b9282; stroke-width: 1.5; }
@@ -354,3 +354,10 @@
 .reset-baseline .reset-baseline-button { color: #345640; border-color: #8a977d; font-size: 10px; padding: 6px 10px; }
 .reset-baseline .reset-baseline-button[aria-disabled='true'] { cursor: not-allowed; color: #5f6a56; border-color: #dce1d4; }
 .reset-baseline-note { font-size: 9px; color: #5f6a56; }
+/* 3D canvas hosts: the R3F wrapper is taken out of flow so the canvas never props its host open.
+   In flow, a disclosure that grew the row left the canvas at the taller pixel height after it
+   closed, and the row could not shrink back. The host's own min-height keeps the view's size. */
+.scene-canvas { position: absolute !important; inset: 0; }
+/* Submit dialog (task 61): the two ways out once a submission is recorded. */
+.submit-exit { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.submit-exit > button { flex: 1 1 160px; justify-content: center; }

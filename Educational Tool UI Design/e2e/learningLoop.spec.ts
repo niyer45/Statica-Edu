@@ -31,9 +31,17 @@ test('happy path: edit, drag a height handle, predict, compare, restore, reflect
   await page.getByRole('dialog', { name: 'Explain & submit', exact: true }).getByRole('textbox').fill('Moving material into flanges improved stiffness.')
   await page.getByRole('button', { name: 'Submit design & reflection' }).click()
   await expect(page.getByLabel('Recorded submission')).toContainText('Accepted')
+  // Task 61: once recorded, focus moves to the way out; either button leaves the dialog.
+  await expect(page.getByRole('button', { name: 'Back to challenges', exact: true })).toBeFocused()
   await audit(page)
-  await page.getByRole('button', { name: 'Close', exact: true }).click()
+  await page.getByRole('button', { name: 'Return to this challenge', exact: true }).click()
+  await expect(page.getByRole('dialog', { name: 'Explain & submit', exact: true })).toBeHidden()
+  await expect(page.getByRole('button', { name: 'Run Test', exact: true })).toBeVisible()
   await audit(page)
+  await page.getByRole('button', { name: 'Design submitted' }).click()
+  await page.getByRole('button', { name: 'Back to challenges', exact: true }).click()
+  await expect(page.getByRole('button', { name: 'View Cantilever Beam I', exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Run Test', exact: true })).toBeHidden()
 })
 
 test('HTML5 palette drag-drop applies the section without recording a result', async ({ page }) => {

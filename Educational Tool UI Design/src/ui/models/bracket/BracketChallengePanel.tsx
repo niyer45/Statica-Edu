@@ -1,12 +1,11 @@
 import { STATUS_LABELS } from '../../panels/resultPresentation'
 import Icon from '../../icons/Icon'
-import { bendSummary } from './BracketDetails'
 import { formatBracket, useBracketStore } from './shared'
 
 // Bracket challenge panel (task 55 L-bracket). Mirrors the beam and torsion panels: the
-// statement, stored value/limit summary of the latest test, applicability reasons/warnings, a
-// table-only Test details disclosure (D-30) with the stored bend and bolt quantities, draft
-// errors and Run Test.
+// statement, stored value/limit summary of the latest test, applicability reasons, a Test
+// details disclosure (D-30) holding the caution warnings and the stored bend and bolt
+// quantities (owner feedback: no extra lines under the checks), draft errors and Run Test.
 
 export default function BracketChallengePanel({ onOpenHelp }: { onOpenHelp: () => void }) {
   const { state, challenge: ch, runTest } = useBracketStore()
@@ -48,7 +47,6 @@ export default function BracketChallengePanel({ onOpenHelp }: { onOpenHelp: () =
             </li>
           ))}
         </ul>
-        <p className="bracket-peak">{bendSummary(a)}</p>
         {outside && (
           <ul aria-label="Model applicability reasons">
             {a.notApplicableReasons.map((r) => (
@@ -56,13 +54,15 @@ export default function BracketChallengePanel({ onOpenHelp }: { onOpenHelp: () =
             ))}
           </ul>
         )}
-        <ul aria-label="Model warnings">
-          {a.warnings.map((w) => (
-            <li key={w.code}>{w.message}</li>
-          ))}
-        </ul>
         <details className="result-details">
           <summary>Test details</summary>
+          {a.warnings.length > 0 && (
+            <ul aria-label="Model warnings">
+              {a.warnings.map((w) => (
+                <li key={w.code}>{w.message}</li>
+              ))}
+            </ul>
+          )}
           <table aria-label="Latest tested results">
             <thead>
               <tr>

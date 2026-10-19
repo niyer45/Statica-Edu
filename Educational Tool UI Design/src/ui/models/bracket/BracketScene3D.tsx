@@ -153,6 +153,7 @@ export default function BracketScene3D({ onContextLost: onLost }: { onContextLos
     <>
       <div className="beam-scene bracket-scene relative flex flex-1 flex-col">
         <Canvas
+          className="scene-canvas"
           orthographic
           frameloop="demand"
           dpr={[1, 2]}

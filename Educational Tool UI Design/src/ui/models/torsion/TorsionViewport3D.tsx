@@ -71,6 +71,7 @@ export default function TorsionViewport3D({ onUnavailable }: ViewportProps = {})
     <>
       <div className="beam-scene relative flex flex-1 flex-col">
         <Canvas
+          className="scene-canvas"
           orthographic
           frameloop="demand"
           dpr={[1, 2]}

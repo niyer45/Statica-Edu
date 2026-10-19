@@ -104,6 +104,7 @@ export default function BracedFrameViewport3D({ onUnavailable }: ViewportProps =
     <>
       <div className="frame-scene-3d">
         <Canvas
+          className="scene-canvas"
           orthographic
           frameloop="demand"
           dpr={[1, 2]}

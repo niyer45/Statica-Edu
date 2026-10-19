@@ -235,6 +235,7 @@ Automated gates passed; none of this is human review.
 - [x] Reset to baseline clears test history and submission (owner decision 2026-10-18, D-51).
 - [ ] Accounts are device-only. Choose a backend for cross-device sync (recommended: Supabase Auth + Postgres with row-level security behind the existing `AccountProvider`), the personal data to collect, retention, and whether users include minors/schools (D-50, 38.1).
 - [ ] The guest-to-account move checkbox is checked by default on sign-up; confirm or change.
+- [ ] Task 61: on each challenge, open and close Test details (and other dropdowns) and confirm the page returns to its size; on Mounting Bracket I confirm the panel reads cleanly with cautions under Test details (D-52); submit once and use both Back to challenges and Return to this challenge.
 
 ## How to record decisions
 

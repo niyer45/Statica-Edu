@@ -107,6 +107,15 @@ describe('Mounting Bracket I workbench', () => {
     expect(within(requirement('Mass')).getByText('180.7 g')).toBeTruthy()
     expect(within(requirements).getAllByText('✗ Fail')).toHaveLength(4)
     expect(screen.getAllByText(/Bend stress 231\.0 MPa at the inside of the bend \(curved-beam factor 1\.73\) · 333 N per bolt/).length).toBeGreaterThan(0)
+    // Owner feedback (task 61): no extra lines under the checks; the cautions sit in Test details.
+    const panel = screen.getByRole('complementary', { name: 'The challenge' })
+    expect(within(panel).queryByText(/^Bend stress .* per bolt$/)).toBeNull()
+    const warnings = within(panel).getByRole('list', { name: 'Model warnings', hidden: true })
+    expect(warnings.closest('details')?.querySelector('summary')?.textContent).toBe('Test details')
+    expect(within(warnings).getAllByRole('listitem', { hidden: true }).map((li) => li.textContent)).toEqual([
+      expect.stringContaining('Bend stress divided by yield stress is 0.962'),
+      expect.stringContaining('Deflection divided by load offset is 0.067'),
+    ])
     expect(screen.getByText(BRACKET_LIMITS_NOTICE)).toBeTruthy()
     // jsdom has no WebGL2: the 2D side view (wall, L-bracket, bolts, hanging load) shows with a notice.
     expect(screen.getByRole('img', { name: ELEVATION_LABEL })).toBeTruthy()

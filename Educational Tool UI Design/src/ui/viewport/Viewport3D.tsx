@@ -79,6 +79,7 @@ export default function Viewport3D({ onUnavailable }: ViewportProps = {}) {
         {...dropProps}
       >
         <Canvas
+          className="scene-canvas"
           orthographic
           frameloop="demand"
           dpr={[1, 2]}

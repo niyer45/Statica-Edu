@@ -92,7 +92,7 @@ export default function Workbench({ onExit }: WorkbenchProps) {
         <Toast message={notice} onDismiss={dismissNotice} />
       </WorkbenchChrome>
       <PredictionDialog />
-      <SubmitDialog open={modal === 'submit'} onClose={() => setModal(null)} />
+      <SubmitDialog open={modal === 'submit'} onClose={() => setModal(null)} onExit={onExit} />
       <ui.Help open={modal === 'help'} onClose={() => setModal(null)} />
       {/* Portaled to <body> so it stays present and unhidden while the template shell hides
           the Workbench during page navigation (Req 30.6). */}
