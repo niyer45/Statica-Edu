@@ -435,6 +435,7 @@ button.profile:hover { background: #eef2e8; }
 }
 .landing-footer > div { display: flex; flex-direction: column; gap: 10px; }
 .landing-footer-brand { color: #fff; }
+.landing-footer .landing-build { font: 12px monospace; color: #b9c9ad; }
 .landing-footer-brand .landing-brand-dot { color: #a9bf92; }
 .landing-footer nav { display: flex; flex-wrap: wrap; gap: 4px 8px; }
 .landing-footer nav button { font-size: 14px; color: #eef3e8; text-decoration: underline; text-underline-offset: 3px; padding: 6px 8px; }

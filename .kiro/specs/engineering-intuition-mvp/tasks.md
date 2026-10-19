@@ -687,6 +687,8 @@ Six owner requests, run as parallel agents and integrated on `integrate-55-60` (
   - Bracket technical art: the rib and bolt heads are drawn after the plates, so the rib stands on the arm instead of passing behind it (library cover, drawer, Home, My designs).
   - Tests: `TeX.test.tsx`; production CSP E2E opens the beam reference and checks KaTeX fractions, MathML and fonts under `default-src 'self'` plus axe. 2571 unit tests (also under coverage), 78/78 E2E.
   - Follow-up (owner, 2026-10-19): the bracket technical art is redrawn as the challenge's bolted L: flange on the wall, two bolts 15 mm below its top, inner bend radius, arm with the load 120 mm out, no rib; generic proportions, not the reference design. CI run 39195142214 passed on 64f207f.
+- [x] 66. GitHub Pages deployment for the pilot (owner, 2026-10-19: "I will be starting the pilot program soon. How do I put it online?")
+  - `.github/workflows/pages.yml`: manual "Run workflow" only; refuses a commit whose CI run did not pass; builds with base `/Statica-Edu/` and `VITE_BUILD_ID`; publishes with the GitHub Pages actions. The landing footer shows the short build id of a deployed build. `DEPLOY.md` gives the one-time Pages setting, the deploy steps and pilot caveats (per-browser storage, shared computers, no redeploy mid-session). Verified locally by building with the subpath base and driving Home, two challenges with 3D, the KaTeX references and a reload from a subfolder server (no failed requests). The live deployment needs the owner to switch Pages to GitHub Actions and run the workflow; supports 30.2.
 
 ### Post-MVP roadmap: scope and execution
 

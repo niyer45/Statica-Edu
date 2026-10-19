@@ -1,0 +1,59 @@
+name: Deploy to GitHub Pages
+# Manual only (Actions → Deploy to GitHub Pages → Run workflow), so the pilot site changes only
+# when the owner chooses. It deploys the selected branch's latest commit, and only if the
+# "Statica Milestone 3" CI run for that exact commit passed.
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: Educational Tool UI Design
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require a passing CI run for this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          passed=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow ci.yml --commit "$GITHUB_SHA" --json conclusion --jq 'map(select(.conclusion == "success")) | length')
+          if [ "$passed" = "0" ]; then
+            echo "::error::CI has not passed for $GITHUB_SHA. Wait for its Statica Milestone 3 run to succeed, then run this deploy again."
+            exit 1
+          fi
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: Educational Tool UI Design/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - name: Build for https://<owner>.github.io/<repository>/
+        run: pnpm run build
+        env:
+          FIGMA_PUBLIC_URL: /${{ github.event.repository.name }}
+          VITE_BUILD_ID: ${{ github.sha }}
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: Educational Tool UI Design/dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

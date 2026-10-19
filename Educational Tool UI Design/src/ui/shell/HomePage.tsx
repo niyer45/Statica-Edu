@@ -7,6 +7,9 @@ import SiteIcon, { StaticaMark, type SiteIconName } from './SiteIcon'
 import TechnicalArt from './TechnicalArt'
 import './home.css'
 
+/** Short commit id of a deployed build, so pilot notes can record exactly what students used. */
+const BUILD_ID = import.meta.env.VITE_BUILD_ID?.slice(0, 7) ?? null
+
 // Landing page (tasks 38, 62, 63, 64): a standalone front page, outside the workspace chrome, for
 // students, educators and investors. Task 64 restyles it from the owner's Figma homepage export
 // (design/figma-homepage/ at the repository root): technical-art hero, challenge cards, audience
@@ -497,6 +500,7 @@ export default function HomePage({ account, entries, startedCount, onBrowse, onM
             <Brand />
           </span>
           <p>Interactive engineering education. Built to complement engineering courses.</p>
+          {BUILD_ID && <p className="landing-build">Build {BUILD_ID}</p>}
         </div>
         <nav aria-label="Footer">
           <button type="button" onClick={onBrowse}>Challenges</button>
