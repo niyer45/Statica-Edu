@@ -11,6 +11,7 @@ export const beamBending: LearnModule = {
   title: 'Beam bending',
   summary: 'What makes a beam bend less: load, length, material and the shape of its cross-section.',
   time: '15–20 min',
+  art: 'beam',
   steps: [
     {
       id: 'load',

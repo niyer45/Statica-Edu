@@ -1,6 +1,6 @@
 import { useId, useState, type ReactNode } from 'react'
-import { sectionOutline } from '../../geometry/outline'
-import type { Vec2 } from '../../geometry/sections'
+import { sectionOutline } from '../../../geometry/outline'
+import type { Vec2 } from '../../../geometry/sections'
 import {
   baseInput,
   cantileverResponse,
@@ -16,10 +16,10 @@ import {
   type CantileverInput,
   type DemoMaterial,
   type DemoSection,
-} from '../../learn/beamDemo'
-import type { DemoKind } from '../../learn/types'
+} from '../../../learn/beamDemo'
+import type { BeamDemoKind } from '../../../learn/types'
 
-// Interactive demonstrations for the Beam bending module (task 67; LRN-04, LRN-05, LRN-09). Every
+// Beam bending demonstrations (task 67; LRN-04, LRN-05, LRN-09). Every
 // value comes from learn/beamDemo (the physics layer); this file only scales it for drawing and
 // formats it. Each drawing is decorative and has a text readout of every value it shows.
 
@@ -47,7 +47,7 @@ function Readout({ rows }: { rows: readonly [string, string][] }) {
 }
 
 /** Side view of the cantilever: wall, unloaded outline, exaggerated deflected shape and tip load. */
-function CantileverDiagram({ input, kind, pxPerM, arrowScale = 1, children }: { input: CantileverInput; kind: DemoKind; pxPerM: number; arrowScale?: number; children?: ReactNode }) {
+function CantileverDiagram({ input, kind, pxPerM, arrowScale = 1, children }: { input: CantileverInput; kind: BeamDemoKind; pxPerM: number; arrowScale?: number; children?: ReactNode }) {
   const drop = MAX_DROP_PX / demoMaxDeflectionM(kind)
   const points = deflectedShape(input).map((p) => [ORIGIN.x + p.xM * pxPerM, ORIGIN.y + p.deflectionM * drop] as const)
   const [tipX, tipY] = points[points.length - 1]!
@@ -202,12 +202,17 @@ function StressDemo() {
   )
 }
 
-export default function Demo({ kind }: { kind: DemoKind }) {
-  const body = { load: <LoadDemo />, length: <LengthDemo />, material: <MaterialDemo />, section: <SectionDemo />, stress: <StressDemo /> }[kind]
-  return (
-    <div className="learn-demo">
-      {body}
-      <p className="learn-demo-note">Cantilever with a tip load, idealized as in Cantilever Beam I. Deflection is drawn exaggerated.</p>
-    </div>
-  )
+const NOTE = 'Cantilever with a tip load, idealized as in Cantilever Beam I. Deflection is drawn exaggerated.'
+
+/** Demo components by kind; each renders its controls, drawing, readout and model note. */
+export const BEAM_DEMOS: Readonly<Record<BeamDemoKind, () => ReactNode>> = {
+  load: () => <><LoadDemo /><DemoNote text={NOTE} /></>,
+  length: () => <><LengthDemo /><DemoNote text={NOTE} /></>,
+  material: () => <><MaterialDemo /><DemoNote text={NOTE} /></>,
+  section: () => <><SectionDemo /><DemoNote text={NOTE} /></>,
+  stress: () => <><StressDemo /><DemoNote text={NOTE} /></>,
+}
+
+export function DemoNote({ text }: { text: string }) {
+  return <p className="learn-demo-note">{text}</p>
 }

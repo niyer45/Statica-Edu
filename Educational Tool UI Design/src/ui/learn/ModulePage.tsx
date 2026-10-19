@@ -3,7 +3,7 @@ import { moduleStatus, type LearnProgress } from '../../learn/progress'
 import type { LearnModule, LearnStep } from '../../learn/types'
 import { Formula } from '../dialogs/Reference'
 import Icon from '../icons/Icon'
-import Demo from './Demos'
+import Demo from './demos'
 import './learn.css'
 
 // Module player (task 67; LRN-02, LRN-03, LRN-06, LRN-09). Steps in order: concept, then a

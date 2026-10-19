@@ -2,8 +2,17 @@
 // modules, each module a short list of steps with a concept, a prediction question, an
 // interactive demonstration and an optional advanced note (LRN-01, LRN-02).
 
-/** Which interactive demonstration a step shows; inputs and ranges live in `beamDemo.ts`. */
-export type DemoKind = 'load' | 'length' | 'material' | 'section' | 'stress'
+import type { ArtKind } from '../challenge/catalog'
+
+/** Beam bending demonstrations; inputs and ranges live in `beamDemo.ts`. */
+export type BeamDemoKind = 'load' | 'length' | 'material' | 'section' | 'stress'
+
+/**
+ * Which interactive demonstration a step shows. Each module adds its own kinds, namespaced by
+ * module (e.g. `torsion-length`), with a demo model in `src/learn/<topic>Demo.ts` and components
+ * in `src/ui/learn/demos/<topic>.tsx` registered in `src/ui/learn/demos/index.tsx`.
+ */
+export type DemoKind = BeamDemoKind
 
 export interface PredictionOption {
   id: string
@@ -48,6 +57,8 @@ export interface LearnModule {
   summary: string
   /** Display estimate, e.g. "15–20 min". */
   time: string
+  /** Technical drawing on the module's Learn card (`ui/shell/TechnicalArt`). */
+  art: ArtKind
   steps: readonly LearnStep[]
   /** The design challenge the final "Apply it" step opens (LRN-06). */
   apply: { challengeId: string; title: string; text: string }

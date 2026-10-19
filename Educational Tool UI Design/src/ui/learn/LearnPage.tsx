@@ -49,7 +49,7 @@ export default function LearnPage({ storage, onOpen }: LearnPageProps) {
                   const s = moduleStatus(m, readProgress(storage, m))
                   return (
                     <li key={m.id} className="learn-card panel">
-                      <TechnicalArt kind="beam" />
+                      <TechnicalArt kind={m.art} />
                       <div>
                         <span className="learn-tag learn-tag-available">Available now</span>
                         <h4>{m.title}</h4>

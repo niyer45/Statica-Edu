@@ -1,7 +1,7 @@
 import type { Section } from '../geometry/sections'
 import { deflectionShape, maxMoment, nominalStress, tipDeflection } from '../physics/beam'
 import { bendingProperties, sectionProperties } from '../physics/sectionProperties'
-import type { DemoKind } from './types'
+import type { BeamDemoKind } from './types'
 
 // Demonstration model for the Beam bending module (task 67; LRN-04, LRN-05): the same
 // Euler–Bernoulli cantilever with a tip load as Cantilever Beam I. Every number a demo shows comes
@@ -130,7 +130,7 @@ export function baseInput(overrides: Partial<CantileverInput> = {}): CantileverI
  * Largest tip deflection a demonstration can produce over its control range, so its drawing keeps
  * one exaggerated scale and every change is drawn in true proportion (LRN-05).
  */
-export function demoMaxDeflectionM(kind: DemoKind): number {
+export function demoMaxDeflectionM(kind: BeamDemoKind): number {
   const tipOf = (overrides: Partial<CantileverInput>) => cantileverResponse(baseInput(overrides)).tipDeflectionM
   switch (kind) {
     case 'load':
