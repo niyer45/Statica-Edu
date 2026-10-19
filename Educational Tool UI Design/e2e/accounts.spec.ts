@@ -45,7 +45,7 @@ async function storageKeys(page: Page) {
 
 test('the homepage explains Statica, offers account and guest entry, and fits 320 px', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByRole('heading', { level: 1, name: 'Welcome to Statica' })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: 'Learn engineering by designing, testing and explaining.' })).toBeVisible()
   await expect(page.getByText('Statica is an interactive engineering education platform.', { exact: false })).toBeVisible()
   await expect(page.getByRole('heading', { level: 2, name: 'How students learn with Statica' })).toBeVisible()
   await expect(page.getByRole('list', { name: 'Challenges available now' }).getByRole('listitem')).toHaveCount(6)
@@ -58,7 +58,7 @@ test('the homepage explains Statica, offers account and guest entry, and fits 32
   await expect(page.getByRole('contentinfo')).toBeVisible()
   const sections = page.getByRole('navigation', { name: 'Page sections' }) // hidden below 860 px
   if (await sections.isVisible()) {
-    await sections.getByRole('button', { name: 'Vision' }).click()
+    await sections.getByRole('button', { name: 'Roadmap' }).click()
     await expect(page.getByRole('heading', { level: 2, name: 'Where Statica is going' })).toBeFocused()
   }
   await audit(page)
@@ -68,7 +68,7 @@ test('the homepage explains Statica, offers account and guest entry, and fits 32
   await expect(page.getByRole('heading', { level: 1, name: 'Challenges' })).toBeVisible()
   await expect(page).toHaveURL(/#challenges$/)
   await navigate(page, 'Home')
-  await expect(page.getByRole('heading', { level: 1, name: 'Welcome to Statica' })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: 'Learn engineering by designing, testing and explaining.' })).toBeVisible()
   // Browser Back returns to the previous shell page.
   await page.goBack()
   await expect(page.getByRole('heading', { level: 1, name: 'Challenges' })).toBeVisible()
@@ -132,7 +132,7 @@ test('sign up, work, sign out, guest sees none of it, sign in restores it', asyn
   await expect(page.getByRole('heading', { level: 1, name: 'Your account' })).toBeVisible()
   await audit(page)
   await page.getByRole('button', { name: 'Sign out', exact: true }).click()
-  await expect(page.getByRole('heading', { level: 1, name: 'Welcome to Statica' })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: 'Learn engineering by designing, testing and explaining.' })).toBeVisible()
   await navigate(page, 'My designs')
   await expect(row(page, 'Cantilever Beam I')).toContainText('Not started')
   await navigate(page, 'Home')
@@ -198,7 +198,7 @@ test('guest work can move into a new account, and deleting the account removes i
   await navigate(page, 'Account')
   await page.getByLabel('Password to confirm deletion').fill(ANA.password)
   await page.getByRole('button', { name: 'Delete account and progress' }).click()
-  await expect(page.getByRole('heading', { level: 1, name: 'Welcome to Statica' })).toBeVisible({ timeout: 15_000 })
+  await expect(page.getByRole('heading', { level: 1, name: 'Learn engineering by designing, testing and explaining.' })).toBeVisible({ timeout: 15_000 })
   await expect(page.getByRole('status')).toContainText('Account deleted')
   const after = await storageKeys(page)
   expect(after.filter((k) => k.startsWith('ei:user:') || k === 'ei:account-session:v1')).toEqual([])

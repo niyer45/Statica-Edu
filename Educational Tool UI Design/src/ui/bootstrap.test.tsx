@@ -87,6 +87,6 @@ describe('bootstrap error page', () => {
     // The app starts on the standalone Home page (tasks 38, 63); Open Statica enters the workspace.
     expect(screen.getByRole('button', { name: 'Statica, top of page' })).toBeTruthy()
     expect(screen.getByRole('button', { name: /^Open Statica/ })).toBeTruthy()
-    expect(screen.getByRole('heading', { level: 1, name: 'Welcome to Statica' })).toBeTruthy()
+    expect(screen.getByRole('heading', { level: 1, name: 'Learn engineering by designing, testing and explaining.' })).toBeTruthy()
   })
 })

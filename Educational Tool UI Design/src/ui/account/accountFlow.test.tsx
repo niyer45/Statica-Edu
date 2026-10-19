@@ -82,7 +82,7 @@ describe('routes', () => {
 describe('homepage and accounts', () => {
   it('starts on Home with guest actions, an on-device storage statement and six challenges', () => {
     setup()
-    expect(screen.getByRole('heading', { level: 1, name: 'Welcome to Statica' })).toBeTruthy()
+    expect(screen.getByRole('heading', { level: 1, name: 'Learn engineering by designing, testing and explaining.' })).toBeTruthy()
     for (const name of ['Create account', 'Sign in', 'Continue as guest']) expect(screen.getByRole('button', { name })).toBeTruthy()
     expect(screen.getByText(/saved in this browser on this device only/)).toBeTruthy()
     // Task 62: Home is the outlook page; per-challenge progress lives in My designs.
@@ -107,7 +107,7 @@ describe('homepage and accounts', () => {
     expect(within(screen.getByRole('navigation', { name: 'Platform' })).queryByRole('button', { name: 'Home' })).toBeNull()
     expect([...(screen.getByLabelText('Navigate workspace') as HTMLSelectElement).options].map((o) => o.value)).not.toContain('Home')
     goTo('Home')
-    expect(screen.getByRole('heading', { level: 1, name: 'Welcome to Statica' })).toBeTruthy()
+    expect(screen.getByRole('heading', { level: 1, name: 'Learn engineering by designing, testing and explaining.' })).toBeTruthy()
     expect(window.location.hash).toBe('#home')
     fireEvent.click(screen.getByRole('button', { name: /^Open Statica/ }))
     expect(screen.getByRole('heading', { level: 1, name: 'Challenges' })).toBeTruthy()
@@ -166,7 +166,7 @@ describe('homepage and accounts', () => {
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Sign out' }))
     })
-    await screen.findByRole('heading', { level: 1, name: 'Welcome to Statica' })
+    await screen.findByRole('heading', { level: 1, name: 'Learn engineering by designing, testing and explaining.' })
     expect(beamStatus()).toContain('Not started')
 
     fireEvent.click(screen.getByRole('button', { name: 'Sign in' }))
@@ -199,7 +199,7 @@ describe('homepage and accounts', () => {
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Delete account and progress' }))
     })
-    await screen.findByRole('heading', { level: 1, name: 'Welcome to Statica' })
+    await screen.findByRole('heading', { level: 1, name: 'Learn engineering by designing, testing and explaining.' })
     expect(screen.getByRole('status').textContent).toContain('Account deleted')
     expect([...storage.map.keys()].filter((k) => k.startsWith('ei:user:'))).toEqual([])
   })
