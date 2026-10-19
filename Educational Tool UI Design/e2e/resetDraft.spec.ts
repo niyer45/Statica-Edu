@@ -22,6 +22,8 @@ const ENTRIES: Entry[] = [
   // Task 69 (D-59): owner-requested Pressure Vessel I.
   { title: 'Pressure Vessel I', id: 'pressure-vessel-1' },
   { title: 'Stress and Strain I', id: 'stress-strain-1' }, // task 72
+  // Task 70 (D-60).
+  { title: 'Fatigue Analysis I', id: 'fatigue-analysis-1' },
   // Task 68 (D-58).
   { title: 'Column Buckling I', id: 'column-buckling-1' },
 ]
