@@ -75,7 +75,7 @@ Sources for this section: Budynas & Nisbett, *Shigley's Mechanical Engineering D
 | Shoulder face for the wheel hub | 2.5 mm | ≥ |
 | Model applicability | Applicable | |
 
-Design grid: d 20–40 mm by 0.5, D 30–60 mm by 0.5, r 0.5–5 mm by 0.25, three finishes: 113 430 valid designs, 108 273 applicable, 270 Accepted (197 ground, 73 machined, none as-forged). The most checks any valid applicable design fails is 3 (fatigue, yield, mass; 14 041 designs); failing the shoulder face as well needs a fillet too large for the screens or the mass to fail at the same time.
+Design grid: d 20–40 mm by 0.5, D 30–60 mm by 0.5, r 0.5–5 mm by 0.25, three finishes (`python3 -I worksheet.py --grid`; valid means r < (D − d)/2): 111 606 valid designs, 106 449 applicable, 270 Accepted (197 ground, 73 machined, none as-forged). The most checks any valid applicable design fails is 3 (fatigue, yield, mass; 14 012 designs); failing the shoulder face as well needs a fillet too large for the screens or the mass to fail at the same time.
 
 ## Worksheet (SI and MPa; transcribed to `test/fixtures/fatigue.ts` at 15 significant figures)
 
@@ -118,7 +118,7 @@ Prediction fixture: Baseline → reference gives r = 1.40168491090465/0.62230311
 
 ## Baseline (D-47) and reference
 
-- Baseline d 22, D 45, r 1 mm, as-forged fails fatigue (n_f 0.62, predicted life 7.0×10³ of 2×10⁵ cycles), yield margin (1.11 < 1.5) and mass (0.678 kg), the maximum of 3; it is applicable without warnings. Tie-break among the 14 041 three-failure designs: keep clear of the `LOCAL_YIELD` screen (metric 0.90, not the 1.00 of the most extreme designs) so small edits do not flip the model to not applicable, while still far from passing fatigue, with plausible proportions (a thin neck under a bulky collar, a sharp forged fillet).
+- Baseline d 22, D 45, r 1 mm, as-forged fails fatigue (n_f 0.62, predicted life 7.0×10³ of 2×10⁵ cycles), yield margin (1.11 < 1.5) and mass (0.678 kg), the maximum of 3; it is applicable without warnings. Tie-break among the 14 012 three-failure designs: keep clear of the `LOCAL_YIELD` screen (metric 0.90, not the 1.00 of the most extreme designs) so small edits do not flip the model to not applicable, while still far from passing fatigue, with plausible proportions (a thin neck under a bulky collar, a sharp forged fillet).
 - Reference d 24.5, D 34, r 2 mm, machined: every check passes with margin (n_f 1.40, n_y 1.85, 0.507 kg, face 2.75 mm). Never shown to students.
 
 ## Integration

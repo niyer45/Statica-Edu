@@ -11,7 +11,8 @@ import { heatSinkModel } from './heatSinkModel'
 import { beamModel } from './models'
 import { sessionKey } from './persistence'
 import { bracedFrameModel } from './bracedFrameModel'
-import { beamRuntime, bracedFrameRuntime, bracketRuntime, heatSinkRuntime, runtimeFor, runtimeForJson, torsionRuntime, vibrationRuntime } from './runtimes'
+import { fatigueModel } from './fatigueModel'
+import { beamRuntime, bracedFrameRuntime, bracketRuntime, fatigueRuntime, heatSinkRuntime, runtimeFor, runtimeForJson, torsionRuntime, vibrationRuntime } from './runtimes'
 import { torsionModel } from './torsionModel'
 import { vibrationModel } from './vibrationModel'
 import { vibrationChallenge } from '../../test/fixtures/vibration'
@@ -37,6 +38,8 @@ describe('runtime dispatch', () => {
     expect(runtimeFor({ id: 'steppedBarBracket', version: 1 })).toBeUndefined()
     expect(runtimeFor(bracedFrameModel.ref)).toBe(bracedFrameRuntime)
     expect(runtimeFor({ id: 'pinJointedBracedFrame', version: 2 })).toBeUndefined()
+    expect(runtimeFor(fatigueModel.ref)).toBe(fatigueRuntime)
+    expect(runtimeFor({ id: 'steppedShaftFatigue', version: 2 })).toBeUndefined()
   })
 
   it.each([
@@ -49,6 +52,7 @@ describe('runtime dispatch', () => {
     ['an explicit bracket model', { model: { id: 'boltedLBracket', version: 1 } }, bracketRuntime],
     ['the retired stepped-bar bracket model', { model: { id: 'steppedBarBracket', version: 1 } }, undefined],
     ['an explicit braced-frame model', { model: { id: 'pinJointedBracedFrame', version: 1 } }, bracedFrameRuntime],
+    ['an explicit fatigue model', { model: { id: 'steppedShaftFatigue', version: 1 } }, fatigueRuntime],
     ['a malformed model', { model: 'circularShaftTorsion' }, undefined],
     ['a model with a non-numeric version', { model: { id: 'circularShaftTorsion', version: '1' } }, undefined],
     ['a non-object config', [1, 2], beamRuntime],

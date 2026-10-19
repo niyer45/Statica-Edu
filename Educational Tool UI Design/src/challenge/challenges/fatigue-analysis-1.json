@@ -1,0 +1,55 @@
+{
+  "id": "fatigue-analysis-1",
+  "version": 1,
+  "model": { "id": "steppedShaftFatigue", "version": 1 },
+  "title": "Fatigue Analysis I",
+  "difficulty": "advanced",
+  "allowedModes": ["guided", "parametric"],
+  "statement": "A steel stub-axle spindle is held by its collar, and the wheel load on its neck rises and falls between 1 kN and 5 kN with every bump. It must last 200,000 of these cycles. The current spindle, with a thin neck, a sharp as-forged shoulder fillet and a bulky collar, would crack at the fillet long before then, has too little margin against yielding and is too heavy. Redesign the neck diameter, collar diameter, fillet radius and surface finish so that every check passes, leaving a flat shoulder face for the wheel hub. The load, its position, the lengths and the material are fixed.",
+  "material": {
+    "id": "steel-cd-educational",
+    "name": "Steel (educational nominal, cold-drawn medium-carbon)",
+    "ultimateStrengthPa": 630e6,
+    "yieldStrengthPa": 530e6,
+    "densityKgM3": 7850
+  },
+  "load": { "meanForceN": 3000, "alternatingForceN": 2000, "armM": 0.05 },
+  "geometry": { "collarLengthM": 0.04, "neckLengthM": 0.06 },
+  "support": "collarClamped",
+  "reliability": { "percent": 90, "factor": 0.897 },
+  "targetLifeCycles": 200000,
+  "allowedFinishes": ["ground", "machined", "asForged"],
+  "initialDesign": {
+    "id": "baseline",
+    "neckDiameterM": 0.022,
+    "collarDiameterM": 0.045,
+    "filletRadiusM": 0.001,
+    "surfaceFinish": "asForged",
+    "materialId": "steel-cd-educational"
+  },
+  "referenceDesign": {
+    "id": "reference",
+    "neckDiameterM": 0.0245,
+    "collarDiameterM": 0.034,
+    "filletRadiusM": 0.002,
+    "surfaceFinish": "machined",
+    "materialId": "steel-cd-educational"
+  },
+  "lockedFields": ["materialId", "load", "geometry", "support"],
+  "constraints": {
+    "minFatigueSafetyFactor": 1.3,
+    "minYieldSafetyFactor": 1.5,
+    "maxMassKg": 0.52,
+    "minShoulderFaceM": 0.0025
+  },
+  "designLimits": {
+    "neckDiameterM": { "minM": 0.02, "maxM": 0.04, "stepM": 0.0005 },
+    "collarDiameterM": { "minM": 0.03, "maxM": 0.06, "stepM": 0.0005 },
+    "filletRadiusM": { "minM": 0.0005, "maxM": 0.005, "stepM": 0.00025 }
+  },
+  "predictionPolicy": { "requiredOnIterations": [1, 3] },
+  "reflectionPrompt": {
+    "id": "fatigue-analysis-1-reflection",
+    "text": "Using your tested designs, explain how the fillet radius, the surface finish and the neck diameter each changed the fatigue safety factor, and why making the neck thicker alone was not the answer."
+  }
+}

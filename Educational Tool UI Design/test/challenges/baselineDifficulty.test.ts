@@ -8,6 +8,8 @@ import { heatSink, heatSinkChallenge } from '../fixtures/heatSink'
 import { shaft, solid, torsionChallenge } from '../fixtures/torsion'
 import { vibrationChallenge } from '../fixtures/vibration'
 import { bracedFrameModel } from '../../src/state/bracedFrameModel'
+import { fatigueModel } from '../../src/state/fatigueModel'
+import { fatigueChallenge, spindle } from '../fixtures/fatigue'
 import { heatSinkModel } from '../../src/state/heatSinkModel'
 import { beamRuntime, bracedFrameRuntime, heatSinkRuntime, torsionRuntime } from '../../src/state/runtimes'
 import { torsionModel } from '../../src/state/torsionModel'
@@ -249,5 +251,59 @@ describe('Braced Frame I baseline difficulty', () => {
 
   it('moves saves to a new key so a previous-version save is never re-scored', () => {
     expectStaleSaveIgnored(bracedFrameRuntime, ch, { ...ch, version: 1, initialDesign: frameFixture('uniform60').design })
+  })
+})
+
+describe('Fatigue Analysis I baseline difficulty (task 70, D-47)', () => {
+  const ch = fatigueChallenge()
+  const L = ch.designLimits
+  // Exhaustive walk of the configured grid through the registered model's pure functions. The
+  // totals are the standalone script's (.kiro/specs/fatigue-analysis-1/design.md).
+  const summary = (() => {
+    let valid = 0
+    let applicable = 0
+    let accepted = 0
+    let max = 0
+    let atMax = 0
+    for (const d of grid(L.neckDiameterM.minM, L.neckDiameterM.maxM, L.neckDiameterM.stepM))
+      for (const D of grid(L.collarDiameterM.minM, L.collarDiameterM.maxM, L.collarDiameterM.stepM))
+        for (const r of grid(L.filletRadiusM.minM, L.filletRadiusM.maxM, L.filletRadiusM.stepM))
+          for (const finish of ch.allowedFinishes) {
+            const design = spindle('g', d, D, r, finish)
+            if (fatigueModel.validateDesign(design, ch).length > 0) continue
+            valid++
+            const res = designChecksFailed(fatigueModel, design, ch)
+            if (!res.applicable) continue
+            applicable++
+            if (res.status === 'accepted') accepted++
+            if (res.failed.length > max) {
+              max = res.failed.length
+              atMax = 0
+            }
+            if (res.failed.length === max) atMax++
+          }
+    return { valid, applicable, accepted, max, atMax }
+  })()
+
+  it('walks the same design space as the worksheet script', () => {
+    expect(summary).toEqual({ valid: 111606, applicable: 106449, accepted: 270, max: 3, atMax: 14012 })
+  })
+
+  it('the Baseline fails the maximum (fatigue, yield, mass), applicable without warnings', () => {
+    expect(designChecksFailed(fatigueModel, ch.initialDesign, ch)).toEqual({ applicable: true, warnings: 0, failed: ['fatigueSafetyFactor', 'yieldSafetyFactor', 'mass'], status: 'notAccepted' })
+    expect(summary.max).toBe(3)
+  })
+
+  it('the reference is Accepted and no single change from the Baseline is', () => {
+    expect(designChecksFailed(fatigueModel, ch.referenceDesign!, ch).status).toBe('accepted')
+    const b = ch.initialDesign
+    const singles = [
+      ...grid(L.neckDiameterM.minM, L.neckDiameterM.maxM, L.neckDiameterM.stepM).map((v) => ({ ...b, neckDiameterM: v })),
+      ...grid(L.collarDiameterM.minM, L.collarDiameterM.maxM, L.collarDiameterM.stepM).map((v) => ({ ...b, collarDiameterM: v })),
+      ...grid(L.filletRadiusM.minM, L.filletRadiusM.maxM, L.filletRadiusM.stepM).map((v) => ({ ...b, filletRadiusM: v })),
+      ...ch.allowedFinishes.map((f) => ({ ...b, surfaceFinish: f })),
+    ].filter((d) => fatigueModel.validateDesign(d, ch).length === 0)
+    expect(singles.length).toBeGreaterThan(50)
+    for (const d of singles) expect(designChecksFailed(fatigueModel, d, ch).status).not.toBe('accepted')
   })
 })

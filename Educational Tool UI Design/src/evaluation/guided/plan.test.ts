@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { BEAM_GUIDED_PLAN } from './beam'
 import { BRACED_FRAME_GUIDED_PLAN } from './bracedFrame'
 import { BRACKET_GUIDED_PLAN } from './bracket'
+import { FATIGUE_GUIDED_PLAN } from './fatigue'
 import { HEAT_SINK_GUIDED_PLAN } from './heatSink'
 import { changedParams, currentStep, guidedProgress, isEditable, lockedChange, observations, type GuidedPlan, type GuidedResult } from './plan'
 import { TORSION_GUIDED_PLAN } from './torsion'
@@ -111,7 +112,7 @@ describe('guided progress', () => {
 })
 
 describe('bundled guided plans', () => {
-  const plans = { BEAM_GUIDED_PLAN, TORSION_GUIDED_PLAN, VIBRATION_GUIDED_PLAN, HEAT_SINK_GUIDED_PLAN, BRACKET_GUIDED_PLAN, BRACED_FRAME_GUIDED_PLAN }
+  const plans = { BEAM_GUIDED_PLAN, TORSION_GUIDED_PLAN, VIBRATION_GUIDED_PLAN, HEAT_SINK_GUIDED_PLAN, BRACKET_GUIDED_PLAN, BRACED_FRAME_GUIDED_PLAN, FATIGUE_GUIDED_PLAN }
   it.each(Object.entries(plans))('%s: single-variable steps unlock their objective parameters and end with an open accepted step', (_name, plan) => {
     const steps = plan.steps
     expect(steps.length).toBeGreaterThanOrEqual(3)

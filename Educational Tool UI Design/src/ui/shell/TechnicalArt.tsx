@@ -31,9 +31,10 @@ function TechnicalArt({kind,large=false}:{kind:string;large?:boolean}) {
     </g>
     {tip&&<path d={`M${tip[0]} ${tip[1]-30}V${tip[1]}m-4-6 4 6 4-6`} className="art-accent" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>}
     {kind==="shaft"&&<g className="art-accent" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points={torque.map(p=>p.join(",")).join(" ")}/><path d="m-6-4 6 4-6 4" transform={`translate(${torqueEnd.join(" ")}) rotate(${torqueAngle})`}/></g>}
+    {kind==="fatigue"&&tip&&<path d={`M${tip[0]+9} ${tip[1]-19}q2.5-5 5 0t5 0t5 0`} className="art-accent" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>}
     {kind==="thermal"&&<g className="art-accent" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">{heatOrigins.map(([x,y],i)=><path key={i} d={`M${x} ${y}q-4-7 0-14t0-14m-3 4 3-4 3 4`}/>)}</g>}
     </g>
-    <g fill="currentColor" opacity=".5" fontFamily="monospace" fontSize="7"><text x="18" y="166">FIG. {({beam:"01",bracket:"02",shaft:"03",thermal:"04",frame:"05",spring:"06"} as Record<string,string>)[kind]||"06"}</text><text x="342" y="166" textAnchor="end">STATICA LAB</text></g>
+    <g fill="currentColor" opacity=".5" fontFamily="monospace" fontSize="7"><text x="18" y="166">FIG. {({beam:"01",bracket:"02",shaft:"03",thermal:"04",frame:"05",spring:"06",fatigue:"09"} as Record<string,string>)[kind]||"06"}</text><text x="342" y="166" textAnchor="end">STATICA LAB</text></g>
   </svg>
 }
 
@@ -146,6 +147,26 @@ function build(kind:string) {
     }
     for(const x of [-74,74])box(x-3,99,-29,6,7,58)
     load=[18,106,29]
+  }else if(kind==="fatigue"){
+    // Fatigue Analysis I's stepped stub-axle spindle (task 70): the collar held in a housing, a
+    // shoulder fillet stepping down to the neck, and the wheel hub on the neck carrying the
+    // fluctuating wheel load 50 mm from the shoulder (arrow plus a cyclic accent). Generic
+    // proportions (collar 40, neck 26, fillet 6), not the reference design; the hub is drawn around
+    // the load line so the fillet stays visible.
+    box(-104,0,-38,44,96,76,true) // the housing face that holds the collar
+    const axisY=48, collarR=20, neckR=13, filletR=6, shoulder=-20
+    cylinder([-60,axisY,0],[shoulder,axisY,0],collarR,false,32)
+    // The fillet as rings along the quarter circle centred at (shoulder + r, neck radius + r).
+    const arcPoint=(theta:number)=>[shoulder+filletR+filletR*Math.cos(theta),neckR+filletR+filletR*Math.sin(theta)]
+    for(let i=0;i<4;i++){
+      const [x0]=arcPoint(Math.PI+i/4*Math.PI/2), [x1]=arcPoint(Math.PI+(i+1)/4*Math.PI/2)
+      const [,radius]=arcPoint(Math.PI+(i+.5)/4*Math.PI/2)
+      cylinder([x0,axisY,0],[x1,axisY,0],radius,false,32)
+    }
+    cylinder([shoulder+filletR,axisY,0],[78,axisY,0],neckR,false,32)
+    layer = 1
+    cylinder([10,axisY,0],[46,axisY,0],23,true,32) // the wheel hub around the load line, clear of the fillet
+    load=[30,axisY+23,0]
   }else{
     // A sprung instrument platform: real helical coils between two solid plates.
     box(-49,0,-35,98,9,70,true)

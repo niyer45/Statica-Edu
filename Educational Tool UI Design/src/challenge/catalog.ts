@@ -7,7 +7,7 @@ import type { Difficulty } from './types'
 // a concept preview with no physics or challenge data until its track is verified.
 
 export type Discipline = 'Mechanics' | 'Structures' | 'Thermal' | 'Dynamics'
-export type ArtKind = 'beam' | 'bracket' | 'shaft' | 'thermal' | 'frame' | 'spring'
+export type ArtKind = 'beam' | 'bracket' | 'shaft' | 'thermal' | 'frame' | 'spring' | 'fatigue'
 
 interface CatalogEntryBase {
   /** Library number shown on cards, e.g. "001". */
@@ -112,5 +112,18 @@ export const catalog: readonly CatalogEntry[] = deepFreeze<CatalogEntry[]>([
     available: true,
     challengeId: 'vibration-isolation-1',
     art: 'spring',
+  },
+  // Task 70: owner-requested on 2026-10-19 ("Fatigue Analysis Challenge (Advanced)"), D-60.
+  {
+    id: '009',
+    title: 'Fatigue Analysis I',
+    description: 'Keep a stepped axle spindle alive for its target life under a fluctuating load.',
+    discipline: 'Mechanics',
+    difficulty: 'advanced',
+    time: '35–45 min',
+    concepts: ['Fatigue', 'Stress concentrations'],
+    available: true,
+    challengeId: 'fatigue-analysis-1',
+    art: 'fatigue',
   },
 ])

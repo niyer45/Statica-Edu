@@ -153,7 +153,7 @@ describe('platform shell component suite (13.6)', () => {
     renderShell()
     fireEvent.click(screen.getByRole('button', { name: 'Save Torsion Shaft I' }))
     fireEvent.click(screen.getByRole('button', { name: 'Mechanics' }))
-    expect(cards()).toEqual(['View Cantilever Beam I', 'View Torsion Shaft I'])
+    expect(cards()).toEqual(['View Cantilever Beam I', 'View Torsion Shaft I', 'View Fatigue Analysis I'])
     fireEvent.change(screen.getByLabelText('Filter difficulty'), { target: { value: 'intermediate' } })
     expect(cards()).toEqual(['View Torsion Shaft I'])
     fireEvent.change(screen.getByLabelText('Search challenges'), { target: { value: 'TORSION' } })

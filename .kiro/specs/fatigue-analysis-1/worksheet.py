@@ -103,5 +103,43 @@ def main():
     print('sa_nom by quadrature / closed form - 1 =', g(s_quad / base['sa_nom'] - 1))
 
 
+def grid(lo, hi, step):
+    n = int(round((hi - lo) / step))
+    return [round(lo + i * step, 9) for i in range(n + 1)]
+
+
+def grid_summary():
+    """Walk the configured grid: d 20-40 mm by 0.5, D 30-60 mm by 0.5, r 0.5-5 mm by 0.25, 3 finishes.
+
+    Valid: every value in range and r < (D - d)/2 - 1e-9 (the fillet fits inside the step).
+    """
+    valid = applicable = accepted = 0
+    per_finish = {k: 0 for k in CH['finishes']}
+    most = 0
+    at_most = 0
+    for d in grid(0.02, 0.04, 0.0005):
+        for D in grid(0.03, 0.06, 0.0005):
+            for r in grid(0.0005, 0.005, 0.00025):
+                if not r < (D - d) / 2 - 1e-9:
+                    continue
+                for fin in CH['finishes']:
+                    valid += 1
+                    a = analyze(dict(d=d, D=D, r=r, finish=fin), CH)
+                    if a['na']:
+                        continue
+                    applicable += 1
+                    fails = sum(1 for v in a['checks'].values() if not v)
+                    if fails == 0:
+                        accepted += 1
+                        per_finish[fin] += 1
+                    if fails > most:
+                        most, at_most = fails, 0
+                    if fails == most:
+                        at_most += 1
+    print('\n# Grid: valid', valid, 'applicable', applicable, 'accepted', accepted, per_finish, 'max fails', most, 'designs at max', at_most)
+
+
 if __name__ == '__main__':
     main()
+    if '--grid' in sys.argv:
+        grid_summary()
