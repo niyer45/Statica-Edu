@@ -4,6 +4,7 @@ import { BEAM_GUIDED_PLAN } from '../../evaluation/guided/beam'
 import { BRACED_FRAME_GUIDED_PLAN } from '../../evaluation/guided/bracedFrame'
 import { BRACKET_GUIDED_PLAN } from '../../evaluation/guided/bracket'
 import { FATIGUE_GUIDED_PLAN } from '../../evaluation/guided/fatigue'
+import { COLUMN_GUIDED_PLAN } from '../../evaluation/guided/column'
 import { HEAT_SINK_GUIDED_PLAN } from '../../evaluation/guided/heatSink'
 import { TORSION_GUIDED_PLAN } from '../../evaluation/guided/torsion'
 import { VIBRATION_GUIDED_PLAN } from '../../evaluation/guided/vibration'
@@ -23,6 +24,7 @@ import { bracketUi } from './bracket'
 import { fatigueUi } from './fatigue'
 import { axialUi } from './axial'
 import { bracedFrameUi } from './bracedFrame'
+import { columnUi } from './column'
 import { defaultModelUis, modelUiFor, ModelUiContext } from './registry'
 import { torsionUi } from './torsion'
 import { vesselUi } from './vessel'
@@ -103,6 +105,7 @@ describe('model UI registry', () => {
       ['thinWallPressureVessel', vesselUi],
       ['steppedShaftFatigue', fatigueUi],
       ['axialTieRod', axialUi],
+      ['eulerColumnBuckling', columnUi],
     ])
     expect(modelUiFor({ id: 'boltedLBracket', version: 1 })).toBe(bracketUi)
     expect(bracketUi.copy.prediction.title).toBe('Predict bend stress')
@@ -158,6 +161,7 @@ describe('model UI registry', () => {
     expect(bracketUi.guided).toBe(BRACKET_GUIDED_PLAN)
     expect(bracedFrameUi.guided).toBe(BRACED_FRAME_GUIDED_PLAN)
     expect(fatigueUi.guided).toBe(FATIGUE_GUIDED_PLAN)
+    expect(columnUi.guided).toBe(COLUMN_GUIDED_PLAN)
   })
 
   it('refuses to render a model that has no registered UI', () => {

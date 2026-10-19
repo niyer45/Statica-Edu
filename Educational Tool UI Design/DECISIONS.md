@@ -300,3 +300,15 @@ Owner requests the same day: "Develop the Stress & Strain module" and "Stress & 
 - **Shared edits:** the catalog card, `ArtKind 'rod'`, a TechnicalArt rod, model, runtime and UI registrations, and `DemoKind`. Home copy now derives the challenge and module counts from the catalogs instead of typing "Six". Count-based tests follow the catalog.
 
 This is repository/local availability, not customer deployment. Owner engineering review of material values, limits, wording and references (29.2) and manual/student QA remain required before release. The open questions are in OWNER_REVIEW_CHECKLIST.md §8.
+## D-58: Column Buckling I, an owner-requested introductory challenge, activated (2026-10-19)
+
+The owner requested a "Buckling Challenge (Introductory)" on 2026-10-19 and asked for it to be registered and shown as an available card; this records that owner-requested activation (task 68). Catalog card 007, Column Buckling I (`column-buckling-1` v1, Structures, introductory, Guided and Parametric), model `eulerColumnBuckling` v1 (a new id, MM-01), v2 saves under `ei:session:column-buckling-1:v1`, art kind `column`. Spec: `.kiro/specs/column-buckling-1/` (CBK-01–CBK-20) with an independent worksheet script.
+
+- **Model:** a straight aluminium column, 2 m between ideal pins (K = 1), 10 kN concentric load; the student picks a solid bar or a round tube (outer diameter, wall thickness). Checks: Euler critical load ≥ 2.0 × the load (a minimum check, shown as "value / ≥ limit"), axial stress P/A ≤ 120 MPa, mass ≤ 2.5 kg.
+- **Applicability:** not applicable below the Euler–Johnson transition slenderness (Euler stress above half the yield stress; caution above 0.4), and a D/t screen (40/100, the beam/torsion convention). No plasticity screen on P/A: inside the Euler range a design whose P/A exceeds yield also fails buckling, and an applicable design that passes buckling has P/A ≤ σ_y/(2n) = 60 MPa, so strength never governs; that is the lesson.
+- **Why aluminium, not steel:** at this scale efficient steel tubes fall in the intermediate (Johnson) range, so most good designs would be "not applicable"; aluminium leaves 117 Accepted grid designs (54 without a caution).
+- **Length fixed:** the length-squared lesson is taught in the reference dialog and the model tests, not as an experiment (owner question whether a later edition adds a brace).
+- **Baseline (D-47):** solid Ø24.5 mm fails buckling (3.01 kN against 20 kN) and mass (2.546 kg) while its stress is 18 % of the allowable; no clean grid design fails more than 2 checks; the tie-break chooses the plausible solid bar over a 10 mm rod failing buckling and stress. The reference tube 60 × 2 mm is Accepted (26.1 kN, 1.97 kg).
+- **Guided (D-49):** thicken the solid bar → hollow it out → change only the wall → widen the tube → meet every check.
+
+Like D-42–D-44 this is repository/local availability, not customer deployment. Constants, thresholds, wording, sources and the cover art await owner engineering review (29.2, OWNER_REVIEW_CHECKLIST.md §8). Adding the card changes count-based copy and tests (seven challenges); branches adding other cards need those counts reconciled at merge.

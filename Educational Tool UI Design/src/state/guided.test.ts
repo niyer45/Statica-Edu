@@ -5,13 +5,14 @@ import { BEAM_GUIDED_PLAN } from '../evaluation/guided/beam'
 import { BRACED_FRAME_GUIDED_PLAN } from '../evaluation/guided/bracedFrame'
 import { BRACKET_GUIDED_PLAN } from '../evaluation/guided/bracket'
 import { FATIGUE_GUIDED_PLAN } from '../evaluation/guided/fatigue'
+import { COLUMN_GUIDED_PLAN } from '../evaluation/guided/column'
 import { HEAT_SINK_GUIDED_PLAN } from '../evaluation/guided/heatSink'
 import { guidedProgress, type GuidedPlan, type GuidedStep } from '../evaluation/guided/plan'
 import { TORSION_GUIDED_PLAN } from '../evaluation/guided/torsion'
 import { VIBRATION_GUIDED_PLAN } from '../evaluation/guided/vibration'
 import { AXIAL_GUIDED_PLAN } from '../evaluation/guided/axial'
 import { SECTION_PARAMS } from '../geometry/params'
-import { axialRuntime, beamRuntime, bracedFrameRuntime, bracketRuntime, fatigueRuntime, heatSinkRuntime, torsionRuntime, vibrationRuntime, type AnyRuntime, type LoopChallenge } from './runtimes'
+import { axialRuntime, beamRuntime, bracedFrameRuntime, bracketRuntime, columnRuntime, fatigueRuntime, heatSinkRuntime, torsionRuntime, vibrationRuntime, type AnyRuntime, type LoopChallenge } from './runtimes'
 
 // Guided structured experiments through the real runtimes (task 58). For every bundled
 // challenge: each step is completable from the Baseline by editing only that step's parameters
@@ -190,6 +191,24 @@ const CASES: Case[] = [
         : [edit({ type: 'setDiameter', valueM: (d.diameterM as number) + (ch.diameterLimits as { stepM: number }).stepM, mode: 'clamp' })],
     toReference: (_d, ch) => [edit({ type: 'setDiameter', valueM: ch.referenceDesign.diameterM, mode: 'strict' }), edit({ type: 'setMaterial', materialId: ch.referenceDesign.materialId })],
     lockedAtStart: (d, ch) => edit({ type: 'setMaterial', materialId: (ch.materials as { id: string }[]).find((m) => m.id !== d.materialId)!.id }),
+  },
+  {
+    name: 'Column Buckling I',
+    id: 'column-buckling-1',
+    runtime: columnRuntime as unknown as AnyRuntime,
+    plan: COLUMN_GUIDED_PLAN as unknown as GuidedPlan<never, never>,
+    experiment: (step, d, ch) => {
+      const section = beamSection(d)
+      if (step.id === 'section') return [edit({ type: 'setSection', kind: (ch.allowedSections as string[]).find((k) => k !== section.kind)! })]
+      const param = target(step, section)
+      return [edit({ type: 'setParam', param, valueM: (section[param] as number) + 0.002, mode: 'clamp' })]
+    },
+    toReference: (_d, ch) => {
+      const ref = (ch.referenceDesign as { section: Record<string, number | string> }).section
+      const params = Object.entries(ref).filter(([k]) => k !== 'kind')
+      return [edit({ type: 'setSection', kind: ref.kind }), ...params.map(([param, v]) => edit({ type: 'setParam', param, valueM: v, mode: 'strict' }))]
+    },
+    lockedAtStart: (d) => edit({ type: 'setSection', kind: beamSection(d).kind === 'tube' ? 'solid' : 'tube' }),
   },
 ]
 

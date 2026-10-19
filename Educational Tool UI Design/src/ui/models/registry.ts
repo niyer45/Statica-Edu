@@ -7,6 +7,7 @@ import { heatSinkUi } from './heatSink'
 import { bracketUi } from './bracket'
 import { bracedFrameUi } from './bracedFrame'
 import { fatigueUi } from './fatigue'
+import { columnUi } from './column'
 import { torsionUi } from './torsion'
 import type { ModelUi } from './types'
 import { vesselUi } from './vessel'
@@ -37,6 +38,7 @@ export function defaultModelUis(): ReadonlyMap<string, ModelUi> {
     ['steppedShaftFatigue', fatigueUi],
     // Task 72 (D-62): Stress and Strain I.
     ['axialTieRod', axialUi],
+    ['eulerColumnBuckling', columnUi],
   ])
   return defaults
 }

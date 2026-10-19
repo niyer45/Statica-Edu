@@ -49,6 +49,8 @@ const ENTRIES: Entry[] = [
   { title: 'Fatigue Analysis I', id: 'fatigue-analysis-1', edit: (page) => fill(page, 'Fillet radius', '2') },
   // Task 72 (D-62).
   { title: 'Stress and Strain I', id: 'stress-strain-1', edit: (page) => fill(page, 'Diameter', '20') },
+  // Task 68 (D-58): the owner-requested Column Buckling I joins the same isolation checks.
+  { title: 'Column Buckling I', id: 'column-buckling-1', edit: (page) => fill(page, 'Diameter', '30') },
 ]
 
 async function toLibrary(page: Page) {

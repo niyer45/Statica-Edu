@@ -17,7 +17,7 @@ function TechnicalArt({kind,large=false}:{kind:string;large?:boolean}) {
   const id = useId().replace(/:/g,"")
   let art = built.get(kind)
   if(!art){art=build(kind);built.set(kind,art)}
-  const {polygons,transform,tip,torque,torqueEnd,torqueAngle,heatOrigins} = art
+  const {polygons,transform,tip,torque,torqueEnd,torqueAngle,heatOrigins,mode} = art
   return <svg className={`technical-art ${large?"large":""}`} viewBox="0 0 360 180" fill="none" aria-hidden="true">
     <defs>
       <pattern id={`${id}-grid`} width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".6" fill="currentColor" opacity=".15"/></pattern>
@@ -32,9 +32,10 @@ function TechnicalArt({kind,large=false}:{kind:string;large?:boolean}) {
     {tip&&<path d={`M${tip[0]} ${tip[1]-30}V${tip[1]}m-4-6 4 6 4-6`} className="art-accent" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>}
     {kind==="shaft"&&<g className="art-accent" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points={torque.map(p=>p.join(",")).join(" ")}/><path d="m-6-4 6 4-6 4" transform={`translate(${torqueEnd.join(" ")}) rotate(${torqueAngle})`}/></g>}
     {kind==="fatigue"&&tip&&<path d={`M${tip[0]+9} ${tip[1]-19}q2.5-5 5 0t5 0t5 0`} className="art-accent" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>}
+    {kind==="column"&&<polyline points={mode.map(p=>p.join(",")).join(" ")} className="art-accent" strokeWidth="1.2" strokeDasharray="3 2.5" strokeLinecap="round"/>}
     {kind==="thermal"&&<g className="art-accent" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">{heatOrigins.map(([x,y],i)=><path key={i} d={`M${x} ${y}q-4-7 0-14t0-14m-3 4 3-4 3 4`}/>)}</g>}
     </g>
-    <g fill="currentColor" opacity=".5" fontFamily="monospace" fontSize="7"><text x="18" y="166">FIG. {({beam:"01",bracket:"02",shaft:"03",thermal:"04",frame:"05",spring:"06",vessel:"08",fatigue:"09",rod:"10"} as Record<string,string>)[kind]||"06"}</text><text x="342" y="166" textAnchor="end">STATICA LAB</text></g>
+    <g fill="currentColor" opacity=".5" fontFamily="monospace" fontSize="7"><text x="18" y="166">FIG. {({beam:"01",bracket:"02",shaft:"03",thermal:"04",frame:"05",spring:"06",vessel:"08",fatigue:"09",rod:"10",column:"07"} as Record<string,string>)[kind]||"06"}</text><text x="342" y="166" textAnchor="end">STATICA LAB</text></g>
   </svg>
 }
 
@@ -114,6 +115,27 @@ function build(kind:string) {
     const outer=arc(ro).map(([x,y])=>[x,y,zf] as Point)
     face([[x0,y0+H,zf],...outer,[xEnd,y0,zf],[xEnd,y0+t,zf],...[...inner].reverse().map(([x,y])=>[x,y,zf] as Point),[x0+t,y0+H,zf]],38)
     load=[x0+120,y0+t,0]
+  }else if(kind==="column"){
+    // Column Buckling I (task 68): a round tube standing between two pinned ends, as modeled. A base
+    // plate and a clevis (two plates and a pin through a tongue in the tube) at the bottom; the same
+    // clevis upside down under a load cap at the top; the load presses straight down on the cap.
+    // The open top of the tube shows its bore. Generic proportions, not the reference design; the
+    // dashed half-sine beside it is the buckling mode shape.
+    const r=8, y0=18, y1=98, pinLow=12, pinHigh=104
+    box(-26,-4,-20,52,6,40,true)
+    for(const z of [-5,2.5])box(-6,2,z,12,14,2.5,true)
+    box(-5,8,-1.2,10,14,2.4,true)
+    cylinder([0,pinLow,-7],[0,pinLow,7],2.2,true,10)
+    cylinder([0,y0,0],[0,y1,0],r,false,28)
+    layer = 1
+    // The bore, seen through the open top of the tube.
+    face(Array.from({length:28},(_,i)=>[5.6*Math.cos(i*Math.PI*2/28),y1+.01,5.6*Math.sin(i*Math.PI*2/28)] as Point),8,true)
+    layer = 2
+    box(-5,94,-1.2,10,14,2.4,true)
+    for(const z of [-5,2.5])box(-6,98,z,12,14,2.5,true)
+    cylinder([0,pinHigh,-7],[0,pinHigh,7],2.2,true,10)
+    box(-22,112,-16,44,6,32,true)
+    load=[0,118,0]
   }else if(kind==="shaft"){
     // A fixed end block restrains a single shaft; a flange receives the torque.
     box(-106,0,-34,65,9,68,true)
@@ -224,6 +246,7 @@ function build(kind:string) {
   }
   const tip = load ? project(load) : null
   const heatOrigins = [-45,-9,27].map(x=>project([x,82,0]))
+  const mode = Array.from({length:25},(_,i)=>project([20*Math.sin(i/24*Math.PI),12+i/24*92,0]))
   const torque = Array.from({length:37},(_,i)=> {
     const angle=-Math.PI*.65+i/36*Math.PI*1.65
     return project([115,44+28*Math.cos(angle),28*Math.sin(angle)])
@@ -232,6 +255,7 @@ function build(kind:string) {
   if(tip)projected.push(tip,[tip[0],tip[1]-30])
   if(kind==="thermal")for(const p of heatOrigins)projected.push([p[0],p[1]-28])
   if(kind==="shaft")projected.push(...torque)
+  if(kind==="column")projected.push(...mode)
   const minX=Math.min(...projected.map(p=>p[0])),maxX=Math.max(...projected.map(p=>p[0]))
   const minY=Math.min(...projected.map(p=>p[1])),maxY=Math.max(...projected.map(p=>p[1]))
   // Fit every complete system (including loads) inside the same padded art area.
@@ -244,5 +268,5 @@ function build(kind:string) {
     fill:f.neutral?`color-mix(in srgb, #7d877b ${f.shade}%, #f4f5ef)`:`color-mix(in srgb, currentColor ${f.shade}%, #f7f9f2)`,
     stroke:f.neutral?"#929c8b":"currentColor",
   }))
-  return {polygons,transform,tip,torque,torqueEnd,torqueAngle,heatOrigins}
+  return {polygons,transform,tip,torque,torqueEnd,torqueAngle,heatOrigins,mode}
 }

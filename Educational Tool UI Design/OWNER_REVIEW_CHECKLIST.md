@@ -252,6 +252,7 @@ Automated gates passed; none of this is human review.
   3. Baseline steel Ø13 mm (fails stress and mass, chosen so thickening alone cannot work) versus aluminium Ø11 mm (furthest from passing among the tied two-failure designs).
   4. Whether the reference dialog should mention that titanium is costly (cost is not modeled).
   Also work through the module's five steps, demos and wording, and the rod cover art.
+- [ ] Task 68, Column Buckling I (card 007, D-58; spec `.kiro/specs/column-buckling-1/`): play it in Guided and Parametric. Review (Q1–Q6 in the spec's design.md): the scope (pinned–pinned K = 1, aluminium, length fixed so the length-squared lesson lives in the reference dialog, not an experiment; add a mid-height brace in a later edition?); the constants (E 69 GPa, ρ 2700 kg/m³, allowable 120 MPa, yield 240 MPa, 2 m, 10 kN, required safety factor 2.0, mass ≤ 2.5 kg); the screens (Euler range caution at 0.4 and limit at 0.5 of yield, the Johnson transition; D/t 40/100, the beam/torsion convention); the critical load shown as "value / ≥ limit"; the solid Ø24.5 mm baseline (tie-break over a 10 mm rod); the Guided steps; the textbook names (Shigley, Gere/Timoshenko, Hibbeler, Roark) and their edition/equation numbers; and the column cover art (a round tube between two pinned clevises under a load cap, with a dashed half-sine mode shape) against the challenge.
 
 ## How to record decisions
 

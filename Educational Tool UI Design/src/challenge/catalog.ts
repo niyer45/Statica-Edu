@@ -3,11 +3,12 @@ import type { Difficulty } from './types'
 
 // Static challenge-library metadata for the platform shell, moved from the template App.tsx.
 // Available entries link to a bundled challenge JSON (`challenge/bundled.ts`). All six original
-// challenges are available (owner-approved activations D-42–D-44). An unavailable entry would be
+// challenges are available (owner-approved activations D-42–D-44), plus the owner-requested
+// Column Buckling I (D-58). An unavailable entry would be
 // a concept preview with no physics or challenge data until its track is verified.
 
 export type Discipline = 'Mechanics' | 'Structures' | 'Thermal' | 'Dynamics'
-export type ArtKind = 'beam' | 'bracket' | 'shaft' | 'thermal' | 'frame' | 'spring' | 'vessel' | 'fatigue' | 'rod'
+export type ArtKind = 'beam' | 'bracket' | 'shaft' | 'thermal' | 'frame' | 'spring' | 'vessel' | 'fatigue' | 'rod' | 'column'
 
 interface CatalogEntryBase {
   /** Library number shown on cards, e.g. "001". */
@@ -113,6 +114,19 @@ export const catalog: readonly CatalogEntry[] = deepFreeze<CatalogEntry[]>([
     available: true,
     challengeId: 'vibration-isolation-1',
     art: 'spring',
+  },
+  {
+    // Task 68: requested by the owner on 2026-10-19 ("Buckling Challenge (Introductory)"), D-58.
+    id: '007',
+    title: 'Column Buckling I',
+    description: 'Keep a slender column from buckling without making it heavy.',
+    discipline: 'Structures',
+    difficulty: 'introductory',
+    time: '15–20 min',
+    concepts: ['Buckling', 'Section properties'],
+    available: true,
+    challengeId: 'column-buckling-1',
+    art: 'column',
   },
   {
     // Task 69, owner-requested activation 2026-10-19 (D-59).

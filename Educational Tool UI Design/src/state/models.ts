@@ -10,6 +10,7 @@ import { heatSinkModel, type HeatSinkModelDefinition } from './heatSinkModel'
 import { bracketModel, type BracketModelDefinition } from './bracketModel'
 import { bracedFrameModel, type BracedFrameModelDefinition } from './bracedFrameModel'
 import { fatigueModel, type FatigueModelDefinition } from './fatigueModel'
+import { columnModel, type ColumnModelDefinition } from './columnModel'
 import { isFreshSessionWith, type ChallengeBase, type DesignBase, type DesignError, type EngineModel, type EvaluationBase } from './engine'
 import { exportDesign, importDesign } from './importExport'
 import { cloneDesign, sameDesignIgnoringId } from './session'
@@ -61,7 +62,7 @@ export const beamModel: BeamModelDefinition = Object.freeze({
 })
 
 /** Any registered model definition. Dispatch narrows by identity (`def === beamModel`). */
-export type RegisteredModel = BeamModelDefinition | TorsionModelDefinition | VibrationModelDefinition | HeatSinkModelDefinition | BracketModelDefinition | BracedFrameModelDefinition | VesselModelDefinition | FatigueModelDefinition | AxialModelDefinition
+export type RegisteredModel = BeamModelDefinition | TorsionModelDefinition | VibrationModelDefinition | HeatSinkModelDefinition | BracketModelDefinition | BracedFrameModelDefinition | VesselModelDefinition | FatigueModelDefinition | AxialModelDefinition | ColumnModelDefinition
 
 /** Every registered model, keyed by id. Exactly one version per id (MM-04). */
 const REGISTRY: ReadonlyMap<string, RegisteredModel> = new Map<string, RegisteredModel>([
@@ -77,6 +78,7 @@ const REGISTRY: ReadonlyMap<string, RegisteredModel> = new Map<string, Registere
   [fatigueModel.ref.id, fatigueModel],
   // Task 72 (D-62): Stress and Strain I.
   [axialModel.ref.id, axialModel],
+  [columnModel.ref.id, columnModel],
 ])
 
 /** The registered model ids, for guard tests. */

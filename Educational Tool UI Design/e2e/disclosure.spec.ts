@@ -5,7 +5,7 @@ import { catalog } from '../src/challenge/catalog'
 // row, but closing it must return the row to its original height. The 3D canvas used to keep the
 // taller pixel height and hold the row open.
 
-const NAMES = ['Cantilever Beam I', 'Mounting Bracket I', 'Torsion Shaft I', 'Heat Sink I', 'Braced Frame I', 'Vibration Isolation I']
+const NAMES = ['Cantilever Beam I', 'Mounting Bracket I', 'Torsion Shaft I', 'Heat Sink I', 'Braced Frame I', 'Vibration Isolation I', 'Column Buckling I']
 
 for (const name of NAMES) {
   test(`${name}: closing a challenge-panel disclosure restores the workbench height`, async ({ page }) => {

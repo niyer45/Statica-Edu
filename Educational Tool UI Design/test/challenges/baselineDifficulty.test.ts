@@ -4,12 +4,14 @@ import { baseline as beamBaseline, reference as beamReference, sidewaysI } from 
 import type { BeamDesign, Section } from '../../src/geometry/sections'
 import { beamModel } from '../../src/state/models'
 import { bracedFrameChallenge, frameDesign, worksheetFixture as frameFixture } from '../fixtures/bracedFrame'
+import { column, columnChallenge, columnGrid, solid as solidBar } from '../fixtures/column'
 import { heatSink, heatSinkChallenge } from '../fixtures/heatSink'
 import { shaft, solid, torsionChallenge } from '../fixtures/torsion'
 import { vibrationChallenge } from '../fixtures/vibration'
 import { bracedFrameModel } from '../../src/state/bracedFrameModel'
 import { fatigueModel } from '../../src/state/fatigueModel'
 import { fatigueChallenge, spindle } from '../fixtures/fatigue'
+import { columnModel } from '../../src/state/columnModel'
 import { heatSinkModel } from '../../src/state/heatSinkModel'
 import { beamRuntime, bracedFrameRuntime, heatSinkRuntime, torsionRuntime } from '../../src/state/runtimes'
 import { torsionModel } from '../../src/state/torsionModel'
@@ -357,5 +359,38 @@ describe('Stress and Strain I baseline difficulty (task 72, D-62; SSR-14)', () =
 
   it('keeps the aluminium reference Accepted', () => {
     expect(designChecksFailed(axialModel, ch.referenceDesign!, ch)).toMatchObject({ applicable: true, failed: [], status: 'accepted' })
+  })
+})
+
+describe('Column Buckling I baseline difficulty (task 68)', () => {
+  const ch = columnChallenge()
+  const base = designChecksFailed(columnModel, ch.initialDesign, ch)
+
+  it('is a solid Ø24.5 mm bar failing buckling and mass, applicable without warnings (strong enough, not stiff enough)', () => {
+    expect(ch.initialDesign.section).toEqual(solidBar(0.0245))
+    expect(base).toEqual({ applicable: true, warnings: 0, failed: ['buckling', 'mass'], status: 'notAccepted' })
+  })
+
+  it('no valid column on the step grid fails more design checks (stress and mass cannot fail together)', () => {
+    const r = maxFailed(columnModel, ch, columnGrid(ch))
+    expect(r.searched).toBe(1542)
+    expect(r.max).toBe(base.failed.length)
+  })
+
+  it('tie-break: among clean solid bars failing buckling and mass, the Baseline is the furthest from passing buckling', () => {
+    const ties: number[] = []
+    for (const g of columnGrid(ch)) {
+      if (g.section.kind !== 'solid') continue
+      const f = designChecksFailed(columnModel, g, ch)
+      if (f.applicable && f.warnings === 0 && f.failed.join() === 'buckling,mass') ties.push(g.section.diameterM)
+    }
+    expect(ties[0]).toBe(0.0245)
+    expect(ties.at(-1)).toBe(0.039)
+    expect(ties).toHaveLength(30)
+    expect(designChecksFailed(columnModel, column('rod', solidBar(0.01)), ch).failed).toEqual(['buckling', 'axialStress'])
+  })
+
+  it('keeps the reference Accepted', () => {
+    expect(designChecksFailed(columnModel, ch.referenceDesign!, ch)).toMatchObject({ applicable: true, failed: [], status: 'accepted' })
   })
 })
