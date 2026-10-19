@@ -11,6 +11,7 @@ import { torsionUi } from './torsion'
 import type { ModelUi } from './types'
 import { vesselUi } from './vessel'
 import { vibrationUi } from './vibration'
+import { axialUi } from './axial'
 
 // Model UI registry (task 34.2; MM-20). Maps an explicit model id to its workbench UI. A model
 // with a runtime but no UI here cannot be opened (bootstrap refuses it), so no model is ever
@@ -34,6 +35,8 @@ export function defaultModelUis(): ReadonlyMap<string, ModelUi> {
     ['pinJointedBracedFrame', bracedFrameUi],
     ['thinWallPressureVessel', vesselUi],
     ['steppedShaftFatigue', fatigueUi],
+    // Task 72 (D-62): Stress and Strain I.
+    ['axialTieRod', axialUi],
   ])
   return defaults
 }

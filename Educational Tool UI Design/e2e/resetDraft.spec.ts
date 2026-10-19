@@ -21,6 +21,7 @@ const ENTRIES: Entry[] = [
   { title: 'Vibration Isolation I', id: 'vibration-isolation-1' },
   // Task 69 (D-59): owner-requested Pressure Vessel I.
   { title: 'Pressure Vessel I', id: 'pressure-vessel-1' },
+  { title: 'Stress and Strain I', id: 'stress-strain-1' }, // task 72
 ]
 
 type Design = { id: string } & Record<string, unknown>

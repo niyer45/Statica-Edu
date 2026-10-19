@@ -35,6 +35,10 @@ import { VIBRATION_GUIDED_PLAN } from '../evaluation/guided/vibration'
 import { torsionModel, torsionPersistence, torsionReducer, type TorsionAction, type TorsionSession } from './torsionModel'
 import { vesselModel, vesselPersistence, vesselReducer, type VesselAction, type VesselSession } from './vesselModel'
 import { vibrationModel, vibrationPersistence, vibrationReducer, type VibrationAction, type VibrationSession } from './vibrationModel'
+import { loadAxialChallenge } from '../challenge/axial/loader'
+import type { AxialChallenge } from '../challenge/axial/types'
+import { AXIAL_GUIDED_PLAN } from '../evaluation/guided/axial'
+import { axialModel, axialPersistence, axialReducer, type AxialAction, type AxialSession } from './axialModel'
 
 // Model runtimes (task 34.2; multi-model-architecture MM-05, MM-15–MM-18).
 // Everything the store and shell need to run one challenge's learning loop, dispatched by the
@@ -158,6 +162,17 @@ export const fatigueRuntime: ModelRuntime<FatigueSession, FatigueAction, Fatigue
   deserialize: (raw: string, ch: FatigueChallenge) => deserializeSessionV2(fatigueModel, fatiguePersistence, raw, ch),
 })
 
+// Task 72 (D-62): Stress and Strain I.
+export const axialRuntime: ModelRuntime<AxialSession, AxialAction, AxialChallenge> = Object.freeze({
+  ref: axialModel.ref,
+  load: loadAxialChallenge,
+  init: (ch: AxialChallenge, now: string, id: string, mode?: InteractionMode) => initSessionWith(axialModel, ch, now, id, mode),
+  reduce: withGuidedLocks(AXIAL_GUIDED_PLAN, axialReducer),
+  key: sessionKey,
+  serialize: (s: AxialSession, savedAt: string) => serializeSessionV2(axialModel.ref, s, savedAt),
+  deserialize: (raw: string, ch: AxialChallenge) => deserializeSessionV2(axialModel, axialPersistence, raw, ch),
+})
+
 /** Erased runtime type for dispatch; callers only pass values the same runtime produced. */
 export type AnyRuntime = ModelRuntime<LoopSession, { type: string }, LoopChallenge>
 
@@ -170,6 +185,7 @@ const RUNTIMES: ReadonlyMap<string, AnyRuntime> = new Map<string, AnyRuntime>([
   [bracedFrameRuntime.ref.id, bracedFrameRuntime as unknown as AnyRuntime],
   [vesselRuntime.ref.id, vesselRuntime as unknown as AnyRuntime],
   [fatigueRuntime.ref.id, fatigueRuntime as unknown as AnyRuntime],
+  [axialRuntime.ref.id, axialRuntime as unknown as AnyRuntime],
 ])
 
 /** Runtime for an exact registered model identity, or undefined (never a substitute, MM-07). */

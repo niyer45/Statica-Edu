@@ -1,0 +1,50 @@
+{
+  "id": "stress-strain-1",
+  "version": 1,
+  "model": { "id": "axialTieRod", "version": 1 },
+  "title": "Stress and Strain I",
+  "difficulty": "introductory",
+  "allowedModes": ["guided", "parametric"],
+  "statement": "A 2 m steel hanger rod holds a 20 kN load from a roof beam. It is overstressed, and it is already too heavy, so a thicker steel rod will not do. Choose the rod's diameter and material so that its stress stays within the material's allowable stress (yield strength divided by a design factor of 2), it stretches no more than 2 mm, and it weighs no more than 2 kg. The length, load and supports are fixed.",
+  "lengthM": 2,
+  "forceN": 20000,
+  "designFactor": 2,
+  "support": "pinnedTop",
+  "materials": [
+    {
+      "id": "steel",
+      "name": "Structural steel",
+      "shortName": "Steel",
+      "elasticModulusPa": 200e9,
+      "yieldStressPa": 250e6,
+      "densityKgM3": 7850
+    },
+    {
+      "id": "aluminium",
+      "name": "Aluminium alloy 6061-T6",
+      "shortName": "Aluminium",
+      "elasticModulusPa": 69e9,
+      "yieldStressPa": 276e6,
+      "densityKgM3": 2700
+    },
+    {
+      "id": "titanium",
+      "name": "Titanium alloy Ti-6Al-4V (annealed)",
+      "shortName": "Titanium",
+      "elasticModulusPa": 114e9,
+      "yieldStressPa": 830e6,
+      "densityKgM3": 4430
+    }
+  ],
+  "initialDesign": { "id": "baseline", "diameterM": 0.013, "materialId": "steel" },
+  "referenceDesign": { "id": "reference", "diameterM": 0.02, "materialId": "aluminium" },
+  "lockedFields": ["lengthM", "forceN", "designFactor", "support"],
+  "constraints": { "maxElongationM": 0.002, "maxMassKg": 2 },
+  "diameterLimits": { "minM": 0.006, "maxM": 0.03, "stepM": 0.0005 },
+  "predictionPolicy": { "requiredOnIterations": [1, 3] },
+  "reflectionPrompt": {
+    "id": "stress-strain-1-reflection",
+    "text": "Using your tested designs, explain how the rod's diameter changed its stress and stretch, and why the choice of material decided whether a rod could pass every check within the mass limit."
+  },
+  "visualization": { "elongationExaggerationFactor": 100, "maxVisualElongationFractionOfL": 0.25 }
+}

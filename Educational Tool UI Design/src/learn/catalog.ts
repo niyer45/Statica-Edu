@@ -1,5 +1,6 @@
 import { beamBending } from './modules/beamBending'
 import { torsion } from './modules/torsion'
+import { stressStrain } from './modules/stressStrain'
 import type { LearnModule, Subject } from './types'
 
 // Learn catalog (task 67; LRN-01): subjects → topics → modules. Available modules have content; the
@@ -16,7 +17,7 @@ export const LEARN_SUBJECTS: readonly Subject[] = [
         modules: [
           { status: 'available', module: beamBending },
           { status: 'available', module: torsion }, // task 71 (D-61)
-          { status: 'planned', id: 'stress-strain', title: 'Stress and strain', summary: 'Stiffness, strength and what happens past yield.' },
+          { status: 'available', module: stressStrain }, // task 72 (D-62)
           { status: 'planned', id: 'buckling', title: 'Buckling', summary: 'When slender members fail by suddenly bowing sideways.' },
         ],
       },

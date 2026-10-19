@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { DemoKind } from '../../../learn/types'
+import { AXIAL_DEMOS } from './axial'
 import { BEAM_DEMOS } from './beam'
 import { TORSION_DEMOS } from './torsion'
 
@@ -9,6 +10,7 @@ import { TORSION_DEMOS } from './torsion'
 const DEMOS: Readonly<Record<DemoKind, () => ReactNode>> = {
   ...BEAM_DEMOS,
   ...TORSION_DEMOS,
+  ...AXIAL_DEMOS,
 }
 
 export default function Demo({ kind }: { kind: DemoKind }) {

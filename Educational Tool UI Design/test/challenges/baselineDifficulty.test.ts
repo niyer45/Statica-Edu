@@ -14,6 +14,8 @@ import { heatSinkModel } from '../../src/state/heatSinkModel'
 import { beamRuntime, bracedFrameRuntime, heatSinkRuntime, torsionRuntime } from '../../src/state/runtimes'
 import { torsionModel } from '../../src/state/torsionModel'
 import { vibrationModel } from '../../src/state/vibrationModel'
+import { axialModel } from '../../src/state/axialModel'
+import { axialChallenge, gridDesigns } from '../fixtures/axial'
 
 // Task 59 (owner requirement): every challenge baseline fails as many of its design checks as
 // any valid, in-range design can, while staying applicable (no model-validity failure or warning)
@@ -316,5 +318,44 @@ describe('Fatigue Analysis I baseline difficulty (task 70, D-47)', () => {
     ].filter((d) => fatigueModel.validateDesign(d, ch).length === 0)
     expect(singles.length).toBeGreaterThan(50)
     for (const d of singles) expect(designChecksFailed(fatigueModel, d, ch).status).not.toBe('accepted')
+  })
+})
+
+describe('Stress and Strain I baseline difficulty (task 72, D-62; SSR-14)', () => {
+  const ch = axialChallenge()
+  const base = designChecksFailed(axialModel, ch.initialDesign, ch)
+
+  it('is steel Ø13 mm failing stress and mass, applicable and without warnings', () => {
+    expect(ch.initialDesign).toMatchObject({ diameterM: 0.013, materialId: 'steel' })
+    expect(base).toEqual({ applicable: true, warnings: 0, failed: ['stress', 'mass'], status: 'notAccepted' })
+  })
+
+  it('no valid rod on the 147-design grid fails more design checks without a warning; the steel ties fail stress and mass', () => {
+    const rows = gridDesigns(ch).map((d) => ({ d, ...designChecksFailed(axialModel, d, ch) }))
+    expect(rows).toHaveLength(147)
+    expect(maxFailed(axialModel, ch, gridDesigns(ch))).toEqual({ max: 2, searched: 147 })
+    const clean = rows.filter((r) => r.applicable && r.warnings === 0)
+    expect(Math.max(...clean.map((r) => r.failed.length))).toBe(base.failed.length)
+    const tied = clean.filter((r) => r.failed.length === base.failed.length)
+    const label = (r: (typeof tied)[number]) => `${r.d.materialId} ${Math.round(r.d.diameterM * 1e4) / 10}`
+    expect(tied.map(label)).toEqual([
+      'steel 13', 'steel 13.5', 'steel 14',
+      'aluminium 11', 'aluminium 11.5', 'aluminium 12', 'aluminium 12.5', 'aluminium 13', 'aluminium 13.5',
+      'titanium 6.5', 'titanium 7', 'titanium 7.5',
+    ])
+    // The baseline is the smallest (furthest from passing stress) steel rod in the tie (design.md "Baseline choice").
+    expect(tied.find((r) => r.d.materialId === 'steel')!.d.diameterM).toBe(ch.initialDesign.diameterM)
+    // No rod fails stretch and mass together, with or without a warning.
+    for (const r of rows) expect(r.failed.includes('elongation') && r.failed.includes('mass')).toBe(false)
+  })
+
+  it('needs both levers: no single-parameter change from the baseline is Accepted', () => {
+    for (const d of gridDesigns(ch).filter((g) => g.materialId === ch.initialDesign.materialId || g.diameterM === ch.initialDesign.diameterM)) {
+      expect(designChecksFailed(axialModel, d, ch).status).not.toBe('accepted')
+    }
+  })
+
+  it('keeps the aluminium reference Accepted', () => {
+    expect(designChecksFailed(axialModel, ch.referenceDesign!, ch)).toMatchObject({ applicable: true, failed: [], status: 'accepted' })
   })
 })

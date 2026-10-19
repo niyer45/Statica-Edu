@@ -7,7 +7,7 @@ import type { Difficulty } from './types'
 // a concept preview with no physics or challenge data until its track is verified.
 
 export type Discipline = 'Mechanics' | 'Structures' | 'Thermal' | 'Dynamics'
-export type ArtKind = 'beam' | 'bracket' | 'shaft' | 'thermal' | 'frame' | 'spring' | 'vessel' | 'fatigue'
+export type ArtKind = 'beam' | 'bracket' | 'shaft' | 'thermal' | 'frame' | 'spring' | 'vessel' | 'fatigue' | 'rod'
 
 interface CatalogEntryBase {
   /** Library number shown on cards, e.g. "001". */
@@ -139,5 +139,18 @@ export const catalog: readonly CatalogEntry[] = deepFreeze<CatalogEntry[]>([
     available: true,
     challengeId: 'fatigue-analysis-1',
     art: 'fatigue',
+  },
+  // Task 72 (D-62): owner-requested activation, 2026-10-19.
+  {
+    id: '010',
+    title: 'Stress and Strain I',
+    description: 'Choose a diameter and a material so a hanger rod is strong, stiff and light enough.',
+    discipline: 'Mechanics',
+    difficulty: 'introductory',
+    time: '10–15 min',
+    concepts: ['Stress and strain', 'Material properties'],
+    available: true,
+    challengeId: 'stress-strain-1',
+    art: 'rod',
   },
 ])

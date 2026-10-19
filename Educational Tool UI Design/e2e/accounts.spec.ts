@@ -1,5 +1,8 @@
 import { expect, test, type Page } from '@playwright/test'
 import { audit, openWorkbench, readState, referenceDesign, runTest } from './helpers'
+import { catalog } from '../src/challenge/catalog'
+
+const AVAILABLE = catalog.filter((e) => e.available).length
 
 // Task 38: homepage, browser-local accounts and per-account progress on desktop and Pixel 7.
 // Accounts live in this browser only; these cases check that the UI says so, that each
@@ -48,7 +51,7 @@ test('the homepage explains Statica, offers account and guest entry, and fits 32
   await expect(page.getByRole('heading', { level: 1, name: 'Learn engineering by designing, testing and explaining.' })).toBeVisible()
   await expect(page.getByText('Statica is an interactive engineering education platform.', { exact: false })).toBeVisible()
   await expect(page.getByRole('heading', { level: 2, name: 'How students learn with Statica' })).toBeVisible()
-  await expect(page.getByRole('list', { name: 'Challenges available now' }).getByRole('listitem')).toHaveCount(7)
+  await expect(page.getByRole('list', { name: 'Challenges available now' }).getByRole('listitem')).toHaveCount(AVAILABLE)
   await expect(page.getByText('Planned', { exact: true }).first()).toBeVisible()
   await expect(page.getByText(/progress is saved in this browser on this device only/)).toBeVisible()
   for (const name of ['Create account', 'Sign in', 'Continue as guest']) await expect(page.getByRole('button', { name, exact: true })).toBeVisible()
@@ -73,9 +76,9 @@ test('the homepage explains Statica, offers account and guest entry, and fits 32
   await page.goBack()
   await expect(page.getByRole('heading', { level: 1, name: 'Challenges' })).toBeVisible()
   await navigate(page, 'My designs')
-  await expect(page.locator('.my-designs .progress-row')).toHaveCount(7)
-  await expect(page.locator('.my-designs .progress-row').filter({ hasText: 'Not started' })).toHaveCount(7)
-  await expect(page.getByLabel('Progress summary')).toHaveText('0 of 7 challenges completed · 0 started')
+  await expect(page.locator('.my-designs .progress-row')).toHaveCount(AVAILABLE)
+  await expect(page.locator('.my-designs .progress-row').filter({ hasText: 'Not started' })).toHaveCount(AVAILABLE)
+  await expect(page.getByLabel('Progress summary')).toHaveText(`0 of ${AVAILABLE} challenges completed · 0 started`)
   await audit(page)
   await expectNoHorizontalOverflow(page, 320)
 })

@@ -21,6 +21,7 @@ import { vibrationUi } from './vibration'
 import { heatSinkUi } from './heatSink'
 import { bracketUi } from './bracket'
 import { fatigueUi } from './fatigue'
+import { axialUi } from './axial'
 import { bracedFrameUi } from './bracedFrame'
 import { defaultModelUis, modelUiFor, ModelUiContext } from './registry'
 import { torsionUi } from './torsion'
@@ -101,6 +102,7 @@ describe('model UI registry', () => {
       ['pinJointedBracedFrame', bracedFrameUi],
       ['thinWallPressureVessel', vesselUi],
       ['steppedShaftFatigue', fatigueUi],
+      ['axialTieRod', axialUi],
     ])
     expect(modelUiFor({ id: 'boltedLBracket', version: 1 })).toBe(bracketUi)
     expect(bracketUi.copy.prediction.title).toBe('Predict bend stress')
