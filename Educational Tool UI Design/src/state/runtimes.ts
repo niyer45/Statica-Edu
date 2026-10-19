@@ -4,6 +4,8 @@ import { loadBracketChallenge } from '../challenge/bracket/loader'
 import type { BracketChallenge } from '../challenge/bracket/types'
 import { loadBracedFrameChallenge } from '../challenge/bracedFrame/loader'
 import type { BracedFrameChallenge } from '../challenge/bracedFrame/types'
+import { loadFatigueChallenge } from '../challenge/fatigue/loader'
+import type { FatigueChallenge } from '../challenge/fatigue/types'
 import { loadChallenge } from '../challenge/loader'
 import { loadTorsionChallenge } from '../challenge/torsion/loader'
 import type { TorsionChallenge } from '../challenge/torsion/types'
@@ -15,6 +17,7 @@ import type { Challenge, InteractionMode, ModelRef, Result, SchemaIssue } from '
 import { bracketModel, bracketPersistence, bracketReducer, type BracketAction, type BracketSession } from './bracketModel'
 import { bracedFrameModel, bracedFramePersistence, bracedFrameReducer, type BracedFrameAction, type BracedFrameSession } from './bracedFrameModel'
 import { initSessionWith } from './engine'
+import { fatigueModel, fatiguePersistence, fatigueReducer, type FatigueAction, type FatigueSession } from './fatigueModel'
 import { withGuidedLocks } from './guided'
 import { heatSinkModel, heatSinkPersistence, heatSinkReducer, type HeatSinkAction, type HeatSinkSession } from './heatSinkModel'
 import { beamModel, modelFor, modelOf } from './models'
@@ -24,6 +27,7 @@ import { initSession, type Action, type InitSessionError, type SessionState } fr
 import { BEAM_GUIDED_PLAN } from '../evaluation/guided/beam'
 import { BRACED_FRAME_GUIDED_PLAN } from '../evaluation/guided/bracedFrame'
 import { BRACKET_GUIDED_PLAN } from '../evaluation/guided/bracket'
+import { FATIGUE_GUIDED_PLAN } from '../evaluation/guided/fatigue'
 import { HEAT_SINK_GUIDED_PLAN } from '../evaluation/guided/heatSink'
 import { TORSION_GUIDED_PLAN } from '../evaluation/guided/torsion'
 import { VESSEL_GUIDED_PLAN } from '../evaluation/guided/vessel'
@@ -143,6 +147,17 @@ export const vesselRuntime: ModelRuntime<VesselSession, VesselAction, VesselChal
   deserialize: (raw: string, ch: VesselChallenge) => deserializeSessionV2(vesselModel, vesselPersistence, raw, ch),
 })
 
+// Task 70 (D-60): Fatigue Analysis I, owner-requested.
+export const fatigueRuntime: ModelRuntime<FatigueSession, FatigueAction, FatigueChallenge> = Object.freeze({
+  ref: fatigueModel.ref,
+  load: loadFatigueChallenge,
+  init: (ch: FatigueChallenge, now: string, id: string, mode?: InteractionMode) => initSessionWith(fatigueModel, ch, now, id, mode),
+  reduce: withGuidedLocks(FATIGUE_GUIDED_PLAN, fatigueReducer),
+  key: sessionKey,
+  serialize: (s: FatigueSession, savedAt: string) => serializeSessionV2(fatigueModel.ref, s, savedAt),
+  deserialize: (raw: string, ch: FatigueChallenge) => deserializeSessionV2(fatigueModel, fatiguePersistence, raw, ch),
+})
+
 /** Erased runtime type for dispatch; callers only pass values the same runtime produced. */
 export type AnyRuntime = ModelRuntime<LoopSession, { type: string }, LoopChallenge>
 
@@ -154,6 +169,7 @@ const RUNTIMES: ReadonlyMap<string, AnyRuntime> = new Map<string, AnyRuntime>([
   [bracketRuntime.ref.id, bracketRuntime as unknown as AnyRuntime],
   [bracedFrameRuntime.ref.id, bracedFrameRuntime as unknown as AnyRuntime],
   [vesselRuntime.ref.id, vesselRuntime as unknown as AnyRuntime],
+  [fatigueRuntime.ref.id, fatigueRuntime as unknown as AnyRuntime],
 ])
 
 /** Runtime for an exact registered model identity, or undefined (never a substitute, MM-07). */

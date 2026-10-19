@@ -379,3 +379,23 @@
 .vessel-scene-controls { display: flex; align-items: center; gap: 2px; align-self: flex-end; margin-top: 6px; background: #fcfdf8; border: 1px solid #e1e6d7; border-radius: 5px; padding: 4px; }
 .vessel-scene-controls button { display: grid; place-items: center; width: 28px; height: 26px; color: #4f653e; }
 .vessel-scene-hint { font-size: 10px; color: #5c6a55; padding: 0 6px; }
+/* Fatigue Analysis I (task 70): card theme, 2D side view, S-N diagram and finish choice. The
+   fillet marker, load arrows and S-N lines differ by shape and dash, never colour alone. */
+.theme-fatigue { --art-background: #eef0ea; --art-color: #8f9a7c; }
+.fatigue-elevation { max-height: 280px; }
+.fatigue-body { fill: #b8c0bb; stroke: #3d4a3f; stroke-width: 1; stroke-linejoin: round; }
+.fatigue-hub { fill: #dfe5d7; fill-opacity: 0.75; stroke: #5c6a55; stroke-width: 0.8; }
+.fatigue-axis { stroke: #5c6a55; stroke-width: 0.8; stroke-dasharray: 8 3 2 3; }
+.fatigue-fillet-marker { fill: none; stroke: #7a3f14; stroke-width: 1.5; }
+.fatigue-load-min { stroke: #3d4a3f; stroke-width: 1.2; }
+.fatigue-load-min-head { fill: #fcfdf8; stroke: #3d4a3f; stroke-width: 1; }
+.fatigue-view .fatigue-sn { width: 100%; height: auto; max-height: 190px; margin-top: 6px; }
+.fatigue-sn-line { fill: none; stroke: #3d4a3f; stroke-width: 2; }
+.fatigue-sn-target { stroke: #5c6a55; stroke-width: 1.2; stroke-dasharray: 1.5 3; }
+.fatigue-sn-stress { stroke: #8a4b1c; stroke-width: 1.4; stroke-dasharray: 6 3; }
+.fatigue-sn-point { fill: #8a4b1c; stroke: #5a2d0c; stroke-width: 1; }
+.fatigue-sn-point-open { fill: #fcfdf8; stroke: #8a4b1c; stroke-width: 1.6; }
+.fatigue-sn-tick { font-size: 9px; fill: #46583b; }
+.fatigue-finish { border: 0; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.fatigue-finish legend { padding: 0; margin-bottom: 4px; width: 100%; }
+.fatigue-finish-option { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #2f3a31; min-height: 24px; }

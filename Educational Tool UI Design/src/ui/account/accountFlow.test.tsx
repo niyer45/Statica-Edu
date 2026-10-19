@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { createLocalAccountProvider } from '../../account/localProvider'
 import type { CryptoLike } from '../../account/password'
 import type { KeyValueStorage } from '../../account/types'
+import { catalog } from '../../challenge/catalog'
 import { bundledChallengeResult } from '../../challenge/content'
 import { serializeSession, sessionKey } from '../../state/persistence'
 import { sessionReducer } from '../../state/reducer'
@@ -15,6 +16,8 @@ import { hashFor, routeFromHash } from '../shell/routes'
 // browser-local provider over in-memory storage.
 
 const clock = () => '2026-10-18T00:00:00.000Z'
+/** Runnable catalog cards (task 70 added Fatigue Analysis I to the original six). */
+const AVAILABLE = catalog.filter((e) => e.available).length
 const newId = () => 'baseline-id'
 
 function memory(): KeyValueStorage & { map: Map<string, string> } {
@@ -85,23 +88,23 @@ describe('routes', () => {
 
 describe('homepage and accounts', () => {
   // Split in three (task 64): one combined case ran close to the 5 s limit under CI coverage.
-  it('starts on Home with guest actions, an on-device storage statement and six challenges', () => {
+  it('starts on Home with guest actions, an on-device storage statement and every available challenge', () => {
     setup()
     expect(screen.getByRole('heading', { level: 1, name: 'Learn engineering by designing, testing and explaining.' })).toBeTruthy()
     for (const name of ['Create account', 'Sign in', 'Continue as guest']) expect(screen.getByRole('button', { name })).toBeTruthy()
     expect(screen.getByText(/saved in this browser on this device only/)).toBeTruthy()
     // Task 62: Home is the outlook page; per-challenge progress lives in My designs.
     expect(screen.getByRole('heading', { level: 2, name: 'How students learn with Statica' })).toBeTruthy()
-    expect(within(screen.getByRole('list', { name: 'Challenges available now' })).getAllByRole('listitem')).toHaveLength(7) // task 69 adds Pressure Vessel I
+    expect(within(screen.getByRole('list', { name: 'Challenges available now' })).getAllByRole('listitem')).toHaveLength(AVAILABLE)
     expect(screen.queryByRole('list', { name: 'Progress on this device' })).toBeNull()
   })
 
   it('lists every challenge as not started in My designs for a new guest', () => {
     setup()
     goTo('My designs')
-    expect(screen.getByLabelText('Progress summary').textContent).toBe('0 of 7 challenges completed · 0 started')
+    expect(screen.getByLabelText('Progress summary').textContent).toBe(`0 of ${AVAILABLE} challenges completed · 0 started`)
     const rows = within(screen.getByRole('list', { name: 'Not started yet' })).getAllByRole('listitem')
-    expect(rows).toHaveLength(7)
+    expect(rows).toHaveLength(AVAILABLE)
     for (const row of rows) expect(within(row).getByText('Not started')).toBeTruthy()
   })
 

@@ -9,6 +9,7 @@ import type { Analysis } from '../physics/types'
 import { heatSinkModel, type HeatSinkModelDefinition } from './heatSinkModel'
 import { bracketModel, type BracketModelDefinition } from './bracketModel'
 import { bracedFrameModel, type BracedFrameModelDefinition } from './bracedFrameModel'
+import { fatigueModel, type FatigueModelDefinition } from './fatigueModel'
 import { isFreshSessionWith, type ChallengeBase, type DesignBase, type DesignError, type EngineModel, type EvaluationBase } from './engine'
 import { exportDesign, importDesign } from './importExport'
 import { cloneDesign, sameDesignIgnoringId } from './session'
@@ -59,7 +60,7 @@ export const beamModel: BeamModelDefinition = Object.freeze({
 })
 
 /** Any registered model definition. Dispatch narrows by identity (`def === beamModel`). */
-export type RegisteredModel = BeamModelDefinition | TorsionModelDefinition | VibrationModelDefinition | HeatSinkModelDefinition | BracketModelDefinition | BracedFrameModelDefinition | VesselModelDefinition
+export type RegisteredModel = BeamModelDefinition | TorsionModelDefinition | VibrationModelDefinition | HeatSinkModelDefinition | BracketModelDefinition | BracedFrameModelDefinition | VesselModelDefinition | FatigueModelDefinition
 
 /** Every registered model, keyed by id. Exactly one version per id (MM-04). */
 const REGISTRY: ReadonlyMap<string, RegisteredModel> = new Map<string, RegisteredModel>([
@@ -71,6 +72,8 @@ const REGISTRY: ReadonlyMap<string, RegisteredModel> = new Map<string, Registere
   [bracedFrameModel.ref.id, bracedFrameModel],
   // Task 69 (D-59): Pressure Vessel I.
   [vesselModel.ref.id, vesselModel],
+  // Task 70 (D-60): Fatigue Analysis I, owner-requested.
+  [fatigueModel.ref.id, fatigueModel],
 ])
 
 /** The registered model ids, for guard tests. */

@@ -4,12 +4,13 @@ import type { InteractionMode } from '../challenge/types'
 import { BEAM_GUIDED_PLAN } from '../evaluation/guided/beam'
 import { BRACED_FRAME_GUIDED_PLAN } from '../evaluation/guided/bracedFrame'
 import { BRACKET_GUIDED_PLAN } from '../evaluation/guided/bracket'
+import { FATIGUE_GUIDED_PLAN } from '../evaluation/guided/fatigue'
 import { HEAT_SINK_GUIDED_PLAN } from '../evaluation/guided/heatSink'
 import { guidedProgress, type GuidedPlan, type GuidedStep } from '../evaluation/guided/plan'
 import { TORSION_GUIDED_PLAN } from '../evaluation/guided/torsion'
 import { VIBRATION_GUIDED_PLAN } from '../evaluation/guided/vibration'
 import { SECTION_PARAMS } from '../geometry/params'
-import { beamRuntime, bracedFrameRuntime, bracketRuntime, heatSinkRuntime, torsionRuntime, vibrationRuntime, type AnyRuntime, type LoopChallenge } from './runtimes'
+import { beamRuntime, bracedFrameRuntime, bracketRuntime, fatigueRuntime, heatSinkRuntime, torsionRuntime, vibrationRuntime, type AnyRuntime, type LoopChallenge } from './runtimes'
 
 // Guided structured experiments through the real runtimes (task 58). For every bundled
 // challenge: each step is completable from the Baseline by editing only that step's parameters
@@ -156,6 +157,25 @@ const CASES: Case[] = [
       ])
     },
     lockedAtStart: () => edit({ type: 'setMemberSection', memberId: 'col1L', sectionId: 'CHS88.9x5.0' }),
+  },
+  {
+    name: 'Fatigue Analysis I',
+    id: 'fatigue-analysis-1',
+    runtime: fatigueRuntime as unknown as AnyRuntime,
+    plan: FATIGUE_GUIDED_PLAN as unknown as GuidedPlan<never, never>,
+    // Numeric steps nudge their dimension one grid step; the finish step switches to another offered finish.
+    experiment: (step, d, ch) => {
+      if (step.id === 'finish') return [edit({ type: 'setFinish', finish: (ch.allowedFinishes as string[]).find((f) => f !== d.surfaceFinish)! })]
+      const param = target(step, d)
+      const delta = (ch.designLimits as Record<string, { stepM: number }>)[param]!.stepM
+      return [edit({ type: 'setParam', param, valueM: (d[param] as number) + sign(step) * delta, mode: 'clamp' })]
+    },
+    // Fillet first, then collar and neck, so the fillet always fits inside the step on the way.
+    toReference: (_d, ch) => [
+      ...['filletRadiusM', 'collarDiameterM', 'neckDiameterM'].map((param) => edit({ type: 'setParam', param, valueM: ch.referenceDesign[param], mode: 'strict' })),
+      edit({ type: 'setFinish', finish: ch.referenceDesign.surfaceFinish }),
+    ],
+    lockedAtStart: (d) => edit({ type: 'setParam', param: 'collarDiameterM', valueM: (d.collarDiameterM as number) - 0.001, mode: 'strict' }),
   },
 ]
 

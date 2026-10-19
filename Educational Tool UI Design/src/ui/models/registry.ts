@@ -6,6 +6,7 @@ import { beamUi } from './beam'
 import { heatSinkUi } from './heatSink'
 import { bracketUi } from './bracket'
 import { bracedFrameUi } from './bracedFrame'
+import { fatigueUi } from './fatigue'
 import { torsionUi } from './torsion'
 import type { ModelUi } from './types'
 import { vesselUi } from './vessel'
@@ -32,6 +33,7 @@ export function defaultModelUis(): ReadonlyMap<string, ModelUi> {
     ['boltedLBracket', bracketUi],
     ['pinJointedBracedFrame', bracedFrameUi],
     ['thinWallPressureVessel', vesselUi],
+    ['steppedShaftFatigue', fatigueUi],
   ])
   return defaults
 }

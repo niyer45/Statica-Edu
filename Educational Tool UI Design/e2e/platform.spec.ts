@@ -3,6 +3,7 @@ import { readFileSync, readdirSync } from 'node:fs'
 import path from 'node:path'
 import { audit, normalizeState, openWorkbench, readState, recordOtherOrigins, referenceDesign, runTest } from './helpers'
 import { DEV_URL, PREVIEW_URL } from '../playwright.config'
+import { catalog } from '../src/challenge/catalog'
 
 test('responsive layout preserves state across breakpoints and has no horizontal overflow', async ({ page }) => {
   test.setTimeout(90_000) // Both sides of every layout boundary plus five axe audits.
@@ -114,9 +115,9 @@ test('Freeform cannot open a workbench, and every catalog challenge is runnable'
   await expect(page.getByRole('button', { name: 'Not available yet', exact: true })).toBeDisabled()
   await expect(page.getByRole('button', { name: 'Run Test', exact: true })).not.toBeVisible()
   await page.getByRole('button', { name: 'Close challenge details' }).click()
-  // All six original challenges are activated (D-42, D-43, D-44): no card remains a concept preview.
-  // Task 69 adds the owner-requested Pressure Vessel I card (D-59).
-  await expect(page.locator('.challenge-card')).toHaveCount(7)
+  // All six original challenges are activated (D-42, D-43, D-44), plus the owner-requested additions
+  // (D-59 onward): no card remains a concept preview.
+  await expect(page.locator('.challenge-card')).toHaveCount(catalog.length)
   await expect(page.locator('.challenge-card').filter({ hasText: 'Concept preview' })).toHaveCount(0)
   await audit(page)
 })
