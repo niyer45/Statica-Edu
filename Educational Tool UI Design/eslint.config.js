@@ -5,7 +5,7 @@ import tseslint from 'typescript-eslint';
 import reactHooks from 'eslint-plugin-react-hooks';
 
 // Directories that hold pure domain code (no React, no Three.js, no UI/state).
-const DOMAIN_DIRS = ['units', 'challenge', 'geometry', 'physics', 'evaluation'];
+const DOMAIN_DIRS = ['units', 'challenge', 'geometry', 'physics', 'evaluation', 'learn']; // learn: task 67 (LRN-10)
 
 // Matches a relative (`./`, `../`), alias (`@/`) or root (`src/`) import whose
 // path contains the given directory segment, e.g. `../ui/Panel`, `@/state`.

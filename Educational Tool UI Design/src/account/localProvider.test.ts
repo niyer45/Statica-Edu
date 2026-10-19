@@ -1,6 +1,8 @@
 import { webcrypto } from 'node:crypto'
 import { describe, expect, it } from 'vitest'
-import { ACCOUNT_SESSION_KEY, ACCOUNTS_KEY, createLocalAccountProvider, namespacedStorage, normalizeIdentifier, userKey, validateSignUp } from './localProvider'
+import { learnKey } from '../learn/progress'
+import { beamBending } from '../learn/modules/beamBending'
+import { ACCOUNT_SESSION_KEY, ACCOUNTS_KEY, createLocalAccountProvider, GUEST_LEARN_PREFIX, namespacedStorage, normalizeIdentifier, userKey, validateSignUp } from './localProvider'
 import { constantTimeEqual, fromHex, hashPassword, toHex, verifyPassword, type CryptoLike } from './password'
 import type { KeyValueStorage } from './types'
 
@@ -124,13 +126,17 @@ describe('local account provider', () => {
   })
 
   it('moves guest progress into a new account only when asked', async () => {
-    const { p, storage } = provider(memory({ [beamKey]: 'guest-beam', [torsionKey]: 'guest-torsion', 'unrelated': 'x' }))
+    const learn = learnKey(beamBending)
+    const { p, storage } = provider(memory({ [beamKey]: 'guest-beam', [torsionKey]: 'guest-torsion', [learn]: 'guest-learn', 'unrelated': 'x' }))
     const r = await p.signUp({ ...ana, importGuestProgress: true })
     if (!r.ok) throw new Error()
-    expect(r.value).toMatchObject({ imported: 2, importFailed: false })
+    expect(r.value).toMatchObject({ imported: 2, importFailed: false }) // challenges only; Learn moves too (task 67)
     const store = p.progressStorage(r.value.user)
     expect(store.getItem(beamKey)).toBe('guest-beam')
     expect(store.getItem(torsionKey)).toBe('guest-torsion')
+    expect(store.getItem(learn)).toBe('guest-learn')
+    expect(learn.startsWith(GUEST_LEARN_PREFIX)).toBe(true)
+    expect(storage.map.has(learn)).toBe(false)
     expect(storage.map.has(beamKey)).toBe(false) // moved, so the guest starts fresh after sign-out
     expect(storage.map.get('unrelated')).toBe('x')
 

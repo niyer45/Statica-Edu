@@ -8,7 +8,6 @@ import { useSession, useDispatch } from '../state/store'
 import type { SessionState } from '../../state/session'
 import type { InteractionMode } from '../../challenge/types'
 import { DEFAULT_FILTERS, filterCatalog } from './LibraryPage'
-import { stepStatus } from './LearningPathsPage'
 import PlatformShell from './PlatformShell'
 
 // Tasks 13.5/13.6: shell interactions and preservation of the typed session.
@@ -99,14 +98,10 @@ describe('PlatformShell', () => {
     expect(screen.getByRole('button', { name: /Return to workbench/ })).toBeTruthy()
   })
 
-  it('filters the catalog and labels non-first learning-path steps Planned', () => {
+  it('filters the catalog', () => {
     expect(filterCatalog(catalog, { ...DEFAULT_FILTERS, discipline: 'Thermal' }, [])).toHaveLength(1)
     expect(filterCatalog(catalog, { ...DEFAULT_FILTERS, search: 'TORSION' }, []).map((c) => c.id)).toEqual(['003'])
     expect(filterCatalog(catalog, { ...DEFAULT_FILTERS, view: 'Saved' }, ['005']).map((c) => c.id)).toEqual(['005'])
-    expect(stepStatus(0, 0, 0)).toBe('Available')
-    expect(stepStatus(0, 0, 1)).toBe('Tested this session')
-    expect(stepStatus(0, 1, 5)).toBe('Planned')
-    expect(stepStatus(2, 0, 5)).toBe('Planned')
   })
 })
 
@@ -186,7 +181,7 @@ describe('platform shell component suite (13.6)', () => {
     act(() => dispatch({ type: 'setParam', param: 'diameterM', valueM: 0.04, mode: 'strict' }))
     const before = latest
     const workbench = host().querySelector('.workbench')
-    for (const page of ['Notebook', 'Learning paths', 'My designs', 'Challenges']) {
+    for (const page of ['Notebook', 'Learn', 'My designs', 'Challenges']) {
       navigate(page)
       expect(host().hidden).toBe(true)
       expect(latest).toBe(before)

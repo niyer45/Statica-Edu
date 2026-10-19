@@ -241,6 +241,7 @@ Automated gates passed; none of this is human review.
 - [x] Task 64: compare the new Home with your Figma design (D-55). **2026-10-19, owner: keep. "Page layout looks good to me."** The export had no page layout, so section order, the hero facts row, the header keeping Open Statica beside Sign in, and the Investors tab copy were inferred; confirm or adjust.
 - [ ] Task 65: open each challenge's light-bulb reference; confirm the key points are the right ones and the formulas read well (D-56).
 - [x] Mounting Bracket cover art. **2026-10-19, owner: "The bracket drawing should look like the bracket in the challenge."** Redrawn as the bolted L with no rib (task 65 follow-up).
+- [ ] Task 67: work through Learn → Beam bending as a student would. Check each concept point, question, explanation and takeaway for engineering accuracy and level (D-57), and the demo values (1 m aluminium cantilever, 20 × 40 mm bar, 200 N; steel 200 GPa, aluminium 69 GPa, timber 12 GPa). Decide which module comes next (Torsion, Stress and strain, Buckling, Resonance or Fins are listed as Planned).
 
 ## How to record decisions
 

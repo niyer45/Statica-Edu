@@ -101,6 +101,7 @@ export default function CatalogHost({ runnable, entries, storage = null, clock, 
         notes={notes}
         onNotesChange={setNotes}
         routed={routed}
+        learnStorage={store}
       />
     </StoreProvider>
   )

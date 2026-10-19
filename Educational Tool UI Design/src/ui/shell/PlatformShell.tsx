@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react'
 import { catalog, type CatalogEntry } from '../../challenge/catalog'
 import type { InteractionMode, ModelRef } from '../../challenge/types'
-import { selectProgress, selectTestCount, selectWorkspaceStarted, type ChallengeProgress } from '../../state/selectors'
+import { selectProgress, selectWorkspaceStarted, type ChallengeProgress } from '../../state/selectors'
 import { useAccount } from '../account/AccountContext'
 import AccountPage from '../account/AccountPage'
 import Icon from '../icons/Icon'
@@ -12,12 +12,16 @@ import { MODE_LABELS } from '../workbench/WorkbenchChrome'
 import ChallengeDrawer from './ChallengeDrawer'
 import HomePage from './HomePage'
 import { storageStatement, type ProgressRow } from './progress'
-import LearningPathsPage from './LearningPathsPage'
 import LibraryPage from './LibraryPage'
 import MyDesignsPage from './MyDesignsPage'
 import NotebookPage from './NotebookPage'
 import ResourceDialog, { ABOUT_TITLE } from './ResourceDialog'
 import { pushRoute, routeFromHash, type AccountView, type Page } from './routes'
+import { LEARN_SUBJECTS, learnModule } from '../../learn/catalog'
+import { commitPrediction, readProgress, writeProgress, type LearnProgress, type LearnStorage } from '../../learn/progress'
+import type { LearnModule } from '../../learn/types'
+import LearnPage from '../learn/LearnPage'
+import ModulePage from '../learn/ModulePage'
 import '../../platform-base.css'
 import '../../platform.css'
 
@@ -47,7 +51,7 @@ export type { Page }
 // Home is the standalone landing page (task 63), reached from the brand, not a workspace page.
 const PAGES: readonly [Page, string][] = [
   ['Challenges', 'grid'],
-  ['Learning paths', 'chart'],
+  ['Learn', 'bulb'],
   ['My designs', 'cube'],
   ['Notebook', 'book'],
 ]
@@ -78,6 +82,8 @@ export interface PlatformShellProps {
   onNotesChange?: (notes: string) => void
   /** Keep the page in the URL fragment and start on Home (the app); otherwise start on Challenges. */
   routed?: boolean
+  /** Guest/account-scoped storage for Learn progress (task 67); in memory when omitted. */
+  learnStorage?: LearnStorage | null
 }
 
 interface Detail {
@@ -100,6 +106,7 @@ export default function PlatformShell({
   notes: notesProp,
   onNotesChange,
   routed = false,
+  learnStorage = null,
 }: PlatformShellProps = {}) {
   const { selectMode } = useStore()
   const session = useSession()
@@ -117,6 +124,10 @@ export default function PlatformShell({
   const [savedState, setSavedState] = useState<string[]>([])
   const [notesState, setNotesState] = useState('')
   const [resource, setResource] = useState<string | null>(null)
+  const [learnStore] = useState<LearnStorage>(() => learnStorage ?? memoryLearnStorage())
+  const [moduleId, setModuleId] = useState<string | null>(route.moduleId ?? null)
+  const openModule = moduleId === null ? undefined : learnModule(moduleId)
+  const [learnProgress, setLearnProgress] = useState<LearnProgress>(() => (openModule ? readProgress(learnStore, openModule) : {}))
   const saved = savedProp ?? savedState
   const setSaved = (update: (s: readonly string[]) => string[]) => {
     const next = update(saved)
@@ -140,6 +151,7 @@ export default function PlatformShell({
       const next = routeFromHash(window.location.hash)
       setPage(next.page === 'Account' && account === null ? 'Home' : next.page)
       setAccountView(next.view)
+      setModuleOpen(next.moduleId ?? null)
       setWorkspace(false)
       setDetail(null)
     }
@@ -157,15 +169,28 @@ export default function PlatformShell({
   const modesFor = (e: CatalogEntry) => otherFor(e)?.allowedModes ?? challenge.allowedModes
   const featured = entries.find(isActive) ?? entries[0]
   if (featured === undefined) throw new Error('The challenge catalog is empty.')
-  const testCount = selectTestCount(session)
   const started = opened || selectWorkspaceStarted(session)
 
-  const go = (p: Page, view?: AccountView) => {
+  /** Opens a Learn module (or the hub with null) and loads its saved progress. */
+  function setModuleOpen(id: string | null) {
+    const m = id === null ? undefined : learnModule(id)
+    setModuleId(m ? m.id : null)
+    setLearnProgress(m ? readProgress(learnStore, m) : {})
+  }
+
+  const go = (p: Page, view?: AccountView, module?: LearnModule) => {
     setPage(p)
     if (view !== undefined) setAccountView(view)
+    setModuleOpen(module?.id ?? null)
     setWorkspace(false)
     setDetail(null)
-    if (routed) pushRoute(p, p === 'Account' ? (view ?? accountView) : undefined)
+    if (routed) pushRoute(p, p === 'Account' ? (view ?? accountView) : undefined, module?.id)
+  }
+
+  const predict = (m: LearnModule, stepId: string, optionId: string) => {
+    const next = commitPrediction(m, learnProgress, stepId, optionId)
+    writeProgress(learnStore, m, next)
+    setLearnProgress(next)
   }
 
   /** Opens the loaded challenge in `mode`; rejected modes keep the current mode (Req 35.4). */
@@ -177,7 +202,17 @@ export default function PlatformShell({
     return true
   }
 
-  /** Featured / resume / learning-path entry points reopen in the session's current mode. */
+  /** Opens any runnable challenge in `mode`, as the drawer does (Learn's Apply it, task 67; D-37). */
+  const openChallenge = (challengeId: string, mode: InteractionMode) => {
+    if (challenge.id === challengeId) {
+      openWorkbench(mode)
+      return
+    }
+    const other = others.find((o) => o.challengeId === challengeId)
+    if (other !== undefined && other.allowedModes.includes(mode)) onOpenOther?.(challengeId, mode)
+  }
+
+  /** Featured / resume entry points reopen in the session's current mode. */
   const resume = () => {
     openWorkbench(session.mode)
   }
@@ -363,8 +398,18 @@ export default function PlatformShell({
                   entries={entries}
                   modesFor={modesFor}
                 />
-              ) : page === 'Learning paths' ? (
-                <LearningPathsPage testCount={testCount} onStart={resume} onPreview={setResource} />
+              ) : page === 'Learn' && openModule ? (
+                <ModulePage
+                  key={openModule.id}
+                  module={openModule}
+                  path={learnPath(openModule)}
+                  progress={learnProgress}
+                  onPredict={(stepId, optionId) => predict(openModule, stepId, optionId)}
+                  onBack={() => go('Learn')}
+                  onApply={() => openChallenge(openModule.apply.challengeId, 'guided')}
+                />
+              ) : page === 'Learn' ? (
+                <LearnPage storage={learnStore} onOpen={(m) => go('Learn', undefined, m)} />
               ) : page === 'My designs' ? (
                 <MyDesignsPage account={account} rows={progressRows} onFindChallenge={() => go('Challenges')} />
               ) : (
@@ -403,4 +448,19 @@ export default function PlatformShell({
       )}
     </div>
   )
+}
+
+/** Subject and topic titles above a module, for its breadcrumb. */
+function learnPath(m: LearnModule): string[] {
+  for (const subject of LEARN_SUBJECTS) {
+    for (const topic of subject.topics) {
+      if (topic.modules.some((e) => e.status === 'available' && e.module.id === m.id)) return [subject.title, topic.title, m.title]
+    }
+  }
+  return [m.title]
+}
+
+function memoryLearnStorage(): LearnStorage {
+  const values = new Map<string, string>()
+  return { getItem: (k) => values.get(k) ?? null, setItem: (k, v) => void values.set(k, v) }
 }

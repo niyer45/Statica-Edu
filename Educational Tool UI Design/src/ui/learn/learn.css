@@ -1,0 +1,132 @@
+/* Learn hub and module player (task 67). Readable sizes, no fixed widths (fits 320 px), and status
+   always in text, never colour alone. */
+
+.learn-hub,
+.learn-module { display: flex; flex-direction: column; gap: 22px; max-width: 1080px; padding-bottom: 40px; }
+.learn-hub .library-heading > p { max-width: 62ch; font-size: 14px; line-height: 1.7; color: #3f4a39; }
+
+.learn-subject { display: flex; flex-direction: column; gap: 14px; }
+.learn-subject > h2 { margin: 0; font-family: Manrope, sans-serif; font-size: 22px; font-weight: 700; letter-spacing: -.4px; color: #1f2a1c; }
+.learn-topic { display: flex; flex-direction: column; gap: 10px; }
+.learn-topic > h3 { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #4a6541; }
+.learn-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); align-items: start; gap: 14px; }
+.learn-card { display: flex; flex-direction: column; border-radius: 12px; overflow: hidden; }
+.learn-card > .technical-art { background: #eef2e7; color: #6f8a5f; aspect-ratio: 2 / 1; }
+.learn-card > div { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 16px 18px 18px; flex: 1; }
+.learn-card h4 { margin: 0; font-family: Manrope, sans-serif; font-size: 18px; font-weight: 700; color: #1f2a1c; }
+.learn-card p { margin: 0; font-size: 13px; line-height: 1.6; color: #4b5644; }
+.learn-card-meta { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.learn-card-meta > span { display: inline-flex; align-items: center; gap: 5px; }
+.learn-card .learn-card-progress { font-weight: 600; color: #2d4a33; }
+.learn-card .primary { margin-top: auto; font-size: 13px; padding: 10px 14px; }
+.learn-card-planned { border: 1px dashed #c3ccb8; border-radius: 12px; background: #f7f9f3; }
+.learn-tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 999px; border: 1px dashed #b9c4ae; background: #f4f6f0; color: #3d4836; }
+.learn-tag-available { border-style: solid; border-color: #8db48f; background: #e5f1e3; color: #1f4d26; }
+
+/* Module player */
+.learn-breadcrumb { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 13px; color: #4b5644; }
+.learn-breadcrumb > button { padding: 0; font-weight: 600; color: #2d4a33; text-decoration: underline; text-underline-offset: 3px; }
+.learn-breadcrumb > span::before { content: '/'; margin-right: 8px; color: #8a9480; }
+.learn-header { display: flex; flex-direction: column; gap: 6px; }
+.learn-header h1 { margin: 0; }
+.learn-header > p { margin: 0; font-size: 14px; line-height: 1.6; color: #3f4a39; max-width: 64ch; }
+.learn-eyebrow { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: #4a6541; }
+.learn-header > .learn-progress { font-weight: 600; color: #2d4a33; }
+
+.learn-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 18px; align-items: start; }
+.learn-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; position: sticky; top: 16px; }
+.learn-steps button { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; text-align: left; font-size: 14px; color: #3f4a39; }
+.learn-steps button:hover { background: #eef2e8; }
+.learn-steps button[aria-current='step'] { background: #e3e9dc; color: #24402a; font-weight: 600; }
+.learn-step-mark { display: grid; place-items: center; flex: none; width: 22px; height: 22px; border-radius: 50%; border: 1px solid #c9d3bf; background: #fff; font-size: 12px; color: #4b5644; }
+.learn-step-mark.done { border-color: #34543c; background: #34543c; color: #fff; }
+
+.learn-step { padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+.learn-step > h2 { margin: 0; font-family: Manrope, sans-serif; font-size: 22px; font-weight: 700; letter-spacing: -.3px; color: #1f2a1c; scroll-margin-top: 16px; }
+.learn-step > h2:focus { outline: none; }
+.learn-step > h2:focus-visible { outline: 2px solid #34543c; outline-offset: 4px; }
+.learn-step h3 { margin: 0; font-family: Manrope, sans-serif; font-size: 15px; font-weight: 700; color: #26321f; }
+.learn-concept { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.learn-concept li { font-size: 14px; line-height: 1.65; color: #2f3a2a; }
+
+.learn-predict { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px; border: 1px solid #dfe5d6; border-radius: 10px; background: #f8faf5; }
+.learn-predict fieldset { margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.learn-predict legend { padding: 0; margin-bottom: 8px; font-size: 15px; font-weight: 600; line-height: 1.5; color: #1f2a1c; }
+.learn-predict legend > span { display: block; font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; color: #4a6541; }
+.learn-predict label { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid #dfe5d6; border-radius: 8px; background: #fff; font-size: 14px; color: #2f3a2a; cursor: pointer; }
+.learn-predict label:has(input:checked) { border-color: #34543c; background: #eef3e8; }
+.learn-predict label.chosen { font-weight: 600; }
+.learn-predict input { accent-color: #34543c; width: 16px; height: 16px; margin: 0; }
+.learn-predict fieldset:disabled label { cursor: default; color: #3f4a39; }
+.learn-predict .primary { font-size: 14px; padding: 10px 16px; }
+
+.learn-feedback:empty { display: none; }
+.learn-feedback { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 8px; background: #eef3e8; font-size: 14px; line-height: 1.6; color: #2f3a2a; }
+.learn-feedback p { margin: 0; }
+.learn-match,
+.learn-differ { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.learn-match { color: #1f4d26; }
+.learn-differ { color: #5a4a12; }
+
+.learn-try { display: flex; flex-direction: column; gap: 8px; }
+.learn-try > p { margin: 0; font-size: 14px; line-height: 1.6; color: #3f4a39; }
+.learn-demo { display: flex; flex-direction: column; gap: 12px; padding: 16px; border: 1px solid #dfe5d6; border-radius: 10px; background: #fff; }
+.learn-demo-note { margin: 0; font-size: 12px; color: #56634b; }
+.learn-diagram { width: 100%; max-width: 560px; height: auto; display: block; }
+.learn-wall { fill: #dfe4d8; stroke: #9aa48f; }
+.learn-hatch { stroke: #9aa48f; stroke-width: 1; }
+.learn-unloaded { fill: none; stroke: #9aa48f; stroke-dasharray: 4 3; }
+.learn-beam { fill: none; stroke: #34543c; stroke-width: 10; stroke-linejoin: round; }
+.learn-load { fill: none; stroke: #b9703f; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.learn-moment { fill: #b9703f; }
+.learn-marker { stroke: #24402a; stroke-width: 1.5; stroke-dasharray: 3 3; }
+.learn-section-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.learn-section-row > .learn-diagram { flex: 1 1 280px; min-width: 0; }
+.learn-section { width: 110px; height: 110px; flex: none; }
+.learn-section-shape { fill: #c9d8bd; stroke: #34543c; stroke-width: 1.2; }
+.learn-stress-profile { fill: #e8c9b0; stroke: #b9703f; stroke-width: 1.2; }
+.learn-axis { stroke: #8a9480; stroke-width: 1; stroke-dasharray: 3 3; }
+
+.learn-slider { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; font-size: 14px; color: #2f3a2a; }
+.learn-slider label { font-weight: 600; }
+.learn-slider input { width: 100%; accent-color: #34543c; }
+.learn-slider output { min-width: 5ch; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.learn-choice { margin: 0; padding: 0; border: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.learn-choice legend { padding: 0; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: #2f3a2a; }
+.learn-choice label { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid #dfe5d6; border-radius: 8px; font-size: 13px; color: #2f3a2a; cursor: pointer; }
+.learn-choice label:has(input:checked) { border-color: #34543c; background: #eef3e8; font-weight: 600; }
+.learn-choice input { accent-color: #34543c; margin: 0; }
+
+.learn-readout { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap: 8px; }
+.learn-readout > div { padding: 10px 12px; border-radius: 8px; background: #f4f6ef; }
+.learn-readout dt { font-size: 12px; color: #4b5644; }
+.learn-readout dd { margin: 2px 0 0; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; color: #24402a; }
+
+.learn-takeaway { margin: 0; padding: 12px 14px; border-left: 3px solid #34543c; background: #f4f6ef; font-size: 14px; line-height: 1.6; color: #2f3a2a; }
+.learn-takeaway strong { display: block; font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; color: #4a6541; }
+.learn-advanced summary { cursor: pointer; width: fit-content; font-size: 14px; font-weight: 600; color: #2d4a33; }
+
+.learn-apply { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.learn-apply > p { margin: 0; font-size: 14px; line-height: 1.65; color: #3f4a39; max-width: 64ch; }
+.learn-apply > .learn-hint { font-size: 13px; color: #56634b; }
+.learn-actions,
+.learn-nav { display: flex; flex-wrap: wrap; gap: 10px; }
+.learn-nav { justify-content: space-between; padding-top: 14px; border-top: 1px solid #e3e8dc; }
+.learn-nav > .primary:only-child { margin-left: auto; }
+.learn-actions .primary,
+.learn-actions .secondary,
+.learn-nav .primary,
+.learn-nav .secondary { font-size: 14px; padding: 10px 16px; }
+
+@media (max-width: 760px) {
+  .learn-layout { grid-template-columns: minmax(0, 1fr); }
+  .learn-steps { position: relative; flex-direction: row; overflow-x: auto; padding-bottom: 4px; } /* relative: contains the sr-only "done" labels */
+  .learn-steps button { white-space: nowrap; }
+  .learn-step { padding: 18px 16px; }
+}
+@media (max-width: 520px) {
+  .learn-slider { grid-template-columns: minmax(0, 1fr) auto; }
+  .learn-slider input { grid-column: 1 / -1; grid-row: 2; }
+  .learn-actions > button,
+  .learn-nav > button { flex: 1 1 100%; }
+}

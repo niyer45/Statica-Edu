@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest'
 const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const SRC_ROOT = path.join(PROJECT_ROOT, 'src')
 
-export const DOMAIN_DIRS = ['units', 'challenge', 'geometry', 'physics', 'evaluation'] as const
+export const DOMAIN_DIRS = ['units', 'challenge', 'geometry', 'physics', 'evaluation', 'learn'] as const // learn: task 67 (LRN-10)
 
 const SOURCE_EXT = /\.(ts|tsx|mts|cts|js|jsx|mjs|cjs)$/
 const TEST_FILE = /\.test\.(ts|tsx|mts|cts|js|jsx|mjs|cjs)$/

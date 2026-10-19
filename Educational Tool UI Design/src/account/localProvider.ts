@@ -13,10 +13,13 @@ import type { AccountError, AccountProvider, AccountUser, KeyValueStorage, Progr
 //   ei:account-session:v1                          signed-in user id
 //   ei:session:<challengeId>:v<version>            guest progress (unchanged from before accounts)
 //   ei:user:<userId>:session:<challengeId>:v<n>    a user's progress (same envelope, namespaced)
+//   ei:learn:<moduleId>:v<n> / ei:user:<userId>:learn:…   Learn module progress (task 67), same scoping
 
 export const ACCOUNTS_KEY = 'ei:accounts:v1'
 export const ACCOUNT_SESSION_KEY = 'ei:account-session:v1'
 export const GUEST_SESSION_PREFIX = 'ei:session:'
+/** Guest Learn progress (learn/progress.ts LEARN_KEY_PREFIX); moves with the sessions on sign-up. */
+export const GUEST_LEARN_PREFIX = 'ei:learn:'
 export const userPrefix = (userId: string) => `ei:user:${userId}:`
 
 /** Maps an `ei:` key to the user's namespace: `ei:session:x:v1` → `ei:user:<id>:session:x:v1`. */
@@ -131,10 +134,15 @@ export function createLocalAccountProvider({ storage, crypto, clock, newId, iter
     try { return storage.keys().filter((k) => k.startsWith(prefix)) } catch { return [] }
   }
 
-  /** Moves every guest session into the user's namespace; all-or-nothing (copies roll back on failure). */
+  /**
+   * Moves every guest session and Learn record into the user's namespace; all-or-nothing (copies
+   * roll back on failure). The count is the number of challenge sessions moved.
+   */
   function moveGuestProgress(userId: string): Result<number, null> {
-    const keys = keysWithPrefix(GUEST_SESSION_PREFIX)
+    const sessions = keysWithPrefix(GUEST_SESSION_PREFIX)
+    const keys = [...sessions, ...keysWithPrefix(GUEST_LEARN_PREFIX)]
     const copied: string[] = []
+    let movedSessions = 0
     try {
       for (const key of keys) {
         const value = storage.getItem(key)
@@ -142,13 +150,14 @@ export function createLocalAccountProvider({ storage, crypto, clock, newId, iter
         const target = userKey(userId, key)
         storage.setItem(target, value)
         copied.push(target)
+        if (key.startsWith(GUEST_SESSION_PREFIX)) movedSessions++
       }
     } catch {
       for (const target of copied) { try { storage.removeItem(target) } catch { /* best effort */ } }
       return { ok: false, error: null }
     }
     for (const key of keys) { try { storage.removeItem(key) } catch { /* the copy is already in the account */ } }
-    return { ok: true, value: copied.length }
+    return { ok: true, value: movedSessions }
   }
 
   // A fixed dummy credential keeps unknown-identifier sign-ins about as slow as wrong passwords.

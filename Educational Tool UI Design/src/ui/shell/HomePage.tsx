@@ -19,7 +19,7 @@ const BUILD_ID = import.meta.env.VITE_BUILD_ID?.slice(0, 7) ?? null
 export type Readiness = 'Available now' | 'Early' | 'Planned'
 
 export const LEARNING_LOOP: readonly { step: string; icon: SiteIconName; text: string }[] = [
-  { step: 'Learn', icon: 'book', text: 'Each challenge opens with a plain-language brief and a reference sheet with the governing equations.' },
+  { step: 'Learn', icon: 'book', text: 'Short Learn modules and each challenge’s reference sheet explain the concept and its governing equations.' },
   { step: 'Experiment', icon: 'cube', text: 'Change the geometry and watch the model respond in 3D, or in 2D when 3D is unavailable.' },
   { step: 'Predict', icon: 'bulb', text: 'Before key tests, commit to a prediction, then see how it compared with the result.' },
   { step: 'Design', icon: 'sliders', text: 'Iterate toward a design that meets real limits on stress, deflection, mass and more.' },
@@ -37,8 +37,8 @@ export const AVAILABLE_FEATURES: readonly string[] = [
 export const PILLARS: readonly { title: string; readiness: Readiness; text: string }[] = [
   { title: 'Interactive engineering simulations', readiness: 'Available now', text: 'Manipulate an engineering system and see its behavior change, with immediate visual feedback. Six models today.' },
   { title: 'Engineering design challenges', readiness: 'Available now', text: 'An objective, performance requirements and constraints; students iterate toward a design that meets them.' },
-  { title: 'Guided learning modules', readiness: 'Early', text: 'Guided mode already sequences experiments. Planned: short concept lessons, demonstrations, prediction questions and optional deeper derivations.' },
-  { title: 'Curriculum and progression', readiness: 'Planned', text: 'Learning paths from subject to topic to module, for example Solid Mechanics → Mechanics of Materials → Beam Bending → Cantilever Beam Design, while every module stays usable on its own.' },
+  { title: 'Guided learning modules', readiness: 'Early', text: 'The first Learn module, Beam bending, is available: short concepts, a prediction at every step, interactive demonstrations and optional equations, leading into Cantilever Beam I. More modules are planned.' },
+  { title: 'Curriculum and progression', readiness: 'Early', text: 'Learn is organized by subject, topic and module, starting with Solid Mechanics → Mechanics of Materials → Beam Bending → Cantilever Beam I. More paths are planned, and every module stays usable on its own.' },
 ]
 
 export const DISCIPLINES: readonly { name: string; example: string; readiness: Readiness }[] = [
