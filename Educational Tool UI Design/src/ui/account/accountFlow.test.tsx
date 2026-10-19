@@ -80,6 +80,7 @@ describe('routes', () => {
 })
 
 describe('homepage and accounts', () => {
+  // Split in three (task 64): one combined case ran close to the 5 s limit under CI coverage.
   it('starts on Home with guest actions, an on-device storage statement and six challenges', () => {
     setup()
     expect(screen.getByRole('heading', { level: 1, name: 'Learn engineering by designing, testing and explaining.' })).toBeTruthy()
@@ -89,12 +90,19 @@ describe('homepage and accounts', () => {
     expect(screen.getByRole('heading', { level: 2, name: 'How students learn with Statica' })).toBeTruthy()
     expect(within(screen.getByRole('list', { name: 'Challenges available now' })).getAllByRole('listitem')).toHaveLength(6)
     expect(screen.queryByRole('list', { name: 'Progress on this device' })).toBeNull()
+  })
+
+  it('lists every challenge as not started in My designs for a new guest', () => {
+    setup()
     goTo('My designs')
     expect(screen.getByLabelText('Progress summary').textContent).toBe('0 of 6 challenges completed · 0 started')
     const rows = within(screen.getByRole('list', { name: 'Not started yet' })).getAllByRole('listitem')
     expect(rows).toHaveLength(6)
     for (const row of rows) expect(within(row).getByText('Not started')).toBeTruthy()
-    goTo('Home')
+  })
+
+  it('shows Home as a standalone page that the guest action, brand and Open Statica move in and out of', () => {
+    setup()
     // Task 63: Home is a standalone page: its own header and footer, no workspace sidebar or top bar,
     // and no Home entry in the workspace navigation; the brand returns to it.
     expect(screen.getByRole('navigation', { name: 'Page sections' })).toBeTruthy()
