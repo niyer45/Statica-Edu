@@ -47,7 +47,7 @@ The dotted deformation outline represents the **latest tested design**. Editing 
 
 ## In development and planned
 
-**Priority: complete the six challenges already displayed in the library before second editions.** All six original challenges work today: Cantilever Beam I, Mounting Bracket I, Torsion Shaft I, Heat Sink I, Braced Frame I and Vibration Isolation I. Their scoped requirements, proposed models and delivery order (Torsion Shaft → Vibration Isolation → Heat Sink → Mounting Bracket → Braced Frame) are specified in `.kiro/specs/original-catalog/`; none is implemented yet. The shared multi-model architecture (task 45.2) is specified in `.kiro/specs/multi-model-architecture/`; next is task 34.1, implementing its registry and per-challenge integration. See the [catalog roadmap](Educational%20Tool%20UI%20Design/CATALOG_ROADMAP.md).
+**Ten challenges work today.** The six originals (Cantilever Beam I, Mounting Bracket I, Torsion Shaft I, Heat Sink I, Braced Frame I and Vibration Isolation I) plus four owner-requested additions (2026-10-19): Column Buckling I (introductory), Pressure Vessel I (intermediate), Fatigue Analysis I (advanced) and Stress and Strain I (introductory). Torsion Shaft I is now introductory. The Learn page has three guided modules: Beam bending, Torsion, and Stress and strain. Each challenge and module has its own scoped specification under `.kiro/specs/`; all of them await owner engineering review before customer use. See the [catalog roadmap](Educational%20Tool%20UI%20Design/CATALOG_ROADMAP.md).
 
 | Area | Status |
 | --- | --- |
@@ -55,7 +55,7 @@ The dotted deformation outline represents the **latest tested design**. Editing 
 | Engineering and student QA | Review plan and pilot materials are prepared. Owner engineering review, manual accessibility/readiness checks and actual student sessions remain open before customer deployment. |
 | Guided / Parametric distinction | Implemented and browser-verified: staged Guided instructions/optional hints versus direct Parametric editing, sharing controls, predictions and results. Owner manual release QA remains open under 44.3. |
 | Multiple challenge workspaces | Implemented: each challenge has its own saved session, mode and history, and My designs attributes each workspace to its challenge |
-| User accounts and saved information | Device-only accounts and a Home progress page are implemented (D-50); cloud authentication and cross-device resume are planned |
+| User accounts and saved information | Device-only accounts are implemented (D-50), with per-challenge progress in My designs; cloud authentication and cross-device resume are planned |
 | Challenge completion history | Planned per-user, per-challenge progress with explicit completion rules and versioned evidence |
 | Freeform design and advanced physics | Future scoped extensions requiring their own specifications, benchmarks and validation |
 | Optional AI learning assistance | Future coaching capability; deterministic numerical analysis remains authoritative |

@@ -11,9 +11,10 @@ example path: Solid Mechanics → Mechanics of Materials → Beam Bending → Ca
 
 ## Requirements
 
-- LRN-01 Structure. Content is organised as subjects, topics and modules. The first release has one
-  available module, **Beam bending** (Solid Mechanics → Mechanics of Materials). Other modules may be
-  listed only with a Planned label and no content.
+- LRN-01 Structure. Content is organised as subjects, topics and modules. The first release had one
+  available module, **Beam bending** (Solid Mechanics → Mechanics of Materials); tasks 71 and 72 added
+  **Torsion** and **Stress and strain** under the same topic (D-61, D-62). Other modules may be listed
+  only with a Planned label and no content.
 - LRN-02 Module shape. A module is a short ordered list of steps (15–20 minutes in total). Each step
   has: a title; a concept of at most three short points; one prediction question; an interactive
   demonstration; a one-line takeaway; and optional advanced equations, collapsed by default. The last
@@ -64,7 +65,7 @@ example path: Solid Mechanics → Mechanics of Materials → Beam Bending → Ca
 
 ## Out of scope (later tasks)
 
-Further modules (torsion, stress and strain, buckling, vibration, heat transfer), educator
+Further modules (buckling, vibration, heat transfer and others), educator
 assignment of modules, cross-device progress, and any scoring or analytics.
 
 ## Owner review
