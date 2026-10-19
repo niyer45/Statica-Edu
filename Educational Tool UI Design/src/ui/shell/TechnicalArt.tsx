@@ -52,15 +52,21 @@ function build(kind:string) {
     face([p[1],p[2],p[6],p[5]],52,neutral)
     face([p[3],p[7],p[6],p[2]],38,neutral)
   }
-  const cylinder = (start:Point,end:Point,r:number,neutral=false,segments=16) => {
+  // Toward the viewer, matching the depth used for back-to-front ordering.
+  const toCamera: Point = [.72/.87, .26*.72/.87+.35, 1]
+  /** `tube` draws an open, back-face-culled run segment (coil wire): caps and far sides are hidden anyway. */
+  const cylinder = (start:Point,end:Point,r:number,neutral=false,segments=16,tube=false) => {
     const axis=normalize(add(end,scale(start,-1)))
     const u=normalize(cross(axis,Math.abs(axis[1])<.9?[0,1,0]:[1,0,0]))
     const v=cross(axis,u)
     const ring = (center:Point) => Array.from({length:segments},(_,i)=>add(center,add(scale(u,r*Math.cos(i*Math.PI*2/segments)),scale(v,r*Math.sin(i*Math.PI*2/segments)))))
     const a=ring(start), b=ring(end)
-    face(a,43,neutral);face(b,28,neutral)
+    if(!tube){face(a,43,neutral);face(b,28,neutral)}
     for(let i=0;i<segments;i++){
       const j=(i+1)%segments
+      const mid=(i+.5)*Math.PI*2/segments
+      const normal=add(scale(u,Math.cos(mid)),scale(v,Math.sin(mid)))
+      if(tube&&normal[0]*toCamera[0]+normal[1]*toCamera[1]+normal[2]*toCamera[2]<0)continue
       face([a[i],b[i],b[j],a[j]],30+19*Math.sin(i*Math.PI*2/segments),neutral)
     }
   }
@@ -125,11 +131,11 @@ function build(kind:string) {
     for(const x of [-29,29])for(const z of [-19,19]){
       cylinder([x,9,z],[x,12,z],10,true)
       cylinder([x,77,z],[x,83,z],10,true)
-      const points:Point[]=Array.from({length:101},(_,i)=>{
-        const theta=i/100*Math.PI*2*5
-        return [x+8*Math.cos(theta),14+i/100*61,z+8*Math.sin(theta)]
+      const points:Point[]=Array.from({length:61},(_,i)=>{
+        const theta=i/60*Math.PI*2*5
+        return [x+8*Math.cos(theta),14+i/60*61,z+8*Math.sin(theta)]
       })
-      for(let i=1;i<points.length;i++)cylinder(points[i-1],points[i],1.8,false,6)
+      for(let i=1;i<points.length;i++)cylinder(points[i-1],points[i],1.8,false,6,true)
     }
     // The full top plate occludes the spring seats and rear coils beneath it.
     layer = 1

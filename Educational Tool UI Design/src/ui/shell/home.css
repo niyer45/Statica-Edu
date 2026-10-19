@@ -202,6 +202,54 @@
 button.profile { width: 100%; text-align: left; color: inherit; }
 button.profile:hover { background: #eef2e8; }
 
+/* Standalone landing page (task 63): no workspace sidebar or top bar; its own header and footer. */
+.platform.landing-open .platform-main { margin-left: 0; }
+.landing { min-height: 100vh; display: flex; flex-direction: column; background: #f6f8f2; }
+.landing-header {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 30;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 22px;
+  padding: 12px clamp(16px, 4vw, 48px);
+  background: #f6f8f2;
+  border-bottom: 1px solid #dfe5d6;
+}
+.landing-header .brand { font-size: 26px; letter-spacing: -1.4px; padding: 0; }
+.landing-sections { display: flex; flex-wrap: wrap; gap: 2px; }
+.landing-sections > button,
+.landing-link { font-size: 14px; color: #2d4a33; padding: 8px 10px; border-radius: 5px; }
+.landing-sections > button:hover,
+.landing-link:hover { background: #e9efe1; }
+.landing-link { font-weight: 600; }
+.landing-header-actions { margin-left: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.landing-header-actions .primary { font-size: 14px; padding: 9px 14px; }
+.landing .home { width: 100%; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 48px; box-sizing: border-box; max-width: calc(1120px + 2 * clamp(16px, 4vw, 48px)); }
+.landing .home h2[tabindex='-1']:focus { outline: none; }
+.landing .home h2[tabindex='-1']:focus-visible { outline: 2px solid #34543c; outline-offset: 4px; }
+.landing .home h2 { scroll-margin-top: 90px; }
+.landing-footer {
+  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  padding: 22px clamp(16px, 4vw, 48px) calc(22px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid #dfe5d6;
+  font-size: 13px;
+  color: #4b5644;
+}
+.landing-footer > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.landing-footer strong { font-size: 18px; color: #2d4a33; letter-spacing: -.6px; }
+.landing-footer nav { display: flex; flex-wrap: wrap; gap: 4px; }
+.landing-footer nav button { font-size: 13px; color: #2d4a33; text-decoration: underline; padding: 6px 8px; }
+@media (max-width: 860px) {
+  .landing-sections { display: none; }
+}
+
 /* Homepage outlook (task 62). */
 .home-hero { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 24px; }
 .home-hero-copy { flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 14px; }

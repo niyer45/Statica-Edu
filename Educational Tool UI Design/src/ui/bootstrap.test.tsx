@@ -84,8 +84,9 @@ describe('bootstrap error page', () => {
   it('mounts the shell (not the error page) when the challenge loads', () => {
     render(<App loaded={loadChallenge(structuredClone(cantileverBeam1Json))} clock={clock} newId={newId} />)
     expect(screen.queryByRole('alert')).toBeNull()
-    expect(screen.getAllByRole('button', { name: 'Statica home' }).length).toBeGreaterThan(0)
-    // The app starts on Home (task 38); Challenges is one navigation step away.
+    // The app starts on the standalone Home page (tasks 38, 63); Open Statica enters the workspace.
+    expect(screen.getByRole('button', { name: 'Statica, top of page' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: /^Open Statica/ })).toBeTruthy()
     expect(screen.getByRole('heading', { level: 1, name: 'Welcome to Statica' })).toBeTruthy()
   })
 })

@@ -9,6 +9,10 @@ const ANA = { name: 'Ana', id: 'ana@example.com', password: 'correct horse batte
 const BEAM = 'cantilever-beam-1'
 
 async function navigate(page: Page, target: 'Home' | 'Challenges' | 'My designs' | 'Account') {
+  // Home is the standalone landing page (task 63): the brand returns to it, Open Statica leaves it.
+  if (target === 'Home') return page.getByRole('button', { name: 'Statica home' }).filter({ visible: true }).first().click()
+  const open = page.getByRole('button', { name: /^Open Statica/ })
+  if (await open.isVisible()) await open.click()
   const sidebar = page.locator('.platform-sidebar')
   if (await sidebar.isVisible()) {
     if (target === 'Account') await sidebar.getByRole('button', { name: /^Account: / }).click()
@@ -48,6 +52,15 @@ test('the homepage explains Statica, offers account and guest entry, and fits 32
   await expect(page.getByText('Planned', { exact: true }).first()).toBeVisible()
   await expect(page.getByText(/progress is saved in this browser on this device only/)).toBeVisible()
   for (const name of ['Create account', 'Sign in', 'Continue as guest']) await expect(page.getByRole('button', { name, exact: true })).toBeVisible()
+  // Task 63: a standalone page with its own header and footer, outside the workspace chrome.
+  await expect(page.locator('.platform-sidebar')).toBeHidden()
+  await expect(page.locator('.platform-topbar')).toHaveCount(0)
+  await expect(page.getByRole('contentinfo')).toBeVisible()
+  const sections = page.getByRole('navigation', { name: 'Page sections' }) // hidden below 860 px
+  if (await sections.isVisible()) {
+    await sections.getByRole('button', { name: 'Vision' }).click()
+    await expect(page.getByRole('heading', { level: 2, name: 'Where Statica is going' })).toBeFocused()
+  }
   await audit(page)
   await expectNoHorizontalOverflow(page, 320)
   await audit(page)

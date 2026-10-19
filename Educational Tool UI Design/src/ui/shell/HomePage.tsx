@@ -7,10 +7,11 @@ import type { AccountView } from './routes'
 import TechnicalArt from './TechnicalArt'
 import './home.css'
 
-// Homepage (tasks 38, 62): an outlook for students, educators and investors: what Statica is,
-// the learning loop, what is available now, and where the platform is going (owner vision,
-// 2026-10-18). Every capability is labelled Available now, Early or Planned so nothing planned
-// reads as shipped. Per-challenge progress lives in My designs.
+// Landing page (tasks 38, 62, 63): a standalone front page, outside the workspace chrome, for
+// students, educators and investors: what Statica is, the learning loop, what is available now,
+// and where the platform is going (owner vision, 2026-10-18). Its own header links to the page
+// sections and into the app. Every capability is labelled Available now, Early or Planned so
+// nothing planned reads as shipped. Per-challenge progress lives in My designs.
 
 export type Readiness = 'Available now' | 'Early' | 'Planned'
 
@@ -49,6 +50,21 @@ export const DISCIPLINES: readonly { name: string; example: string; readiness: R
   { name: 'Controls', example: 'Tune a controller for a dynamic system', readiness: 'Planned' },
 ]
 
+const SECTIONS: readonly [string, string][] = [
+  ['How it works', 'loop-title'],
+  ['Available now', 'now-title'],
+  ['For educators', 'educators-title'],
+  ['Vision', 'vision-title'],
+]
+
+/** Moves to a section heading: scroll it into view and focus it, so keyboard users land there too. */
+function jumpTo(id: string) {
+  const target = document.getElementById(id)
+  if (!target) return
+  target.scrollIntoView?.({ behavior: 'smooth', block: 'start' })
+  target.focus({ preventScroll: true })
+}
+
 function ReadinessTag({ readiness }: { readiness: Readiness }) {
   return <span className={`readiness readiness-${readiness === 'Available now' ? 'now' : readiness.toLowerCase()}`}>{readiness}</span>
 }
@@ -76,7 +92,36 @@ export default function HomePage({ account, entries, startedCount, onBrowse, onM
   const user = account?.user ?? null
   const available = entries.filter((e) => e.available)
   return (
-    <div className="home">
+    <div className="landing">
+      <header className="landing-header">
+        <button type="button" className="brand" onClick={() => window.scrollTo?.({ top: 0, behavior: 'smooth' })} aria-label="Statica, top of page">
+          <span className="brand-mark" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+          </span>
+          statica<span className="brand-dot">.</span>
+        </button>
+        <nav aria-label="Page sections" className="landing-sections">
+          {SECTIONS.map(([label, id]) => (
+            <button type="button" key={id} onClick={() => jumpTo(id)}>
+              {label}
+            </button>
+          ))}
+        </nav>
+        <div className="landing-header-actions">
+          {startedCount > 0 && (
+            <button type="button" className="landing-link" onClick={onMyDesigns}>
+              My designs
+            </button>
+          )}
+          <button type="button" className="primary" onClick={onBrowse}>
+            Open Statica
+            <Icon name="arrow" size={14} />
+          </button>
+        </div>
+      </header>
+      <main className="home">
       <section className="home-hero panel" aria-labelledby="home-title">
         <div className="home-hero-copy">
           <span className="eyebrow">
@@ -147,7 +192,7 @@ export default function HomePage({ account, entries, startedCount, onBrowse, onM
       </section>
 
       <section className="home-section" aria-labelledby="loop-title">
-        <h2 id="loop-title">How students learn with Statica</h2>
+        <h2 id="loop-title" tabIndex={-1}>How students learn with Statica</h2>
         <p className="home-section-lede">The goal is engineering intuition, not learning to operate simulation software.</p>
         <ol className="home-loop">
           {LEARNING_LOOP.map((s, i) => (
@@ -164,7 +209,7 @@ export default function HomePage({ account, entries, startedCount, onBrowse, onM
 
       <section className="home-section" aria-labelledby="now-title">
         <div className="home-section-heading">
-          <h2 id="now-title">Available now</h2>
+          <h2 id="now-title" tabIndex={-1}>Available now</h2>
           <ReadinessTag readiness="Available now" />
         </div>
         <ul className="home-challenges" aria-label="Challenges available now">
@@ -198,7 +243,7 @@ export default function HomePage({ account, entries, startedCount, onBrowse, onM
           </ul>
         </article>
         <article className="panel" aria-labelledby="educators-title">
-          <h2 id="educators-title">For educators and schools</h2>
+          <h2 id="educators-title" tabIndex={-1}>For educators and schools</h2>
           <ul>
             <li>Use a challenge as a live demonstration in lecture, or set it as a design exercise. <ReadinessTag readiness="Available now" /></li>
             <li>Start a class in Guided mode, then assign Parametric mode for open-ended design. <ReadinessTag readiness="Available now" /></li>
@@ -209,7 +254,7 @@ export default function HomePage({ account, entries, startedCount, onBrowse, onM
       </section>
 
       <section className="home-section" aria-labelledby="vision-title">
-        <h2 id="vision-title">Where Statica is going</h2>
+        <h2 id="vision-title" tabIndex={-1}>Where Statica is going</h2>
         <p className="home-section-lede">
           The long-term goal is a structured engineering counterpart to platforms like Khan Academy and Brilliant, with a
           stronger emphasis on physical simulation and design. Structural mechanics comes first; more disciplines follow,
@@ -252,6 +297,18 @@ export default function HomePage({ account, entries, startedCount, onBrowse, onM
           <Icon name="arrow" size={15} />
         </button>
       </section>
+      </main>
+      <footer className="landing-footer">
+        <div>
+          <strong>statica.</strong>
+          <span>Interactive engineering education. Built to complement engineering courses.</span>
+        </div>
+        <nav aria-label="Footer">
+          <button type="button" onClick={onBrowse}>Challenges</button>
+          <button type="button" onClick={onMyDesigns}>My designs</button>
+          {user && <button type="button" onClick={() => onAccount()}>Account</button>}
+        </nav>
+      </footer>
     </div>
   )
 }

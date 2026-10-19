@@ -44,8 +44,8 @@ export const PRODUCT_NAME = 'Statica'
 
 export type { Page }
 
+// Home is the standalone landing page (task 63), reached from the brand, not a workspace page.
 const PAGES: readonly [Page, string][] = [
-  ['Home', 'home'],
   ['Challenges', 'grid'],
   ['Learning paths', 'chart'],
   ['My designs', 'cube'],
@@ -221,9 +221,12 @@ export default function PlatformShell({
   const toggleSaved = (id: string) =>
     setSaved((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]))
 
+  // The landing page replaces the whole workspace chrome; the Workbench stays mounted (Req 34.6).
+  const landing = page === 'Home' && !workspace
+
   return (
-    <div className={`platform${workspace ? ' workbench-open' : ''}`}>
-      <aside className="platform-sidebar">
+    <div className={`platform${workspace ? ' workbench-open' : ''}${landing ? ' landing-open' : ''}`}>
+      <aside className="platform-sidebar" hidden={landing}>
         <button type="button" className="brand" onClick={() => go('Home')} aria-label={`${PRODUCT_NAME} home`}>
           <span className="brand-mark">
             <i />
@@ -296,11 +299,12 @@ export default function PlatformShell({
         </div>
       </aside>
       <div className="platform-main">
-        <div className="mobile-platform-nav">
+        <div className="mobile-platform-nav" hidden={landing}>
           <button type="button" className="brand" onClick={() => go('Home')} aria-label={`${PRODUCT_NAME} home`}>
             statica.
           </button>
-          <select aria-label="Navigate workspace" value={page} onChange={(e) => go(e.target.value as Page)}>
+          <select aria-label="Navigate workspace" value={page === 'Home' ? '' : page} onChange={(e) => go(e.target.value as Page)}>
+            {page === 'Home' && <option value="" disabled>Choose a page</option>}
             {pages.map(([p]) => (
               <option key={p}>{p}</option>
             ))}
@@ -310,7 +314,17 @@ export default function PlatformShell({
         <div hidden={!workspace} data-testid="workbench-host">
           <Workbench onExit={() => go('Challenges')} />
         </div>
-        {!workspace && (
+        {landing && (
+          <HomePage
+            account={account}
+            entries={entries}
+            startedCount={progressRows.filter((r) => r.started || r.status !== 'notStarted').length}
+            onBrowse={() => go('Challenges')}
+            onMyDesigns={() => go('My designs')}
+            onAccount={(view) => go('Account', view)}
+          />
+        )}
+        {!workspace && !landing && (
           <>
             <header className="platform-topbar">
               <div>
@@ -328,16 +342,7 @@ export default function PlatformShell({
               </div>
             </header>
             <main className="platform-content">
-              {page === 'Home' ? (
-                <HomePage
-                  account={account}
-                  entries={entries}
-                  startedCount={progressRows.filter((r) => r.started || r.status !== 'notStarted').length}
-                  onBrowse={() => go('Challenges')}
-                  onMyDesigns={() => go('My designs')}
-                  onAccount={(view) => go('Account', view)}
-                />
-              ) : page === 'Account' && account ? (
+              {page === 'Account' && account ? (
                 <AccountPage
                   account={account}
                   view={accountView}

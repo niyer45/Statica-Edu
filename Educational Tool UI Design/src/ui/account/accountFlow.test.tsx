@@ -37,7 +37,11 @@ function startedBeamSession(): [string, string] {
   return [sessionKey(ch), serializeSession(sessionReducer(init.value, { type: 'setReflection', text: 'guest idea' }, ch))]
 }
 
-const goTo = (page: string) => fireEvent.change(screen.getByLabelText('Navigate workspace'), { target: { value: page } })
+/** Home is the standalone landing page (task 63), reached from the brand; the rest via the page select. */
+const goTo = (page: string) =>
+  page === 'Home'
+    ? fireEvent.click(screen.getAllByRole('button', { name: 'Statica home' })[0]!)
+    : fireEvent.change(screen.getByLabelText('Navigate workspace'), { target: { value: page } })
 /** Cantilever Beam I's progress text in My designs (task 62), then back to Home. */
 function beamStatus(): string {
   goTo('My designs')
@@ -91,15 +95,22 @@ describe('homepage and accounts', () => {
     expect(rows).toHaveLength(6)
     for (const row of rows) expect(within(row).getByText('Not started')).toBeTruthy()
     goTo('Home')
-    // Navigation reaches Home again from the sidebar and the mobile select.
+    // Task 63: Home is a standalone page: its own header and footer, no workspace sidebar or top bar,
+    // and no Home entry in the workspace navigation; the brand returns to it.
+    expect(screen.getByRole('navigation', { name: 'Page sections' })).toBeTruthy()
+    expect(screen.getByRole('contentinfo')).toBeTruthy()
+    expect(document.querySelector('.platform-sidebar')!.hasAttribute('hidden')).toBe(true)
+    expect(document.querySelector('.platform-topbar')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Continue as guest' }))
     expect(screen.getByRole('heading', { level: 1, name: 'Challenges' })).toBeTruthy()
     expect(window.location.hash).toBe('#challenges')
-    fireEvent.change(screen.getByLabelText('Navigate workspace'), { target: { value: 'Home' } })
+    expect(within(screen.getByRole('navigation', { name: 'Platform' })).queryByRole('button', { name: 'Home' })).toBeNull()
+    expect([...(screen.getByLabelText('Navigate workspace') as HTMLSelectElement).options].map((o) => o.value)).not.toContain('Home')
+    goTo('Home')
     expect(screen.getByRole('heading', { level: 1, name: 'Welcome to Statica' })).toBeTruthy()
-    fireEvent.click(within(screen.getByRole('navigation', { name: 'Platform' })).getByRole('button', { name: 'Challenges' }))
-    fireEvent.click(within(screen.getByRole('navigation', { name: 'Platform' })).getByRole('button', { name: 'Home' }))
     expect(window.location.hash).toBe('#home')
+    fireEvent.click(screen.getByRole('button', { name: /^Open Statica/ }))
+    expect(screen.getByRole('heading', { level: 1, name: 'Challenges' })).toBeTruthy()
   })
 
   it('reports invalid sign-up fields accessibly and focuses the first one', async () => {
@@ -146,7 +157,9 @@ describe('homepage and accounts', () => {
     expect(beamStatus()).toContain('In progress')
     expect(storage.map.has(key)).toBe(false)
     expect(storage.map.has(`ei:user:user-0001:${key.slice(3)}`)).toBe(true)
+    goTo('Challenges') // the workspace sidebar names the signed-in account (Home has no sidebar)
     expect(screen.getByRole('button', { name: 'Account: Ana' })).toBeTruthy()
+    goTo('Home')
 
     fireEvent.click(screen.getByRole('button', { name: 'Account settings' }))
     expect(screen.getByRole('heading', { level: 1, name: 'Your account' })).toBeTruthy()
@@ -177,7 +190,7 @@ describe('homepage and accounts', () => {
     const storage = setup()
     await signUp('Ben', 'ben', 'battery staple')
     storage.setItem('ei:user:user-0001:session:torsion-shaft-1:v1', 'x')
-    fireEvent.click(screen.getByRole('button', { name: 'Account: Ben' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Account settings' }))
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Delete account and progress' }))
     })
