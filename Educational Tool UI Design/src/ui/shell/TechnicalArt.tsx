@@ -1,4 +1,4 @@
-import { useId } from "react"
+import { memo, useId } from "react"
 
 type Point = [number, number, number]
 type Face = { points: Point[]; shade: number; neutral: boolean; depth: number; layer: number }
@@ -9,9 +9,37 @@ const scale = (p: Point, s: number): Point => [p[0]*s,p[1]*s,p[2]*s]
 const cross = (a: Point,b: Point): Point => [a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]]
 const normalize = (p: Point): Point => scale(p,1/Math.hypot(...p))
 
+// Geometry depends only on `kind`; build it once per kind (the spring alone is thousands of faces).
+const built = new Map<string, ReturnType<typeof build>>()
+
 /** Every solid uses the same projection, lighting, and back-to-front face ordering. */
-export default function TechnicalArt({kind,large=false}:{kind:string;large?:boolean}) {
+function TechnicalArt({kind,large=false}:{kind:string;large?:boolean}) {
   const id = useId().replace(/:/g,"")
+  let art = built.get(kind)
+  if(!art){art=build(kind);built.set(kind,art)}
+  const {polygons,transform,tip,torque,torqueEnd,torqueAngle,heatOrigins} = art
+  return <svg className={`technical-art ${large?"large":""}`} viewBox="0 0 360 180" fill="none" aria-hidden="true">
+    <defs>
+      <pattern id={`${id}-grid`} width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".6" fill="currentColor" opacity=".15"/></pattern>
+      <radialGradient id={`${id}-shadow`}><stop stopColor="currentColor" stopOpacity=".17"/><stop offset="1" stopColor="currentColor" stopOpacity="0"/></radialGradient>
+    </defs>
+    <rect width="360" height="180" fill={`url(#${id}-grid)`}/>
+    <ellipse cx="180" cy="146" rx="105" ry="13" fill={`url(#${id}-shadow)`}/>
+    <g transform={transform}>
+    <g strokeWidth=".65" strokeLinejoin="round">
+      {polygons.map((f,i)=><polygon key={i} points={f.points} fill={f.fill} stroke={f.stroke} strokeOpacity=".65"/>)}
+    </g>
+    {tip&&<path d={`M${tip[0]} ${tip[1]-30}V${tip[1]}m-4-6 4 6 4-6`} className="art-accent" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>}
+    {kind==="shaft"&&<g className="art-accent" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points={torque.map(p=>p.join(",")).join(" ")}/><path d="m-6-4 6 4-6 4" transform={`translate(${torqueEnd.join(" ")}) rotate(${torqueAngle})`}/></g>}
+    {kind==="thermal"&&<g className="art-accent" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">{heatOrigins.map(([x,y],i)=><path key={i} d={`M${x} ${y}q-4-7 0-14t0-14m-3 4 3-4 3 4`}/>)}</g>}
+    </g>
+    <g fill="currentColor" opacity=".5" fontFamily="monospace" fontSize="7"><text x="18" y="166">FIG. {({beam:"01",bracket:"02",shaft:"03",thermal:"04",frame:"05",spring:"06"} as Record<string,string>)[kind]||"06"}</text><text x="342" y="166" textAnchor="end">STATICA LAB</text></g>
+  </svg>
+}
+
+export default memo(TechnicalArt)
+
+function build(kind:string) {
   const faces: Face[] = []
   let layer = 0
   const face = (points:Point[],shade:number,neutral=false) => {
@@ -126,21 +154,10 @@ export default function TechnicalArt({kind,large=false}:{kind:string;large?:bool
   const transform=`translate(180 94) scale(${fit}) translate(${-(minX+maxX)/2} ${-(minY+maxY)/2})`
   const torqueEnd=torque[torque.length-1],torquePrevious=torque[torque.length-2]
   const torqueAngle=Math.atan2(torqueEnd[1]-torquePrevious[1],torqueEnd[0]-torquePrevious[0])*180/Math.PI
-  return <svg className={`technical-art ${large?"large":""}`} viewBox="0 0 360 180" fill="none" aria-hidden="true">
-    <defs>
-      <pattern id={`${id}-grid`} width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".6" fill="currentColor" opacity=".15"/></pattern>
-      <radialGradient id={`${id}-shadow`}><stop stopColor="currentColor" stopOpacity=".17"/><stop offset="1" stopColor="currentColor" stopOpacity="0"/></radialGradient>
-    </defs>
-    <rect width="360" height="180" fill={`url(#${id}-grid)`}/>
-    <ellipse cx="180" cy="146" rx="105" ry="13" fill={`url(#${id}-shadow)`}/>
-    <g transform={transform}>
-    <g strokeWidth=".65" strokeLinejoin="round">
-      {faces.sort((a,b)=>a.layer-b.layer||a.depth-b.depth).map((f,i)=><polygon key={i} points={pointString(f.points)} fill={f.neutral?`color-mix(in srgb, #7d877b ${f.shade}%, #f4f5ef)`:`color-mix(in srgb, currentColor ${f.shade}%, #f7f9f2)`} stroke={f.neutral?"#929c8b":"currentColor"} strokeOpacity=".65"/>)}
-    </g>
-    {tip&&<path d={`M${tip[0]} ${tip[1]-30}V${tip[1]}m-4-6 4 6 4-6`} className="art-accent" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>}
-    {kind==="shaft"&&<g className="art-accent" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points={torque.map(p=>p.join(",")).join(" ")}/><path d="m-6-4 6 4-6 4" transform={`translate(${torqueEnd.join(" ")}) rotate(${torqueAngle})`}/></g>}
-    {kind==="thermal"&&<g className="art-accent" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">{heatOrigins.map(([x,y],i)=><path key={i} d={`M${x} ${y}q-4-7 0-14t0-14m-3 4 3-4 3 4`}/>)}</g>}
-    </g>
-    <g fill="currentColor" opacity=".5" fontFamily="monospace" fontSize="7"><text x="18" y="166">FIG. {({beam:"01",bracket:"02",shaft:"03",thermal:"04",frame:"05",spring:"06"} as Record<string,string>)[kind]||"06"}</text><text x="342" y="166" textAnchor="end">STATICA LAB</text></g>
-  </svg>
+  const polygons = faces.sort((a,b)=>a.layer-b.layer||a.depth-b.depth).map(f=>({
+    points:pointString(f.points),
+    fill:f.neutral?`color-mix(in srgb, #7d877b ${f.shade}%, #f4f5ef)`:`color-mix(in srgb, currentColor ${f.shade}%, #f7f9f2)`,
+    stroke:f.neutral?"#929c8b":"currentColor",
+  }))
+  return {polygons,transform,tip,torque,torqueEnd,torqueAngle,heatOrigins}
 }

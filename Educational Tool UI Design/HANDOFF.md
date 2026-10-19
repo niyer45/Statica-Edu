@@ -8,7 +8,8 @@ Owner requests: L-bracket (57, D-46), declutter frame/vibration (56, D-48), acco
 
 - Follow-up (owner): Reset now restarts the challenge and clears history/submission (D-51); the beam starts as a solid Ø31 mm circle, content version 3 (D-47 amendment). Verified by agents on the merged tree: 2564 tests, 66/66 E2E.
 - Follow-up (owner): goal card withdrawn; frame/vibration challenge panels now match the Cantilever's (D-48 amendment).
-- Follow-up (owner, task 61): bracket summary line removed and cautions moved into Test details (D-52); disclosures no longer leave the workbench row stretched (3D canvas taken out of flow, `.scene-canvas`); Explain & submit offers Back to challenges / Return to this challenge after a submission. Rebuilding `dist` while a tab is open breaks its lazy 3D chunk until reload.
+- Follow-up (owner, task 61): bracket summary line removed and cautions moved into Test details (D-52); disclosures no longer leave the workbench row stretched (3D canvas taken out of flow, `.scene-canvas`); Explain & submit offers Back to challenges / Return to this challenge after a submission. Rebuilding `dist` while a tab is open breaks its lazy 3D chunk until reload. CI run 39184394328 passed.
+- Follow-up (owner, task 62): Home is now a product outlook for students, educators and investors with Available now / Early / Planned labels (D-53); device progress moved to My designs, whose cards now draw their own challenge instead of repeating the beam.
 - Content versions: torsion, heat sink, frame and bracket are now version 2, the beam version 3 (new `:v2` storage keys; version-1 saves untouched and never re-scored). Bracket is a new model id `boltedLBracket`.
 - `/` is now Home; E2E open the library at `/#challenges`. `PW_DEV_PORT`/`PW_PREVIEW_PORT` select E2E ports (04fa406) so parallel worktrees don't reuse each other's servers.
 - Guided progress is derived from history (no new persisted fields). Unit tests that edit freely enter in Parametric.

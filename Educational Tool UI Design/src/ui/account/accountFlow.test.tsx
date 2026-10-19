@@ -37,7 +37,15 @@ function startedBeamSession(): [string, string] {
   return [sessionKey(ch), serializeSession(sessionReducer(init.value, { type: 'setReflection', text: 'guest idea' }, ch))]
 }
 
-const beamRow = () => screen.getByRole('heading', { level: 3, name: 'Cantilever Beam I' }).closest('li')!
+const goTo = (page: string) => fireEvent.change(screen.getByLabelText('Navigate workspace'), { target: { value: page } })
+/** Cantilever Beam I's progress text in My designs (task 62), then back to Home. */
+function beamStatus(): string {
+  goTo('My designs')
+  const designs = screen.getByRole('heading', { level: 1, name: 'My designs' }).closest('.my-designs')!
+  const text = within(designs as HTMLElement).getByRole('heading', { name: 'Cantilever Beam I' }).closest('article, li')!.textContent!
+  goTo('Home')
+  return text
+}
 const fill = (label: string, value: string) => fireEvent.change(screen.getByLabelText(label), { target: { value } })
 
 async function signUp(name: string, id: string, password: string) {
@@ -73,10 +81,16 @@ describe('homepage and accounts', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Welcome to Statica' })).toBeTruthy()
     for (const name of ['Create account', 'Sign in', 'Continue as guest']) expect(screen.getByRole('button', { name })).toBeTruthy()
     expect(screen.getByText(/saved in this browser on this device only/)).toBeTruthy()
-    const rows = within(screen.getByRole('list', { name: 'Progress on this device' })).getAllByRole('listitem')
+    // Task 62: Home is the outlook page; per-challenge progress lives in My designs.
+    expect(screen.getByRole('heading', { level: 2, name: 'How students learn with Statica' })).toBeTruthy()
+    expect(within(screen.getByRole('list', { name: 'Challenges available now' })).getAllByRole('listitem')).toHaveLength(6)
+    expect(screen.queryByRole('list', { name: 'Progress on this device' })).toBeNull()
+    goTo('My designs')
+    expect(screen.getByLabelText('Progress summary').textContent).toBe('0 of 6 challenges completed · 0 started')
+    const rows = within(screen.getByRole('list', { name: 'Not started yet' })).getAllByRole('listitem')
     expect(rows).toHaveLength(6)
     for (const row of rows) expect(within(row).getByText('Not started')).toBeTruthy()
-    expect(screen.getByText('0 of 6 challenges completed')).toBeTruthy()
+    goTo('Home')
     // Navigation reaches Home again from the sidebar and the mobile select.
     fireEvent.click(screen.getByRole('button', { name: 'Continue as guest' }))
     expect(screen.getByRole('heading', { level: 1, name: 'Challenges' })).toBeTruthy()
@@ -112,7 +126,7 @@ describe('homepage and accounts', () => {
     const [key, value] = startedBeamSession()
     storage.setItem(key, value)
     setup(storage)
-    expect(within(beamRow()).getByText('In progress')).toBeTruthy()
+    expect(beamStatus()).toContain('In progress')
 
     fireEvent.click(screen.getByRole('button', { name: 'Create account' }))
     const migrate = screen.getByRole('group', { name: 'Guest progress on this device' })
@@ -129,7 +143,7 @@ describe('homepage and accounts', () => {
     expect(screen.getByRole('status').textContent).toContain('Guest progress for 1 challenge moved into your account.')
     expect(document.activeElement).toBe(screen.getByRole('heading', { level: 1 }))
     expect(window.location.hash).toBe('#home')
-    expect(within(beamRow()).getByText('In progress')).toBeTruthy()
+    expect(beamStatus()).toContain('In progress')
     expect(storage.map.has(key)).toBe(false)
     expect(storage.map.has(`ei:user:user-0001:${key.slice(3)}`)).toBe(true)
     expect(screen.getByRole('button', { name: 'Account: Ana' })).toBeTruthy()
@@ -140,7 +154,7 @@ describe('homepage and accounts', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Sign out' }))
     })
     await screen.findByRole('heading', { level: 1, name: 'Welcome to Statica' })
-    expect(within(beamRow()).getByText('Not started')).toBeTruthy()
+    expect(beamStatus()).toContain('Not started')
 
     fireEvent.click(screen.getByRole('button', { name: 'Sign in' }))
     fill('Email or username', 'ANA@example.com')
@@ -155,8 +169,9 @@ describe('homepage and accounts', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Sign in' }))
     })
     await screen.findByRole('heading', { level: 1, name: 'Welcome back, Ana' })
-    expect(within(beamRow()).getByText('In progress')).toBeTruthy()
-  })
+    expect(beamStatus()).toContain('In progress')
+    // Many full-App page renders (Home and My designs draw every challenge's illustration).
+  }, 20_000)
 
   it('deletes the account and its progress after the password is confirmed', async () => {
     const storage = setup()

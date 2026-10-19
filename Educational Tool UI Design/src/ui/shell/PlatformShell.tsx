@@ -10,7 +10,8 @@ import { modelUiFor, ModelUiContext, useModelUi } from '../models/registry'
 import Workbench from '../workbench/Workbench'
 import { MODE_LABELS } from '../workbench/WorkbenchChrome'
 import ChallengeDrawer from './ChallengeDrawer'
-import HomePage, { storageStatement, type ProgressRow } from './HomePage'
+import HomePage from './HomePage'
+import { storageStatement, type ProgressRow } from './progress'
 import LearningPathsPage from './LearningPathsPage'
 import LibraryPage from './LibraryPage'
 import MyDesignsPage from './MyDesignsPage'
@@ -35,8 +36,8 @@ import '../../platform.css'
 //   the active challenge's StoreProvider. Other runnable challenges arrive as `others` with a
 //   read-only saved summary; opening one asks the host (CatalogHost) to switch stores. With no
 //   `others` the shell behaves exactly as the single-challenge shell.
-// - Home and accounts (task 38): Home summarizes each runnable challenge's progress and offers
-//   account / guest entry. With `routed`, the page lives in the URL fragment (routes.ts) and the
+// - Home and accounts (task 38, 62): Home presents what Statica does now and where it is going,
+//   with account / guest entry; My designs holds each runnable challenge's progress. With `routed`, the page lives in the URL fragment (routes.ts) and the
 //   app starts on Home; without it (isolated tests) the shell starts on Challenges as before.
 
 export const PRODUCT_NAME = 'Statica'
@@ -196,20 +197,23 @@ export default function PlatformShell({
     if (!openWorkbench(mode)) setDetail({ ...detail, error: rejectedModeMessage(mode) })
   }
 
-  // Home progress: every runnable challenge, from the live session (active) or its own saved session.
+  // Progress (My designs, Home): every runnable challenge, from the live session (active) or its own saved session.
   const progressRows: ProgressRow[] = entries.filter((e): e is Extract<CatalogEntry, { available: true }> => e.available && isRunnable(e)).map((entry) => {
+    const card = { challengeId: entry.challengeId, title: entry.title, art: entry.art, discipline: entry.discipline }
     if (isActive(entry)) {
       const progress = selectProgress(session)
-      return { challengeId: entry.challengeId, title: entry.title, ...progress, onContinue: () => (progress.status === 'notStarted' ? showDetail(entry) : resume()) }
+      return { ...card, ...progress, active: true, started, mode: started ? session.mode : undefined, onContinue: () => (progress.status === 'notStarted' && !started ? showDetail(entry) : resume()) }
     }
     const other = otherFor(entry)!
     const progress = other.saved?.progress ?? { status: 'notStarted' as const, testsRun: 0 }
-    const savedMode = other.saved?.mode
+    const savedMode = other.saved?.started ? other.saved.mode : undefined
     return {
-      challengeId: entry.challengeId,
-      title: entry.title,
+      ...card,
       ...progress,
-      onContinue: () => (progress.status === 'notStarted' || savedMode === undefined ? showDetail(entry) : onOpenOther?.(other.challengeId, savedMode)),
+      active: false,
+      started: other.saved?.started === true,
+      mode: savedMode,
+      onContinue: () => (savedMode === undefined ? showDetail(entry) : onOpenOther?.(other.challengeId, savedMode)),
     }
   })
   const pages = account ? [...PAGES, ['Account', 'user'] as [Page, string]] : PAGES
@@ -325,7 +329,14 @@ export default function PlatformShell({
             </header>
             <main className="platform-content">
               {page === 'Home' ? (
-                <HomePage account={account} rows={progressRows} onBrowse={() => go('Challenges')} onAccount={(view) => go('Account', view)} />
+                <HomePage
+                  account={account}
+                  entries={entries}
+                  startedCount={progressRows.filter((r) => r.started || r.status !== 'notStarted').length}
+                  onBrowse={() => go('Challenges')}
+                  onMyDesigns={() => go('My designs')}
+                  onAccount={(view) => go('Account', view)}
+                />
               ) : page === 'Account' && account ? (
                 <AccountPage
                   account={account}
@@ -350,18 +361,7 @@ export default function PlatformShell({
               ) : page === 'Learning paths' ? (
                 <LearningPathsPage testCount={testCount} onStart={resume} onPreview={setResource} />
               ) : page === 'My designs' ? (
-                <MyDesignsPage
-                  title={challenge.title}
-                  mode={session.mode}
-                  started={started}
-                  onReturn={resume}
-                  onFindChallenge={() => go('Challenges')}
-                  others={others.flatMap((o) =>
-                    o.saved?.started && onOpenOther
-                      ? [{ id: o.challengeId, title: o.title, mode: o.saved.mode, onReturn: () => onOpenOther(o.challengeId, o.saved!.mode) }]
-                      : [],
-                  )}
-                />
+                <MyDesignsPage account={account} rows={progressRows} onFindChallenge={() => go('Challenges')} />
               ) : (
                 <NotebookPage notes={notes} onChange={setNotes} />
               )}

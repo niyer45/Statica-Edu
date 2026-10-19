@@ -22,7 +22,7 @@ const beam1 = bundledChallengeResult.value
 const beam2: Challenge = deepFreeze({ ...structuredClone(beam1), id: 'test-beam-2', title: 'Test Beam II' }) as Challenge
 const entries: CatalogEntry[] = [
   ...catalog,
-  { id: '901', title: 'Test Beam II', description: 'Test-only second runnable challenge.', discipline: 'Mechanics', difficulty: 'introductory', time: '5 min', concepts: ['Bending'], available: true, challengeId: 'test-beam-2', art: 'beam' },
+  { id: '901', title: 'Test Beam II', description: 'Test-only second runnable challenge.', discipline: 'Mechanics', difficulty: 'introductory', time: '5 min', concepts: ['Bending'], available: true, challengeId: 'test-beam-2', art: 'frame' },
 ]
 
 function memory() {
@@ -97,9 +97,12 @@ describe('CatalogHost multi-challenge isolation', () => {
     render(<CatalogHost runnable={[boot(beam1), boot(beam2)]} entries={entries} storage={storage} clock={clock} newId={newId} />)
     openFromLibrary('Test Beam II', 'Guided')
     navigate('My designs')
-    expect(screen.getByRole('article', { name: 'Test Beam II workspace' })).toBeTruthy()
+    const active = screen.getByRole('article', { name: 'Test Beam II workspace' })
     const other = screen.getByRole('article', { name: 'Cantilever Beam I workspace' })
     expect(within(other).getByText('SAVED WORKSPACE')).toBeTruthy()
+    // Task 62: each card draws its own challenge (frame vs beam), not one repeated image.
+    expect(active.querySelector('svg')!.innerHTML).not.toBe(other.querySelector('svg')!.innerHTML)
+    expect(within(other).getByText('In progress')).toBeTruthy()
     fireEvent.click(within(other).getByRole('button', { name: 'Return to Cantilever Beam I' }))
     expect(snapshot().challengeId).toBe('cantilever-beam-1')
     expect(snapshot().reflectionAnswer).toBe('Beam I notes')

@@ -236,6 +236,7 @@ Automated gates passed; none of this is human review.
 - [ ] Accounts are device-only. Choose a backend for cross-device sync (recommended: Supabase Auth + Postgres with row-level security behind the existing `AccountProvider`), the personal data to collect, retention, and whether users include minors/schools (D-50, 38.1).
 - [ ] The guest-to-account move checkbox is checked by default on sign-up; confirm or change.
 - [ ] Task 61: on each challenge, open and close Test details (and other dropdowns) and confirm the page returns to its size; on Mounting Bracket I confirm the panel reads cleanly with cautions under Test details (D-52); submit once and use both Back to challenges and Return to this challenge.
+- [ ] Task 62: read the new Home as a student, a teacher and an investor would; confirm every Available now / Early / Planned label is accurate and the vision wording matches your intent (D-53). Check My designs shows each challenge's own drawing and its progress.
 
 ## How to record decisions
 

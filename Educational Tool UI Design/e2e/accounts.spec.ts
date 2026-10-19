@@ -8,7 +8,7 @@ import { audit, openWorkbench, readState, referenceDesign, runTest } from './hel
 const ANA = { name: 'Ana', id: 'ana@example.com', password: 'correct horse battery' }
 const BEAM = 'cantilever-beam-1'
 
-async function navigate(page: Page, target: 'Home' | 'Challenges' | 'Account') {
+async function navigate(page: Page, target: 'Home' | 'Challenges' | 'My designs' | 'Account') {
   const sidebar = page.locator('.platform-sidebar')
   if (await sidebar.isVisible()) {
     if (target === 'Account') await sidebar.getByRole('button', { name: /^Account: / }).click()
@@ -16,7 +16,8 @@ async function navigate(page: Page, target: 'Home' | 'Challenges' | 'Account') {
   } else await page.getByLabel('Navigate workspace').selectOption(target)
 }
 
-const row = (page: Page, title: string) => page.locator('.progress-row').filter({ has: page.getByRole('heading', { name: title, exact: true }) })
+// Per-challenge progress lives in My designs (task 62): a card once started, a row otherwise.
+const row = (page: Page, title: string) => page.locator('.my-designs').locator('article, li').filter({ has: page.getByRole('heading', { name: title, exact: true }) })
 
 async function expectNoHorizontalOverflow(page: Page, width: number) {
   await page.setViewportSize({ width, height: 900 })
@@ -41,11 +42,12 @@ async function storageKeys(page: Page) {
 test('the homepage explains Statica, offers account and guest entry, and fits 320 px', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { level: 1, name: 'Welcome to Statica' })).toBeVisible()
-  await expect(page.getByText('Statica is a hands-on practice space for structures and mechanics.', { exact: false })).toBeVisible()
+  await expect(page.getByText('Statica is an interactive engineering education platform.', { exact: false })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 2, name: 'How students learn with Statica' })).toBeVisible()
+  await expect(page.getByRole('list', { name: 'Challenges available now' }).getByRole('listitem')).toHaveCount(6)
+  await expect(page.getByText('Planned', { exact: true }).first()).toBeVisible()
   await expect(page.getByText(/progress is saved in this browser on this device only/)).toBeVisible()
   for (const name of ['Create account', 'Sign in', 'Continue as guest']) await expect(page.getByRole('button', { name, exact: true })).toBeVisible()
-  await expect(page.locator('.progress-row')).toHaveCount(6)
-  await expect(page.locator('.progress-row').filter({ hasText: 'Not started' })).toHaveCount(6)
   await audit(page)
   await expectNoHorizontalOverflow(page, 320)
   await audit(page)
@@ -57,6 +59,12 @@ test('the homepage explains Statica, offers account and guest entry, and fits 32
   // Browser Back returns to the previous shell page.
   await page.goBack()
   await expect(page.getByRole('heading', { level: 1, name: 'Challenges' })).toBeVisible()
+  await navigate(page, 'My designs')
+  await expect(page.locator('.my-designs .progress-row')).toHaveCount(6)
+  await expect(page.locator('.my-designs .progress-row').filter({ hasText: 'Not started' })).toHaveCount(6)
+  await expect(page.getByLabel('Progress summary')).toHaveText('0 of 6 challenges completed · 0 started')
+  await audit(page)
+  await expectNoHorizontalOverflow(page, 320)
 })
 
 test('sign-up errors are announced, keyboard operable and fit 320 px', async ({ page }) => {
@@ -102,16 +110,19 @@ test('sign up, work, sign out, guest sees none of it, sign in restores it', asyn
   expect(keys).toContain(userKey)
   expect(keys.filter((k) => k.startsWith('ei:session:'))).toEqual([]) // nothing written as guest
 
-  await navigate(page, 'Home')
+  await navigate(page, 'My designs')
   await expect(row(page, 'Cantilever Beam I')).toContainText('In progress')
   await expect(row(page, 'Cantilever Beam I')).toContainText('1 test run')
+  await audit(page)
 
   await navigate(page, 'Account')
   await expect(page.getByRole('heading', { level: 1, name: 'Your account' })).toBeVisible()
   await audit(page)
   await page.getByRole('button', { name: 'Sign out', exact: true }).click()
   await expect(page.getByRole('heading', { level: 1, name: 'Welcome to Statica' })).toBeVisible()
+  await navigate(page, 'My designs')
   await expect(row(page, 'Cantilever Beam I')).toContainText('Not started')
+  await navigate(page, 'Home')
   await page.getByRole('button', { name: 'Continue as guest', exact: true }).click()
   await openWorkbench(page, false)
   const guest = await readState(page)
@@ -119,9 +130,10 @@ test('sign up, work, sign out, guest sees none of it, sign in restores it', asyn
   expect(guest.draft).not.toEqual(work.draft)
   await page.reload()
   await expect(page.getByRole('heading', { level: 1, name: 'Challenges' })).toBeVisible()
-  await navigate(page, 'Home')
+  await navigate(page, 'My designs')
   await expect(row(page, 'Cantilever Beam I')).toContainText('Not started')
 
+  await navigate(page, 'Home')
   await page.getByRole('button', { name: 'Sign in', exact: true }).click()
   await page.getByLabel('Email or username').fill(ANA.id)
   await page.getByLabel('Password', { exact: true }).fill('not the password')
@@ -130,14 +142,18 @@ test('sign up, work, sign out, guest sees none of it, sign in restores it', asyn
   await page.getByLabel('Password', { exact: true }).fill(ANA.password)
   await page.getByRole('button', { name: 'Sign in', exact: true }).click()
   await expect(page.getByRole('heading', { level: 1, name: `Welcome back, ${ANA.name}` })).toBeVisible({ timeout: 15_000 })
+  await expect(page.getByText('You have 1 challenge started on this device.')).toBeVisible()
+  await page.getByRole('button', { name: 'Open My designs', exact: true }).click()
   await expect(row(page, 'Cantilever Beam I')).toContainText('In progress')
-  await page.getByRole('button', { name: 'Continue Cantilever Beam I' }).click()
+  await row(page, 'Cantilever Beam I').getByRole('button').click()
   await expect(page.getByRole('button', { name: 'Run Test', exact: true })).toBeVisible()
   const restored = await readState(page)
   expect({ draft: restored.draft, history: restored.history }).toEqual({ draft: work.draft, history: work.history })
 
   // A reload keeps the session on this device.
   await page.reload()
+  await expect(page.getByRole('heading', { level: 1, name: 'My designs' })).toBeVisible()
+  await navigate(page, 'Home')
   await expect(page.getByRole('heading', { level: 1, name: `Welcome back, ${ANA.name}` })).toBeVisible()
 })
 
@@ -149,19 +165,21 @@ test('guest work can move into a new account, and deleting the account removes i
   const work = await readState(page)
   expect(await storageKeys(page)).toContain(`ei:session:${BEAM}:v3`)
 
-  await navigate(page, 'Home')
+  await navigate(page, 'My designs')
   await expect(row(page, 'Cantilever Beam I')).toContainText('In progress')
+  await navigate(page, 'Home')
   await page.getByRole('button', { name: 'Create account', exact: true }).click()
   const preview = page.getByRole('group', { name: 'Guest progress on this device' })
   await expect(preview.getByRole('listitem')).toHaveText(['Cantilever Beam I'])
   await audit(page)
   await signUp(page, true)
   await expect(page.getByRole('status')).toContainText('Guest progress for 1 challenge moved into your account.')
+  await navigate(page, 'My designs')
   await expect(row(page, 'Cantilever Beam I')).toContainText('In progress')
   const keys = await storageKeys(page)
   expect(keys.filter((k) => k.startsWith('ei:session:'))).toEqual([])
   expect(keys.some((k) => /^ei:user:[^:]+:session:cantilever-beam-1:v3$/.test(k))).toBe(true)
-  await page.getByRole('button', { name: 'Continue Cantilever Beam I' }).click()
+  await row(page, 'Cantilever Beam I').getByRole('button').click()
   expect((await readState(page)).history).toEqual(work.history)
 
   await navigate(page, 'Account')
@@ -172,5 +190,6 @@ test('guest work can move into a new account, and deleting the account removes i
   const after = await storageKeys(page)
   expect(after.filter((k) => k.startsWith('ei:user:') || k === 'ei:account-session:v1')).toEqual([])
   expect(JSON.parse((await page.evaluate(() => window.localStorage.getItem('ei:accounts:v1')))!).accounts).toEqual([])
+  await navigate(page, 'My designs')
   await expect(row(page, 'Cantilever Beam I')).toContainText('Not started')
 })

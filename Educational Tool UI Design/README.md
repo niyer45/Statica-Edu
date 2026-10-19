@@ -2,7 +2,7 @@
 
 Statica Edu helps students build engineering intuition by changing a design, predicting its behavior, testing constraints and explaining results. See the [repository README](../README.md) for the product overview, current features, roadmap and model/storage limitations.
 
-Current UI: all six original challenges (Cantilever Beam I, Mounting Bracket I, Torsion Shaft I, Heat Sink I, Braced Frame I, Vibration Isolation I) with Guided/Parametric modes, section editing, 3D/SVG visualization, prediction, tested history, comparison/restore/deletion, reflection/submission and validated local saving/design import/export. Cantilever Beam II has a tested configuration but is not available in the UI yet. Accounts, cloud saves and completed-challenge history remain planned. Since 2026-10-18: a Home page with optional device-only accounts (D-50), Guided structured experiments vs Parametric open design (D-49), Reset to baseline, and hardest-possible baselines (D-47).
+Current UI: all six original challenges (Cantilever Beam I, Mounting Bracket I, Torsion Shaft I, Heat Sink I, Braced Frame I, Vibration Isolation I) with Guided/Parametric modes, section editing, 3D/SVG visualization, prediction, tested history, comparison/restore/deletion, reflection/submission and validated local saving/design import/export. Cantilever Beam II has a tested configuration but is not available in the UI yet. Accounts, cloud saves and completed-challenge history remain planned. Since 2026-10-18: a Home page presenting the product and roadmap (D-53) with optional device-only accounts (D-50) and per-challenge progress in My designs, Guided structured experiments vs Parametric open design (D-49), Reset to baseline, and hardest-possible baselines (D-47).
 
 ## Setup
 
