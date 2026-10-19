@@ -37,7 +37,7 @@ export const AVAILABLE_FEATURES: readonly string[] = [
 export const PILLARS: readonly { title: string; readiness: Readiness; text: string }[] = [
   { title: 'Interactive engineering simulations', readiness: 'Available now', text: 'Manipulate an engineering system and see its behavior change, with immediate visual feedback. Six models today.' },
   { title: 'Engineering design challenges', readiness: 'Available now', text: 'An objective, performance requirements and constraints; students iterate toward a design that meets them.' },
-  { title: 'Guided learning modules', readiness: 'Early', text: 'The first Learn module, Beam bending, is available: short concepts, a prediction at every step, interactive demonstrations and optional equations, leading into Cantilever Beam I. More modules are planned.' },
+  { title: 'Guided learning modules', readiness: 'Early', text: 'Learn modules on Beam bending and Torsion are available: short concepts, a prediction at every step, interactive demonstrations and optional equations, each leading into its design challenge. More modules are planned.' },
   { title: 'Curriculum and progression', readiness: 'Early', text: 'Learn is organized by subject, topic and module, starting with Solid Mechanics → Mechanics of Materials → Beam Bending → Cantilever Beam I. More paths are planned, and every module stays usable on its own.' },
 ]
 

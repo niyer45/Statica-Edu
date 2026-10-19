@@ -68,11 +68,12 @@ export const catalog: readonly CatalogEntry[] = deepFreeze<CatalogEntry[]>([
   {
     id: '003',
     title: 'Torsion Shaft I',
-    description: 'Balance torsional stiffness, weight, and packaging in a rotating shaft.',
+    description: 'Make a drive shaft twist less while weighing less.',
     discipline: 'Mechanics',
-    difficulty: 'intermediate',
-    time: '20–30 min',
-    concepts: ['Torsion', 'Section properties'],
+    // Introductory since task 71 (D-61): one idea, the polar moment J (hollow beats solid).
+    difficulty: 'introductory',
+    time: '15–20 min',
+    concepts: ['Torsion', 'Polar moment'],
     available: true,
     challengeId: 'torsion-shaft-1',
     art: 'shaft',

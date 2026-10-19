@@ -4,7 +4,7 @@ import type { TorsionDesign } from '../../geometry/torsion/design'
 import { PhysicsInvariantError } from '../analyze'
 import { analyzeShaft, TORSION_MODEL_ID, TORSION_MODEL_VERSION, TorsionInvariantError } from './analyze'
 import { TORSION_ASSUMPTIONS, TORSION_UNSUPPORTED_EFFECTS } from './constants'
-import { maxShearStress, shaftDiameters, shaftSectionProperties, torsionalStiffness, twistAngle } from './shaft'
+import { maxShearStress, shaftDiameters, shaftSectionProperties, shearStressAtRadius, torsionalStiffness, twistAngle } from './shaft'
 
 // Torsion analysis entry point (task 47.2; TSH-06, TSH-10–TSH-13, MM-03, MM-10).
 
@@ -101,5 +101,12 @@ describe('shaft formulas', () => {
     expect(twistAngle(2, 3, 4, 5)).toBe(6 / 20)
     expect(maxShearStress(2, 3, 5)).toBe(3 / 5)
     expect(torsionalStiffness(4, 5, 2)).toBe(10)
+  })
+
+  it('give a shear stress linear in radius: zero on the axis, the maximum at the surface (task 71)', () => {
+    const J = shaftSectionProperties(solid(0.03)).polarMomentM4
+    expect(shearStressAtRadius(400, 0, J)).toBe(0)
+    expect(shearStressAtRadius(400, 0.015, J)).toBe(maxShearStress(400, 0.03, J))
+    expect(shearStressAtRadius(400, 0.0075, J)).toBeCloseTo(maxShearStress(400, 0.03, J) / 2, 6)
   })
 })

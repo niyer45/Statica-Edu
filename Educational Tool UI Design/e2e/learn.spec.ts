@@ -61,3 +61,43 @@ test('Learn: predict, check with the demo, keep progress and apply it in Guided 
   await expect(page.getByRole('button', { name: 'Run Test', exact: true })).toBeVisible()
   await expect(page.getByRole('region', { name: 'Guided experiments' })).toBeVisible()
 })
+
+// Task 71 (D-61): the Torsion module, with model-backed demo readouts, KaTeX equations, progress
+// across a reload, 320 px and axe, and Apply it opening Torsion Shaft I in Guided mode.
+test('Learn Torsion: predict, check with the shaft demo and apply it to Torsion Shaft I', async ({ page }) => {
+  test.setTimeout(90_000)
+  await page.goto('/#learn')
+  await page.getByRole('button', { name: 'Start Torsion' }).click()
+  await expect(page).toHaveURL(/#learn\/torsion$/)
+  await expect(page.getByRole('heading', { level: 2, name: 'Torque and twist' })).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Try it' })).toHaveCount(0)
+  await predict(page, 'It doubles')
+  await expect(page.locator('.learn-feedback')).toContainText('Your prediction matches the model.')
+  const twist = page.getByRole('region', { name: 'Try it' }).locator('dt', { hasText: 'Angle of twist' }).locator('xpath=following-sibling::dd')
+  // 1 m steel shaft, Ø20 mm, G 79 GPa (learn/torsionDemo): the readout comes from φ = TL/(GJ).
+  await expect(twist).toHaveText('4.62°')
+  await page.getByRole('slider', { name: 'Torque' }).fill('50')
+  await expect(twist).toHaveText('2.31°')
+  await page.locator('.learn-advanced summary').click()
+  await expect(page.locator('.learn-advanced .katex .mfrac').first()).toBeVisible()
+  await audit(page)
+
+  await page.getByRole('button', { name: 'Next step' }).click()
+  await expect(page.getByRole('heading', { level: 2, name: 'Length' })).toBeFocused()
+  await predict(page, 'Eight times as large')
+  await expect(page.locator('.learn-feedback')).toContainText('The model gives a different answer: twice as large.')
+
+  await page.reload()
+  await expect(page.getByRole('heading', { level: 2, name: 'Diameter' })).toBeVisible()
+  await expect(page.getByLabel('Module progress')).toHaveText('2 of 5 steps done')
+  await predict(page, 'A sixteenth as large')
+  await page.getByRole('slider', { name: 'Diameter' }).fill('40')
+  await expect(twist).toHaveText('0.29°')
+  await expectNoHorizontalOverflow(page, 320)
+  await audit(page)
+
+  await page.getByRole('list', { name: 'Steps' }).getByRole('button', { name: 'Apply it' }).click()
+  await page.getByRole('button', { name: 'Open Torsion Shaft I in Guided mode' }).click()
+  await expect(page.getByRole('button', { name: 'Run Test', exact: true })).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('heading', { name: 'Hollow it out', exact: true })).toBeVisible()
+})

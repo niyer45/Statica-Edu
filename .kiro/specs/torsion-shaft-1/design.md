@@ -67,3 +67,13 @@ Derived targets: the twist limit requires J ≥ T L/(G φ_lim) = 2.3208417017957
 - New-model persistence uses envelope v2 and import `ei-design` v2 (MM-18/MM-19).
 - Explanation facts: compare twist ratio with the J ratio (inverse) and mass ratio between tested designs, using stored values only.
 - Viewport: reuse the lazy viewport chunk pattern with a shaft mesh from `geometry.sectionOutline` for circle/tube. Twist is display-only (`ui/mesh` may read the stored φ; no formulas in UI).
+
+## Content version 3 worksheet addition (task 71, D-61, 2026-10-19)
+
+Additive; the rows above are unchanged. Computed with an independent 40-digit decimal script from the equations above (not application code), same constants.
+
+| Fixture | D, d (m) | J (m⁴) | φ (rad) | φ (°) | τ_max (Pa) | m (kg) | τ/τ_y | Expected |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `baseline` (v3) solid | 0.0305, 0 | 8.49570163444773e-8 | 0.0476786154420514 | 2.73178343785682 | 71801014.9422643 | 4.58827250862299 | 0.495179413394926 | Not accepted: twist, mass |
+
+The version-2 baseline (Ø26.5 mm, twist and shear stress) stays a fixture as `solid26_5`. Prediction fixture: v3 baseline → reference twist ratio 0.345882600811222 (a decrease). Shear stress bound: τ_max = G φ (D/2)/L, so a design within the twist limit and D ≤ 50 mm has τ_max ≤ G φ_lim D_max/(2L) = 43.0878 MPa < 80 MPa; only twist and mass can decide acceptance for designs inside the packaging limit.

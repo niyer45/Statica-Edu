@@ -13,6 +13,7 @@ import {
   TORSION_WORKSHEET,
   TORSION_WORKSHEET_REL_TOL,
   torsionChallenge,
+  tube,
   worksheetFixture,
   type TorsionFixture,
 } from './torsion'
@@ -32,9 +33,10 @@ const expectRel = (actual: number, expected: number, what: string) =>
   expect(relClose(actual, expected), `${what}: ${actual} vs ${expected}`).toBe(true)
 
 describe('Torsion Shaft I worksheet (TSH-13)', () => {
-  it('covers all nine worksheet rows', () => {
+  it('covers all ten worksheet rows', () => {
     expect(TORSION_WORKSHEET.map((f) => f.name)).toEqual([
       'baseline',
+      'solid26_5',
       'solid30',
       'reference',
       'tubeEqualMass',
@@ -125,6 +127,27 @@ describe('derived targets', () => {
       }
     }
     expect(twistPasses).toBeGreaterThan(0)
+  })
+
+  it('a shaft meeting the twist and packaging limits always meets the shear stress limit (D-61)', () => {
+    // τ_max = G φ (D/2) / L, so at φ ≤ φ_lim and D ≤ D_max, τ_max ≤ G φ_lim D_max / (2 L) ≈ 43.1 MPa.
+    const bound = (ch.material.shearModulusPa * ch.constraints.maxTwistRad * ch.constraints.maxOuterDiameterM) / (2 * ch.lengthM)
+    expect(bound / 1e6).toBeCloseTo(43.0878, 3)
+    expect(bound).toBeLessThan(ch.constraints.maxShearStressPa)
+    const L = ch.sectionLimits
+    let checked = 0
+    for (let D = L.tube.outerDiameterM.minM; D <= ch.constraints.maxOuterDiameterM + 1e-12; D += L.tube.outerDiameterM.stepM) {
+      for (let d = 0; d <= D - 2 * L.tube.minWallM + 1e-12; d += 0.0005) {
+        const design = shaft('t', d === 0 ? solid(D) : tube(D, d))
+        if (validateTorsionDesign(design, ch).length > 0) continue
+        const e = evaluateShaft(design, analyzeShaft(design, ch), ch)
+        if (e.failures.includes('twist') || e.failures.includes('outerDiameter')) continue
+        checked++
+        expect(e.failures).not.toContain('shearStress')
+        expect(e.constraints.find((c) => c.id === 'shearStress')!.value).toBeLessThanOrEqual(bound * (1 + 1e-12))
+      }
+    }
+    expect(checked).toBeGreaterThan(100)
   })
 
   it('prediction fixture: baseline → reference twist ratio is a decrease', () => {

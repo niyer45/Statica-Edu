@@ -79,9 +79,17 @@ describe('evaluateShaft', () => {
     expect(e.efficiency.stressMargin).toBeGreaterThan(0)
   })
 
-  it('gives the baseline negative twist and stress margins, failing both', () => {
+  it('gives the baseline a negative twist margin and mass usage above 1, failing both (version 3, D-61)', () => {
     const { e } = run('baseline')
     expect(e.status).toBe('notAccepted')
+    expect(e.failures).toEqual(['twist', 'mass'])
+    expect(e.efficiency.twistMargin).toBeLessThan(0)
+    expect(e.efficiency.massUsage).toBeGreaterThan(1)
+    expect(e.efficiency.stressMargin).toBeGreaterThan(0)
+  })
+
+  it('gives the version 2 baseline (Ø26.5 mm) negative twist and stress margins, failing both', () => {
+    const { e } = run('solid26_5')
     expect(e.failures).toEqual(['twist', 'shearStress'])
     expect(e.efficiency.twistMargin).toBeLessThan(0)
     expect(e.efficiency.stressMargin).toBeLessThan(0)

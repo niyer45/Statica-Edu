@@ -10,8 +10,9 @@ const LABELS: Readonly<Record<string, string>> = {
   outerDiameterM: 'Outer diameter',
   innerDiameterM: 'Inner diameter',
 }
-const OUTER = ['diameterM', 'outerDiameterM'] as const
-const DIAMETERS = ['diameterM', 'outerDiameterM', 'innerDiameterM'] as const
+// Task 71 (D-61, introductory): the experiments follow the one idea of the challenge, the polar
+// moment J. Hollow the solid shaft first, then move the tube's material outward, then combine.
+const TUBE = ['outerDiameterM', 'innerDiameterM'] as const
 
 type R = { analysis: TorsionAnalysis }
 
@@ -28,40 +29,33 @@ export const TORSION_GUIDED_PLAN: GuidedPlan<TorsionDesign, R> = Object.freeze({
   },
   steps: [
     {
-      id: 'diameter',
-      title: 'Thicken the shaft',
-      instruction: 'Increase only the outside diameter. Predict how the twist angle will change, then Run Test.',
-      hint: 'Torsional stiffness depends on the polar moment, which grows very quickly with diameter. Watch the mass as well.',
-      focus: 'Outside diameter',
-      unlocks: OUTER,
-      objective: { kind: 'change', params: OUTER, direction: 'increase', single: true },
-      observe: ['twistRad', 'massKg'],
-    },
-    {
+      // Id kept from version 2 (it names the section switch); the step now comes first.
       id: 'section',
-      title: 'Solid or hollow',
-      instruction: 'Switch between a solid shaft and a hollow tube without changing anything else. Predict, then test: what happens to twist and mass?',
-      hint: 'Material near the centre carries little torque. Removing it saves mass while costing only a little stiffness.',
+      title: 'Hollow it out',
+      instruction: 'Switch the solid shaft to a hollow tube with the same outside diameter. Predict how the twist angle will change, then Run Test.',
+      hint: 'Material near the centre carries little of the torque. Removing it cuts the mass by much more than it costs in stiffness.',
       focus: 'Shaft type (solid or hollow)',
       unlocks: ['section'],
       objective: { kind: 'change', params: ['section'], direction: 'any' },
       observe: ['twistRad', 'massKg'],
     },
     {
-      id: 'tune',
-      title: 'Tune one diameter',
-      instruction: 'Change exactly one diameter. Predict the effect on twist and mass, then Run Test.',
-      hint: 'For a tube, a larger outer diameter adds stiffness fast; a larger inner diameter removes mass from where it matters least.',
-      focus: 'Any one diameter',
-      unlocks: DIAMETERS,
-      objective: { kind: 'change', params: DIAMETERS, direction: 'any', single: true },
-      observe: ['twistRad', 'massKg', 'maxShearStressPa'],
+      id: 'outward',
+      title: 'Move the material outward',
+      instruction: 'Increase the outer diameter of the tube; you may increase the inner diameter as well to keep the wall thin. Predict the twist, then Run Test.',
+      hint: 'Stiffness depends on the polar moment J, which grows with the fourth power of the diameter: the same steel further from the centre resists twist much more.',
+      focus: 'Outer diameter (inner diameter optional)',
+      unlocks: TUBE,
+      // The inner diameter is a coupled follower of the outer one, so a test that grows both
+      // counts as one outward change.
+      objective: { kind: 'change', params: ['outerDiameterM'], direction: 'increase' },
+      observe: ['twistRad', 'massKg'],
     },
     {
       id: 'open',
       title: 'Meet every check',
       instruction: 'Every parameter is unlocked. Combine what your experiments showed and Run Test until a shaft passes every check.',
-      hint: 'Stay inside the packaging limit on the outer diameter, then trade inner diameter against mass.',
+      hint: 'Keep the outer diameter within the packaging limit, then adjust the inner diameter: a smaller bore adds stiffness, a larger bore saves mass.',
       focus: 'All parameters',
       unlocks: 'all',
       objective: { kind: 'accepted' },

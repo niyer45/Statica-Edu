@@ -73,7 +73,7 @@ describe('runtime persistence', () => {
     const s = torsionRuntime.init(ch, T0, 't0', 'parametric')
     if (!s.ok) throw new Error(s.error.message)
     expect(s.value.mode).toBe('parametric')
-    expect(torsionRuntime.key(ch)).toBe('ei:session:torsion-shaft-1:v2')
+    expect(torsionRuntime.key(ch)).toBe('ei:session:torsion-shaft-1:v3') // content version 3 (task 71, D-61)
     const raw = torsionRuntime.serialize(s.value, T0)
     expect(JSON.parse(raw)).toMatchObject({ schemaVersion: 2, model: torsionModel.ref })
     const back = torsionRuntime.deserialize(raw, ch)

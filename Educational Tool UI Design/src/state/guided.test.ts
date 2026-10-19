@@ -84,7 +84,12 @@ const CASES: Case[] = [
       const params = Object.entries(ref).filter(([k]) => k !== 'kind')
       return [edit({ type: 'setSection', kind: ref.kind }), ...params.map(([param, v]) => edit({ type: 'setParam', param, valueM: v, mode: 'strict' }))]
     },
-    lockedAtStart: (d) => edit({ type: 'setSection', kind: beamSection(d).kind === 'tube' ? 'circle' : 'tube' }),
+    // Step 1 unlocks only the shaft type (D-61), so a diameter edit is locked.
+    lockedAtStart: (d) => {
+      const section = beamSection(d)
+      const param = Object.keys(section).find((k) => k !== 'kind')!
+      return edit({ type: 'setParam', param, valueM: (section[param] as number) + 0.002, mode: 'clamp' })
+    },
   },
   {
     name: 'Vibration Isolation I',

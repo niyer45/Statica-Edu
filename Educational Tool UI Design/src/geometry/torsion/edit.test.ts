@@ -101,14 +101,14 @@ describe('applyTorsionEdit', () => {
 
   it('switches sections and keeps the id and locked fields', () => {
     const r = applyTorsionEdit(draft, { type: 'setSection', kind: 'tube' }, ch)
-    expect(r).toEqual({ ok: true, value: { ...draft, section: tube(0.0265, 0.0265 - 0.008) } })
+    expect(r).toEqual({ ok: true, value: { ...draft, section: tube(0.0305, 0.0305 - 0.008) } })
   })
 
   it('rejects a disallowed kind without changing the draft', () => {
     const circleOnly = { ...ch, allowedSections: ['circle' as const] }
     const r = applyTorsionEdit(draft, { type: 'setSection', kind: 'tube' }, circleOnly)
     expect(!r.ok && r.error.map((e) => e.code)).toEqual(['SECTION_NOT_ALLOWED'])
-    expect(draft.section).toEqual(solid(0.0265))
+    expect(draft.section).toEqual(solid(0.0305))
   })
 
   it('applies clamp and strict parameter edits', () => {

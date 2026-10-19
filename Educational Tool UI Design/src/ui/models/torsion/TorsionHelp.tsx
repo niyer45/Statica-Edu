@@ -9,6 +9,8 @@ export default function TorsionHelp({ open, onClose }: { open: boolean; onClose:
   return (
     <Dialog title="Torsional stiffness" icon="book" onClose={onClose}>
       <Formula tex={String.raw`\varphi = \dfrac{T L}{G J}`} text="φ = TL ÷ GJ" caption="Angle of twist" />
+      {/* Task 71 (D-61): the one idea of the introductory challenge, J, is shown as well. */}
+      <Formula tex={String.raw`J = \dfrac{\pi\,(D^{4} - d^{4})}{32}`} text="J = π(D⁴ − d⁴) ÷ 32" caption="Polar moment of a tube; d = 0 for a solid shaft" />
       <Formula tex={String.raw`\tau_{\max} = \dfrac{T r}{J}`} text="τ = Tr ÷ J" caption="Peak shear stress, at the outer surface" />
       <KeyPoints
         points={[

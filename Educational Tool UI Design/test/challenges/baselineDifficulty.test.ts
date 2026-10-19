@@ -136,13 +136,24 @@ describe('Cantilever Beam I baseline difficulty (a solid circle, D-47 amendment)
 describe('Torsion Shaft I baseline difficulty', () => {
   const ch = torsionChallenge()
   const base = designChecksFailed(torsionModel, ch.initialDesign, ch)
+  const L = ch.sectionLimits
 
-  it('fails twist and shear stress, applicable and without warnings', () => {
-    expect(base).toEqual({ applicable: true, warnings: 0, failed: ['twist', 'shearStress'], status: 'notAccepted' })
+  // Version 3 (task 71, D-61, introductory): among the tied two-check designs, the baseline is the
+  // solid that fails twist and mass, the pair a hollow section fixes, and of those the one furthest
+  // from passing twist (the smallest solid over the mass limit), as for the beam (D-47 amendment).
+  it('fails twist and mass, applicable and without warnings', () => {
+    expect(base).toEqual({ applicable: true, warnings: 0, failed: ['twist', 'mass'], status: 'notAccepted' })
+  })
+
+  it('is the smallest solid on the grid that fails twist and mass', () => {
+    const solids = grid(L.circle.diameterM.minM, L.circle.diameterM.maxM, L.circle.diameterM.stepM)
+      .map((d) => ({ d, ...designChecksFailed(torsionModel, shaft('s', solid(d)), ch) }))
+      .filter((r) => r.applicable && r.warnings === 0 && r.failed.join() === 'twist,mass')
+    expect(solids[0]!.d).toBe(0.0305)
+    expect(ch.initialDesign.section).toEqual(solid(solids[0]!.d))
   })
 
   it('no valid shaft on the step grid fails more design checks', () => {
-    const L = ch.sectionLimits
     function* designs() {
       for (const d of grid(L.circle!.diameterM.minM, L.circle!.diameterM.maxM, L.circle!.diameterM.stepM)) yield shaft('s', solid(d))
       for (const D of grid(L.tube!.outerDiameterM.minM, L.tube!.outerDiameterM.maxM, L.tube!.outerDiameterM.stepM)) {
@@ -159,7 +170,7 @@ describe('Torsion Shaft I baseline difficulty', () => {
   })
 
   it('moves saves to a new key so a previous-version save is never re-scored', () => {
-    expectStaleSaveIgnored(torsionRuntime, ch, { ...ch, version: 1, initialDesign: { ...ch.initialDesign, section: solid(0.03) } })
+    expectStaleSaveIgnored(torsionRuntime, ch, { ...ch, version: 2, initialDesign: { ...ch.initialDesign, section: solid(0.0265) } })
   })
 })
 

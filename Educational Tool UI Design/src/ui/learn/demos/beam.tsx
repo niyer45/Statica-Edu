@@ -33,7 +33,7 @@ const mm2 = (m2: number) => `${Math.round(m2 * 1e6).toLocaleString('en-US')} mmÂ
 const MAX_DROP_PX = 70
 const ORIGIN = { x: 34, y: 52 }
 
-function Readout({ rows }: { rows: readonly [string, string][] }) {
+export function Readout({ rows }: { rows: readonly [string, string][] }) {
   return (
     <dl className="learn-readout">
       {rows.map(([k, v]) => (
@@ -66,7 +66,7 @@ function CantileverDiagram({ input, kind, pxPerM, arrowScale = 1, children }: { 
   )
 }
 
-function Slider({ label, value, min, max, step, unit, onChange }: { label: string; value: number; min: number; max: number; step: number; unit: string; onChange: (v: number) => void }) {
+export function Slider({ label, value, min, max, step, unit, onChange }: { label: string; value: number; min: number; max: number; step: number; unit: string; onChange: (v: number) => void }) {
   const id = useId()
   return (
     <div className="learn-slider">
@@ -79,7 +79,7 @@ function Slider({ label, value, min, max, step, unit, onChange }: { label: strin
   )
 }
 
-function Choice<T extends string>({ legend, options, value, onChange }: { legend: string; options: readonly { id: T; label: string }[]; value: T; onChange: (v: T) => void }) {
+export function Choice<T extends string>({ legend, options, value, onChange }: { legend: string; options: readonly { id: T; label: string }[]; value: T; onChange: (v: T) => void }) {
   const name = useId()
   return (
     <fieldset className="learn-choice">

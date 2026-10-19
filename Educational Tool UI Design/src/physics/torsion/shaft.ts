@@ -43,6 +43,14 @@ export function maxShearStress(torqueNm: number, outerDiameterM: number, polarMo
   return (torqueNm * (outerDiameterM / 2)) / polarMomentM4
 }
 
+/**
+ * τ(r) = T r / J at radius r from the axis, Pa (task 71, Learn torsion module). Shear stress is
+ * linear in radius, so this is zero on the axis and equals maxShearStress at r = D/2.
+ */
+export function shearStressAtRadius(torqueNm: number, radiusM: number, polarMomentM4: number): number {
+  return (torqueNm * radiusM) / polarMomentM4
+}
+
 /** k_t = G J / L, N·m/rad. */
 export function torsionalStiffness(shearModulusPa: number, polarMomentM4: number, lengthM: number): number {
   return (shearModulusPa * polarMomentM4) / lengthM
