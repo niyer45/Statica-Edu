@@ -1,8 +1,9 @@
 import { beamBending } from './modules/beamBending'
+import { stressStrain } from './modules/stressStrain'
 import type { LearnModule, Subject } from './types'
 
-// Learn catalog (task 67; LRN-01): subjects → topics → modules. One module is available; the rest
-// are Planned placeholders with no content, following the owner's vision (2026-10-18).
+// Learn catalog (task 67; LRN-01): subjects → topics → modules. Available modules have content; the
+// rest are Planned placeholders with no content, following the owner's vision (2026-10-18).
 
 export const LEARN_SUBJECTS: readonly Subject[] = [
   {
@@ -15,7 +16,8 @@ export const LEARN_SUBJECTS: readonly Subject[] = [
         modules: [
           { status: 'available', module: beamBending },
           { status: 'planned', id: 'torsion', title: 'Torsion', summary: 'How shafts twist, and why hollow tubes are efficient.' },
-          { status: 'planned', id: 'stress-strain', title: 'Stress and strain', summary: 'Stiffness, strength and what happens past yield.' },
+          // Task 72 (D-62): available, at its Planned position.
+          { status: 'available', module: stressStrain },
           { status: 'planned', id: 'buckling', title: 'Buckling', summary: 'When slender members fail by suddenly bowing sideways.' },
         ],
       },

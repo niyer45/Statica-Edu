@@ -33,7 +33,7 @@ function TechnicalArt({kind,large=false}:{kind:string;large?:boolean}) {
     {kind==="shaft"&&<g className="art-accent" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points={torque.map(p=>p.join(",")).join(" ")}/><path d="m-6-4 6 4-6 4" transform={`translate(${torqueEnd.join(" ")}) rotate(${torqueAngle})`}/></g>}
     {kind==="thermal"&&<g className="art-accent" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">{heatOrigins.map(([x,y],i)=><path key={i} d={`M${x} ${y}q-4-7 0-14t0-14m-3 4 3-4 3 4`}/>)}</g>}
     </g>
-    <g fill="currentColor" opacity=".5" fontFamily="monospace" fontSize="7"><text x="18" y="166">FIG. {({beam:"01",bracket:"02",shaft:"03",thermal:"04",frame:"05",spring:"06"} as Record<string,string>)[kind]||"06"}</text><text x="342" y="166" textAnchor="end">STATICA LAB</text></g>
+    <g fill="currentColor" opacity=".5" fontFamily="monospace" fontSize="7"><text x="18" y="166">FIG. {({beam:"01",bracket:"02",shaft:"03",thermal:"04",frame:"05",spring:"06",rod:"10"} as Record<string,string>)[kind]||"06"}</text><text x="342" y="166" textAnchor="end">STATICA LAB</text></g>
   </svg>
 }
 
@@ -146,6 +146,23 @@ function build(kind:string) {
     }
     for(const x of [-74,74])box(x-3,99,-29,6,7,58)
     load=[18,106,29]
+  }else if(kind==="rod"){
+    // Stress and Strain I (task 72): a straight solid round hanger rod in tension, pinned in a
+    // clevis under a roof beam and carrying a load block on a second clevis; the load acts
+    // through the rod's axis. Generic proportions, not the challenge's reference design.
+    box(-92,118,-24,184,14,48,true) // roof beam
+    box(-14,111,-14,28,7,28,true) // clevis base plate on the beam
+    cylinder([0,30,0],[0,111,0],6,false,20) // the rod, the component as modeled
+    layer = 1
+    for(const z of [-9,5]){ // clevis cheeks either side of the rod ends, with their pins
+      box(-8,92,z,16,19,4,true)
+      box(-8,14,z,16,19,4,true)
+    }
+    cylinder([0,100,-12],[0,100,12],2.6,true,8)
+    cylinder([0,22,-12],[0,22,12],2.6,true,8)
+    layer = 2
+    box(-26,-22,-20,52,36,40,true) // the hanging load
+    load=[0,-54,0]
   }else{
     // A sprung instrument platform: real helical coils between two solid plates.
     box(-49,0,-35,98,9,70,true)

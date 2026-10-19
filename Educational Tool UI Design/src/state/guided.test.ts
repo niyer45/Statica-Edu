@@ -8,8 +8,9 @@ import { HEAT_SINK_GUIDED_PLAN } from '../evaluation/guided/heatSink'
 import { guidedProgress, type GuidedPlan, type GuidedStep } from '../evaluation/guided/plan'
 import { TORSION_GUIDED_PLAN } from '../evaluation/guided/torsion'
 import { VIBRATION_GUIDED_PLAN } from '../evaluation/guided/vibration'
+import { AXIAL_GUIDED_PLAN } from '../evaluation/guided/axial'
 import { SECTION_PARAMS } from '../geometry/params'
-import { beamRuntime, bracedFrameRuntime, bracketRuntime, heatSinkRuntime, torsionRuntime, vibrationRuntime, type AnyRuntime, type LoopChallenge } from './runtimes'
+import { axialRuntime, beamRuntime, bracedFrameRuntime, bracketRuntime, heatSinkRuntime, torsionRuntime, vibrationRuntime, type AnyRuntime, type LoopChallenge } from './runtimes'
 
 // Guided structured experiments through the real runtimes (task 58). For every bundled
 // challenge: each step is completable from the Baseline by editing only that step's parameters
@@ -151,6 +152,19 @@ const CASES: Case[] = [
       ])
     },
     lockedAtStart: () => edit({ type: 'setMemberSection', memberId: 'col1L', sectionId: 'CHS88.9x5.0' }),
+  },
+  {
+    // Task 72 (D-62).
+    name: 'Stress and Strain I',
+    id: 'stress-strain-1',
+    runtime: axialRuntime as unknown as AnyRuntime,
+    plan: AXIAL_GUIDED_PLAN as unknown as GuidedPlan<never, never>,
+    experiment: (step, d, ch) =>
+      step.id === 'material'
+        ? [edit({ type: 'setMaterial', materialId: (ch.materials as { id: string }[]).find((m) => m.id !== d.materialId)!.id })]
+        : [edit({ type: 'setDiameter', valueM: (d.diameterM as number) + (ch.diameterLimits as { stepM: number }).stepM, mode: 'clamp' })],
+    toReference: (_d, ch) => [edit({ type: 'setDiameter', valueM: ch.referenceDesign.diameterM, mode: 'strict' }), edit({ type: 'setMaterial', materialId: ch.referenceDesign.materialId })],
+    lockedAtStart: (d, ch) => edit({ type: 'setMaterial', materialId: (ch.materials as { id: string }[]).find((m) => m.id !== d.materialId)!.id }),
   },
 ]
 

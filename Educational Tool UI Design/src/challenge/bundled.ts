@@ -2,6 +2,7 @@ import bracedFrame1 from './challenges/braced-frame-1.json'
 import cantileverBeam1 from './challenges/cantilever-beam-1.json'
 import heatSink1 from './challenges/heat-sink-1.json'
 import mountingBracket1 from './challenges/mounting-bracket-1.json'
+import stressStrain1 from './challenges/stress-strain-1.json'
 import torsionShaft1 from './challenges/torsion-shaft-1.json'
 import vibrationIsolation1 from './challenges/vibration-isolation-1.json'
 
@@ -21,6 +22,8 @@ export const BUNDLED_CHALLENGE_JSON: Readonly<Record<string, unknown>> = Object.
   'mounting-bracket-1': mountingBracket1 as unknown,
   // Task 49.3, owner-approved activation 2026-10-17.
   'braced-frame-1': bracedFrame1 as unknown,
+  // Task 72 (D-62), owner-requested activation 2026-10-19.
+  'stress-strain-1': stressStrain1 as unknown,
 })
 
 /** Raw config for a bundled challenge id, or undefined when none is bundled. */

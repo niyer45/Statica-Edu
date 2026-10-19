@@ -53,7 +53,9 @@ describe('Learn (task 67)', () => {
     const cards = within(topic).getAllByRole('listitem')
     expect(within(cards[0]!).getByRole('heading', { name: 'Beam bending' })).toBeTruthy()
     expect(within(cards[0]!).getByText('Not started')).toBeTruthy()
-    for (const card of cards.slice(1)) {
+    // Task 72: Stress and strain (third card) is available too; the rest are Planned.
+    expect(within(cards[2]!).getByRole('heading', { name: 'Stress and strain' })).toBeTruthy()
+    for (const card of cards.filter((_, i) => i !== 0 && i !== 2)) {
       expect(within(card).getByText('Planned')).toBeTruthy()
       expect(within(card).queryByRole('button')).toBeNull()
     }

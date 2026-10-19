@@ -1,0 +1,13 @@
+/* Stress and strain demonstrations (task 72). Kept beside the demos so learn.css stays shared. */
+.learn-rod-diagram { max-width: 220px; }
+.learn-section-row > .learn-rod-diagram { flex: 0 1 220px; }
+.learn-rod { fill: #c9d8bd; stroke: #34543c; stroke-width: 1.2; }
+.learn-rod-yielded { stroke-dasharray: 4 3; fill: #f0dccb; stroke: #8a4b1c; }
+.learn-unstretched { stroke: #24402a; stroke-width: 1.2; stroke-dasharray: 3 3; }
+.learn-weight { fill: #e8c9b0; stroke: #b9703f; stroke-width: 1.2; }
+.learn-chart { max-width: 520px; }
+.learn-curve { stroke: #34543c; stroke-width: 2; fill: none; }
+.learn-yield-point { fill: #fff; stroke: #34543c; stroke-width: 1.5; }
+.learn-legend { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #2f3a2a; }
+.learn-legend li { display: flex; align-items: center; gap: 8px; }
+.learn-legend svg { width: 28px; height: 8px; flex: none; }

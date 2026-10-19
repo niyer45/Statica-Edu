@@ -43,6 +43,8 @@ const ENTRIES: Entry[] = [
     },
   },
   { title: 'Vibration Isolation I', id: 'vibration-isolation-1', edit: (page) => fill(page, 'Stiffness', '85') },
+  // Task 72 (D-62).
+  { title: 'Stress and Strain I', id: 'stress-strain-1', edit: (page) => fill(page, 'Diameter', '20') },
 ]
 
 async function toLibrary(page: Page) {
@@ -70,7 +72,7 @@ async function runWithPrediction(page: Page) {
 }
 
 test('all six original challenges keep separate saved work in one browser profile', async ({ page }) => {
-  test.setTimeout(180_000) // Six workbenches, six tests, a reload and six restores.
+  test.setTimeout(30_000 * ENTRIES.length) // Per workbench: a test, then a restore after the reload (180 s for the original six).
   expect(catalog.filter((e) => e.available).map((e) => e.title).sort()).toEqual(ENTRIES.map((e) => e.title).sort())
   await page.goto('/#challenges')
   const saved = new Map<string, { draft: unknown; history: unknown }>()
@@ -117,7 +119,7 @@ async function exportDesign(page: Page): Promise<string> {
 }
 
 test("a design file opens only in its own challenge's workbench", async ({ page }) => {
-  test.setTimeout(180_000) // Six exports, six own-challenge imports and six cross-challenge refusals.
+  test.setTimeout(30_000 * ENTRIES.length) // Per workbench: an export, an own-challenge import and a cross-challenge refusal.
   await page.goto('/#challenges')
   const files = new Map<string, string>()
   for (const entry of ENTRIES) {

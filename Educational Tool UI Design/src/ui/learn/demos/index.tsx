@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { DemoKind } from '../../../learn/types'
+import { AXIAL_DEMOS } from './axial'
 import { BEAM_DEMOS } from './beam'
 
 // Demo registry (task 67). Each module's demos live in their own file and are added here; a demo
@@ -7,6 +8,7 @@ import { BEAM_DEMOS } from './beam'
 
 const DEMOS: Readonly<Record<DemoKind, () => ReactNode>> = {
   ...BEAM_DEMOS,
+  ...AXIAL_DEMOS,
 }
 
 export default function Demo({ kind }: { kind: DemoKind }) {

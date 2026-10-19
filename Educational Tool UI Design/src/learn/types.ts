@@ -12,7 +12,10 @@ export type BeamDemoKind = 'load' | 'length' | 'material' | 'section' | 'stress'
  * module (e.g. `torsion-length`), with a demo model in `src/learn/<topic>Demo.ts` and components
  * in `src/ui/learn/demos/<topic>.tsx` registered in `src/ui/learn/demos/index.tsx`.
  */
-export type DemoKind = BeamDemoKind
+export type DemoKind = BeamDemoKind | AxialDemoKind
+
+/** Stress and strain demonstrations (task 72); inputs and ranges live in `axialDemo.ts`. */
+export type AxialDemoKind = 'axial-area' | 'axial-strain' | 'axial-hooke' | 'axial-yield' | 'axial-length'
 
 export interface PredictionOption {
   id: string

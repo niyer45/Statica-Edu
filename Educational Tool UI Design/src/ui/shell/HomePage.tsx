@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
-import { DIFFICULTY_LABELS, type CatalogEntry } from '../../challenge/catalog'
+import { catalog, DIFFICULTY_LABELS, type CatalogEntry } from '../../challenge/catalog'
+import { LEARN_MODULES } from '../../learn/catalog'
 import type { AccountContextValue } from '../account/AccountContext'
 import { storageStatement } from './progress'
 import type { AccountView } from './routes'
@@ -18,6 +19,16 @@ const BUILD_ID = import.meta.env.VITE_BUILD_ID?.slice(0, 7) ?? null
 
 export type Readiness = 'Available now' | 'Early' | 'Planned'
 
+const NUMBER_WORDS = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve']
+/** Capitalized count word ("Seven"), so Home copy follows the catalog instead of a typed number. */
+const countWord = (n: number): string => NUMBER_WORDS[n] ?? String(n)
+const RUNNABLE = countWord(catalog.filter((e) => e.available).length)
+const MODULE_TITLES = LEARN_MODULES.map((m) => m.title)
+const LEARN_TEXT =
+  MODULE_TITLES.length === 1
+    ? `The first Learn module, ${MODULE_TITLES[0]}, is available`
+    : `${countWord(MODULE_TITLES.length)} Learn modules are available (${MODULE_TITLES.slice(0, -1).join(', ')} and ${MODULE_TITLES.at(-1)})`
+
 export const LEARNING_LOOP: readonly { step: string; icon: SiteIconName; text: string }[] = [
   { step: 'Learn', icon: 'book', text: 'Short Learn modules and each challenge’s reference sheet explain the concept and its governing equations.' },
   { step: 'Experiment', icon: 'cube', text: 'Change the geometry and watch the model respond in 3D, or in 2D when 3D is unavailable.' },
@@ -35,9 +46,9 @@ export const AVAILABLE_FEATURES: readonly string[] = [
 ]
 
 export const PILLARS: readonly { title: string; readiness: Readiness; text: string }[] = [
-  { title: 'Interactive engineering simulations', readiness: 'Available now', text: 'Manipulate an engineering system and see its behavior change, with immediate visual feedback. Six models today.' },
+  { title: 'Interactive engineering simulations', readiness: 'Available now', text: `Manipulate an engineering system and see its behavior change, with immediate visual feedback. ${RUNNABLE} models today.` },
   { title: 'Engineering design challenges', readiness: 'Available now', text: 'An objective, performance requirements and constraints; students iterate toward a design that meets them.' },
-  { title: 'Guided learning modules', readiness: 'Early', text: 'The first Learn module, Beam bending, is available: short concepts, a prediction at every step, interactive demonstrations and optional equations, leading into Cantilever Beam I. More modules are planned.' },
+  { title: 'Guided learning modules', readiness: 'Early', text: `${LEARN_TEXT}: short concepts, a prediction at every step, interactive demonstrations and optional equations, each leading into its design challenge. More modules are planned.` },
   { title: 'Curriculum and progression', readiness: 'Early', text: 'Learn is organized by subject, topic and module, starting with Solid Mechanics → Mechanics of Materials → Beam Bending → Cantilever Beam I. More paths are planned, and every module stays usable on its own.' },
 ]
 
@@ -94,7 +105,7 @@ export const AUDIENCES: Readonly<Record<Audience, AudienceContent>> = {
     intro: 'A focused platform for engineering education.',
     description: 'Statica is developing a structured engineering learning platform centered on physical simulation and iterative design.',
     items: [
-      { title: 'Today', text: 'Six working design challenges, each computed by its own engineering model, and the core learning workflow.', readiness: 'Available now' },
+      { title: 'Today', text: `${RUNNABLE} working design challenges, each computed by its own engineering model, and the core learning workflow.`, readiness: 'Available now' },
       { title: 'Next', text: 'Short concept lessons, more challenges and classroom workflows.', readiness: 'Planned' },
       { title: 'Long term', text: 'A connected curriculum across engineering disciplines, with increasingly independent design tools.', readiness: 'Planned' },
     ],

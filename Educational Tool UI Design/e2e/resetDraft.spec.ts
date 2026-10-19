@@ -19,6 +19,7 @@ const ENTRIES: Entry[] = [
   { title: 'Heat Sink I', id: 'heat-sink-1' },
   { title: 'Braced Frame I', id: 'braced-frame-1' },
   { title: 'Vibration Isolation I', id: 'vibration-isolation-1' },
+  { title: 'Stress and Strain I', id: 'stress-strain-1' }, // task 72
 ]
 
 type Design = { id: string } & Record<string, unknown>

@@ -242,6 +242,12 @@ Automated gates passed; none of this is human review.
 - [ ] Task 65: open each challenge's light-bulb reference; confirm the key points are the right ones and the formulas read well (D-56).
 - [x] Mounting Bracket cover art. **2026-10-19, owner: "The bracket drawing should look like the bracket in the challenge."** Redrawn as the bolted L with no rib (task 65 follow-up).
 - [ ] Task 67: work through Learn → Beam bending as a student would. Check each concept point, question, explanation and takeaway for engineering accuracy and level (D-57), and the demo values (1 m aluminium cantilever, 20 × 40 mm bar, 200 N; steel 200 GPa, aluminium 69 GPa, timber 12 GPa). Decide which module comes next (Torsion, Stress and strain, Buckling, Resonance or Fins are listed as Planned).
+- [ ] Task 72 (D-62): Stress and Strain I (card 010, Introductory) and the Stress and strain Learn module. Spec `../.kiro/specs/stress-strain-1/` lists four owner questions:
+  1. Material values (typical textbook values): structural steel 200 GPa / 250 MPa / 7850 kg/m³; aluminium 6061-T6 69 GPa / 276 MPa / 2700 kg/m³; Ti-6Al-4V annealed 114 GPa / 830 MPa / 4430 kg/m³. Some textbooks quote a lower 6061-T6 yield (about 255–270 MPa); no fixture outcome changes, the numbers would.
+  2. Design factor 2 on yield, the 2 mm stretch limit and the 2 kg mass limit (20 kN on a 2 m hanger).
+  3. Baseline steel Ø13 mm (fails stress and mass, chosen so thickening alone cannot work) versus aluminium Ø11 mm (furthest from passing among the tied two-failure designs).
+  4. Whether the reference dialog should mention that titanium is costly (cost is not modeled).
+  Also work through the module's five steps, demos and wording, and the rod cover art.
 
 ## How to record decisions
 

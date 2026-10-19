@@ -108,7 +108,7 @@ describe('Learn catalog (LRN-01, LRN-06)', () => {
     const topic = LEARN_SUBJECTS[0]!.topics[0]!
     expect([LEARN_SUBJECTS[0]!.title, topic.title]).toEqual(['Solid mechanics', 'Mechanics of materials'])
     expect(topic.modules[0]).toEqual({ status: 'available', module: beamBending })
-    expect(LEARN_MODULES).toEqual([beamBending])
+    expect(LEARN_MODULES[0]).toBe(beamBending) // more modules follow (task 72: Stress and strain)
     expect(learnModule('beam-bending')).toBe(beamBending)
     expect(learnModule('nope')).toBeUndefined()
     const entry = catalog.find((e) => e.available && e.challengeId === beamBending.apply.challengeId)
