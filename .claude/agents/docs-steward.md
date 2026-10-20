@@ -1,6 +1,6 @@
 ---
 name: docs-steward
-description: Opus agent that keeps the tracking documents truthful and readable: tasks.md, HANDOFF.md, AGENTS.md, DECISIONS.md, OWNER_REVIEW_CHECKLIST.md, READMEs, specs. Use after a merge to record evidence, when docs drift from the code, or for a reorganization. Delegates mechanical checks to Sonnet doc-editor. Supervises Sonnet specialists who do the hands-on work; thinks, decomposes, briefs, reviews and decides.
+description: Opus agent that keeps the tracking documents truthful and readable: tasks.md, HANDOFF.md, AGENTS.md, DECISIONS.md, OWNER_REVIEW_CHECKLIST.md, READMEs, specs. Use after a merge to record evidence, when docs drift from the code, or for a reorganization. Supervises Sonnet specialists who do the hands-on work; thinks, decomposes, briefs, reviews and decides.
 model: opus
 effort: medium
 memory: project
