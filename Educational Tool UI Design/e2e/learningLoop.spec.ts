@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 import { audit, dragHeightHandle, normalizeState, openWorkbench, projectScenePoint, readState, referenceDesign, runTest, setDimension, tabTo } from './helpers'
 
 test('happy path: edit, drag a height handle, predict, compare, restore, reflect and submit', async ({ page }) => {
@@ -70,8 +70,10 @@ test('HTML5 palette drag-drop applies the section without recording a result', a
   await audit(page)
 })
 
-test('keyboard flow matches mouse state and focus can leave the canvas', async ({ page, context }) => {
-  test.setTimeout(90_000) // Two complete flows, real Tab traversal and two axe audits on software WebGL.
+// Task 77: the former single keyboard/mouse test is split in two. Playwright runs this suite fullyParallel
+// and shards by test, so the halves may run in different workers or shards; the comparison test
+// therefore rebuilds the keyboard state itself instead of reading it from the other test.
+async function submitByKeyboard(page: Page) {
   await openWorkbench(page, true, true)
   await referenceDesign(page, true)
   await runTest(page, true)
@@ -81,12 +83,24 @@ test('keyboard flow matches mouse state and focus can leave the canvas', async (
   await tabTo(page, answer); await answer.pressSequentially('Material placement improved stiffness.')
   const submit = page.getByRole('button', { name: 'Submit design & reflection' })
   await tabTo(page, submit); await submit.press('Enter')
+  await expect(page.getByLabel('Recorded submission')).toBeVisible()
+}
+
+test('keyboard flow submits a design and focus can leave the canvas', async ({ page }) => {
+  test.setTimeout(90_000) // A complete keyboard flow with real Tab traversal and an axe audit on software WebGL.
+  await submitByKeyboard(page)
   await audit(page)
   await page.keyboard.press('Escape')
-  const state = normalizeState(await readState(page))
   const canvas = page.getByRole('img', { name: '3D beam view', exact: true })
   await tabTo(page, canvas); await page.keyboard.press('Tab')
   await expect(canvas).not.toBeFocused()
+})
+
+test('keyboard flow matches mouse state', async ({ page, context }) => {
+  test.setTimeout(90_000) // Two complete flows, real Tab traversal and an axe audit on software WebGL.
+  await submitByKeyboard(page)
+  await page.keyboard.press('Escape')
+  const state = normalizeState(await readState(page))
   await page.evaluate(() => localStorage.clear())
   const mouse = await context.newPage()
   await openWorkbench(mouse)
@@ -95,6 +109,7 @@ test('keyboard flow matches mouse state and focus can leave the canvas', async (
   await mouse.getByRole('button', { name: 'Explain & submit' }).click()
   await mouse.getByRole('dialog', { name: 'Explain & submit', exact: true }).getByRole('textbox').fill('Material placement improved stiffness.')
   await mouse.getByRole('button', { name: 'Submit design & reflection' }).click()
+  await expect(mouse.getByLabel('Recorded submission')).toBeVisible()
   expect(normalizeState(await readState(mouse))).toEqual(state)
   await audit(mouse)
 })
