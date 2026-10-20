@@ -318,3 +318,8 @@ Owner requests the same day: "Develop the Stress & Strain module" and "Stress & 
 - **Shared edits:** the catalog card, `ArtKind 'rod'`, a TechnicalArt rod, model, runtime and UI registrations, and `DemoKind`. Home copy now derives the challenge and module counts from the catalogs instead of typing "Six". Count-based tests follow the catalog.
 
 This is repository/local availability, not customer deployment. Owner engineering review of material values, limits, wording and references (29.2) and manual/student QA remain required before release. The open questions are in OWNER_REVIEW_CHECKLIST.md §8.
+
+## D-63: The library is ordered by difficulty (2026-10-19)
+
+Owner: introductory challenges first, then intermediate, then advanced. The catalog order sets the library, Home and My designs order, so the catalog itself is ordered that way (within a level, the order challenges were added), and the library numbers shown on cards and in the challenge drawer are renumbered 001–010 to follow it: 001 Cantilever Beam I, 002 Torsion Shaft I, 003 Column Buckling I, 004 Stress and Strain I, 005 Mounting Bracket I, 006 Heat Sink I, 007 Pressure Vessel I, 008 Braced Frame I, 009 Vibration Isolation I, 010 Fatigue Analysis I. Library numbers are display labels only: saves, design files and model ids use challenge ids, so no saved work moves. TechnicalArt figure numbers are derived from the catalog so they always match the card number. The first available entry is still Cantilever Beam I, which keeps the default challenge.
+

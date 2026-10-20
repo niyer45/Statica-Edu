@@ -1,4 +1,4 @@
-import { useId, useState, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import {
   AXIAL_DEMO_DEFAULTS,
   AXIAL_DEMO_MATERIALS,
@@ -12,7 +12,7 @@ import {
   type DemoMaterialId,
 } from '../../../learn/axialDemo'
 import type { AxialDemoKind } from '../../../learn/types'
-import { DemoNote } from './beam'
+import { Choice, DemoNote, Readout, Slider } from './controls'
 import './axial.css'
 
 // Stress and strain demonstrations (task 72; SSL-02–SSL-04, LRN-09). Every value comes from
@@ -31,47 +31,6 @@ const BEYOND = 'Beyond yield: not modeled'
 /** Pixel stretch that a demo's largest possible elongation is drawn at (exaggerated). */
 const MAX_STRETCH_PX = 36
 const ROD_TOP = 22
-
-function Readout({ rows }: { rows: readonly [string, string][] }) {
-  return (
-    <dl className="learn-readout">
-      {rows.map(([k, v]) => (
-        <div key={k}>
-          <dt>{k}</dt>
-          <dd>{v}</dd>
-        </div>
-      ))}
-    </dl>
-  )
-}
-
-function Slider({ label, value, min, max, step, unit, onChange }: { label: string; value: number; min: number; max: number; step: number; unit: string; onChange: (v: number) => void }) {
-  const id = useId()
-  return (
-    <div className="learn-slider">
-      <label htmlFor={id}>{label}</label>
-      <input id={id} type="range" min={min} max={max} step={step} value={value} aria-valuetext={`${value} ${unit}`} onChange={(e) => onChange(Number(e.target.value))} />
-      <output htmlFor={id}>
-        {value} {unit}
-      </output>
-    </div>
-  )
-}
-
-function Choice<T extends string | number>({ legend, options, value, onChange }: { legend: string; options: readonly { id: T; label: string }[]; value: T; onChange: (v: T) => void }) {
-  const name = useId()
-  return (
-    <fieldset className="learn-choice">
-      <legend>{legend}</legend>
-      {options.map((o) => (
-        <label key={String(o.id)}>
-          <input type="radio" name={name} value={String(o.id)} checked={value === o.id} onChange={() => onChange(o.id)} />
-          {o.label}
-        </label>
-      ))}
-    </fieldset>
-  )
-}
 
 /**
  * A rod hanging from a support with a load block: width to a fixed scale, length `lengthPx` (not to

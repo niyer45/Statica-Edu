@@ -294,9 +294,9 @@ describe('column display helpers and technical art', () => {
     expect(pts[20]![0]).toBeCloseTo(0.18, 12)
   })
 
-  it('TechnicalArt draws the column (FIG. 07) with its dashed mode shape and a load arrow', () => {
+  it('TechnicalArt draws the column (FIG. 03) with its dashed mode shape and a load arrow', () => {
     const { container } = render(<TechnicalArt kind="column" />)
-    expect(container.textContent).toContain('FIG. 07')
+    expect(container.textContent).toContain('FIG. 03')
     expect(container.querySelectorAll('polyline[stroke-dasharray]')).toHaveLength(1)
     expect(container.querySelectorAll('path.art-accent')).toHaveLength(1)
     expect(container.querySelectorAll('polygon').length).toBeGreaterThan(50)

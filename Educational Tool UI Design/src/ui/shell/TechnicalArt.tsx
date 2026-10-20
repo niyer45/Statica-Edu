@@ -1,4 +1,8 @@
 import { memo, useId } from "react"
+import { catalog } from "../../challenge/catalog"
+
+/** Figure number = the library number of the challenge drawn with this art (e.g. "01"). */
+const FIGURE: Readonly<Record<string, string>> = Object.fromEntries(catalog.map((e) => [e.art, e.id.slice(-2)]))
 
 type Point = [number, number, number]
 type Face = { points: Point[]; shade: number; neutral: boolean; depth: number; layer: number }
@@ -36,7 +40,7 @@ function TechnicalArt({kind,large=false}:{kind:string;large?:boolean}) {
     {kind==="vessel"&&<g className="art-accent" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">{pressure.map(({from,to,angle},i)=><g key={i}><path d={`M${from.join(" ")}L${to.join(" ")}`}/><path d="m-4.5-3 4.5 3-4.5 3" transform={`translate(${to.join(" ")}) rotate(${angle})`}/></g>)}</g>}
     {kind==="thermal"&&<g className="art-accent" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">{heatOrigins.map(([x,y],i)=><path key={i} d={`M${x} ${y}q-4-7 0-14t0-14m-3 4 3-4 3 4`}/>)}</g>}
     </g>
-    <g fill="currentColor" opacity=".5" fontFamily="monospace" fontSize="7"><text x="18" y="166">FIG. {({beam:"01",bracket:"02",shaft:"03",thermal:"04",frame:"05",spring:"06",vessel:"08",fatigue:"09",rod:"10",column:"07"} as Record<string,string>)[kind]||"06"}</text><text x="342" y="166" textAnchor="end">STATICA LAB</text></g>
+    <g fill="currentColor" opacity=".5" fontFamily="monospace" fontSize="7"><text x="18" y="166">FIG. {FIGURE[kind] ?? "00"}</text><text x="342" y="166" textAnchor="end">STATICA LAB</text></g>
   </svg>
 }
 

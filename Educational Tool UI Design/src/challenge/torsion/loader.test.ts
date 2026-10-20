@@ -100,7 +100,7 @@ describe('loadTorsionChallenge: bundled-format config', () => {
 
   it('is bundled and linked from catalog card 003 since owner-approved activation (task 47.3, TSH-16)', () => {
     expect(Object.keys(BUNDLED_CHALLENGE_JSON)).toContain('torsion-shaft-1')
-    expect(catalog.find((e) => e.id === '003')).toMatchObject({ available: true, challengeId: 'torsion-shaft-1' })
+    expect(catalog.find((e) => e.id === '002')).toMatchObject({ available: true, challengeId: 'torsion-shaft-1' })
   })
 
   it('is not a beam config, and the beam config is not a torsion config (MM-02)', () => {

@@ -9,7 +9,7 @@ import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers
 // Pixel 7. Guided exercises the lazy 3D scene and keyboard entry; Parametric hides WebGL2 to
 // exercise the 2D fallback.
 
-test.skip(!catalog.find((e) => e.id === '009')?.available, 'Fatigue Analysis I is not available')
+test.skip(!catalog.find((e) => e.id === '010')?.available, 'Fatigue Analysis I is not available')
 
 async function openFatigue(page: Page, mode: 'Guided' | 'Parametric', keyboard: boolean) {
   const view = page.getByRole('button', { name: 'View Fatigue Analysis I', exact: true })
@@ -171,7 +171,7 @@ test('Fatigue Analysis I: the library card is available with its own drawing and
   await expect(card).toHaveCount(1)
   await expect(card.getByText('Advanced')).toBeVisible()
   await expect(card.locator('svg.technical-art')).toHaveCount(1)
-  await expect(card.getByText('FIG. 09')).toBeAttached()
+  await expect(card.getByText('FIG. 10')).toBeAttached()
   await page.getByRole('button', { name: 'View Fatigue Analysis I', exact: true }).click()
   const drawer = page.getByRole('dialog', { name: 'Fatigue Analysis I', exact: true })
   await expect(drawer.getByText(/stress-life fatigue model of a stepped spindle/)).toBeVisible()

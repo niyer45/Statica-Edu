@@ -9,7 +9,7 @@ import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers
 // overflow, on desktop and Pixel 7. Guided walks the five experiments; Parametric is open design
 // and exercises the 2D fallback.
 
-test.skip(!catalog.find((e) => e.id === '008')?.available, 'Pressure Vessel I is not active')
+test.skip(!catalog.find((e) => e.id === '007')?.available, 'Pressure Vessel I is not active')
 
 async function openVessel(page: Page, mode: 'Guided' | 'Parametric', keyboard: boolean) {
   const view = page.getByRole('button', { name: 'View Pressure Vessel I', exact: true })
@@ -57,7 +57,7 @@ test('Pressure Vessel I card is available in the library with its own drawing', 
   const card = page.locator('.challenge-card').filter({ hasText: 'Pressure Vessel I' })
   await expect(card).toHaveCount(1)
   await expect(card).toHaveClass(/theme-vessel/)
-  await expect(card.getByText('FIG. 08')).toBeVisible()
+  await expect(card.getByText('FIG. 07')).toBeVisible()
   await expect(card.getByText('Intermediate')).toBeVisible()
   await expect(card.getByText('Concept preview')).toHaveCount(0)
 })

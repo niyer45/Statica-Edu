@@ -57,7 +57,7 @@ afterEach(cleanup)
 describe('Vibration Isolation I workbench', () => {
   it('is registered in the production model UI registry and linked from catalog card 006 (owner-approved activation)', () => {
     expect(modelUiFor(ch.model)).toBe(vibrationUi)
-    expect(catalog.find((e) => e.id === '006')).toMatchObject({ available: true, challengeId: 'vibration-isolation-1' })
+    expect(catalog.find((e) => e.id === '009')).toMatchObject({ available: true, challengeId: 'vibration-isolation-1' })
   })
 
   it('shows the baseline resonance failures with vibration wording and no beam or torsion wording', () => {

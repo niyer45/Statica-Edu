@@ -8,7 +8,7 @@ import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers
 // isolated from Cantilever Beam I, keyboard-reachable, axe-clean and free of 320 px overflow, on
 // desktop and Pixel 7. Guided exercises the 3D view; Parametric hides WebGL2 for the 2D fallback.
 
-test.skip(!catalog.find((e) => e.id === '007')?.available, 'Column Buckling I is not available')
+test.skip(!catalog.find((e) => e.id === '003')?.available, 'Column Buckling I is not available')
 
 async function openColumn(page: Page, mode: 'Guided' | 'Parametric', keyboard: boolean) {
   const view = page.getByRole('button', { name: 'View Column Buckling I', exact: true })

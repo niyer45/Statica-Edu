@@ -1,4 +1,4 @@
-import { useId, useState, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { sectionOutline } from '../../../geometry/outline'
 import type { Vec2 } from '../../../geometry/sections'
 import {
@@ -17,6 +17,7 @@ import {
   type DemoMaterial,
   type DemoSection,
 } from '../../../learn/beamDemo'
+import { Choice, DemoNote, Readout, Slider } from './controls'
 import type { BeamDemoKind } from '../../../learn/types'
 
 // Beam bending demonstrations (task 67; LRN-04, LRN-05, LRN-09). Every
@@ -32,19 +33,6 @@ const mm2 = (m2: number) => `${Math.round(m2 * 1e6).toLocaleString('en-US')} mmÂ
 /** Pixel height that the demo's largest possible deflection is drawn at. */
 const MAX_DROP_PX = 70
 const ORIGIN = { x: 34, y: 52 }
-
-export function Readout({ rows }: { rows: readonly [string, string][] }) {
-  return (
-    <dl className="learn-readout">
-      {rows.map(([k, v]) => (
-        <div key={k}>
-          <dt>{k}</dt>
-          <dd>{v}</dd>
-        </div>
-      ))}
-    </dl>
-  )
-}
 
 /** Side view of the cantilever: wall, unloaded outline, exaggerated deflected shape and tip load. */
 function CantileverDiagram({ input, kind, pxPerM, arrowScale = 1, children }: { input: CantileverInput; kind: BeamDemoKind; pxPerM: number; arrowScale?: number; children?: ReactNode }) {
@@ -63,34 +51,6 @@ function CantileverDiagram({ input, kind, pxPerM, arrowScale = 1, children }: { 
       <polyline points={points.map((p) => p.join(',')).join(' ')} className="learn-beam" />
       <path d={`M${tipX} ${tipY - 7 - arrow}V${tipY - 7}m-5-7 5 7 5-7`} className="learn-load" />
     </svg>
-  )
-}
-
-export function Slider({ label, value, min, max, step, unit, onChange }: { label: string; value: number; min: number; max: number; step: number; unit: string; onChange: (v: number) => void }) {
-  const id = useId()
-  return (
-    <div className="learn-slider">
-      <label htmlFor={id}>{label}</label>
-      <input id={id} type="range" min={min} max={max} step={step} value={value} aria-valuetext={`${value} ${unit}`} onChange={(e) => onChange(Number(e.target.value))} />
-      <output htmlFor={id}>
-        {value} {unit}
-      </output>
-    </div>
-  )
-}
-
-export function Choice<T extends string>({ legend, options, value, onChange }: { legend: string; options: readonly { id: T; label: string }[]; value: T; onChange: (v: T) => void }) {
-  const name = useId()
-  return (
-    <fieldset className="learn-choice">
-      <legend>{legend}</legend>
-      {options.map((o) => (
-        <label key={o.id}>
-          <input type="radio" name={name} value={o.id} checked={value === o.id} onChange={() => onChange(o.id)} />
-          {o.label}
-        </label>
-      ))}
-    </fieldset>
   )
 }
 
@@ -213,6 +173,3 @@ export const BEAM_DEMOS: Readonly<Record<BeamDemoKind, () => ReactNode>> = {
   stress: () => <><StressDemo /><DemoNote text={NOTE} /></>,
 }
 
-export function DemoNote({ text }: { text: string }) {
-  return <p className="learn-demo-note">{text}</p>
-}

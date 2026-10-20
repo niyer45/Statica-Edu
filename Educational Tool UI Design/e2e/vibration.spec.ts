@@ -8,7 +8,7 @@ import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers
 // The whole file is skipped while catalog card 006 is unavailable: activation needs explicit owner
 // approval, and this spec becomes the browser gate once it is given.
 
-test.skip(!catalog.find((e) => e.id === '006')?.available, 'Vibration Isolation I awaits owner-approved activation')
+test.skip(!catalog.find((e) => e.id === '009')?.available, 'Vibration Isolation I awaits owner-approved activation')
 
 async function openVibration(page: Page, mode: 'Guided' | 'Parametric', keyboard: boolean) {
   const view = page.getByRole('button', { name: 'View Vibration Isolation I', exact: true })

@@ -41,6 +41,8 @@ export const DISCIPLINES: readonly Discipline[] = deepFreeze([
   'Dynamics',
 ])
 
+// Ordered by difficulty (owner, 2026-10-19): introductory, then intermediate, then advanced; within a
+// level, the order the challenges were added. Library numbers follow this order.
 export const catalog: readonly CatalogEntry[] = deepFreeze<CatalogEntry[]>([
   {
     id: '001',
@@ -56,18 +58,6 @@ export const catalog: readonly CatalogEntry[] = deepFreeze<CatalogEntry[]>([
   },
   {
     id: '002',
-    title: 'Mounting Bracket I',
-    description: 'Rethink a mounting bracket that carries more stress than it should.',
-    discipline: 'Structures',
-    difficulty: 'intermediate',
-    time: '25–35 min',
-    concepts: ['Load paths', 'Stress concentrations'],
-    available: true,
-    challengeId: 'mounting-bracket-1',
-    art: 'bracket',
-  },
-  {
-    id: '003',
     title: 'Torsion Shaft I',
     description: 'Make a drive shaft twist less while weighing less.',
     discipline: 'Mechanics',
@@ -80,7 +70,45 @@ export const catalog: readonly CatalogEntry[] = deepFreeze<CatalogEntry[]>([
     art: 'shaft',
   },
   {
+    // Task 68: requested by the owner on 2026-10-19 ("Buckling Challenge (Introductory)"), D-58.
+    id: '003',
+    title: 'Column Buckling I',
+    description: 'Keep a slender column from buckling without making it heavy.',
+    discipline: 'Structures',
+    difficulty: 'introductory',
+    time: '15–20 min',
+    concepts: ['Buckling', 'Section properties'],
+    available: true,
+    challengeId: 'column-buckling-1',
+    art: 'column',
+  },
+  // Task 72 (D-62): owner-requested activation, 2026-10-19.
+  {
     id: '004',
+    title: 'Stress and Strain I',
+    description: 'Choose a diameter and a material so a hanger rod is strong, stiff and light enough.',
+    discipline: 'Mechanics',
+    difficulty: 'introductory',
+    time: '10–15 min',
+    concepts: ['Stress and strain', 'Material properties'],
+    available: true,
+    challengeId: 'stress-strain-1',
+    art: 'rod',
+  },
+  {
+    id: '005',
+    title: 'Mounting Bracket I',
+    description: 'Rethink a mounting bracket that carries more stress than it should.',
+    discipline: 'Structures',
+    difficulty: 'intermediate',
+    time: '25–35 min',
+    concepts: ['Load paths', 'Stress concentrations'],
+    available: true,
+    challengeId: 'mounting-bracket-1',
+    art: 'bracket',
+  },
+  {
+    id: '006',
     title: 'Heat Sink I',
     description: 'Explore how geometry helps a compact heat sink move heat away.',
     discipline: 'Thermal',
@@ -92,7 +120,20 @@ export const catalog: readonly CatalogEntry[] = deepFreeze<CatalogEntry[]>([
     art: 'thermal',
   },
   {
-    id: '005',
+    // Task 69, owner-requested activation 2026-10-19 (D-59).
+    id: '007',
+    title: 'Pressure Vessel I',
+    description: 'Size the shell and heads of a steel air receiver to hold its pressure safely without wasting steel.',
+    discipline: 'Structures',
+    difficulty: 'intermediate',
+    time: '25–35 min',
+    concepts: ['Thin-walled vessels', 'Hoop stress'],
+    available: true,
+    challengeId: 'pressure-vessel-1',
+    art: 'vessel',
+  },
+  {
+    id: '008',
     title: 'Braced Frame I',
     description: 'Follow the forces through a frame and strengthen what matters.',
     discipline: 'Structures',
@@ -104,7 +145,7 @@ export const catalog: readonly CatalogEntry[] = deepFreeze<CatalogEntry[]>([
     art: 'frame',
   },
   {
-    id: '006',
+    id: '009',
     title: 'Vibration Isolation I',
     description: 'Tune a component to keep unwanted vibration out of its operating range.',
     discipline: 'Dynamics',
@@ -115,35 +156,9 @@ export const catalog: readonly CatalogEntry[] = deepFreeze<CatalogEntry[]>([
     challengeId: 'vibration-isolation-1',
     art: 'spring',
   },
-  {
-    // Task 68: requested by the owner on 2026-10-19 ("Buckling Challenge (Introductory)"), D-58.
-    id: '007',
-    title: 'Column Buckling I',
-    description: 'Keep a slender column from buckling without making it heavy.',
-    discipline: 'Structures',
-    difficulty: 'introductory',
-    time: '15–20 min',
-    concepts: ['Buckling', 'Section properties'],
-    available: true,
-    challengeId: 'column-buckling-1',
-    art: 'column',
-  },
-  {
-    // Task 69, owner-requested activation 2026-10-19 (D-59).
-    id: '008',
-    title: 'Pressure Vessel I',
-    description: 'Size the shell and heads of a steel air receiver to hold its pressure safely without wasting steel.',
-    discipline: 'Structures',
-    difficulty: 'intermediate',
-    time: '25–35 min',
-    concepts: ['Thin-walled vessels', 'Hoop stress'],
-    available: true,
-    challengeId: 'pressure-vessel-1',
-    art: 'vessel',
-  },
   // Task 70: owner-requested on 2026-10-19 ("Fatigue Analysis Challenge (Advanced)"), D-60.
   {
-    id: '009',
+    id: '010',
     title: 'Fatigue Analysis I',
     description: 'Keep a stepped axle spindle alive for its target life under a fluctuating load.',
     discipline: 'Mechanics',
@@ -153,18 +168,5 @@ export const catalog: readonly CatalogEntry[] = deepFreeze<CatalogEntry[]>([
     available: true,
     challengeId: 'fatigue-analysis-1',
     art: 'fatigue',
-  },
-  // Task 72 (D-62): owner-requested activation, 2026-10-19.
-  {
-    id: '010',
-    title: 'Stress and Strain I',
-    description: 'Choose a diameter and a material so a hanger rod is strong, stiff and light enough.',
-    discipline: 'Mechanics',
-    difficulty: 'introductory',
-    time: '10–15 min',
-    concepts: ['Stress and strain', 'Material properties'],
-    available: true,
-    challengeId: 'stress-strain-1',
-    art: 'rod',
   },
 ])

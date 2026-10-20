@@ -78,7 +78,7 @@ describe('loadColumnChallenge: bundled config', () => {
 
   it('is bundled and linked from the available catalog card 007 (MM-06, D-58)', () => {
     expect(BUNDLED_CHALLENGE_JSON['column-buckling-1']).toBe(columnJson)
-    expect(catalog.find((e) => e.id === '007')).toMatchObject({
+    expect(catalog.find((e) => e.id === '003')).toMatchObject({
       title: 'Column Buckling I',
       discipline: 'Structures',
       difficulty: 'introductory',

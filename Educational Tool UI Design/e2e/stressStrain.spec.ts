@@ -8,7 +8,7 @@ import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers
 // Beam I, keyboard-reachable, axe-clean and free of 320 px overflow, on desktop and Pixel 7. Guided
 // walks the three experiments with the 3D view; Parametric hides WebGL2 to use the 2D view.
 
-test.skip(!catalog.find((e) => e.id === '010')?.available, 'Stress and Strain I is not active')
+test.skip(!catalog.find((e) => e.id === '004')?.available, 'Stress and Strain I is not active')
 
 async function openRod(page: Page, mode: 'Guided' | 'Parametric', keyboard: boolean) {
   const view = page.getByRole('button', { name: 'View Stress and Strain I', exact: true })
@@ -170,5 +170,5 @@ test('Stress and Strain I card shows its own rod drawing in the library', async 
   await expect(card).toBeVisible()
   await expect(card.getByText('Introductory')).toBeVisible()
   await expect(card.locator('svg.technical-art')).toHaveCount(1)
-  await expect(card.locator('svg.technical-art text').first()).toHaveText('FIG. 10')
+  await expect(card.locator('svg.technical-art text').first()).toHaveText('FIG. 04')
 })

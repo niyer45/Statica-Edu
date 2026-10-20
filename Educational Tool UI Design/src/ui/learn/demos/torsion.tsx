@@ -14,7 +14,7 @@ import {
 } from '../../../learn/torsionDemo'
 import type { TorsionDemoKind } from '../../../learn/types'
 import { m2ToMm2, m4ToMm4, mToMm, paToMpa, radToDeg } from '../../../units/units'
-import { Choice, DemoNote, Readout, Slider } from './beam'
+import { Choice, DemoNote, Readout, Slider } from './controls'
 import './torsion.css'
 
 // Torsion demonstrations (task 71, D-61; LRN-04, LRN-05, LRN-09). Every value comes from

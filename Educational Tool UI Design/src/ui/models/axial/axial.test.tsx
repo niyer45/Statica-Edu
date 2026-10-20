@@ -76,7 +76,7 @@ afterEach(cleanup)
 describe('Stress and Strain I workbench', () => {
   it('is registered in the production registry and linked from an available Introductory Mechanics card', () => {
     expect(modelUiFor(ch.model)).toBe(axialUi)
-    expect(catalog.find((e) => e.id === '010')).toMatchObject({ available: true, challengeId: 'stress-strain-1', difficulty: 'introductory', discipline: 'Mechanics', art: 'rod' })
+    expect(catalog.find((e) => e.id === '004')).toMatchObject({ available: true, challengeId: 'stress-strain-1', difficulty: 'introductory', discipline: 'Mechanics', art: 'rod' })
   })
 
   it('shows the steel baseline failing stress and mass, passing stretch, with rod wording only', () => {

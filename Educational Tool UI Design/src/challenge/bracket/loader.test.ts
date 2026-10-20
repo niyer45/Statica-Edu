@@ -105,7 +105,7 @@ describe('loadBracketChallenge: bundled-format config', () => {
 
   it('is bundled and linked from catalog card 002 (owner-approved activation), its config never imported by UI code (MM-06, MBR-20)', () => {
     expect(Object.keys(BUNDLED_CHALLENGE_JSON)).toContain('mounting-bracket-1')
-    expect(catalog.find((e) => e.id === '002')).toMatchObject({ available: true, challengeId: 'mounting-bracket-1' })
+    expect(catalog.find((e) => e.id === '005')).toMatchObject({ available: true, challengeId: 'mounting-bracket-1' })
     // Only the bundled registry imports the raw config; the catalog links it by id.
     const bundled = readFileSync(new URL('../bundled.ts', import.meta.url), 'utf8')
     const catalogSource = readFileSync(new URL('../catalog.ts', import.meta.url), 'utf8')

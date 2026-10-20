@@ -9,16 +9,16 @@ afterEach(cleanup)
 
 describe('TechnicalArt vessel', () => {
   it('is the art of the Pressure Vessel I card', () => {
-    expect(catalog.find((e) => e.title === 'Pressure Vessel I')).toMatchObject({ id: '008', art: 'vessel', discipline: 'Structures', difficulty: 'intermediate', available: true })
+    expect(catalog.find((e) => e.title === 'Pressure Vessel I')).toMatchObject({ id: '007', art: 'vessel', discipline: 'Structures', difficulty: 'intermediate', available: true })
   })
 
-  it('draws a closed shell with two heads from camera-facing patches only, labelled FIG. 08', () => {
+  it('draws a closed shell with two heads from camera-facing patches only, labelled FIG. 07', () => {
     const { container } = render(<TechnicalArt kind="vessel" />)
     const polygons = [...container.querySelectorAll('polygon')]
     // Front half of the 32-sided shell plus the visible patches of the two 8 × 32 domes.
     expect(polygons.length).toBeGreaterThan(150)
     expect(polygons.length).toBeLessThan(32 + 2 * 8 * 32)
-    expect(container.textContent).toContain('FIG. 08')
+    expect(container.textContent).toContain('FIG. 07')
     // No point load or torque: the only accent is the internal pressure, five short arrows pointing
     // outward from the shell and the two head poles (owner request 2026-10-19).
     expect(container.querySelector('path.art-accent')).toBeNull()

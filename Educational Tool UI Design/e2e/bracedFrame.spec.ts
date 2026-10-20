@@ -10,7 +10,7 @@ import { audit, expectGuidedStep, readState, tabTo } from './helpers'
 // with WebGL disabled and asserts the SVG elevation fallback with no canvas. The whole file is skipped while catalog card 005 is unavailable: activation needs
 // explicit owner approval (BFR-18, OC-15).
 
-test.skip(!catalog.find((e) => e.id === '005')?.available, 'Braced Frame I awaits owner-approved activation')
+test.skip(!catalog.find((e) => e.id === '008')?.available, 'Braced Frame I awaits owner-approved activation')
 
 async function openFrame(page: Page, mode: 'Guided' | 'Parametric', keyboard: boolean) {
   const view = page.getByRole('button', { name: 'View Braced Frame I', exact: true })

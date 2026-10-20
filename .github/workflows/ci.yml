@@ -8,10 +8,13 @@ permissions:
 concurrency:
   group: statica-${{ github.ref }}
   cancel-in-progress: true
+# Two kinds of job run in parallel (2026-10-19): `verify` (lint, types, unit tests with coverage,
+# build, schema drift) and four `e2e` shards that split the Playwright suite. The run passes only
+# if every job passes, which is what the Pages deploy checks.
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 60 # ten challenges: the full E2E suite alone runs about 30 minutes on the runner (2026-10-19)
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: Educational Tool UI Design
@@ -35,14 +38,38 @@ jobs:
           pnpm run gen:schema
           git diff --exit-code -- schemas/
           test -z "$(git ls-files --others --exclude-standard -- schemas/)"
+
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    defaults:
+      run:
+        working-directory: Educational Tool UI Design
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: Educational Tool UI Design/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
       - name: Responsive regression (desktop and Pixel 7)
+        if: matrix.shard == 1
         run: pnpm exec playwright test e2e/platform.spec.ts --grep "responsive layout"
-      - run: pnpm run e2e
+      - name: Playwright shard ${{ matrix.shard }} of 4
+        run: pnpm exec playwright test --shard=${{ matrix.shard }}/4
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: browser-report
+          name: browser-report-${{ matrix.shard }}
           path: |
             Educational Tool UI Design/playwright-report/
             Educational Tool UI Design/test-results/

@@ -8,7 +8,7 @@ import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers
 // The whole file skips while catalog card 004 is unavailable: activation needs explicit owner
 // approval, and this spec becomes the browser gate the moment the card is made available.
 
-test.skip(!catalog.find((e) => e.id === '004')?.available, 'Heat Sink I awaits owner-approved activation')
+test.skip(!catalog.find((e) => e.id === '006')?.available, 'Heat Sink I awaits owner-approved activation')
 
 async function openHeatSink(page: Page, mode: 'Guided' | 'Parametric', keyboard: boolean) {
   const view = page.getByRole('button', { name: 'View Heat Sink I', exact: true })

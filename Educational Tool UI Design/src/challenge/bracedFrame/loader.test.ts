@@ -104,7 +104,7 @@ describe('loadBracedFrameChallenge: bundled-format config', () => {
 
   it('is bundled and linked from catalog card 005 (owner-approved activation); only the bundled registry imports the raw config (MM-06, BFR-18)', () => {
     expect(Object.keys(BUNDLED_CHALLENGE_JSON)).toContain('braced-frame-1')
-    expect(catalog.find((e) => e.id === '005')).toMatchObject({ available: true, challengeId: 'braced-frame-1' })
+    expect(catalog.find((e) => e.id === '008')).toMatchObject({ available: true, challengeId: 'braced-frame-1' })
     const src = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
     const runtime: string[] = []
     const walk = (dir: string) => {

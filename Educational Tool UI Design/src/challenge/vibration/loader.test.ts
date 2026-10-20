@@ -100,7 +100,7 @@ describe('loadVibrationChallenge: bundled-format config', () => {
 
   it('is bundled and linked from catalog card 006 since owner-approved activation (task 50.3, VIB-16)', () => {
     expect(Object.keys(BUNDLED_CHALLENGE_JSON)).toContain('vibration-isolation-1')
-    expect(catalog.find((e) => e.title === 'Vibration Isolation I')).toMatchObject({ id: '006', available: true, challengeId: 'vibration-isolation-1' })
+    expect(catalog.find((e) => e.title === 'Vibration Isolation I')).toMatchObject({ id: '009', available: true, challengeId: 'vibration-isolation-1' })
   })
 
   it('is neither a beam nor a torsion config, and neither of those loads as vibration (MM-02)', () => {

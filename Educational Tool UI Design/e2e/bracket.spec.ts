@@ -7,7 +7,7 @@ import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers
 // Accepted internal reference, saved under its own version-2 key, isolated from Cantilever Beam I,
 // keyboard-reachable, axe-clean and free of 320 px overflow, on desktop and Pixel 7.
 
-test.skip(!catalog.find((e) => e.id === '002')?.available, 'Mounting Bracket I awaits owner-approved activation')
+test.skip(!catalog.find((e) => e.id === '005')?.available, 'Mounting Bracket I awaits owner-approved activation')
 
 async function openBracket(page: Page, mode: 'Guided' | 'Parametric', keyboard: boolean) {
   const view = page.getByRole('button', { name: 'View Mounting Bracket I', exact: true })

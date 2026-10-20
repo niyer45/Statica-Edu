@@ -100,8 +100,8 @@ describe('PlatformShell', () => {
 
   it('filters the catalog', () => {
     expect(filterCatalog(catalog, { ...DEFAULT_FILTERS, discipline: 'Thermal' }, [])).toHaveLength(1)
-    expect(filterCatalog(catalog, { ...DEFAULT_FILTERS, search: 'TORSION' }, []).map((c) => c.id)).toEqual(['003'])
-    expect(filterCatalog(catalog, { ...DEFAULT_FILTERS, view: 'Saved' }, ['005']).map((c) => c.id)).toEqual(['005'])
+    expect(filterCatalog(catalog, { ...DEFAULT_FILTERS, search: 'TORSION' }, []).map((c) => c.id)).toEqual(['002'])
+    expect(filterCatalog(catalog, { ...DEFAULT_FILTERS, view: 'Saved' }, ['008']).map((c) => c.id)).toEqual(['008'])
   })
 })
 
@@ -153,7 +153,7 @@ describe('platform shell component suite (13.6)', () => {
     renderShell()
     fireEvent.click(screen.getByRole('button', { name: 'Save Torsion Shaft I' }))
     fireEvent.click(screen.getByRole('button', { name: 'Mechanics' }))
-    expect(cards()).toEqual(['View Cantilever Beam I', 'View Torsion Shaft I', 'View Fatigue Analysis I', 'View Stress and Strain I'])
+    expect(cards()).toEqual(['View Cantilever Beam I', 'View Torsion Shaft I', 'View Stress and Strain I', 'View Fatigue Analysis I'])
     fireEvent.change(screen.getByLabelText('Filter difficulty'), { target: { value: 'intermediate' } })
     expect(cards()).toEqual([])
     // Torsion Shaft I is introductory since task 71 (D-61); Stress and Strain I is introductory (task 72).
