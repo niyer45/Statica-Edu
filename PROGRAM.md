@@ -72,7 +72,7 @@ Three tiers, defined in `.claude/agents/`. Nesting depth is capped at two below 
 
 | Tier | Agent | Model | Does | Spawns |
 | --- | --- | --- | --- | --- |
-| Director | `director` | Fable | Plans, briefs, reviews numbers, integrates, pushes, watches CI, reports to the owner. Writes no feature code. | Opus developers |
+| Director | `director` | Fable | Plans, briefs, reviews numbers, integrates, pushes, watches CI, reports to the owner. Executes nothing process-heavy itself; never spawns Fable. | Opus developers |
 | Developer | `challenge-developer` | Opus | One design challenge end to end, in its own worktree. | Sonnet specialists |
 | Developer | `learn-developer` | Opus | One Learn module end to end, in its own worktree. | Sonnet specialists |
 | Developer | `platform-engineer` | Opus | Shell, accounts, persistence, CI, deploy, cleanup, teacher features. | Sonnet specialists |
@@ -97,7 +97,7 @@ That runs the main session on Fable with the director's prompt. A plain `claude`
 
 ### Delegation rules
 
-1. The director delegates everything that produces code. It reviews, integrates and records.
+1. The director is an orchestrator only. It delegates everything process-heavy: code, specs, worksheets, document rewrites, test runs and reviews. Sonnet specialists take bulk and mechanical work; Opus developers take deep logic, debugging, architecture and review. The director never spawns another Fable agent (no fork). It briefs, checks hand-backs, integrates, pushes and records.
 2. A developer's brief states the task number, the goal, the files, the rules that apply, the definition of done and what the owner must approve. Developers refuse to start without a spec when the task is a model.
 3. Developers delegate narrow, well-specified pieces (a worksheet, a test file, a component, an E2E run) and keep the design decisions. They do not delegate "build the challenge".
 4. At most three developers run browser tests at the same time. Five parallel agents pushed the load average above 100 and Playwright timed out; everything passed on serial reruns.
