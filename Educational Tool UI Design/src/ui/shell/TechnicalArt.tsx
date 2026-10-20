@@ -17,7 +17,7 @@ function TechnicalArt({kind,large=false}:{kind:string;large?:boolean}) {
   const id = useId().replace(/:/g,"")
   let art = built.get(kind)
   if(!art){art=build(kind);built.set(kind,art)}
-  const {polygons,transform,tip,torque,torqueEnd,torqueAngle,heatOrigins,mode} = art
+  const {polygons,transform,tip,torque,torqueEnd,torqueAngle,heatOrigins,mode,pressure} = art
   return <svg className={`technical-art ${large?"large":""}`} viewBox="0 0 360 180" fill="none" aria-hidden="true">
     <defs>
       <pattern id={`${id}-grid`} width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".6" fill="currentColor" opacity=".15"/></pattern>
@@ -33,6 +33,7 @@ function TechnicalArt({kind,large=false}:{kind:string;large?:boolean}) {
     {kind==="shaft"&&<g className="art-accent" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points={torque.map(p=>p.join(",")).join(" ")}/><path d="m-6-4 6 4-6 4" transform={`translate(${torqueEnd.join(" ")}) rotate(${torqueAngle})`}/></g>}
     {kind==="fatigue"&&tip&&<path d={`M${tip[0]+9} ${tip[1]-19}q2.5-5 5 0t5 0t5 0`} className="art-accent" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>}
     {kind==="column"&&<polyline points={mode.map(p=>p.join(",")).join(" ")} className="art-accent" strokeWidth="1.2" strokeDasharray="3 2.5" strokeLinecap="round"/>}
+    {kind==="vessel"&&<g className="art-accent" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">{pressure.map(({from,to,angle},i)=><g key={i}><path d={`M${from.join(" ")}L${to.join(" ")}`}/><path d="m-4.5-3 4.5 3-4.5 3" transform={`translate(${to.join(" ")}) rotate(${angle})`}/></g>)}</g>}
     {kind==="thermal"&&<g className="art-accent" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">{heatOrigins.map(([x,y],i)=><path key={i} d={`M${x} ${y}q-4-7 0-14t0-14m-3 4 3-4 3 4`}/>)}</g>}
     </g>
     <g fill="currentColor" opacity=".5" fontFamily="monospace" fontSize="7"><text x="18" y="166">FIG. {({beam:"01",bracket:"02",shaft:"03",thermal:"04",frame:"05",spring:"06",vessel:"08",fatigue:"09",rod:"10",column:"07"} as Record<string,string>)[kind]||"06"}</text><text x="342" y="166" textAnchor="end">STATICA LAB</text></g>
@@ -251,11 +252,18 @@ function build(kind:string) {
     const angle=-Math.PI*.65+i/36*Math.PI*1.65
     return project([115,44+28*Math.cos(angle),28*Math.sin(angle)])
   })
+  // Pressure Vessel I: short arrows just off the shell and the head poles, pointing outward, for
+  // the internal pressure pushing on the walls (owner request 2026-10-19).
+  const pressure = ([[-24,83,0,0,1],[0,83,0,0,1],[24,83,0,0,1],[-75,46,0,-1,0],[75,46,0,1,0]] as const).map(([x,y,z,dx,dy])=>{
+    const from=project([x,y,z]), to=project([x+dx*14,y+dy*14,z])
+    return {from,to,angle:Math.atan2(to[1]-from[1],to[0]-from[0])*180/Math.PI}
+  })
   const projected = faces.flatMap(f=>f.points.map(project))
   if(tip)projected.push(tip,[tip[0],tip[1]-30])
   if(kind==="thermal")for(const p of heatOrigins)projected.push([p[0],p[1]-28])
   if(kind==="shaft")projected.push(...torque)
   if(kind==="column")projected.push(...mode)
+  if(kind==="vessel")for(const a of pressure)projected.push(a.to)
   const minX=Math.min(...projected.map(p=>p[0])),maxX=Math.max(...projected.map(p=>p[0]))
   const minY=Math.min(...projected.map(p=>p[1])),maxY=Math.max(...projected.map(p=>p[1]))
   // Fit every complete system (including loads) inside the same padded art area.
@@ -268,5 +276,5 @@ function build(kind:string) {
     fill:f.neutral?`color-mix(in srgb, #7d877b ${f.shade}%, #f4f5ef)`:`color-mix(in srgb, currentColor ${f.shade}%, #f7f9f2)`,
     stroke:f.neutral?"#929c8b":"currentColor",
   }))
-  return {polygons,transform,tip,torque,torqueEnd,torqueAngle,heatOrigins,mode}
+  return {polygons,transform,tip,torque,torqueEnd,torqueAngle,heatOrigins,mode,pressure}
 }

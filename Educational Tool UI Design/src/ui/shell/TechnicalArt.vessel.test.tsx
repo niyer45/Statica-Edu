@@ -19,9 +19,12 @@ describe('TechnicalArt vessel', () => {
     expect(polygons.length).toBeGreaterThan(150)
     expect(polygons.length).toBeLessThan(32 + 2 * 8 * 32)
     expect(container.textContent).toContain('FIG. 08')
-    // No load arrow or torque accent: the vessel is loaded by internal pressure only.
+    // No point load or torque: the only accent is the internal pressure, five short arrows pointing
+    // outward from the shell and the two head poles (owner request 2026-10-19).
     expect(container.querySelector('path.art-accent')).toBeNull()
-    expect(container.querySelector('g.art-accent')).toBeNull()
+    const accents = container.querySelectorAll('g.art-accent')
+    expect(accents).toHaveLength(1)
+    expect(accents[0]!.querySelectorAll(':scope > g')).toHaveLength(5)
     const other = render(<TechnicalArt kind="bracket" />).container
     expect(other.querySelectorAll('polygon').length).not.toBe(polygons.length)
   })

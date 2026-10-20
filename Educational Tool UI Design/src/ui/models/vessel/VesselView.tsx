@@ -17,7 +17,7 @@ const VesselScene3D = lazy(() => import('./VesselScene3D'))
 export const VESSEL_FALLBACK_NOTICE = '3D view is unavailable. Showing the 2D section of the vessel instead.'
 
 /** Caption of the 2D section: what is to scale and what is exaggerated. */
-export const ELEVATION_CAPTION = `Section along the axis. Lengths and the inner diameter are to scale; wall thicknesses are drawn ${WALL_EXAGGERATION} times thicker so both walls stay visible.`
+export const ELEVATION_CAPTION = `Section along the axis. Lengths and the inner diameter are to scale; wall thicknesses are drawn ${WALL_EXAGGERATION} times thicker so both walls stay visible. Arrows show the internal pressure pushing outward on the walls.`
 
 function VesselFallback({ onUnavailable }: ViewportProps) {
   const announced = useRef(false)

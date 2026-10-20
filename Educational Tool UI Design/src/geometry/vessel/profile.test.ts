@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { vessel } from '../../../test/fixtures/vessel'
-import { vesselHalfExtentM, vesselProfile, vesselWallSection, VESSEL_ARC_SEGMENTS } from './profile'
+import { vesselHalfExtentM, vesselPressureStations, vesselProfile, vesselWallSection, VESSEL_ARC_SEGMENTS } from './profile'
 
 // Pressure vessel display profile (task 69; PVS-12, PVS-15): the drawn shape is the modeled shape.
 
@@ -42,5 +42,36 @@ describe('vesselProfile', () => {
     const section = vesselWallSection(d, 4)
     const p = vesselProfile(d, 4)
     expect(section).toEqual([...p.outer, ...[...p.inner].reverse()])
+  })
+})
+
+describe('vesselPressureStations (internal-pressure arrows)', () => {
+  it('puts every station on the inner surface with a unit normal pointing out of the cavity', () => {
+    for (const [D, L] of [[0.24, 1.2], [0.4, 0.53], [0.5, 0.1], [0.2, 1.2]] as const) {
+      const r = D / 2
+      const half = L / 2
+      const stations = vesselPressureStations({ innerDiameterM: D, shellLengthM: L })
+      for (const { point, normal } of stations) {
+        expect(Math.hypot(normal.x, normal.y)).toBeCloseTo(1, 12)
+        // On the shell (|x| <= L/2) the surface is at y = r; on a head it is r from the head centre.
+        const centre = Math.abs(point.x) <= half + 1e-12 ? { x: point.x, y: 0 } : { x: Math.sign(point.x) * half, y: 0 }
+        expect(Math.hypot(point.x - centre.x, point.y - centre.y)).toBeCloseTo(r, 12)
+        // Outward: a small step along the normal moves away from the centre line or head centre.
+        const step = { x: point.x + 1e-3 * normal.x, y: point.y + 1e-3 * normal.y }
+        expect(Math.hypot(step.x - centre.x, step.y - centre.y)).toBeGreaterThan(r)
+      }
+      const xs = stations.map((s) => s.point.x)
+      expect([...xs].sort((a, b) => a - b)).toEqual(xs)
+    }
+  })
+
+  it('scales the shell stations with length (1 to 5) and always marks both heads', () => {
+    const shellCount = (D: number, L: number) => vesselPressureStations({ innerDiameterM: D, shellLengthM: L }).filter((s) => s.normal.x === 0).length
+    expect(shellCount(0.5, 0.1)).toBe(1)
+    expect(shellCount(0.4, 0.53)).toBe(3)
+    expect(shellCount(0.2, 1.2)).toBe(5)
+    const ends = vesselPressureStations({ innerDiameterM: 0.4, shellLengthM: 0.53 })
+    expect(ends[0]!.normal).toEqual({ x: -1, y: 0 })
+    expect(ends[ends.length - 1]!.normal).toEqual({ x: 1, y: 0 })
   })
 })

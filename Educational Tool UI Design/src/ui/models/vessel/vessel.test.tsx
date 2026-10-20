@@ -10,6 +10,7 @@ import Workbench from '../../workbench/Workbench'
 import { modelUiFor } from '../registry'
 import { vesselUi, VESSEL_LIMITS_NOTICE } from '.'
 import { ELEVATION_LABEL, WALL_EXAGGERATION } from './VesselElevation'
+import { vesselPressureStations } from '../../../geometry/vessel/profile'
 import { ELEVATION_CAPTION, VESSEL_FALLBACK_NOTICE } from './VesselView'
 import { formatLimit, formatVessel } from './shared'
 
@@ -114,6 +115,10 @@ describe('Pressure Vessel I workbench', () => {
     expect(svg.querySelectorAll('polygon.vessel-wall')).toHaveLength(2)
     expect(svg.querySelectorAll('polygon.vessel-cavity')).toHaveLength(1)
     expect(svg.querySelectorAll('line.vessel-axis')).toHaveLength(1)
+    // Internal-pressure arrows (owner request 2026-10-19): one per station on the upper half and its
+    // mirror below, the two poles on the axis drawn once.
+    const stations = vesselPressureStations(ch.initialDesign)
+    expect(svg.querySelectorAll('.vessel-pressure path')).toHaveLength(2 * stations.length - 2)
     expect(svg.querySelectorAll('text')).toHaveLength(0)
     expect(WALL_EXAGGERATION).toBeGreaterThan(1)
     const before = svg.querySelector('polygon.vessel-wall')!.getAttribute('points')

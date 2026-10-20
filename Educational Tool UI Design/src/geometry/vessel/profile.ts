@@ -56,3 +56,31 @@ export function vesselWallSection(d: Pick<VesselDesign, 'innerDiameterM' | 'shel
 export function vesselHalfExtentM(d: Pick<VesselDesign, 'innerDiameterM' | 'shellLengthM' | 'headThicknessM'>): number {
   return d.shellLengthM / 2 + d.innerDiameterM / 2 + d.headThicknessM
 }
+
+/** A point on the inner surface and the outward unit normal there (display only). */
+export interface PressureStation {
+  point: ProfilePoint
+  normal: ProfilePoint
+}
+
+/**
+ * Where the views draw internal-pressure arrows (owner request 2026-10-19): points on the inner
+ * surface of the upper half-section with the outward normal, along which pressure pushes on the
+ * wall. The shell gets one station per inner radius of length (1 to 5, evenly spaced, normal
+ * straight out); each head gets stations at its pole and at 45°, with the normal pointing away
+ * from the head's centre. Ordered left to right.
+ */
+export function vesselPressureStations(d: Pick<VesselDesign, 'innerDiameterM' | 'shellLengthM'>): PressureStation[] {
+  const r = d.innerDiameterM / 2
+  const half = d.shellLengthM / 2
+  const head = (sign: 1 | -1, angle: number): PressureStation => ({
+    point: { x: sign * (half + r * Math.cos(angle)), y: r * Math.sin(angle) },
+    normal: { x: sign * Math.cos(angle), y: Math.sin(angle) },
+  })
+  const count = Math.min(5, Math.max(1, Math.round(d.shellLengthM / r)))
+  const shell = Array.from({ length: count }, (_, i): PressureStation => ({
+    point: { x: -half + (d.shellLengthM * (i + 0.5)) / count, y: r },
+    normal: { x: 0, y: 1 },
+  }))
+  return [head(-1, 0), head(-1, Math.PI / 4), ...shell, head(1, Math.PI / 4), head(1, 0)]
+}
