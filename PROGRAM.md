@@ -68,16 +68,16 @@ Keep CI near 10 minutes; remove dead worktrees and branches (never uncommitted w
 
 ## 3. The agent hierarchy
 
-Three tiers, defined in `.claude/agents/`. Nesting depth is capped at two below the main session by `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=2` in `.claude/settings.json`; Sonnet specialists have no `Agent` tool, so they are leaves.
+Three tiers, defined in `.claude/agents/`. Nesting depth is capped at two below the main session by `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=2` in `.claude/settings.json`; Sonnet specialists have no `Agent` tool, so they are leaves. Opus agents think and supervise: they decompose, brief Sonnet specialists, and verify the result; they do not do the hands-on work and never spawn Opus or Fable agents. The director never spawns Fable agents.
 
 | Tier | Agent | Model | Does | Spawns |
 | --- | --- | --- | --- | --- |
 | Director | `director` | Fable | Plans, briefs, reviews numbers, integrates, pushes, watches CI, reports to the owner. Executes nothing process-heavy itself; never spawns Fable. | Opus developers |
-| Developer | `challenge-developer` | Opus | One design challenge end to end, in its own worktree. | Sonnet specialists |
-| Developer | `learn-developer` | Opus | One Learn module end to end, in its own worktree. | Sonnet specialists |
-| Developer | `platform-engineer` | Opus | Shell, accounts, persistence, CI, deploy, cleanup, teacher features. | Sonnet specialists |
-| Developer | `release-verifier` | Opus | Independent check of a branch or the integrated tree; recomputes numbers; runs the full gate; never edits. | `spec-worksheet`, `e2e-runner` |
-| Developer | `docs-steward` | Opus | Tracking docs, decisions, handoff, checklists, READMEs. | `doc-editor` |
+| Developer | `challenge-developer` | Opus | Supervises: one design challenge end to end, in its own worktree, through Sonnet specialists. | Sonnet specialists |
+| Developer | `learn-developer` | Opus | Supervises: one Learn module end to end, in its own worktree, through Sonnet specialists. | Sonnet specialists |
+| Developer | `platform-engineer` | Opus | Supervises: shell, accounts, persistence, CI, deploy, cleanup and teacher features, through Sonnet specialists. | Sonnet specialists |
+| Developer | `release-verifier` | Opus | Supervises an independent check of a branch or the integrated tree; recomputes key numbers itself; the full gate runs through Sonnet specialists; never edits. | `spec-worksheet`, `e2e-runner` |
+| Developer | `docs-steward` | Opus | Supervises the tracking docs, decisions, handoff, checklists and READMEs; decides structure and wording; `doc-editor` makes the edits. | `doc-editor` |
 | Specialist | `spec-worksheet` | Sonnet | Standalone Python worksheet, grid search, cross-checks; never reads app code for numbers. | none |
 | Specialist | `test-writer` | Sonnet | Vitest unit, property and component tests for a fixed API. | none |
 | Specialist | `e2e-runner` | Sonnet | Runs Playwright, triages flakes, writes a spec from a pattern. | none |
@@ -99,7 +99,7 @@ That runs the main session on Fable with the director's prompt. A plain `claude`
 
 1. The director is an orchestrator only. It delegates everything process-heavy: code, specs, worksheets, document rewrites, test runs and reviews. Sonnet specialists take bulk and mechanical work; Opus developers take deep logic, debugging, architecture and review. The director never spawns another Fable agent (no fork). It briefs, checks hand-backs, integrates, pushes and records.
 2. A developer's brief states the task number, the goal, the files, the rules that apply, the definition of done and what the owner must approve. Developers refuse to start without a spec when the task is a model.
-3. Developers delegate narrow, well-specified pieces (a worksheet, a test file, a component, an E2E run) and keep the design decisions. They do not delegate "build the challenge".
+3. Opus agents supervise: they decompose, brief Sonnet specialists for every hands-on piece (implementation, tests, runs, screenshots, docs), verify the output against spec and numbers, and keep the design decisions. They write code only for a small logic-dense fix a worker got wrong twice. They never spawn Opus or Fable agents.
 4. At most three developers run browser tests at the same time. Five parallel agents pushed the load average above 100 and Playwright timed out; everything passed on serial reruns.
 5. Nothing merges without the director reading the hand-back and checking the key numbers. Physics, save-format, CI and multi-model changes also go through `release-verifier`.
 6. Two agents never edit the same tracking document at once. The director serializes `docs-steward`.
@@ -109,7 +109,7 @@ That runs the main session on Fable with the director's prompt. A plain `claude`
 ### Definition of done, by tier
 
 - Specialist: the deliverable, the command it was checked with, and the output pasted in the report.
-- Developer: lint 0 errors, typecheck, unit tests with coverage, build, schema no drift, the relevant E2E specs on desktop and Pixel 7; committed on the branch; report with numbers, shared files touched, deviations and owner questions.
+- Developer: lint 0 errors, typecheck, unit tests with coverage, build, schema no drift, the relevant E2E specs on desktop and Pixel 7; committed on the branch; report with numbers, shared files touched, deviations and owner questions; every hands-on piece traceable to a Sonnet worker's report that the developer verified.
 - Director: integrated, full gate passed, pushed, CI watched to green, `tasks.md`/`HANDOFF.md`/`DECISIONS.md`/checklist updated, owner told what to decide and what to run.
 
 ## 4. Owner's standing list
