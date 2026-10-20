@@ -93,7 +93,9 @@ async function submitByKeyboard(page: Page) {
 }
 
 test('keyboard flow submits a design and focus can leave the canvas', async ({ page }) => {
-  test.setTimeout(90_000) // A complete keyboard flow with real Tab traversal and an axe audit on software WebGL.
+  // 150 s, owner-approved 2026-10-20 (D-64): this flow runs 60–95 s on GitHub runners because the app re-renders the 3D beam under software WebGL after every dimension edit (CI runs 39371364350, 39425541797, 39432279501); the trace shows no stuck step.
+  // Locally it takes ~14 s.
+  test.setTimeout(150_000)
   await submitByKeyboard(page)
   const keyboardState = normalizeState(await readState(page))
   if (process.env.PW_UPDATE_FIXTURES !== '1') expect(keyboardState, `Keyboard end state differs from the committed fixture. If the change is intended (for example a Cantilever Beam I content-version bump), regenerate it: ${REGENERATE}`).toEqual(readFixture())

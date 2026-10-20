@@ -9,7 +9,7 @@ the current state and next work live in `HANDOFF.md`.
 
 1. `HANDOFF.md`: the state right now, what waits on the owner, recent changes.
 2. `../PROGRAM.md` (repository root, written by the director): the plan and the agent hierarchy.
-3. `DECISIONS.md`: D-01–D-63 and the 14 applicability thresholds. Later decisions supersede earlier ones
+3. `DECISIONS.md`: D-01–D-64 and the 14 applicability thresholds. Later decisions supersede earlier ones
    where they say so (for example D-37 over D-36; D-26 over the original 3D overlay requirements).
 4. `OWNER_REVIEW_CHECKLIST.md`: open owner questions. Defaults stay live until the owner answers.
 5. `../.kiro/specs/`: `engineering-intuition-mvp/` (requirements 1–35; design D-01–D-25 and Properties
