@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { audit, dragHeightHandle, normalizeState, openWorkbench, projectScenePoint, readState, referenceDesign, runTest, setDimension, tabTo } from './helpers'
 
 test('happy path: edit, drag a height handle, predict, compare, restore, reflect and submit', async ({ page }) => {
@@ -71,8 +72,13 @@ test('HTML5 palette drag-drop applies the section without recording a result', a
 })
 
 // Task 77: the former single keyboard/mouse test is split in two. Playwright runs this suite fullyParallel
-// and shards by test, so the halves may run in different workers or shards; the comparison test
-// therefore rebuilds the keyboard state itself instead of reading it from the other test.
+// and shards by test, so the halves may run in different workers or shards. Task 77.2: the keyboard test
+// owns the normalized end state; the mouse test compares against a committed fixture instead of rebuilding
+// the keyboard flow. The fixture is identical on chromium-desktop and pixel-7 (verified), so there is one file.
+// Regenerate: PW_UPDATE_FIXTURES=1 pnpm exec playwright test e2e/learningLoop.spec.ts -g "keyboard flow submits"
+const FIXTURE_URL = new URL('./fixtures/learningLoop/keyboard-state.json', import.meta.url)
+const REGENERATE = 'PW_UPDATE_FIXTURES=1 pnpm exec playwright test e2e/learningLoop.spec.ts -g "keyboard flow submits" --project=chromium-desktop'
+const readFixture = () => JSON.parse(readFileSync(FIXTURE_URL, 'utf8')) as unknown
 async function submitByKeyboard(page: Page) {
   await openWorkbench(page, true, true)
   await referenceDesign(page, true)
@@ -80,7 +86,7 @@ async function submitByKeyboard(page: Page) {
   const open = page.getByRole('button', { name: 'Explain & submit' })
   await tabTo(page, open); await open.press('Enter')
   const answer = page.getByRole('dialog', { name: 'Explain & submit', exact: true }).getByRole('textbox')
-  await tabTo(page, answer); await answer.pressSequentially('Material placement improved stiffness.')
+  await tabTo(page, answer); await answer.fill('Material placement improved stiffness.') // Task 77.2: fill, not per-key typing (0.28 s per keystroke on CI runners).
   const submit = page.getByRole('button', { name: 'Submit design & reflection' })
   await tabTo(page, submit); await submit.press('Enter')
   await expect(page.getByLabel('Recorded submission')).toBeVisible()
@@ -89,29 +95,28 @@ async function submitByKeyboard(page: Page) {
 test('keyboard flow submits a design and focus can leave the canvas', async ({ page }) => {
   test.setTimeout(90_000) // A complete keyboard flow with real Tab traversal and an axe audit on software WebGL.
   await submitByKeyboard(page)
+  const keyboardState = normalizeState(await readState(page))
+  if (process.env.PW_UPDATE_FIXTURES !== '1') expect(keyboardState, `Keyboard end state differs from the committed fixture. If the change is intended (for example a Cantilever Beam I content-version bump), regenerate it: ${REGENERATE}`).toEqual(readFixture())
   await audit(page)
   await page.keyboard.press('Escape')
   const canvas = page.getByRole('img', { name: '3D beam view', exact: true })
   await tabTo(page, canvas); await page.keyboard.press('Tab')
   await expect(canvas).not.toBeFocused()
+  // Written last: a file change under e2e/ makes the Vite dev server reload the page being tested.
+  if (process.env.PW_UPDATE_FIXTURES === '1') writeFileSync(FIXTURE_URL, JSON.stringify(keyboardState, null, 2) + '\n')
 })
 
-test('keyboard flow matches mouse state', async ({ page, context }) => {
-  test.setTimeout(90_000) // Two complete flows, real Tab traversal and an axe audit on software WebGL.
-  await submitByKeyboard(page)
-  await page.keyboard.press('Escape')
-  const state = normalizeState(await readState(page))
-  await page.evaluate(() => localStorage.clear())
-  const mouse = await context.newPage()
-  await openWorkbench(mouse)
-  await referenceDesign(mouse)
-  await runTest(mouse)
-  await mouse.getByRole('button', { name: 'Explain & submit' }).click()
-  await mouse.getByRole('dialog', { name: 'Explain & submit', exact: true }).getByRole('textbox').fill('Material placement improved stiffness.')
-  await mouse.getByRole('button', { name: 'Submit design & reflection' }).click()
-  await expect(mouse.getByLabel('Recorded submission')).toBeVisible()
-  expect(normalizeState(await readState(mouse))).toEqual(state)
-  await audit(mouse)
+test('keyboard flow matches mouse state', async ({ page }) => {
+  test.setTimeout(90_000) // The mouse flow and an axe audit on software WebGL; the keyboard state is the committed fixture.
+  await openWorkbench(page)
+  await referenceDesign(page)
+  await runTest(page)
+  await page.getByRole('button', { name: 'Explain & submit' }).click()
+  await page.getByRole('dialog', { name: 'Explain & submit', exact: true }).getByRole('textbox').fill('Material placement improved stiffness.')
+  await page.getByRole('button', { name: 'Submit design & reflection' }).click()
+  await expect(page.getByLabel('Recorded submission')).toBeVisible()
+  expect(normalizeState(await readState(page)), `Mouse end state differs from the committed keyboard fixture. If the change is intended (for example a Cantilever Beam I content-version bump), regenerate it: ${REGENERATE}`).toEqual(readFixture())
+  await audit(page)
 })
 
 test('invalid tube and flange geometry leave state/history unchanged; edits preserve tested values', async ({ page }) => {
