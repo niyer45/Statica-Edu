@@ -1,151 +1,176 @@
-# Statica (Engineering Intuition MVP)
+# Statica development rules
 
-Browser-based structures learning tool. A student designs the cross-section of a cantilever beam
-("Cantilever Beam I"), predicts how it will behave, runs an idealized Euler–Bernoulli test, and
-compares iterations. It is built inside a Figma Make template ("figma-make-app"), and the
-template's visual design and platform shell are kept.
+Statica is a browser-based tool for building engineering intuition: ten design challenges and three Learn
+modules where students predict, test against an idealized model, and iterate. It is built on a Figma Make
+template ("figma-make-app") whose visual design and platform shell are kept. This file holds rules only;
+the current state and next work live in `HANDOFF.md`.
 
-Read `HANDOFF.md` first for the current status and the next task.
+## Where to start
 
-Current task progress (2026-10-19): task 73 complete (difficulty order and 001–010 numbering D-63, sharded CI, cleanup); tasks 68–72 complete and integrated by the coordinator from five parallel agents (Column Buckling I D-58, Pressure Vessel I D-59, Fatigue Analysis I D-60, Torsion Shaft I introductory + Torsion module D-61, Stress and Strain I + Stress and strain module D-62; ten available challenges, three Learn modules; all owner-requested, all pending owner engineering review). Before that: task 67 complete (Learn pillar, Beam bending module, D-57; 2592 tests, 80/80 E2E); task 66 complete (GitHub Pages workflow, DEPLOY.md). 2026-10-18: task 65 complete (reference dialogs as KaTeX formulas and key points, D-56; bracket art rib; 2571 tests, 78/78 E2E); task 64 complete (Home redesigned from the owner Figma export, D-55); tasks 61–63 complete (D-52–D-54). Earlier the same day: owner feedback batch 56–60 and 38.0 complete (D-46 L-bracket, D-47 hardest baselines, D-48 goal card, D-49 Guided experiments vs Parametric, D-50 local accounts/Home; 2540 tests, 64/64 E2E); owner review pending. Earlier (2026-10-17): 45.1 original-catalog scoping complete as specification (`../.kiro/specs/original-catalog/`, D-38: Torsion → Vibration → Heat Sink → Bracket → Frame; owner decisions HS-08/MB-07 open). 45.2 shared multi-model contracts complete as specification (`../.kiro/specs/multi-model-architecture/`, D-39: frozen beam v1 save shape, v2 envelopes for new models, registry/host-per-challenge). 47.1 Torsion Shaft I model specification and worksheet complete (`../.kiro/specs/torsion-shaft-1/`). 34.1 complete (CI). All five track specs 46.1–50.1 complete; 47.2 torsion model implemented and registered; Task 34 complete (model runtimes, generic store, `ui/models` UI-slot registry; production registers only the beam UI). All five models (46.2–50.2) implemented; beam and torsion registered. **All six original challenges are runnable** (D-42–D-44; tasks 46–50 complete). Owner review checklist: OWNER_REVIEW_CHECKLIST.md (task 55). Task 54 complete: bracket, torsion and frame open lazy 3D views with main-bundle 2D fallbacks (D-45). Head: 2441 tests/234 files, 46/46 E2E. Gate 51 automated audit recorded in MILESTONE5.md; 51 stays open for 44.3/owner QA. D-40/D-41 record owner decisions. All six original challenges are runnable. Guided/Parametric distinction implemented and CI verified: choose mode before entry, no in-workbench switch (D-37). 44.3/parent 44 open only for owner manual release-mode evidence; next development is not blocked on human QA. CI-verified baseline: 906 core tests, 2 responsive and all 24 E2E cases (run 38970465802); spec batch run 39071816823 passed. Beam II integration deferred to 52 after 51. Read HANDOFF.md; historical notes moved to HANDOFF_HISTORY.md.
+1. `HANDOFF.md`: the state right now, what waits on the owner, recent changes.
+2. `../PROGRAM.md` (repository root, written by the director): the plan and the agent hierarchy.
+3. `DECISIONS.md`: D-01–D-63 and the 14 applicability thresholds. Later decisions supersede earlier ones
+   where they say so (for example D-37 over D-36; D-26 over the original 3D overlay requirements).
+4. `OWNER_REVIEW_CHECKLIST.md`: open owner questions. Defaults stay live until the owner answers.
+5. `../.kiro/specs/`: `engineering-intuition-mvp/` (requirements 1–35; design D-01–D-25 and Properties
+   1–37; `tasks.md` for open work, `tasks-history.md` for completed detail and the wave graph), additive specs (`interaction-modes/`, `original-catalog/`,
+   `multi-model-architecture/`, `learn-modules/`), one folder per later challenge, dormant `cantilever-beam-2/`.
 
-## Specifications (source of truth)
+`HANDOFF_HISTORY.md` and the `MILESTONE*.md` ledgers are historical evidence, never current instructions.
 
-The spec lives outside this folder, one level up:
+## Standing rules
 
-- `../.kiro/specs/engineering-intuition-mvp/requirements.md`: Requirements 1–35 with numbered acceptance criteria.
-- `../.kiro/specs/engineering-intuition-mvp/design.md`: architecture, decisions D-01…D-25, correctness Properties 1–37, fixtures, thresholds.
-- `../.kiro/specs/engineering-intuition-mvp/tasks.md`: the completed MVP plan (Milestones 0–3, tasks 1–28) and post-MVP roadmap/maintenance (tasks 29–53) with a JSON wave dependency graph at the end.
-- Additive specs: `../.kiro/specs/interaction-modes/` (task 44), `../.kiro/specs/original-catalog/` (task 45.1 scopes/models/benchmarks/delivery order for the five previews), `../.kiro/specs/multi-model-architecture/` (task 45.2 shared contracts for tasks 34 and 46–50), `../.kiro/specs/torsion-shaft-1/` (47.1), `../.kiro/specs/heat-sink-1/` (48.1), `../.kiro/specs/vibration-isolation-1/` (50.1), `../.kiro/specs/braced-frame-1/` (49.1), `../.kiro/specs/mounting-bracket-1/` (46.1) and dormant `../.kiro/specs/cantilever-beam-2/`.
+Engineering content
+- Spec first. Before coding or changing a model, write or extend `../.kiro/specs/<challenge>/` with
+  requirements, design and a worksheet of independent hand calculations (a standalone script, not app
+  code). Tests check the model against the worksheet.
+- Cite textbooks by name and topic. Never invent edition, page or equation numbers; mark them "pending
+  engineering review" until someone transcribes them from a printed copy.
+- Every number a student sees comes from the physics and evaluation code (for the beam, a stored
+  Test_Result from `physics/analyze` and `evaluation/evaluate`). Never show fabricated numbers, and never
+  use one model's results for another challenge (D-38).
+- Each baseline is the hardest valid design: applicable, without warnings, failing as many checks as
+  possible (D-47). Each challenge has a hidden reference design that passes; student challenge data
+  excludes `referenceDesign`, so never expose it through the UI or hooks.
+- A changed constant, limit or meaning-changing wording gets a new challenge content version and storage
+  key (MM-04). Changed model outputs also bump the model version.
 
-Absolute path: `/Users/nikhiliyer/Documents/Kiro/.kiro/specs/engineering-intuition-mvp/`.
-`DECISIONS.md` records D-01…D-63 and the 14 applicability thresholds. D-25 defines required `sectionDefaults`; D-26 records the user-directed uncluttered 3D presentation and overrides the original visible-overlay requirements.
+Product behaviour
+- Guided or Parametric is chosen before entering a challenge; there is no in-workbench switch. Resume
+  keeps the mode; leaving to the library allows a new choice over the same saved work (D-37, D-49).
+- No visible envelope or static annotations on any 3D model (D-26). Drag feedback goes below the canvas,
+  in the numeric controls and in the accessible summary.
+- Prediction follows D-27: dispatch `setPrediction` with `now: store.clock()`, then `store.runTest()`.
+  The reducer never reads the time itself.
+- Keep the compact challenge, history, compare and My designs presentation (D-28–D-33): no permanent
+  explanatory paragraphs, no exclamation prefix on Not accepted, no dense results table.
+- Do not regenerate completed requirements or design or rewrite completed features; add scoped specs.
+  Later tasks fill existing stub files in place; do not create parallel components.
 
-## Rules for following the spec
+Owner, QA and release
+- Never fabricate human QA, student sessions or owner review. Passing CI, axe or component tests does not
+  prove screen-reader, touch, engineering or student review. Nikhil is the owner reviewer (D-34); tasks
+  29.2, 30, 31.2, 32 and 44.3 stay open until he records evidence.
+- Activating a card, deploying, or merging work an agent was blocked from committing needs explicit owner
+  approval. An owner request for a challenge counts as approval to activate it.
+- Cantilever Beam II stays dormant. Its configuration and tests are kept; integration is task 52.
+- No deployment and no contact with participants, reviewers or anyone else without a specific owner
+  instruction.
 
-- Implement tasks in `tasks.md` order, respecting the wave graph. Each task lists the requirement IDs it must satisfy.
-- Milestone 2 and its component gate are complete; see `MILESTONE2.md` for evidence and limitations. Follow the current-task pointer above; HANDOFF.md records verified browser results and remaining work.
-- Prediction actions use D-27: `setPrediction` requires `now` from the injected store clock. Confirm by dispatching `setPrediction`, then `runTest`; the reducer never reads time itself.
-- Follow D-26: no visible envelope or static annotations on the 3D model. Keep active drag feedback below Canvas, numerical controls and the accessible summary. Do not restore the original spec overlays; the user explicitly requested their removal.
-- Do not regenerate completed MVP requirements/design or rewrite completed functionality. Update task progress/dependencies when authorized; create additive scoped specifications for new models/features. Record deviations in HANDOFF.md and design decisions in DECISIONS.md.
-- Property tests must carry the tag comment `// Feature: engineering-intuition-mvp, Property N: <title>` and use the `test/pbt.ts` helper (`PBT_RUNS` env var, default 200, fixed seed).
-- Never show fabricated numbers in the UI. Every displayed result comes from a stored Test_Result produced by `physics/analyze` and `evaluation/evaluate`.
-- Later tasks fill existing stub files in place (each stub header names its task). Don't create parallel components.
+Git, CI and tracking documents
+- No force-push, no unrelated history, no silent deletion. Preserve the root README, `.kiro/`,
+  `.github/workflows/`, `design/` and remote-only files.
+- Push verified batches (standing authorization), then watch the CI run yourself until it finishes
+  (user, 2026-10-17; the public Actions API works without `gh`). No endless fix-and-retry loops.
+- After every task, update the `tasks.md` checkboxes and `HANDOFF.md`, add decisions to `DECISIONS.md`,
+  and update READMEs, specs and Home copy when availability or counts change.
+- One agent at a time edits the shared tracking documents (`tasks.md`, `HANDOFF.md`, `AGENTS.md`,
+  `DECISIONS.md`, `OWNER_REVIEW_CHECKLIST.md`). In parallel work the integrator updates them after merging.
+- Documentation-only edits: validate task IDs, the dependency graph, local Markdown links and every
+  capability or status claim against the code. Do not claim new runtime or browser testing.
+
+Parallel agents and merges
+- Registration files conflict whenever parallel branches each add a challenge: `src/challenge/catalog.ts`,
+  `src/challenge/bundled.ts`, `src/state/models.ts`, `src/state/runtimes.ts`, `src/ui/models/registry.ts`
+  and `src/ui/shell/TechnicalArt.tsx`. Merge them by hand and keep every entry.
+- Count-based tests and copy (catalog, platform and accounts E2E specs, Home counts) must list every
+  entry after a merge.
+- Playwright `reuseExistingServer` tests whatever server holds the E2E ports. Give each worktree its own
+  `PW_DEV_PORT`/`PW_PREVIEW_PORT` and check `lsof -iTCP:4173 -iTCP:4174` first.
+- Never run two Vitest coverage processes into the same report directory.
 
 ## Tech stack
 
-- React 19, TypeScript (strict), Vite 8, Tailwind CSS v4 (`@tailwindcss/vite`), and the four Figma Make Vite plugins in `vite.config.ts` (leave them unchanged).
-- 3D: three 0.186.1, @react-three/fiber 9.8.2, @react-three/drei 10.7.9. Milestone 2 is complete: viewport, typed SVG fallback/recovery, handles, shell/numeric test suites and four-profile component gate. Real-browser rendering/CSP verification passed in CI; see MILESTONE2.md and HANDOFF.md.
-- zod 3.25.76 (challenge and import schemas), zod-to-json-schema.
-- KaTeX 0.18.11 for reference-dialog formulas, loaded lazily by `ui/math/TeX.tsx` (D-56).
-- Testing: Vitest 5 (jsdom for `src/ui/**`), fast-check 4, Testing Library, Playwright 1.64 with axe-core.
-- ESLint 10 with typescript-eslint, oxfmt.
-- Node 22, pnpm 10.34.3 (`.mise.toml`, `packageManager`). Use pnpm only. Pin new dependencies to exact versions (`pnpm add -E`).
+- React 19.2, TypeScript 5.9 strict, Vite 8, Tailwind CSS 4, and the four Figma Make Vite plugins in
+  `vite.config.ts` (leave them unchanged). three 0.186.1, @react-three/fiber 9.8.2, @react-three/drei
+  10.7.9; zod 3.25.76; KaTeX 0.18.11 loaded lazily by `ui/math/TeX.tsx` (D-56); `@fontsource` fonts.
+- Vitest 5 (jsdom for `src/ui/**`), fast-check 4, Testing Library, Playwright 1.64 with axe-core,
+  ESLint 10 with typescript-eslint, oxfmt. Node 22 and pnpm 10.34.3 (`.mise.toml`, `packageManager`);
+  pnpm only; pin new dependencies exactly (`pnpm add -E`).
 
 ## Architecture and structure
 
-- `src/units`: mm/m/MPa conversion, `parseMmInput`, `formatMm`.
-- `src/challenge`: types, zod schema, loader, bundled challenges via `bundled.ts` (beam, torsion, vibration, heat sink, bracket), `catalog.ts` (all six cards available), `content.ts`.
-- `src/geometry`: sections, validation, clamp/strict set, conversion, envelope, outline, handle descriptors.
-- `src/physics`: section properties, beam formulas, applicability checks, `analyze`.
-- `src/evaluation`: constraints, acceptance, efficiency, explanations (`explain.ts`), prediction scoring. Also holds the TestResult/Prediction types.
-- `src/state`: `session.ts` (types incl. generic `SessionStateOf`, `initSession`), `engine.ts` (model-generic reducer/init), `reducer.ts` (beam edits + engine), `selectors.ts`, `importExport.ts` (beam v1) / `importV2.ts`, `persistence.ts` (v1 beam + v2), `models.ts` (registry; dispatch by explicit identity), `torsionModel.ts`.
-- Per-model pure code: `src/{challenge,geometry,physics,evaluation}/{torsion,heatSink,bracedFrame,vibration,bracket,column,vessel,fatigue,axial}/`; engine definitions `src/state/{torsion,heatSink,bracedFrame,vibration,bracket,column,vessel,fatigue,axial}Model.ts`; `src/state/runtimes.ts` (registered runtimes: beam, torsion).
-- `src/ui/models/`: model UI registry (`registry.ts`), contract (`types.ts`), beam entry (`beam.tsx`), one folder per other model. Bracket, torsion and frame views mount a lazy 3D chunk inside `ViewportBoundary` (model `fallback` component) and check `viewport/webgl.ts` first; their 2D views stay in the main bundle. Workbench regions, dialogs wording, footer, chrome and drawer text come from the active model's entry.
-- `src/challenge/bundled.ts`: bundled challenge registry (only configs an available card links to).
-- `src/learn` (pure, task 67): Learn types, demo cantilever (`beamDemo.ts`, physics calls only), module content (`modules/`), catalog and progress. UI in `src/ui/learn` (hub, module player, demos). Spec `../.kiro/specs/learn-modules/`.
-- `src/ui`: app, store, shell, workbench, palette, controls, mesh, viewport, dialogs, panels, history, a11y, icons.
-  - `ui/App.tsx`: bootstrap.
-  - `ui/state`: StoreProvider, hooks, dev snapshot.
-  - `ui/shell`: platform shell; `CatalogHost` owns one store per active challenge (34.1).
-  - `ui/workbench`: layout.
-  - `ui/mesh`: three.js geometry.
-  - `ui/viewport`: lazy R3F Canvas/`BeamView`, `DimensionHandles`/`handleDrag`, shared controls/summary/layout; main-bundle `ViewportBoundary`, `FallbackViewport`, typed `Fallback2D`, and pure `projection` helpers.
-- The template `src/BeamScene.tsx` and temporary `LegacyFallback` are deleted. Their SVG projection now lives in `ui/viewport/projection.ts` and `Fallback2D.tsx`. Keep this fallback independent of Three.js so recovery works when the 3D chunk fails to load.
-- `test/state/model.ts`: reusable fast-check command harness, per-action invariant hooks and reachable-session generator (task 19.3). Dedicated reducer properties reuse it and the `test/pbt.ts` helper.
-- `test/`: shared arbitraries, pbt helper, fixtures (`test/fixtures/designs.ts`), architecture and config guard tests.
-- `e2e/`: Playwright desktop/Pixel 7 scenarios per challenge plus `catalog.spec.ts` (all six saves together); originally 24 verified scenarios (including four mode cases; run 38970465802); CI also runs the focused responsive pair before the full suite. CI (2026-10-19, task 73) runs a `verify` job and four parallel Playwright shards (`--shard=n/4`), the focused responsive pair first in shard 1.
-- `schemas/`: generated JSON Schema. `scripts/`: schema generator.
-- Unit tests are colocated as `*.test.ts(x)`. Property tests are named `*.pN.test.ts`.
+- Pure domain code: `src/units`, `src/challenge` (types, zod schema, loader, `challenges/*.json`,
+  `bundled.ts`, `catalog.ts` with ten available cards numbered 001–010 by difficulty, `content.ts`),
+  `src/geometry`, `src/physics`, `src/evaluation` (plus TestResult/Prediction types and `guided/<model>.ts`).
+  The beam lives at the top level of each; other models in `<layer>/<model>/` for `torsion`, `heatSink`,
+  `bracedFrame`, `vibration`, `bracket`, `column`, `vessel`, `fatigue` and `axial`.
+- `src/state`: `session.ts`, `engine.ts` (model-generic reducer), `reducer.ts` (beam), `selectors.ts`,
+  `importExport.ts` (beam v1) and `importV2.ts`, `persistence.ts`, `models.ts` (registry, dispatch by
+  explicit identity), `<model>Model.ts`, `guided.ts`, `runtimes.ts` (all ten models registered).
+- `src/account`: framework-free account provider and local implementation (D-50).
+- `src/learn`: pure Learn types, `modules/` (beamBending, torsion, stressStrain), physics-only demos,
+  `catalog.ts` (three available, the rest Planned), `progress.ts`. Spec `../.kiro/specs/learn-modules/`.
+- `src/ui`: `App.tsx`; `state/`; `shell/` (platform shell, `CatalogHost` with one store per active
+  challenge, `HomePage.tsx`, library, My designs, `routes.ts`, `TechnicalArt.tsx` card art); `models/`
+  (`registry.ts`, `types.ts`, `beam.tsx`, one folder per other model, which supplies workbench regions
+  and wording); `viewport/` (lazy R3F canvas; main-bundle `ViewportBoundary`, `FallbackViewport`,
+  `Fallback2D`, `webgl.ts`); `learn/`, `account/`, `math/` and the template's other folders. Models with
+  a 3D view load it lazily inside `ViewportBoundary`; their 2D view stays in the main bundle.
+- Routes: Home at `/`, library at `/#challenges`, Learn at `#learn` and `#learn/<moduleId>`. The
+  workbench is not a route.
+- `test/`: arbitraries, `pbt.ts`, fixtures, the `state/model.ts` harness, architecture and config guards,
+  `challenges/` baseline-difficulty tests. Unit tests are colocated `*.test.ts(x)`; property tests are
+  `*.pN.test.ts`. `e2e/`: a Playwright spec per challenge plus catalog, platform, accounts, learn and others.
+- CI (`../.github/workflows/ci.yml`): a `verify` job (lint, typecheck, unit tests with coverage, build,
+  schema drift) and four Playwright shards (responsive pair first in shard 1), each with a 30-minute
+  limit. `pages.yml` is the manual, CI-gated Pages deploy (`DEPLOY.md`).
 
 ### Import boundary (enforced by ESLint and `test/architecture.test.ts`)
 
-- `units`, `challenge`, `geometry`, `physics`, `evaluation` and `learn` are pure. They must not import `react`, `three`, `@react-three/*`, `ui/`, or `state/`.
-- `physics` must not import `evaluation`, and `evaluation` must not import `units` or `state`.
-- No section, mass, deflection, or stress formulas anywhere in `src/ui` or `src/state`. Call the domain functions instead. `ui/mesh` and the 2D fallback may call `physics.deflectionShape` and `geometry.sectionOutline` for display only.
-- Don't recreate `src/physics.ts`.
-- The reducer is pure: no `Date`, randomness, DOM, or storage. Clock and id are injected via StoreProvider.
+- `units`, `challenge`, `geometry`, `physics`, `evaluation`, `learn` and `account` must not import
+  `react`, `three`, `@react-three/*`, `ui/` or `state/` (`account` is checked by ESLint only).
+- `physics` must not import `evaluation`; `evaluation` must not import `units` or `state`.
+- No section, mass, deflection or stress formulas in `src/ui` or `src/state`. `ui/mesh` and the 2D
+  fallback may call `physics.deflectionShape` and `geometry.sectionOutline` for display only. Do not
+  recreate `src/physics.ts`.
+- The reducer is pure: no `Date`, randomness, DOM or storage. Clock and ids are injected by StoreProvider.
 
 ### Runtime constraints
 
-- No network requests at runtime. Fonts are self-hosted through `@fontsource`.
-- The production build injects the CSP `default-src 'self'`, so avoid inline styles/scripts, `data:` URLs, and remote assets. Keep `.figma/make/site.json` free of analytics and custom scripts, and leave `addBypassLinks` false.
-- Keep the template class names, `index.css`, and `platform*.css`. Only make contrast fixes there.
+- No network requests at runtime. The production CSP is `default-src 'self'`: no inline styles or
+  scripts, `data:` URLs or remote assets. Keep `.figma/make/site.json` free of analytics and custom
+  scripts, and leave `addBypassLinks` false. The 2D fallback must work when the 3D chunk fails to load.
+- Keep the template class names, `index.css` and `platform*.css`; only make contrast fixes there.
+  Learning-loop styles go in `ui/learningLoop.css`.
 
 ## Code conventions
 
-- TypeScript strict. Components use default exports.
-- Single quotes in TS. Use double quotes for strings containing apostrophes.
-- Keep CSS `@import` statements first in `src/index.css`.
-- Accessibility: every control has an accessible name, and state is never conveyed by color alone. Announcements go through the single `ui/a11y/LiveRegion`.
+- TypeScript strict; default-export components; single quotes in TS (double quotes for strings with
+  apostrophes); CSS `@import` statements first in `src/index.css`. Every control has an accessible name;
+  state is never shown by colour alone; announcements go through the single `ui/a11y/LiveRegion`.
+- Property tests carry `// Feature: engineering-intuition-mvp, Property N: <title>` and use `test/pbt.ts`
+  (`PBT_RUNS`, default 200, fixed seed).
 
-## Commands (run from this folder; quote the path, it contains spaces)
+## Commands
+
+Run from this folder (quote the path; it contains spaces) with Node 22: prefix `PATH` with
+`/opt/homebrew/opt/node@22/bin` (keg-only; the default `node` here is 24).
 
 ```bash
-pnpm install
-pnpm run dev          # http://localhost:8443
-pnpm run lint
-pnpm run typecheck
-pnpm run test         # all Vitest tests
-PBT_RUNS=2000 pnpm run test   # deeper property-test run
-pnpm exec vitest run --coverage
-pnpm run build && pnpm run preview
-pnpm exec playwright install chromium   # once, before e2e
-pnpm run e2e
-pnpm run gen:schema   # then check schemas/ for drift
+pnpm install --frozen-lockfile
+pnpm run lint && pnpm run typecheck
+pnpm exec vitest run --coverage    # all unit tests; 95% lines on physics, geometry, evaluation, state
+PBT_RUNS=2000 pnpm run test        # deeper property-test run
+pnpm run build
+PORT=4180 pnpm run preview         # the director's preview port
+pnpm exec playwright install chromium   # once, before E2E
+pnpm run e2e                       # dev server 4174, production preview 4173
+pnpm run gen:schema                # then check schemas/ for drift
 pnpm run format
 ```
 
-Before finishing any task, all of these must pass: lint (0 errors), typecheck, test, build.
+`pnpm run dev` and `preview` default to port 8443, the user's Kiro dev server: always set `PORT`. E2E
+uses 4174 (dev, exposes test-only `__EI_STATE__`) and 4173 (production, must not expose it).
 
-## Maintaining task progress
+Before finishing a task: lint (0 errors), typecheck, tests with coverage, build and schema drift pass,
+plus the affected Playwright specs. Never weaken assertions, timeouts or retries to hide a regression.
 
-`tasks.md` checkbox markers:
-- `- [x]` done and verified
-- `- [ ]` not started
-- `- [-]` in progress
-- `- [~]` queued
-- `*` after the box means optional (the user chose to include optional tests)
+## Maintaining tasks.md and the handoff
 
-When you finish a task:
-1. Run the full verification above.
-2. Change only that task's box to `[x]`. Mark a parent `[x]` once all its children are `[x]`.
-3. Don't mark a task done without verifying it.
+Markers: `- [x]` done and verified, `- [ ]` not started, `- [-]` in progress, `- [~]` queued; `*` after
+the box marks an optional task. Change only the finished task's box; mark a parent `[x]` once all its
+children are. Never mark work done without verification, or human and browser work without evidence.
 
-## Updating handoff docs
-
-After every completed task and at the end of each work session, update `HANDOFF.md`:
-- the last completed task and the next task
-- test counts
-- new deviations and known issues
-
-Per the user's standing instruction, also update this file's current-task pointer and the relevant sibling `tasks.md` checkboxes after every completed task. Keep README status/counts synchronized when they change. Record whether work is local or pushed, and keep commands, structure and rules current.
-
-## Current user directives and handoff
-
-- Prioritize the original six catalog challenges before second editions (D-35). Read CATALOG_ROADMAP.md, tasks 45–52 and `../.kiro/specs/original-catalog/` (D-38 order; never substitute beam results for torsion, vibration, thermal, bracket or frame physics). Beam II artifacts/tests stay preserved/dormant; no card activation or non-beam outputs from the cantilever solver.
-- Guided includes staged instructions/optional hints; Parametric omits scaffolding. Mode is selected in library/challenge details before entry and fixed inside the workbench; resume/reload retains it. No live mode selector. Leaving to the library permits a new entry choice with shared saved work (D-37).
-- Preserve compact challenge/history/compare/My designs presentation (D-28–D-33); no permanent informational history paragraphs, no exclamation prefix on Not accepted, no dense My designs result table.
-- Human engineering/manual/student review is deferred until before deployment, not completed (D-34). Nikhil is owner reviewer. 44.3/parent 44 remain open solely for manual release evidence. CI success does not prove screen-reader/touch/student QA.
-- Local-first accounts and Home are implemented (38.0, D-50: `src/account` framework-free, `ui/account`, `ui/shell/HomePage.tsx` standalone landing page outside the workspace chrome (D-53, D-54), styled from the owner Figma export in `../design/figma-homepage/` (D-55), `routes.ts`); per-challenge progress is in My designs (`ui/shell/progress.ts`); `/` is Home and E2E open the library at `/#challenges`. Cross-device sync (38.1–38.2) is not implemented: no backend/network; provider/ownership/data/CSP decisions precede it. Submission can record Not accepted; it is not a completion flag.
-- Node 22/pnpm 10.34.3 are target/CI versions. Local historical Node/sandbox differences are recorded in HANDOFF.md; do not assume they apply to a new Claude environment. Keep pinned dependencies/Figma plugins.
-- Use Safari for manual browser inspection if needed; retain Chromium/Pixel 7 automated gates. Never infer a browser pass from component tests or weaken regression assertions.
-- Push authorized verified batches. User update 2026-10-17: after pushing, continuously monitor the GitHub workflow yourself (public Actions API) without waiting for user confirmation; run independent tasks in parallel with agents. Do not deploy/contact others without a specific instruction.
-
-## Repository and contributor entry points
-
-GitHub: https://github.com/niyer45/Statica-Edu, branch main. Root CLAUDE.md/AGENTS.md point here. The existing local Kiro mirror is not a git checkout; use a real separate clone for ordinary CLI git work after reconciling local files. Preserve root README, sibling .kiro specs and workflow layout, unrelated changes and remote-only files. Do not initialize unrelated history, force-push or silently delete files.
-
-Read HANDOFF.md for paths, exact verified implementation/run, next task and architectural edge cases. DECISIONS.md records D-01–D-63 (D-46–D-63: 2026-10-18 owner feedback batch; D-40: owner HS-08/MB-07 decisions; D-41: bracket K-1–K-5; D-42–D-44: challenge activations; D-45: task 54 3D views); D-35 and D-37 supersede earlier priority/mode choices; D-38 records proposed original-catalog models and delivery order; D-39 records the multi-model contracts and frozen beam save format. HANDOFF_HISTORY.md contains archived status only. Keep root product README and app developer README accurate when feature availability changes.
-
-For documentation-only edits, validate task IDs/dependency graph, local Markdown links and factual capability/status claims; do not claim new runtime/browser testing. For source changes run all required core checks and affected/full browser gates. Never run concurrent Vitest coverage processes into the same report directory.
+After each task, update `HANDOFF.md` (state, a recent-changes row with task, date, commit, CI run and
+decision, new known issues, test counts). Move superseded material to `HANDOFF_HISTORY.md` verbatim.

@@ -1,6 +1,128 @@
 # Requirements Document
 
+## About this document
+
+This is the completed MVP requirements baseline for Statica's first challenge, Cantilever Beam I. Requirements 1–35 cover Milestones 0–3. Tasks 1–28 in [tasks.md](tasks.md) implemented them, and checkpoint 28 passed in CI on 2026-10-16. [design.md](design.md) holds the matching architecture and correctness Properties 1–37.
+
+Requirement IDs (1–35) and criterion IDs (for example 9.3) are cited by tasks.md, by design.md properties and by test comments, so they never change. Later work is specified in separate, additive specifications rather than by editing this file.
+
+## Related specifications
+
+Each folder below sits beside this one in `.kiro/specs/`. Status is taken from tasks.md. "Implemented" means the listed tasks are checked; owner engineering review (task 29.2) and manual QA are still required before customer release (D-34).
+
+| Spec folder | Covers | Status |
+|---|---|---|
+| [`interaction-modes/`](../interaction-modes/requirements.md) | Guided and Parametric behavior (task 44, MODE-01–MODE-08) | Implemented (44.1–44.2); 44.3 open for owner manual checks. Guided behavior since redefined by D-49 (task 58). |
+| [`original-catalog/`](../original-catalog/requirements.md) | Scope, bounded models and delivery order for the five original preview challenges (task 45.1, OC-01–OC-16) | Specification; its challenges were implemented in tasks 46–50. Task 51 open for owner QA. |
+| [`multi-model-architecture/`](../multi-model-architecture/requirements.md) | Shared model identity, registry, evaluation and save contracts (task 45.2, MM-01–MM-27) | Specification; implemented by task 34. |
+| [`torsion-shaft-1/`](../torsion-shaft-1/requirements.md) | Torsion Shaft I (task 47) | Implemented (task 47; made introductory in task 71, D-61). |
+| [`heat-sink-1/`](../heat-sink-1/requirements.md) | Heat Sink I (task 48) | Implemented (task 48). |
+| [`vibration-isolation-1/`](../vibration-isolation-1/requirements.md) | Vibration Isolation I (task 50) | Implemented (task 50). |
+| [`braced-frame-1/`](../braced-frame-1/requirements.md) | Braced Frame I (task 49) | Implemented (task 49). |
+| [`mounting-bracket-1/`](../mounting-bracket-1/requirements.md) | Mounting Bracket I (task 46); `l-bracket-design.md` covers the bolted L-bracket | Implemented (task 46; rebuilt as a bolted L-bracket in task 57, D-46). |
+| [`column-buckling-1/`](../column-buckling-1/requirements.md) | Column Buckling I (task 68) | Implemented (task 68, D-58). |
+| [`pressure-vessel-1/`](../pressure-vessel-1/requirements.md) | Pressure Vessel I (task 69) | Implemented (task 69, D-59). |
+| [`fatigue-analysis-1/`](../fatigue-analysis-1/requirements.md) | Fatigue Analysis I (task 70) | Implemented (task 70, D-60). |
+| [`stress-strain-1/`](../stress-strain-1/requirements.md) | Stress and Strain I and the Stress and strain Learn module (task 72) | Implemented (task 72, D-62). |
+| [`learn-modules/`](../learn-modules/requirements.md) | The Learn pillar and its modules (task 67) | Implemented (task 67, D-57). |
+| [`cantilever-beam-2/`](../cantilever-beam-2/requirements.md) | Cantilever Beam II (tasks 33.1–33.2) | Dormant: configuration validated but not registered; integration is task 52 (not started). |
+
+## How amendments are recorded
+
+[DECISIONS.md][decisions] records decisions D-01–D-63, including every later change to these requirements. When a decision amends or supersedes a criterion, the criterion text below stays as written and the requirement carries one italic note under its heading naming the decision. The "Amended by" column of the [Requirement index](#requirement-index) lists the same decisions. Where a note and a criterion disagree, the decision applies.
+
+[decisions]: ../../../Educational%20Tool%20UI%20Design/DECISIONS.md
+
+## Contents
+
+- [About this document](#about-this-document)
+- [Related specifications](#related-specifications)
+- [How amendments are recorded](#how-amendments-are-recorded)
+- [Requirement index](#requirement-index)
+- [Introduction](#introduction)
+- [Glossary](#glossary)
+- [Requirements](#requirements)
+  - [Requirement 1: Project Scaffold, CI, and Architecture Boundaries](#requirement-1-project-scaffold-ci-and-architecture-boundaries)
+  - [Requirement 2: Units](#requirement-2-units)
+  - [Requirement 3: Challenge Definition and Loading](#requirement-3-challenge-definition-and-loading)
+  - [Requirement 4: Locked Fields and Immutable Challenge Data](#requirement-4-locked-fields-and-immutable-challenge-data)
+  - [Requirement 5: Section Types and Geometry Validation](#requirement-5-section-types-and-geometry-validation)
+  - [Requirement 6: Clamp, Strict Set, and Section Conversion](#requirement-6-clamp-strict-set-and-section-conversion)
+  - [Requirement 7: Orientation and Envelope](#requirement-7-orientation-and-envelope)
+  - [Requirement 8: Section Properties](#requirement-8-section-properties)
+  - [Requirement 9: Beam Solver](#requirement-9-beam-solver)
+  - [Requirement 10: Model Applicability and Analysis Metadata](#requirement-10-model-applicability-and-analysis-metadata)
+  - [Requirement 11: Constraint Evaluation](#requirement-11-constraint-evaluation)
+  - [Requirement 12: Acceptance Status and Efficiency](#requirement-12-acceptance-status-and-efficiency)
+  - [Requirement 13: Grounded Explanations](#requirement-13-grounded-explanations)
+  - [Requirement 14: Prediction Checkpoint and Scoring](#requirement-14-prediction-checkpoint-and-scoring)
+  - [Requirement 15: Session Initialization and Reducer Invariants](#requirement-15-session-initialization-and-reducer-invariants)
+  - [Requirement 16: Draft and Tested Status](#requirement-16-draft-and-tested-status)
+  - [Requirement 17: Run Test](#requirement-17-run-test)
+  - [Requirement 18: Append-Only History and Comparison](#requirement-18-append-only-history-and-comparison)
+  - [Requirement 19: Restore](#requirement-19-restore)
+  - [Requirement 20: Reflection and Submission](#requirement-20-reflection-and-submission)
+  - [Requirement 21: Session Persistence](#requirement-21-session-persistence)
+  - [Requirement 22: Design Import and Export](#requirement-22-design-import-and-export)
+  - [Requirement 23: Security of Imported Data and Rendering](#requirement-23-security-of-imported-data-and-rendering)
+  - [Requirement 24: Application Layout](#requirement-24-application-layout)
+  - [Requirement 25: 3D Viewport](#requirement-25-3d-viewport)
+  - [Requirement 26: Section Palette](#requirement-26-section-palette)
+  - [Requirement 27: Dimension Handles](#requirement-27-dimension-handles)
+  - [Requirement 28: Numeric Controls](#requirement-28-numeric-controls)
+  - [Requirement 29: Requirements and Results Panel](#requirement-29-requirements-and-results-panel)
+  - [Requirement 30: Dialogs and Live Announcements](#requirement-30-dialogs-and-live-announcements)
+  - [Requirement 31: WebGL Fallback](#requirement-31-webgl-fallback)
+  - [Requirement 32: Accessibility](#requirement-32-accessibility)
+  - [Requirement 33: Testing and Milestone Gates](#requirement-33-testing-and-milestone-gates)
+  - [Requirement 34: Platform Shell and Preview Items](#requirement-34-platform-shell-and-preview-items)
+  - [Requirement 35: Interaction Modes and Workflow Stepper](#requirement-35-interaction-modes-and-workflow-stepper)
+
+## Requirement index
+
+Areas: domain (pure modules), state (reducer, persistence, import and export), UI (Workbench), platform (scaffold, security, shell), quality (accessibility, testing).
+
+| # | Title | Area | Summary | Amended by |
+|---|---|---|---|---|
+| [1](#requirement-1-project-scaffold-ci-and-architecture-boundaries) | Project Scaffold, CI, and Architecture Boundaries | platform | Template stack, exact pins, CI order, import boundaries, schema generation, offline runtime, self-hosted fonts. |  |
+| [2](#requirement-2-units) | Units | domain | SI units inside the domain; mm and MPa conversion, parsing and locale-independent formatting at the UI boundary. |  |
+| [3](#requirement-3-challenge-definition-and-loading) | Challenge Definition and Loading | domain | zod-validated, deep-frozen challenge JSON; bundled Cantilever Beam I values; cross-field rules. | D-47 |
+| [4](#requirement-4-locked-fields-and-immutable-challenge-data) | Locked Fields and Immutable Challenge Data | state | Span, material, load and support fixed by the challenge and shown read-only. | D-32 |
+| [5](#requirement-5-section-types-and-geometry-validation) | Section Types and Geometry Validation | domain | Four section kinds and every geometry validation error code. |  |
+| [6](#requirement-6-clamp-strict-set-and-section-conversion) | Clamp, Strict Set, and Section Conversion | domain | Clamp mode for drags, strict mode for typed values, section-kind conversion. |  |
+| [7](#requirement-7-orientation-and-envelope) | Orientation and Envelope | domain | 0°/90° orientation and the oriented envelope. | D-26 |
+| [8](#requirement-8-section-properties) | Section Properties | domain | Area, second moments and extreme fibres per section, with fixture values. |  |
+| [9](#requirement-9-beam-solver) | Beam Solver | domain | Deterministic Euler–Bernoulli cantilever analysis and its scaling laws. |  |
+| [10](#requirement-10-model-applicability-and-analysis-metadata) | Model Applicability and Analysis Metadata | domain | Fourteen applicability thresholds, warnings, not-applicable reasons and model metadata. |  |
+| [11](#requirement-11-constraint-evaluation) | Constraint Evaluation | domain | Seven constraint results with inclusive REL_TOL comparison. |  |
+| [12](#requirement-12-acceptance-status-and-efficiency) | Acceptance Status and Efficiency | domain | Accepted, Not accepted or Model not applicable; efficiency margins; fixture outcomes. | D-47 |
+| [13](#requirement-13-grounded-explanations) | Grounded Explanations | domain | Explanation facts whose numbers come from stored results. |  |
+| [14](#requirement-14-prediction-checkpoint-and-scoring) | Prediction Checkpoint and Scoring | state | Required predictions on iterations 1 and 3 and the ±2% scoring rule. | D-27 (extension) |
+| [15](#requirement-15-session-initialization-and-reducer-invariants) | Session Initialization and Reducer Invariants | state | Baseline as iteration 0; pure, deterministic reducer invariants. |  |
+| [16](#requirement-16-draft-and-tested-status) | Draft and Tested Status | state | Draft versus Tested status; untested drafts show no computed results. |  |
+| [17](#requirement-17-run-test) | Run Test | state | Run Test appends one result, saves it and updates the compare selection. |  |
+| [18](#requirement-18-append-only-history-and-comparison) | Append-Only History and Comparison | state | Immutable history; Baseline-anchored comparison of up to three iterations. | D-29, D-30, D-31, D-51 |
+| [19](#requirement-19-restore) | Restore | state | Restore an earlier design into the draft without changing history. | D-31 |
+| [20](#requirement-20-reflection-and-submission) | Reflection and Submission | state | Reflection text and submission of a chosen tested iteration. | D-31 |
+| [21](#requirement-21-session-persistence) | Session Persistence | state | Versioned `localStorage` save with migration and re-analysis on load. | D-50 |
+| [22](#requirement-22-design-import-and-export) | Design Import and Export | state | `ei-design` JSON export and validated import. |  |
+| [23](#requirement-23-security-of-imported-data-and-rendering) | Security of Imported Data and Rendering | platform | Import size and key limits, escaping, CSP, no tracking, dev-only state snapshot. | D-50 |
+| [24](#requirement-24-application-layout) | Application Layout | UI | Template grid at each breakpoint, lazy 3D bundle, loading placeholder. |  |
+| [25](#requirement-25-3d-viewport) | 3D Viewport | UI | 3D scene, deformation exaggeration, scene controls and style. | D-26 |
+| [26](#requirement-26-section-palette) | Section Palette | UI | Section tiles applied by drag, click and keyboard. |  |
+| [27](#requirement-27-dimension-handles) | Dimension Handles | UI | Draggable 3D handles that resize the section through the clamper. | D-26 |
+| [28](#requirement-28-numeric-controls) | Numeric Controls | UI | Millimetre inputs with strict validation and the orientation radio group. |  |
+| [29](#requirement-29-requirements-and-results-panel) | Requirements and Results Panel | UI | Challenge statement, constraint results, Run Test, footer notice, history and compare tabs. | D-28, D-29, D-30 |
+| [30](#requirement-30-dialogs-and-live-announcements) | Dialogs and Live Announcements | UI | Modal dialog focus rules and the single polite live region. |  |
+| [31](#requirement-31-webgl-fallback) | WebGL Fallback | UI | SVG fallback when WebGL or the 3D bundle is unavailable. |  |
+| [32](#requirement-32-accessibility) | Accessibility | quality | Keyboard and click equivalents, text summary, contrast, focus, reduced motion. | D-29 |
+| [33](#requirement-33-testing-and-milestone-gates) | Testing and Milestone Gates | quality | Property tests, model-based reducer tests, coverage, E2E and milestone gates. |  |
+| [34](#requirement-34-platform-shell-and-preview-items) | Platform Shell and Preview Items | platform | Sidebar, library, detail drawer, previews, My designs, notebook, product name. | D-33, D-42–D-44, D-50, D-53–D-55, D-57–D-63 |
+| [35](#requirement-35-interaction-modes-and-workflow-stepper) | Interaction Modes and Workflow Stepper | UI | Guided and Parametric share one model; workflow stepper and submit button. | D-36, D-37, D-49 |
+
 ## Introduction
+
+*Written at MVP closeout. Statements about scope and previews describe the MVP; [Related specifications](#related-specifications) lists what has been added since.*
 
 Statica (working title "Engineering Intuition Platform") MVP is a browser-only single-page application that trains students to diagnose and improve a flawed mechanical component. The MVP ships one challenge, "Cantilever Beam I: Reduce Deflection". A student inspects a cantilever with a downward tip load, predicts the effect of a change, swaps and resizes the cross-section in a 3D viewport, runs a deterministic Euler-Bernoulli analysis, reads per-constraint feedback, compares iterations, restores earlier designs, answers a reflection prompt, and submits.
 
@@ -10,55 +132,57 @@ The MVP is built inside the existing Figma Make UI template at `Educational Tool
 
 ## Glossary
 
-- **Platform**: The Statica single-page application as a whole, including the Platform_Shell and the Workbench.
-- **Template_Root**: The project root folder `Educational Tool UI Design/`, which holds the retained Figma Make template and all MVP source.
-- **Platform_Shell**: The retained template navigation and pages: sidebar, challenge library (filters, search, Explore/Saved views), challenge detail drawer, learning paths, my designs, notebook, and mode cards.
-- **Workbench**: The challenge workspace for Cantilever Beam I, built from the template's `design-panel`, viewport panel, `challenge-panel`, `results-panel`, and `page-footer` regions.
-- **Workflow_Stepper**: The four-step indicator in the Workbench: Inspect → Modify & predict → Test & compare → Explain & submit.
-- **Preview_Item**: A challenge other than Cantilever Beam I, a learning path, or the Freeform mode, shown in the Platform_Shell as a preview or "Planned" item with no runnable analysis.
-- **Interaction_Mode**: One of `guided`, `parametric`, or `freeform`. Guided and Parametric are runnable for Cantilever Beam I; Freeform is a Preview_Item.
-- **Domain_Modules**: The pure TypeScript modules `units/`, `challenge/`, `geometry/`, `physics/`, and `evaluation/`.
-- **CI_Pipeline**: The GitHub Actions workflow in `.github/workflows/ci.yml`.
-- **Units_Module**: The `units/` module that converts between SI values and display units.
+Terms are defined as they were for the MVP, in alphabetical order. Where a decision has since changed the behavior a term describes (for example Workflow_Stepper and Preview_Item), the requirement notes say so.
+
+- **Analysis**: The frozen result of `analyze` for one Design.
+- **Applicability_Checker**: The `physics/` function `checkApplicability`.
+- **Baseline**: The Test_Result at iteration 0, produced from the challenge's initial design.
 - **Challenge**: A frozen, schema-validated scenario definition (load case, material, limits, ranges, content).
 - **Challenge_Loader**: The `challenge/` function `loadChallenge` that validates unknown JSON into a Challenge.
-- **Locked_Field**: A challenge-fixed field that students cannot change: `lengthM`, `materialId`, `forceN`, `support`.
-- **Section**: A typed cross-section: circle, tube, rectangle, or I-section, with dimensions in metres.
-- **Design**: A `BeamDesign` consisting of a Section, an orientation (0° or 90°), `lengthM`, and `materialId`.
-- **Draft**: The editable Design held in session state.
-- **Geometry_Validator**: The `geometry/` functions `validateSection` and `validateDesign`.
-- **Section_Clamper**: The `geometry/` function `clampParam`, used for handle drags.
-- **Strict_Setter**: The `geometry/` function `trySetParam`, used for numeric input.
-- **Section_Converter**: The `geometry/` function `convertSection`, used when the section kind changes.
-- **Envelope**: The oriented bounding box of a Section in global Z (width) and Y (height).
-- **GEOM_TOL**: Absolute geometry tolerance of 1e-9 m.
-- **Physics_Engine**: The `physics/` module (`sectionProperties`, `bendingProperties`, `analyze`, `deflectionShape`).
-- **Applicability_Checker**: The `physics/` function `checkApplicability`.
-- **Analysis**: The frozen result of `analyze` for one Design.
-- **I_bend**: The second moment of area resisting vertical load for the current orientation (Ixx at 0°, Iyy at 90°).
+- **CI_Pipeline**: The GitHub Actions workflow in `.github/workflows/ci.yml`.
 - **Constraint_Engine**: The `evaluation/` functions `withinLimit` and `evaluate`.
-- **REL_TOL**: Relative comparison tolerance of 1e-9.
-- **Evaluation**: The frozen result of `evaluate`: constraint results, failures, status, efficiency, facts.
-- **Status**: One of `accepted`, `notAccepted`, `modelNotApplicable`.
-- **Explanation_Generator**: The `evaluation/` functions that produce grounded `ExplanationFact` entries.
-- **Prediction_Scorer**: The `evaluation/` function `scorePrediction`.
-- **Session_Reducer**: The pure `state/` function `sessionReducer` together with `initSession`.
-- **Test_Result**: A frozen history entry containing a design snapshot, Analysis, Evaluation, and optional prediction.
-- **Baseline**: The Test_Result at iteration 0, produced from the challenge's initial design.
-- **Persistence_Module**: The `state/` serialization, migration, and `localStorage` functions.
-- **Import_Export_Module**: The `state/` functions `exportDesign` and `importDesign`.
-- **Viewport**: The React Three Fiber (WebGL) 3D scene component in the Workbench viewport panel.
-- **SVG_Fallback**: The SVG beam projection adapted from the template's `BeamScene.tsx`, plus a 2D section view, used when WebGL is unavailable.
-- **Section_Palette**: The UI tile list used to choose a section kind.
+- **Design**: A `BeamDesign` consisting of a Section, an orientation (0° or 90°), `lengthM`, and `materialId`.
 - **Dimension_Handles**: Draggable 3D handles that resize Section parameters.
-- **Numeric_Controls**: The labeled millimetre inputs and orientation radio group.
-- **Requirements_Panel**: The template `challenge-panel` region showing the challenge statement, constraints, Run Test, and results.
+- **Domain_Modules**: The pure TypeScript modules `units/`, `challenge/`, `geometry/`, `physics/`, and `evaluation/`.
+- **Draft**: The editable Design held in session state.
+- **Envelope**: The oriented bounding box of a Section in global Z (width) and Y (height).
+- **Evaluation**: The frozen result of `evaluate`: constraint results, failures, status, efficiency, facts.
+- **Explanation_Generator**: The `evaluation/` functions that produce grounded `ExplanationFact` entries.
+- **GEOM_TOL**: Absolute geometry tolerance of 1e-9 m.
+- **Geometry_Validator**: The `geometry/` functions `validateSection` and `validateDesign`.
 - **History_Compare**: The template `results-panel` region, with "Design history" and "Compare results" tabs, listing Baseline and iterations with compare and restore.
-- **Prediction_Dialog**: The modal that collects a predicted direction of deflection change.
-- **Reflection_Prompt**: The textarea that collects the reflection answer.
-- **Submit_Dialog**: The dialog that selects a Test_Result and records a submission.
+- **I_bend**: The second moment of area resisting vertical load for the current orientation (Ixx at 0°, Iyy at 90°).
+- **Import_Export_Module**: The `state/` functions `exportDesign` and `importDesign`.
+- **Interaction_Mode**: One of `guided`, `parametric`, or `freeform`. Guided and Parametric are runnable for Cantilever Beam I; Freeform is a Preview_Item.
 - **Live_Region**: The `aria-live="polite"` announcer element. The template's visual toast shows the same notices but is not the Live_Region.
+- **Locked_Field**: A challenge-fixed field that students cannot change: `lengthM`, `materialId`, `forceN`, `support`.
+- **Numeric_Controls**: The labeled millimetre inputs and orientation radio group.
+- **Persistence_Module**: The `state/` serialization, migration, and `localStorage` functions.
+- **Physics_Engine**: The `physics/` module (`sectionProperties`, `bendingProperties`, `analyze`, `deflectionShape`).
+- **Platform**: The Statica single-page application as a whole, including the Platform_Shell and the Workbench.
+- **Platform_Shell**: The retained template navigation and pages: sidebar, challenge library (filters, search, Explore/Saved views), challenge detail drawer, learning paths, my designs, notebook, and mode cards.
+- **Prediction_Dialog**: The modal that collects a predicted direction of deflection change.
+- **Prediction_Scorer**: The `evaluation/` function `scorePrediction`.
+- **Preview_Item**: A challenge other than Cantilever Beam I, a learning path, or the Freeform mode, shown in the Platform_Shell as a preview or "Planned" item with no runnable analysis.
+- **Reflection_Prompt**: The textarea that collects the reflection answer.
+- **REL_TOL**: Relative comparison tolerance of 1e-9.
+- **Requirements_Panel**: The template `challenge-panel` region showing the challenge statement, constraints, Run Test, and results.
+- **Section**: A typed cross-section: circle, tube, rectangle, or I-section, with dimensions in metres.
+- **Section_Clamper**: The `geometry/` function `clampParam`, used for handle drags.
+- **Section_Converter**: The `geometry/` function `convertSection`, used when the section kind changes.
+- **Section_Palette**: The UI tile list used to choose a section kind.
+- **Session_Reducer**: The pure `state/` function `sessionReducer` together with `initSession`.
+- **Status**: One of `accepted`, `notAccepted`, `modelNotApplicable`.
+- **Strict_Setter**: The `geometry/` function `trySetParam`, used for numeric input.
+- **Submit_Dialog**: The dialog that selects a Test_Result and records a submission.
+- **SVG_Fallback**: The SVG beam projection adapted from the template's `BeamScene.tsx`, plus a 2D section view, used when WebGL is unavailable.
+- **Template_Root**: The project root folder `Educational Tool UI Design/`, which holds the retained Figma Make template and all MVP source.
+- **Test_Result**: A frozen history entry containing a design snapshot, Analysis, Evaluation, and optional prediction.
 - **Test_Suite**: The Vitest, fast-check, Testing Library, and Playwright tests of the Platform.
+- **Units_Module**: The `units/` module that converts between SI values and display units.
+- **Viewport**: The React Three Fiber (WebGL) 3D scene component in the Workbench viewport panel.
+- **Workbench**: The challenge workspace for Cantilever Beam I, built from the template's `design-panel`, viewport panel, `challenge-panel`, `results-panel`, and `page-footer` regions.
+- **Workflow_Stepper**: The four-step indicator in the Workbench: Inspect → Modify & predict → Test & compare → Explain & submit.
 
 ## Requirements
 
@@ -99,6 +223,8 @@ The MVP is built inside the existing Figma Make UI template at `Educational Tool
 
 ### Requirement 3: Challenge Definition and Loading
 
+*Amended by D-47 and its amendment (2026-10-18): the beam baseline in 3.6 is now a Ø31 mm solid circle that fails deflection and mass (content version 3); the Ø30 mm circle remains a physics fixture. See [DECISIONS.md][decisions].*
+
 **User Story:** As a content author, I want challenges defined as schema-validated configuration, so that new challenges can be added without code changes and invalid data is caught early.
 
 #### Acceptance Criteria
@@ -137,6 +263,8 @@ The MVP is built inside the existing Figma Make UI template at `Educational Tool
 10. IF the supplied challenge input is not parseable JSON, THEN THE Challenge_Loader SHALL return no Challenge and SHALL return a schema issue indicating that the input could not be parsed.
 
 ### Requirement 4: Locked Fields and Immutable Challenge Data
+
+*Amended by D-32 (2026-10-16): the fixed values of 4.8 sit in a native disclosure, collapsed by default, with the lock icon and summary always visible; which fields are locked is unchanged. See [DECISIONS.md][decisions].*
 
 **User Story:** As an instructor, I want the load case, span, and material fixed by the challenge, so that students learn by changing only the cross-section.
 
@@ -193,6 +321,8 @@ The MVP is built inside the existing Figma Make UI template at `Educational Tool
 11. WHEN the target section kind equals the current kind, THE Section_Converter SHALL return a Section deep-equal to the current Section.
 
 ### Requirement 7: Orientation and Envelope
+
+*Amended by D-26 (2026-10-15): the bending-axis label and axis triad of 7.5 are removed from the 3D model. See [DECISIONS.md][decisions].*
 
 **User Story:** As a student, I want to rotate a section between 0° and 90° and see how its footprint changes, so that I learn how orientation affects bending stiffness.
 
@@ -280,6 +410,8 @@ The MVP is built inside the existing Figma Make UI template at `Educational Tool
 
 ### Requirement 12: Acceptance Status and Efficiency
 
+*Amended by D-47 and its amendment (2026-10-18): the Baseline fixture in 12.7 describes the former Ø30 mm baseline; the current beam baseline (Ø31 mm) fails deflection and mass. See [DECISIONS.md][decisions].*
+
 **User Story:** As a student, I want a single acceptance status plus efficiency indicators, so that I can tell whether my design works and how much margin it has.
 
 #### Acceptance Criteria
@@ -312,6 +444,8 @@ The MVP is built inside the existing Figma Make UI template at `Educational Tool
 9. WHEN the same pair of Test_Results is compared more than once, THE Explanation_Generator SHALL produce identical facts each time, with the same `id`, `text`, and `basis` values in the same order.
 
 ### Requirement 14: Prediction Checkpoint and Scoring
+
+*Extended by D-27: `setPrediction` carries an injected `now` that becomes `Prediction.createdAt`, which keeps 15.8; the criteria text is unchanged. See [DECISIONS.md][decisions].*
 
 **User Story:** As a student, I want to predict the effect of my change before testing, so that I practice engineering judgment and see whether my intuition was right.
 
@@ -378,6 +512,8 @@ The MVP is built inside the existing Figma Make UI template at `Educational Tool
 
 ### Requirement 18: Append-Only History and Comparison
 
+*Amended by D-29, D-30, D-31 (2026-10-16) and D-51 (2026-10-18): compact history rows and a list/detail comparison view; non-Baseline entries can be deleted from the visible history (archived results are kept); reset to baseline restarts history with a new Baseline, and 18.1 still holds for every other action. See [DECISIONS.md][decisions].*
+
 **User Story:** As a student, I want an unchangeable record of my tests that I can compare, so that I can see how each change affected performance.
 
 #### Acceptance Criteria
@@ -393,6 +529,8 @@ The MVP is built inside the existing Figma Make UI template at `Educational Tool
 
 ### Requirement 19: Restore
 
+*Amended by D-31 (2026-10-16): a result deleted from the visible history can no longer be restored. See [DECISIONS.md][decisions].*
+
 **User Story:** As a student, I want to restore an earlier design, so that I can branch from a better iteration without losing history.
 
 #### Acceptance Criteria
@@ -406,6 +544,8 @@ The MVP is built inside the existing Figma Make UI template at `Educational Tool
 7. IF a restore action references a Test_Result id absent from history, THEN THE Session_Reducer SHALL return a state deep-equal to the input state, with the Draft, `draftStatus`, `draftErrors`, and history unchanged.
 
 ### Requirement 20: Reflection and Submission
+
+*Amended by D-31 (2026-10-16): a deleted result cannot be submitted, and deleting the submitted result clears the submission but keeps the reflection text. See [DECISIONS.md][decisions].*
 
 **User Story:** As a student, I want to reflect on what I learned and submit a chosen iteration, so that I complete the challenge deliberately.
 
@@ -421,6 +561,8 @@ The MVP is built inside the existing Figma Make UI template at `Educational Tool
 8. THE Platform SHALL record the reflection text without assigning any score, grade, or pass/fail judgment to it, and the recorded Status SHALL be identical regardless of the reflection text content.
 
 ### Requirement 21: Session Persistence
+
+*Amended by D-50 (2026-10-18): sessions of signed-in local accounts are saved under `ei:user:<id>:session:<challengeId>:v<n>`; guest keys are unchanged. See [DECISIONS.md][decisions].*
 
 **User Story:** As a student, I want my progress saved in the browser, so that a reload does not lose my work.
 
@@ -450,6 +592,8 @@ The MVP is built inside the existing Figma Make UI template at `Educational Tool
 7. WHEN valid JSON is imported, THE Session_Reducer SHALL set `draftStatus` to `tested` if the imported Design deep-equals the latest Test_Result design snapshot (ignoring design id), and to `draft` otherwise.
 
 ### Requirement 23: Security of Imported Data and Rendering
+
+*Amended by D-50 (2026-10-18): optional local accounts ask for credentials (23.9), kept on this device only as PBKDF2 hashes; nothing is sent over the network. See [DECISIONS.md][decisions].*
 
 **User Story:** As a student, I want imported files and stored data handled safely, so that a malicious file cannot compromise the app.
 
@@ -486,6 +630,8 @@ The MVP is built inside the existing Figma Make UI template at `Educational Tool
 11. THE Platform SHALL keep the template's visual design: `src/index.css`, `src/platform.css`, and `src/platform-base.css` remain the stylesheets for the Platform_Shell and Workbench, and the Workbench SHALL keep the template's class names for its regions (`design-panel`, `viewport`, `challenge-panel`, `results-panel`, `page-footer`, `toast`, `modal`) so those stylesheets apply unchanged, except for edits needed for self-hosted fonts and accessibility contrast (Requirement 32.5, 32.6).
 
 ### Requirement 25: 3D Viewport
+
+*Amended by D-26 (2026-10-15): the visible envelope, dimension, span and axis guides, static text annotations and the "Fixed support" text (25.1, 25.12, 25.15) are removed from the 3D model. See [DECISIONS.md][decisions].*
 
 **User Story:** As a student, I want to see the beam, load, and deformation in 3D, so that I can connect the numbers to physical behavior.
 
@@ -525,6 +671,8 @@ The MVP is built inside the existing Figma Make UI template at `Educational Tool
 
 ### Requirement 27: Dimension Handles
 
+*Amended by D-26 (2026-10-15): the live value label and limit feedback of 27.3–27.4 appear in a bar below the canvas, not next to the handle. See [DECISIONS.md][decisions].*
+
 **User Story:** As a student, I want to drag handles to resize the section, so that I can explore shape changes directly in 3D.
 
 #### Acceptance Criteria
@@ -553,6 +701,8 @@ The MVP is built inside the existing Figma Make UI template at `Educational Tool
 8. WHEN an orientation option is selected, THE Session_Reducer SHALL set the Draft orientation to the selected value (0 or 90) and leave every Section parameter unchanged.
 
 ### Requirement 29: Requirements and Results Panel
+
+*Amended by D-28, D-29 and D-30 (2026-10-16): a compact value/limit list with Pass/Fail badges; no Status banner in the panel (29.6); the full table sits in a collapsed Test details disclosure without explanation prose or college formulas (29.6, 29.8); Compare results uses the history list/detail layout (29.11). See [DECISIONS.md][decisions].*
 
 **User Story:** As a student, I want the challenge requirements and my results in one place, so that I can see what passes and what fails.
 
@@ -601,6 +751,8 @@ The MVP is built inside the existing Figma Make UI template at `Educational Tool
 
 ### Requirement 32: Accessibility
 
+*Amended by D-29 (2026-10-16): the Not accepted badge shows text alone, with no icon (32.4). See [DECISIONS.md][decisions].*
+
 **User Story:** As a student with a disability, I want to complete the whole challenge with a keyboard and assistive technology, so that I have equal access to the learning experience.
 
 #### Acceptance Criteria
@@ -636,6 +788,8 @@ The MVP is built inside the existing Figma Make UI template at `Educational Tool
 
 ### Requirement 34: Platform Shell and Preview Items
 
+*Amended by D-33 (2026-10-16), D-42–D-44 (2026-10-17), D-50 and D-53–D-55 (2026-10-18), and D-57–D-63 (2026-10-19): all ten catalog challenges are available and ordered by difficulty; My designs shows workspaces, not a results list (34.7); local accounts and a standalone Home page; Learning paths became Learn. See [DECISIONS.md][decisions].*
+
 **User Story:** As a student, I want to browse the wider challenge library and learning paths, so that I can see where the platform is going, without being misled into thinking unfinished challenges are real simulations.
 
 #### Acceptance Criteria
@@ -651,6 +805,8 @@ The MVP is built inside the existing Figma Make UI template at `Educational Tool
 9. THE Platform SHALL display the product name "Statica" in the sidebar brand, the document title, and the help dialog.
 
 ### Requirement 35: Interaction Modes and Workflow Stepper
+
+*Amended by D-36, D-37 (2026-10-16) and D-49 (2026-10-18): the mode is chosen before entry and fixed inside the workbench; Guided runs single-variable experiments that lock parameters per step; the Workflow_Stepper (35.5) is removed. See [DECISIONS.md][decisions].*
 
 **User Story:** As a student, I want to choose Guided or Parametric editing and see where I am in the workflow, so that I can learn in my preferred style while solving the same problem.
 

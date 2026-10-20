@@ -1,6 +1,18 @@
 # Local pilot protocol and recording materials — task 31.1
 
-Prepared 2026-10-16. Materials are ready for owner review; no participants, consent, sessions or outcomes are claimed. Nikhil is the nominated owner engineering reviewer. Per owner direction, human QA and student testing occur on a release candidate before customer deployment and do not block isolated development. Use the local-only pilot first; account functionality has separate later testing.
+**Updated 2026-10-20** for the full-product pilot. Changed: access is now the GitHub Pages site, with the footer build id recorded per session; the product facts below list ten challenges, three Learn modules and on-device accounts; the suggested session set is the three introductory Learn → challenge pairs instead of Cantilever Beam I alone; no deploy during a session. The session script, pre/post questions, rubric and sheets are unchanged. The two replaced sentences of the 2026-10-16 version are kept in HANDOFF_HISTORY.md.
+
+Prepared 2026-10-16. Materials are ready for owner review; no participants, consent, sessions or outcomes are claimed. Nikhil is the nominated owner engineering reviewer. Per owner direction, human QA and student testing occur on a release candidate before customer deployment and do not block isolated development. The pilot uses the full product on the GitHub Pages site, including on-device accounts (see Access and product).
+
+## Access and product (2026-10-20)
+
+- **Access:** the GitHub Pages site, https://niyer45.github.io/Statica-Edu/ (deploy steps in DEPLOY.md). Record the build id shown in the Home page footer ("Build" and seven characters of the commit) on each session cover sheet.
+- **Challenges (ten, each in Guided or Parametric, chosen before entry):** Introductory: 001 Cantilever Beam I, 002 Torsion Shaft I, 003 Column Buckling I, 004 Stress and Strain I. Intermediate: 005 Mounting Bracket I, 006 Heat Sink I, 007 Pressure Vessel I. Advanced: 008 Braced Frame I, 009 Vibration Isolation I, 010 Fatigue Analysis I.
+- **Learn modules (three):** Beam bending, Torsion, Stress and strain. Each ends with Apply it, which opens its challenge (Cantilever Beam I, Torsion Shaft I, Stress and Strain I) in Guided mode.
+- **Accounts:** local, on-device only. Each participant creates an account on their own device or uses their own browser profile. Accounts never leave the device; there is no password reset.
+- **Progress** is saved per browser. It is not shared between devices, browsers or profiles, a private window loses it when closed, and there is no cloud backup.
+- **No deploy during a session.** An open tab on an old build can break its lazily loaded 3D and formula views until it reloads.
+- **Facilitator note:** the opening script now says accounts stay on the device and that "Accepted" refers to an idealized engineering model (it said "beam model" when the pilot covered one challenge).
 
 ## Session cover sheet
 
@@ -19,7 +31,7 @@ Do not proceed without agreement or if access/readiness/reviewer gates are uncle
 
 ## Opening script — read consistently
 
-“We are testing an educational design tool, not grading you. Your feedback helps identify confusing parts. Participation is voluntary; you may skip a question or stop. We will record task outcomes and brief de-identified observations, not your name or email. Avoid entering identifying information in your reflection. Your designs remain in this browser on this device; there is no account or cloud backup in this pilot. ‘Accepted’ refers to an idealized beam model, not approval for real construction. Please describe what you expect and what you find confusing.”
+“We are testing an educational design tool, not grading you. Your feedback helps identify confusing parts. Participation is voluntary; you may skip a question or stop. We will record task outcomes and brief de-identified observations, not your name or email. Avoid entering identifying information in your reflection. Your designs and any account you create stay in this browser on this device; there is no cloud backup in this pilot. ‘Accepted’ refers to an idealized engineering model, not approval for real construction. Please describe what you expect and what you find confusing.”
 
 Explain where notes will be kept and the actual deletion date (proposed 30 days after analysis; confirm with owner before sessions). Confirm the participant agrees before recording observations. State whether anyone else observes. Do not imply institutional consent/approval has been obtained.
 
@@ -32,7 +44,7 @@ Record the answer in de-identified paraphrase and use the rubric below. Do not t
 
 ## Tasks and neutral facilitator prompts
 
-Use Cantilever Beam I for the first pilot; the second configuration remains a development candidate until integrated/reviewed. Allow 30 minutes for core tasks and roughly 5 minutes for wrap-up.
+Suggested session set, kept the same across participants so sessions can be compared: the three introductory pairs, each a Learn module followed by its challenge — Beam bending → Cantilever Beam I, Stress and strain → Stress and Strain I, Torsion → Torsion Shaft I. The tasks below apply to each challenge. Other challenges are optional and should be recorded separately. Allow 30 minutes for core tasks and roughly 5 minutes for wrap-up.
 
 | Task | Participant instruction | Observer records |
 | --- | --- | --- |
@@ -89,6 +101,6 @@ Aggregate report: actual participants/attempts/completions/interrupted sessions;
 
 ## Before and after each session
 
-Before: record the exact release build; verify owner engineering review, manual accessibility/readiness and pilot access/recovery checks; use a fresh browser profile; check no previous participant work appears; read consent/data handling and confirm agreement. If shared devices are used, ensure the previous profile is removed.
+Before: record the exact release build (the footer build id); confirm no deploy will run during the session; verify owner engineering review, manual accessibility/readiness and pilot access/recovery checks; use a fresh browser profile; check no previous participant work appears; read consent/data handling and confirm agreement. If shared devices are used, ensure the previous profile is removed.
 
 After: retain only agreed de-identified notes; verify saved work as part of the participant's task before clearing it; close/remove the participant browser profile and local session data; check the next session starts clean. Design JSON export does not back up full session history. Do not promise recovery or transfer that has not been implemented.
