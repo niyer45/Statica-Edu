@@ -323,3 +323,14 @@ This is repository/local availability, not customer deployment. Owner engineerin
 
 Owner: introductory challenges first, then intermediate, then advanced. The catalog order sets the library, Home and My designs order, so the catalog itself is ordered that way (within a level, the order challenges were added), and the library numbers shown on cards and in the challenge drawer are renumbered 001–010 to follow it: 001 Cantilever Beam I, 002 Torsion Shaft I, 003 Column Buckling I, 004 Stress and Strain I, 005 Mounting Bracket I, 006 Heat Sink I, 007 Pressure Vessel I, 008 Braced Frame I, 009 Vibration Isolation I, 010 Fatigue Analysis I. Library numbers are display labels only: saves, design files and model ids use challenge ids, so no saved work moves. TechnicalArt figure numbers are derived from the catalog so they always match the card number. The first available entry is still Cantilever Beam I, which keeps the default challenge.
 
+## D-64: The keyboard-flow E2E test has a 150 s budget (2026-10-20)
+
+What: one test, `e2e/learningLoop.spec.ts` "keyboard flow submits a design and focus can leave the canvas", has `test.setTimeout(150_000)` instead of the suite's 90 s. Every other test keeps 90 s.
+
+Why: measured on GitHub runners, the old combined test timed out at 90 s three times on 2026-10-20 (runs 39371364350 attempt 1 and 39425915351 attempt 1, 1.5-1.6 min each). The keyboard-flow half alone still takes 1.0-1.1 min on a healthy runner (runs 39425541797, 39432279501) versus about 14 s locally. The Playwright trace shows no stuck step, only main-thread stalls of 2.8-21 s per wait while the app re-renders the 3D beam under software WebGL after each dimension edit. Nothing the test does is wasteful any more.
+
+Tried first: task 77 split the test in two and removed the keyboard pre-scroll; task 77.2 replaced the keyboard rebuild in the mouse test with a committed normalized fixture comparison and entered the keyboard reflection with `fill()` instead of per-keystroke typing.
+
+Rule unchanged: no assertion, retry or other timeout was changed, and timeouts are never raised to hide a regression. A timeout in any other test is still a failure to investigate.
+
+Approved by the owner on 2026-10-20.

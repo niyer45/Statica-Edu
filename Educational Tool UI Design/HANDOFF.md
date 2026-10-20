@@ -81,7 +81,7 @@ catalog gate), 35.2 (Milestone 5 checkpoint), then 74 onward.
 
 | Task | Date | Commit | CI run | Decision |
 | --- | --- | --- | --- | --- |
-| 77 learningLoop keyboard/mouse E2E split; keyboard path no longer pre-scrolls; 77.2: mouse test compares against a committed normalized fixture (`e2e/fixtures/learningLoop/`) instead of rebuilding the keyboard flow, and the keyboard reflection is entered with `fill()` instead of `pressSequentially` | 2026-10-20 | this branch | pending | — |
+| 77 learningLoop keyboard/mouse E2E split; keyboard path no longer pre-scrolls; 77.2: mouse test compares against a committed normalized fixture (`e2e/fixtures/learningLoop/`) instead of rebuilding the keyboard flow, and the keyboard reflection is entered with `fill()` instead of `pressSequentially`; 77.3: 150 s budget for the keyboard-flow test only (D-64, owner-approved) | 2026-10-20 | this branch | pending | D-64 |
 | Card art: Fatigue Analysis I spindle, Stress and Strain I hanger rod (owner) | 2026-10-20 | 618e2ee | 39368119809 passed | — |
 | 73 Difficulty order, numbers 001–010; CI split into `verify` + 4 shards; cleanup | 2026-10-19 | 5c9e2ba | 39363320472 passed (9.9 min) | D-63 |
 | Pressure Vessel I internal-pressure arrows (2D, 3D cutaway, card art) | 2026-10-19 | ed58280 | not recorded | — |
