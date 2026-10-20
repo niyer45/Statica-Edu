@@ -1,5 +1,7 @@
 # Statica Edu repository instructions
 
-Read `Educational Tool UI Design/AGENTS.md` and `Educational Tool UI Design/HANDOFF.md` before working anywhere in this repository, including sibling `.kiro/` specifications. Those files contain the current shared development rules/status. `CLAUDE.md` provides the Claude Code entry point.
-
-App commands run from `Educational Tool UI Design/`; specs live in `.kiro/specs/` at the root. 45.1 original-catalog scoping is complete (`.kiro/specs/original-catalog/`, D-38); 45.2 shared contracts are specified (`.kiro/specs/multi-model-architecture/`, D-39). Task 34, models 46.2–50.2 and Torsion Shaft I (47, D-42) are complete; next development task is 50.3. Preserve completed functionality/specifications, mode selection before entry with no in-workbench switch, original-six-before-second-editions priority and truthful QA/task evidence. After each task update task status and handoff/agent docs, verify the change and push authorized batches; await user workflow feedback without continuous polling. Do not deploy or contact others as part of this handoff.
+Read `PROGRAM.md` (the plan), then `Educational Tool UI Design/AGENTS.md` (the development rules) and
+`Educational Tool UI Design/HANDOFF.md` (the current state) before working anywhere in this
+repository, including `.kiro/specs/`. The task list is `.kiro/specs/engineering-intuition-mvp/tasks.md`.
+App commands run in `Educational Tool UI Design/` with Node 22 and pnpm 10.34.3.
+Never fabricate human QA; activations and deploys need owner approval; update tasks.md and HANDOFF.md after every task.

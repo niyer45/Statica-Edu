@@ -1,5 +1,7 @@
 # Owner review checklist: open questions across the challenge specifications
 
+Card and FIG. numbers follow the difficulty order of D-63 (2026-10-19).
+
 Task 55, compiled 2026-10-17 for the owner's pre-release engineering review ([task 29.2][tasks]).
 
 **What this is.** One list of every open owner question in the challenge specifications, plus the developer-written UI copy that still needs owner wording review. Under the owner policy of 2026-10-17, **every default stays live as implemented**. This document decides nothing and changes nothing.
@@ -21,7 +23,7 @@ Every challenge has these open items in common (OC-14, [D-34][dec]):
 - [ ] **Beam copy.** `BEAM_LIMITS_NOTICE` "Idealized beam approximation, not a structural certification", tagline "Reduce deflection within mass and stress limits.", solver label "Euler–Bernoulli · Beam solver" (`src/ui/models/beam.tsx:20–29`).
 - [ ] **44.3 manual mode checks.** Owner manual Guided/Parametric checks on the release candidate, including screen-reader and touch checks under 30.1 ([tasks 44.3][tasks]).
 
-## 2. Torsion Shaft I (`torsion-shaft-1`, card 003, available since D-42)
+## 2. Torsion Shaft I (`torsion-shaft-1`, card 002, available since D-42)
 
 Sources: [requirements][ts-r] and [design][ts-d]; `torsion-shaft-1.json`; [`src/ui/models/torsion/index.tsx`][ts-ui].
 
@@ -52,7 +54,7 @@ Sources: [requirements][ts-r] and [design][ts-d]; `torsion-shaft-1.json`; [`src/
 **Verification items**
 - [ ] **View.** A 3D shaft (task 54.2, D-45) is now the primary view; the SVG elevation is the fallback. Confirm the twist line exaggeration (×10, capped) reads clearly and is not mistaken for true scale.
 
-## 3. Vibration Isolation I (`vibration-isolation-1`, card 006, available since D-43)
+## 3. Vibration Isolation I (`vibration-isolation-1`, card 009, available since D-43)
 
 Sources: [requirements][vi-r] and [design][vi-d] (§Open questions Q1–Q5); `vibration-isolation-1.json`; [`src/ui/models/vibration/index.tsx`][vi-ui].
 
@@ -84,7 +86,7 @@ Sources: [requirements][vi-r] and [design][vi-d] (§Open questions Q1–Q5); `vi
 **Verification items**
 - [ ] None beyond 29.2 and the references. The numeric cross-checks (golden-section, dense grid, RK4) are development evidence ([design][vi-d]).
 
-## 4. Heat Sink I (`heat-sink-1`, card 004, available since D-43)
+## 4. Heat Sink I (`heat-sink-1`, card 006, available since D-43)
 
 Sources: [requirements][hs-r] and [design][hs-d]; `heat-sink-1.json`; [`src/ui/models/heatSink/index.tsx`][hs-ui]. The owner settled HS-08 on 2026-10-17 (D-40): a specified effective h with a minimum-gap rule. Tasks 48.1 and HANDOFF mention "seven open owner questions", but the spec does not number them. The items below are every point the spec marks as pending owner review.
 
@@ -118,7 +120,7 @@ Sources: [requirements][hs-r] and [design][hs-d]; `heat-sink-1.json`; [`src/ui/m
 - [ ] **Thick-fin count.** The worksheet count was corrected from 23 to 27 (inclusive gap rule; [design][hs-d] §Derived targets). Confirm.
 - [ ] **View.** HSK-14 specified a lazily loaded 3D fin array; a fin-array SVG with a profile table shipped ([tasks 48.3][tasks]). Task 54 does not cover the heat sink (see §7).
 
-## 5. Mounting Bracket I (`mounting-bracket-1`, card 002, available since D-43)
+## 5. Mounting Bracket I (`mounting-bracket-1`, card 005, available since D-43)
 
 Sources: [requirements][mb-r] and [design][mb-d]; `mounting-bracket-1.json`; [`src/ui/models/bracket/index.tsx`][mb-ui]. The owner decided MB-07 (D-40) and K-1 to K-5 (D-41) for development. Those decisions are not 29.2 sign-off.
 
@@ -155,7 +157,7 @@ Sources: [requirements][mb-r] and [design][mb-d]; `mounting-bracket-1.json`; [`s
 - [ ] **Chart rows recorded, not asserted.** The digitized-chart rows at D/d = 3 and ≤ 1.05 are recorded for review only ([design][mb-d] §Alternative-method (c)).
 - [ ] **View.** A 3D bracket (task 54.1, D-45): wall, mounting plate with bolts, stepped bar, hanging load and a band at the governing section. Without WebGL2 a 2D side view shows the same context. Confirm both now show what the component is.
 
-## 6. Braced Frame I (`braced-frame-1`, card 005, available since D-44)
+## 6. Braced Frame I (`braced-frame-1`, card 008, available since D-44)
 
 Sources: [requirements][bf-r] and [design][bf-d] (§Integration notes, owner questions 1–8); `braced-frame-1.json`; [`src/ui/models/bracedFrame/index.tsx`][bf-ui].
 
@@ -187,17 +189,17 @@ Sources: [requirements][bf-r] and [design][bf-d] (§Integration notes, owner que
 - [ ] Hibbeler, *Structural Analysis*; McGuire, Gallagher & Ziemian, *Matrix Structural Analysis*; Timoshenko & Gere, *Theory of Elastic Stability*; Salmon, Johnson & Malhas; Higham, and Golub & Van Loan (pivoted Cholesky). Each needs edition and equation numbers ([design][bf-d] §References; `src/physics/bracedFrame/{directStiffness,members,pivotedCholesky}.ts`).
 
 **Verification items**
-- [ ] **Activation.** Card 005 activation has not been requested (`available: false` in `src/challenge/catalog.ts`; [D-43][dec]). The browser spec `e2e/bracedFrame.spec.ts` still skips.
+- [x] **Activation.** Card 008 was activated with owner approval on 2026-10-17 ([D-44][dec]); `e2e/bracedFrame.spec.ts` runs unskipped. (Written before activation as "not requested, `available: false`".)
 - [ ] **View.** A 3D frame (task 54.3, D-45). Tube diameters are drawn ×4 (not to scale) so the sections are visible; patterns: solid tension, striped compression, beaded ≈ 0, open wire mesh untested, dashed absent. Confirm the exaggeration and pattern key.
 
 ## 7. Cross-cutting
 
 **Catalog card copy (OC-15; `src/challenge/catalog.ts`)**
-- [ ] 002 Mounting Bracket I: "Rethink a mounting bracket that carries more stress than it should.", concepts Load paths and Stress concentrations. Kept per MB-07(b) (D-40).
-- [ ] 003 Torsion Shaft I: "Balance torsional stiffness, weight, and packaging in a rotating shaft.", concepts Torsion and Section properties. TSH-01 says it is "supported as written", although rotating dynamics are excluded (TSH-12).
-- [ ] 004 Heat Sink I: "Explore how geometry helps a compact heat sink move heat away.", concepts Heat transfer and Surface area (HSK-01).
-- [ ] 005 Braced Frame I: "Follow the forces through a frame and strengthen what matters.", concepts Frame analysis and Stability. BFR-01 makes this conditional on the idealization statement.
-- [ ] 006 Vibration Isolation I: "Tune a component to keep unwanted vibration out of its operating range.", concepts Natural frequency and Vibration (VIB-01).
+- [ ] 005 Mounting Bracket I: "Rethink a mounting bracket that carries more stress than it should.", concepts Load paths and Stress concentrations. Kept per MB-07(b) (D-40).
+- [ ] 002 Torsion Shaft I: "Balance torsional stiffness, weight, and packaging in a rotating shaft.", concepts Torsion and Section properties. TSH-01 says it is "supported as written", although rotating dynamics are excluded (TSH-12).
+- [ ] 006 Heat Sink I: "Explore how geometry helps a compact heat sink move heat away.", concepts Heat transfer and Surface area (HSK-01).
+- [ ] 008 Braced Frame I: "Follow the forces through a frame and strengthen what matters.", concepts Frame analysis and Stability. BFR-01 makes this conditional on the idealization statement.
+- [ ] 009 Vibration Isolation I: "Tune a component to keep unwanted vibration out of its operating range.", concepts Natural frequency and Vibration (VIB-01).
 
 **"Stability" label for the frame**
 - [ ] Keep "Stability" with the idealization statement, or rename it (for example "Bracing and stability")? This is frame Q5 and BFR-01. The current label is `stability: 'Stability'` in `src/evaluation/bracedFrame/constraints.ts:26`. The help text says "Stability here means only whether this pin-jointed idealization is stable or a mechanism".
@@ -244,15 +246,15 @@ Automated gates passed; none of this is human review.
 - [ ] Task 67: work through Learn → Beam bending as a student would. Check each concept point, question, explanation and takeaway for engineering accuracy and level (D-57), and the demo values (1 m aluminium cantilever, 20 × 40 mm bar, 200 N; steel 200 GPa, aluminium 69 GPa, timber 12 GPa). Decide which module comes next (Torsion, Stress and strain, Buckling, Resonance or Fins are listed as Planned).
 - [ ] Task 71 (D-61): Torsion Shaft I is now Introductory. Confirm the new start (solid Ø30.5 mm: twist 2.73° vs 1°, mass 4.59 vs 4.5 kg, stress passes), the shorter statement and reflection prompt, and the three Guided steps (Hollow it out, Move the material outward, Meet every check). Decide whether to keep the shear stress and outer-diameter checks: in this challenge any shaft that meets the twist and 50 mm limits also passes stress (at most about 43 MPa vs 80 MPa), so only twist and mass decide acceptance. Removing a check would change the evaluation contract and needs a new content version.
 - [ ] Task 71 (D-61): work through Learn → Torsion. Check each concept point, question, explanation and takeaway for accuracy and level, and the demo values (1 m steel shaft, G 79 GPa, solid Ø20 mm, 100 N·m; equal-area sections Ø20 solid, 25/15 and 29/21 mm tubes; torque 25–150 N·m, length 0.5–2 m, diameter 20–40 mm).
-- [ ] Task 69: Pressure Vessel I (card 008, your 2026-10-19 request, D-59). Check the model and constants in `.kiro/specs/pressure-vessel-1/` against Hibbeler / Gere & Goodno (thin-wall σ_h = p r/t, σ_l = p r/(2t), hemispherical head p r/(2t), inner radius; edition and equation numbers still to transcribe): 4.0 MPa, steel yield 250 MPa with design factor 2.0 (allowable 125 MPa), 100 L minimum, 1000 mm overall length, 55 kg; screens r/t ≥ 10 (caution below 20) and 0.8/1.0 of yield. Confirm the baseline (Ø240 × 1200 mm, shell 2.5, heads 1.5 mm: fails hoop, head, volume, length) and the five Guided steps. Look at the card drawing, the 3D cutaway and the 2D section (walls drawn 6× thicker, stated under it). Open questions: should discontinuity stresses at the head-shell junction get a screen or stay a listed exclusion; is 2.0 on yield the design factor you want students to see (it is not a code allowable); should a short-shell screen be added when the shell is shorter than its edge-bending zones?
-- [ ] Task 70, Fatigue Analysis I (card 009, owner-requested, D-60; spec `../.kiro/specs/fatigue-analysis-1/`). Engineering review against printed copies, since these are screening correlations, not certification: (a) the Roark shoulder-fillet Kt polynomial (bending) and its edition, because a later Roark edition revised the h/r ≤ 2 coefficients, and the fit reads about 6 % above a Shigley chart value; (b) Shigley's metric Neuber-constant fit and q = 1/(1 + √a/√r); (c) the current-edition Marin surface factors (ground 1.38/−0.067, machined 3.04/−0.217, as-forged converted from 12.7/−0.758 kpsi) and the omission of hot-rolled; (d) the non-rotating equivalent diameter 0.370 d in kb; (e) the f fit and the Basquin line; (f) Kf applied to the mean stress and the first-cycle yield check. Also confirm the challenge constants (630/530 MPa steel, 1–5 kN at 50 mm, 2×10⁵ cycles, n_f ≥ 1.3, n_y ≥ 1.5, 520 g, 2.5 mm shoulder face, 90 % reliability), the change of scope from a rotating shaft to a non-rotating stub-axle spindle under a fluctuating load (one Kt fit instead of bending plus torsion), that surface finish has no modeled cost, the Baseline (thin neck, sharp forged fillet, bulky collar; fails 3, the maximum) and the wording. Visual: the 3D spindle, the 2D side view, the S-N diagram and the FIG. 09 cover art (its hub is drawn at the load line so the fillet shows).
-- [ ] Task 72 (D-62): Stress and Strain I (card 010, Introductory) and the Stress and strain Learn module. Spec `../.kiro/specs/stress-strain-1/` lists four owner questions:
+- [ ] Task 69: Pressure Vessel I (card 007, your 2026-10-19 request, D-59). Check the model and constants in `.kiro/specs/pressure-vessel-1/` against Hibbeler / Gere & Goodno (thin-wall σ_h = p r/t, σ_l = p r/(2t), hemispherical head p r/(2t), inner radius; edition and equation numbers still to transcribe): 4.0 MPa, steel yield 250 MPa with design factor 2.0 (allowable 125 MPa), 100 L minimum, 1000 mm overall length, 55 kg; screens r/t ≥ 10 (caution below 20) and 0.8/1.0 of yield. Confirm the baseline (Ø240 × 1200 mm, shell 2.5, heads 1.5 mm: fails hoop, head, volume, length) and the five Guided steps. Look at the card drawing, the 3D cutaway and the 2D section (walls drawn 6× thicker, stated under it). Open questions: should discontinuity stresses at the head-shell junction get a screen or stay a listed exclusion; is 2.0 on yield the design factor you want students to see (it is not a code allowable); should a short-shell screen be added when the shell is shorter than its edge-bending zones?
+- [ ] Task 70, Fatigue Analysis I (card 010, owner-requested, D-60; spec `../.kiro/specs/fatigue-analysis-1/`). Engineering review against printed copies, since these are screening correlations, not certification: (a) the Roark shoulder-fillet Kt polynomial (bending) and its edition, because a later Roark edition revised the h/r ≤ 2 coefficients, and the fit reads about 6 % above a Shigley chart value; (b) Shigley's metric Neuber-constant fit and q = 1/(1 + √a/√r); (c) the current-edition Marin surface factors (ground 1.38/−0.067, machined 3.04/−0.217, as-forged converted from 12.7/−0.758 kpsi) and the omission of hot-rolled; (d) the non-rotating equivalent diameter 0.370 d in kb; (e) the f fit and the Basquin line; (f) Kf applied to the mean stress and the first-cycle yield check. Also confirm the challenge constants (630/530 MPa steel, 1–5 kN at 50 mm, 2×10⁵ cycles, n_f ≥ 1.3, n_y ≥ 1.5, 520 g, 2.5 mm shoulder face, 90 % reliability), the change of scope from a rotating shaft to a non-rotating stub-axle spindle under a fluctuating load (one Kt fit instead of bending plus torsion), that surface finish has no modeled cost, the Baseline (thin neck, sharp forged fillet, bulky collar; fails 3, the maximum) and the wording. Visual: the 3D spindle, the 2D side view, the S-N diagram and the FIG. 10 cover art (its hub is drawn at the load line so the fillet shows).
+- [ ] Task 72 (D-62): Stress and Strain I (card 004, Introductory) and the Stress and strain Learn module. Spec `../.kiro/specs/stress-strain-1/` lists four owner questions:
   1. Material values (typical textbook values): structural steel 200 GPa / 250 MPa / 7850 kg/m³; aluminium 6061-T6 69 GPa / 276 MPa / 2700 kg/m³; Ti-6Al-4V annealed 114 GPa / 830 MPa / 4430 kg/m³. Some textbooks quote a lower 6061-T6 yield (about 255–270 MPa); no fixture outcome changes, the numbers would.
   2. Design factor 2 on yield, the 2 mm stretch limit and the 2 kg mass limit (20 kN on a 2 m hanger).
   3. Baseline steel Ø13 mm (fails stress and mass, chosen so thickening alone cannot work) versus aluminium Ø11 mm (furthest from passing among the tied two-failure designs).
   4. Whether the reference dialog should mention that titanium is costly (cost is not modeled).
   Also work through the module's five steps, demos and wording, and the rod cover art.
-- [ ] Task 68, Column Buckling I (card 007, D-58; spec `.kiro/specs/column-buckling-1/`): play it in Guided and Parametric. Review (Q1–Q6 in the spec's design.md): the scope (pinned–pinned K = 1, aluminium, length fixed so the length-squared lesson lives in the reference dialog, not an experiment; add a mid-height brace in a later edition?); the constants (E 69 GPa, ρ 2700 kg/m³, allowable 120 MPa, yield 240 MPa, 2 m, 10 kN, required safety factor 2.0, mass ≤ 2.5 kg); the screens (Euler range caution at 0.4 and limit at 0.5 of yield, the Johnson transition; D/t 40/100, the beam/torsion convention); the critical load shown as "value / ≥ limit"; the solid Ø24.5 mm baseline (tie-break over a 10 mm rod); the Guided steps; the textbook names (Shigley, Gere/Timoshenko, Hibbeler, Roark) and their edition/equation numbers; and the column cover art (a round tube between two pinned clevises under a load cap, with a dashed half-sine mode shape) against the challenge.
+- [ ] Task 68, Column Buckling I (card 003, D-58; spec `.kiro/specs/column-buckling-1/`): play it in Guided and Parametric. Review (Q1–Q6 in the spec's design.md): the scope (pinned–pinned K = 1, aluminium, length fixed so the length-squared lesson lives in the reference dialog, not an experiment; add a mid-height brace in a later edition?); the constants (E 69 GPa, ρ 2700 kg/m³, allowable 120 MPa, yield 240 MPa, 2 m, 10 kN, required safety factor 2.0, mass ≤ 2.5 kg); the screens (Euler range caution at 0.4 and limit at 0.5 of yield, the Johnson transition; D/t 40/100, the beam/torsion convention); the critical load shown as "value / ≥ limit"; the solid Ø24.5 mm baseline (tie-break over a 10 mm rod); the Guided steps; the textbook names (Shigley, Gere/Timoshenko, Hibbeler, Roark) and their edition/equation numbers; and the column cover art (a round tube between two pinned clevises under a load cap, with a dashed half-sine mode shape) against the challenge.
 
 ## How to record decisions
 
