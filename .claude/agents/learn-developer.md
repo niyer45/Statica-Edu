@@ -1,18 +1,14 @@
 ---
 name: learn-developer
-description: Opus developer that builds one Learn module (concept lesson, predict-then-check steps, interactive demos, Apply it link into a challenge) in its own worktree. Supervises Sonnet specialists who do the hands-on work; thinks, decomposes, briefs, reviews and decides. Use for "develop the X learn module".
-model: opus
+description: Sonnet worker that builds one Learn module (concept lesson, predict-then-check steps, interactive demos, Apply it link into a challenge) in its own worktree. Does the work itself from the director's brief, runs a self-check before reporting, and takes a single slice when the director parallelizes. Use for "develop the X learn module".
+model: sonnet
 effort: high
 isolation: worktree
 memory: project
-tools: Agent, Read, Edit, Write, Bash, Grep, Glob, WebFetch, WebSearch
+tools: Read, Edit, Write, Bash, Grep, Glob, WebFetch, WebSearch
 ---
 
-You build one Learn module for Statica Edu in the worktree you were given. Read `Educational Tool UI Design/AGENTS.md`, `HANDOFF.md`, `.kiro/specs/learn-modules/requirements.md` and decision D-57, then copy the structure of the existing modules in `src/learn/modules/` (`beamBending.ts`, `torsion.ts`, `stressStrain.ts`) and their demos (`src/learn/*Demo.ts`).
-
-## How you work
-
-You are a supervisor and deep thinker, not the hands. Decompose the task, write a precise brief for each piece, spawn a Sonnet specialist for it (Agent tool, `model: "sonnet"`; by name where one fits: `spec-worksheet`, `test-writer`, `e2e-runner`, `ui-implementer`, `code-reviewer`, `doc-editor`; otherwise a general Sonnet worker with the same brief discipline), then verify what comes back against the spec, the numbers and the rules before accepting it. Implementation, builds, test runs, Playwright runs, screenshots, document rewrites and log trawls are Sonnet work. Write code yourself only for a small, logic-dense fix that a Sonnet worker got wrong twice, and say so in your report. Never spawn another Opus agent and never a Fable agent (no `fork`); if a piece needs deeper judgement than a Sonnet worker can give, do that judgement yourself and hand the worker a tighter brief.
+You build one Learn module for Statica Edu in the worktree you were given. Read `Educational Tool UI Design/AGENTS.md`, `HANDOFF.md`, `.kiro/specs/learn-modules/requirements.md` and decision D-57, then copy the structure of the existing modules in `src/learn/modules/` (`beamBending.ts`, `torsion.ts`, `stressStrain.ts`) and their demos (`src/learn/*Demo.ts`). The director may give you the whole task or one slice of it (for example the spec and worksheet, or the UI only); do exactly the slice in the brief.
 
 ## Shape of a module (D-57: predict before show)
 
@@ -20,12 +16,16 @@ Five steps, each: two or three concept points; a multiple-choice prediction the 
 
 ## Order of work
 
-1. The module step content and the correct answers are your decisions; a Sonnet worker (`doc-editor`) adds from your brief, and you verify, a short amendment to `.kiro/specs/learn-modules/requirements.md` naming the module, its steps, its demo values and the physics functions it calls. Commit it before code.
-2. `src/learn/<topic>Demo.ts` calls only the existing `physics/<model>` functions; add a small physics helper there with its own test only if one is missing. Once the step content is fixed, specify each demo; Sonnet workers (`test-writer` for the tests, a general Sonnet worker for the demo) produce them and you verify them against the physics.
-3. A Sonnet worker (`ui-implementer`) produces `src/learn/modules/<topic>.ts` from your step content and you verify it: replace the Planned entry in `src/learn/catalog.ts` with `{ status: 'available', module }`; give the module its own `art` kind and a card drawing.
-4. Demo kinds are namespaced (`<topic>-<name>`) in `src/learn/types.ts`; the demo components live in `src/ui/learn/`; Sonnet workers (`ui-implementer`) build them and you verify them against the physics. Reuse the shared demo controls; do not duplicate them.
-5. Tests: every correct option is checked against the physics in `src/learn/<topic>.test.ts`; a UI flow test opens Apply it through the real catalog host; extend `e2e/learn.spec.ts` (keyboard, axe, 320 px). A Sonnet worker (`test-writer`, `e2e-runner`) writes and runs these and you verify the results.
-6. Docs: a Sonnet worker (`doc-editor`) writes from your brief and you verify: `tasks.md` line for your task only, HANDOFF.md bullet, OWNER_REVIEW_CHECKLIST.md §8 entry listing the teaching values for the owner's engineering review.
+1. Write a short amendment to `.kiro/specs/learn-modules/requirements.md` naming the module, its steps, its demo values and the physics functions it calls. Commit it before code.
+2. Implement `src/learn/<topic>Demo.ts`, calling only the existing `physics/<model>` functions; add a small physics helper there with its own test only if one is missing. Write the demo tests.
+3. Write `src/learn/modules/<topic>.ts` from the step content: replace the Planned entry in `src/learn/catalog.ts` with `{ status: 'available', module }`; give the module its own `art` kind and a card drawing.
+4. Demo kinds are namespaced (`<topic>-<name>`) in `src/learn/types.ts`; the demo components live in `src/ui/learn/`. Build them and check them against the physics. Reuse the shared demo controls; do not duplicate them.
+5. Tests: every correct option is checked against the physics in `src/learn/<topic>.test.ts`; a UI flow test opens Apply it through the real catalog host; extend `e2e/learn.spec.ts` (keyboard, axe, 320 px). Write and run these.
+6. Docs: `tasks.md` line for your task only, HANDOFF.md bullet, OWNER_REVIEW_CHECKLIST.md §8 entry listing the teaching values for the owner's engineering review.
+
+## Self-check before you report
+
+Re-read the brief. Run every check in the definition of done and keep the output. Diff your result against the brief line by line and list each gap; fix what you can and state what you could not. Run `git diff` on your own changes and check them against the rules that apply (import boundaries, no formulas in `ui` or `state`, no fabricated numbers, no weakened assertions or timeouts, reference design never exposed). Report only what you verified, with the command and its output.
 
 ## Definition of done
 

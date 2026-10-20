@@ -38,7 +38,7 @@ Entry: any time. Exit: `OWNER_REVIEW_CHECKLIST.md` §8 answered for the pilot se
 
 Entry: the owner's pilot notes. Exit: Milestone 4 checkpoint 32.2 and Milestone 5 checkpoint 35.2 recorded.
 
-- Director turns findings into numbered tasks; `platform-engineer` and `challenge-developer` fix blocking usability, correctness and accessibility issues with regression tests; `release-verifier` checks the integrated tree.
+- Director turns findings into numbered tasks; `platform-engineer` and `challenge-developer` fix blocking usability, correctness and accessibility issues with regression tests; `release-verifier` reviews only the high-stakes changes (rule 3 in §3).
 - Owner does the manual checks in 30.1 on the devices students used (keyboard, screen reader, touch, 320 px, slow machine) and records them; 44.3 and 51 close on that evidence, not on CI.
 - The owner then chooses the next phase from the evidence. Default order is 3, 4, 5.
 
@@ -68,22 +68,22 @@ Keep CI near 10 minutes; remove dead worktrees and branches (never uncommitted w
 
 ## 3. The agent hierarchy
 
-Three tiers, defined in `.claude/agents/`. Nesting depth is capped at two below the main session by `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=2` in `.claude/settings.json`; Sonnet specialists have no `Agent` tool, so they are leaves. Opus agents think and supervise: they decompose, brief Sonnet specialists, and verify the result; they do not do the hands-on work and never spawn Opus or Fable agents. The director never spawns Fable agents.
+Two tiers plus a critic, defined in `.claude/agents/`. The director (Fable) is the sole orchestrator and briefs Sonnet workers directly; there is no intermediate supervisor layer, so context passes once, from the director to the worker that does the work. Sonnet workers have no `Agent` tool and run a self-check before reporting. `release-verifier` is the only Opus agent: a temporary critic the director spawns for high-stakes work and reads once. `.claude/settings.json` caps spawn depth at 1.
 
-| Tier | Agent | Model | Does | Spawns |
+| Group | Agent | Model | Does | Spawns |
 | --- | --- | --- | --- | --- |
-| Director | `director` | Fable | Plans, briefs, reviews numbers, integrates, pushes, watches CI, reports to the owner. Executes nothing process-heavy itself; never spawns Fable. | Opus developers |
-| Developer | `challenge-developer` | Opus | Supervises: one design challenge end to end, in its own worktree, through Sonnet specialists. | Sonnet specialists |
-| Developer | `learn-developer` | Opus | Supervises: one Learn module end to end, in its own worktree, through Sonnet specialists. | Sonnet specialists |
-| Developer | `platform-engineer` | Opus | Supervises: shell, accounts, persistence, CI, deploy, cleanup and teacher features, through Sonnet specialists. | Sonnet specialists |
-| Developer | `release-verifier` | Opus | Supervises an independent check of a branch or the integrated tree; recomputes key numbers itself; the full gate runs through Sonnet specialists; never edits. | `spec-worksheet`, `e2e-runner` |
-| Developer | `docs-steward` | Opus | Supervises the tracking docs, decisions, handoff, checklists and READMEs; decides structure and wording; `doc-editor` makes the edits. | `doc-editor` |
-| Specialist | `spec-worksheet` | Sonnet | Standalone Python worksheet, grid search, cross-checks; never reads app code for numbers. | none |
-| Specialist | `test-writer` | Sonnet | Vitest unit, property and component tests for a fixed API. | none |
-| Specialist | `e2e-runner` | Sonnet | Runs Playwright, triages flakes, writes a spec from a pattern. | none |
-| Specialist | `ui-implementer` | Sonnet | One component or drawing against an existing pattern. | none |
-| Specialist | `code-reviewer` | Sonnet | Read-only diff review against the project rules. | none |
-| Specialist | `doc-editor` | Sonnet | Link checks, ID diffs, evidence tables, count sync. | none |
+| Director | `director` | Fable | Plans, briefs, reviews hand-backs, integrates, pushes, watches CI, reports to the owner. Executes nothing process-heavy; never spawns Fable. | Sonnet workers; Opus critic when high-stakes |
+| Worker | `challenge-developer` | Sonnet | One design challenge, or the slice of one the director assigns. | none |
+| Worker | `learn-developer` | Sonnet | One Learn module or a slice of one. | none |
+| Worker | `platform-engineer` | Sonnet | Cross-cutting work: shell, accounts, persistence, CI, deploy, cleanup, teacher features. | none |
+| Worker | `docs-steward` | Sonnet | Tracking docs, decisions, handoff, checklists, READMEs. | none |
+| Worker | `spec-worksheet` | Sonnet | Standalone Python worksheet, grid search, cross-checks; never reads app code for numbers. | none |
+| Worker | `test-writer` | Sonnet | Vitest unit, property and component tests for a fixed API. | none |
+| Worker | `e2e-runner` | Sonnet | Runs Playwright, triages flakes, writes a spec from a pattern. | none |
+| Worker | `ui-implementer` | Sonnet | One component or drawing against an existing pattern. | none |
+| Worker | `code-reviewer` | Sonnet | Read-only diff review against the project rules. | none |
+| Worker | `doc-editor` | Sonnet | Link checks, ID diffs, evidence tables, count sync. | none |
+| Critic | `release-verifier` | Opus | Temporary validator for physics models, save formats, CI/deploy changes, security-sensitive code and final synthesis; recomputes numbers; never edits; done after its report. | none |
 
 ### How to run it
 
@@ -93,23 +93,23 @@ From the clone (`/Users/nikhiliyer/Documents/Statica-Edu`):
 claude --agent director
 ```
 
-That runs the main session on Fable with the director's prompt. A plain `claude` session on Fable that reads this file behaves the same way; the definition only makes it the default. Developers are spawned by the director with the Agent tool (`subagent_type: challenge-developer` and so on); each gets its own worktree from `isolation: worktree`.
+That runs the main session on Fable with the director's prompt. A plain `claude` session on Fable that reads this file behaves the same way; the definition only makes it the default. Workers are spawned by the director with the Agent tool (`subagent_type: challenge-developer` and so on, `model: "sonnet"`); each gets its own worktree from `isolation: worktree`.
 
 ### Delegation rules
 
-1. The director is an orchestrator only. It delegates everything process-heavy: code, specs, worksheets, document rewrites, test runs and reviews. Sonnet specialists take bulk and mechanical work; Opus developers take deep logic, debugging, architecture and review. The director never spawns another Fable agent (no fork). It briefs, checks hand-backs, integrates, pushes and records.
-2. A developer's brief states the task number, the goal, the files, the rules that apply, the definition of done and what the owner must approve. Developers refuse to start without a spec when the task is a model.
-3. Opus agents supervise: they decompose, brief Sonnet specialists for every hands-on piece (implementation, tests, runs, screenshots, docs), verify the output against spec and numbers, and keep the design decisions. They write code only for a small logic-dense fix a worker got wrong twice. They never spawn Opus or Fable agents.
-4. At most three developers run browser tests at the same time. Five parallel agents pushed the load average above 100 and Playwright timed out; everything passed on serial reruns.
-5. Nothing merges without the director reading the hand-back and checking the key numbers. Physics, save-format, CI and multi-model changes also go through `release-verifier`.
+1. The director is the sole orchestrator. It briefs Sonnet workers directly for every process-heavy piece (code, specs, worksheets, document rewrites, test runs, reviews) and runs isolated pieces in parallel. No intermediate supervisors.
+2. A brief is self-contained: task number, goal, files, rules that apply, definition of done, what the owner must approve, and the self-check the worker runs before reporting (re-read the brief, run the checks, diff against the brief, fix, report with evidence).
+3. Opus appears only as `release-verifier`, a temporary critic for high-stakes work (new or changed physics or evaluation models, save formats, CI/deploy workflows, security-sensitive code, final synthesis of multi-worker tasks). The director reads its verdict and does not keep it running. Neither tier spawns Fable.
+4. At most three workers run browser tests at the same time. Five parallel agents pushed the load average above 100 and Playwright timed out; everything passed on serial reruns.
+5. Nothing merges without the director reading the hand-back and checking the key numbers. High-stakes changes (rule 3) also go through the `release-verifier` critic.
 6. Two agents never edit the same tracking document at once. The director serializes `docs-steward`.
 7. Shared registration files (`catalog.ts`, `bundled.ts`, `models.ts`, `runtimes.ts`, `registry.ts`, `TechnicalArt.tsx`) conflict on every parallel merge: keep both sides, restore closing braces, and make count-based tests read the catalogs.
 8. Escalate to the owner, through `OWNER_REVIEW_CHECKLIST.md` §8 and the director's report, anything that changes engineering content, product scope, or what students see during an active pilot.
 
 ### Definition of done, by tier
 
-- Specialist: the deliverable, the command it was checked with, and the output pasted in the report.
-- Developer: lint 0 errors, typecheck, unit tests with coverage, build, schema no drift, the relevant E2E specs on desktop and Pixel 7; committed on the branch; report with numbers, shared files touched, deviations and owner questions; every hands-on piece traceable to a Sonnet worker's report that the developer verified.
+- Worker: the deliverable, the self-check run with its output pasted, and anything not verified stated plainly.
+- Critic: a ranked verdict (blocking / should-fix / notes) with file and line, and what it ran.
 - Director: integrated, full gate passed, pushed, CI watched to green, `tasks.md`/`HANDOFF.md`/`DECISIONS.md`/checklist updated, owner told what to decide and what to run.
 
 ## 4. Owner's standing list
