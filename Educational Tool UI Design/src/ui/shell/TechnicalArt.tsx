@@ -77,6 +77,17 @@ function build(kind:string) {
       face([a[i],b[i],b[j],a[j]],30+19*Math.sin(i*Math.PI*2/segments),neutral)
     }
   }
+  /** Side surface of a frustum along x from (x0, r0) to (x1, r1), camera-facing quads only (smooth turned profiles). */
+  const frustumX = (x0:number,r0:number,x1:number,r1:number,y:number,segments=32) => {
+    for(let i=0;i<segments;i++){
+      const a=i*Math.PI*2/segments, b=(i+1)*Math.PI*2/segments, mid=(a+b)/2
+      const slope=(r0-r1)/(x1-x0)
+      const n=normalize([slope,Math.cos(mid),Math.sin(mid)])
+      if(n[0]*toCamera[0]+n[1]*toCamera[1]+n[2]*toCamera[2]<0)continue
+      const at=(x:number,r:number,t:number):Point=>[x,y+r*Math.cos(t),r*Math.sin(t)]
+      face([at(x0,r0,a),at(x1,r1,a),at(x1,r1,b),at(x0,r0,b)],30+19*Math.cos(mid))
+    }
+  }
   const bolt = (x:number,y:number,z:number) => cylinder([x,y,z],[x+4,y,z],3.3,true,6)
   const wall = () => box(-87,0,-32,19,110,64,true)
   let load: Point | null = null
@@ -195,42 +206,45 @@ function build(kind:string) {
       }
     }
   }else if(kind==="fatigue"){
-    // Fatigue Analysis I's stepped stub-axle spindle (task 70): the collar held in a housing, a
-    // shoulder fillet stepping down to the neck, and the wheel hub on the neck carrying the
-    // fluctuating wheel load 50 mm from the shoulder (arrow plus a cyclic accent). Generic
-    // proportions (collar 40, neck 26, fillet 6), not the reference design; the hub is drawn around
-    // the load line so the fillet stays visible.
+    // Fatigue Analysis I's stepped stub-axle spindle (task 70; redrawn 2026-10-20): the collar held in
+    // a housing, its shoulder face stepping down through a smooth fillet to the neck, and the wheel
+    // hub on the neck carrying the fluctuating wheel load (arrow plus a cyclic accent). The axle end
+    // leaves the centre of the hub. Generic proportions, not the reference design.
     box(-104,0,-38,44,96,76,true) // the housing face that holds the collar
-    const axisY=48, collarR=20, neckR=13, filletR=6, shoulder=-20
-    cylinder([-60,axisY,0],[shoulder,axisY,0],collarR,false,32)
-    // The fillet as rings along the quarter circle centred at (shoulder + r, neck radius + r).
-    const arcPoint=(theta:number)=>[shoulder+filletR+filletR*Math.cos(theta),neckR+filletR+filletR*Math.sin(theta)]
-    for(let i=0;i<4;i++){
-      const [x0]=arcPoint(Math.PI+i/4*Math.PI/2), [x1]=arcPoint(Math.PI+(i+1)/4*Math.PI/2)
-      const [,radius]=arcPoint(Math.PI+(i+.5)/4*Math.PI/2)
-      cylinder([x0,axisY,0],[x1,axisY,0],radius,false,32)
+    const axisY=48, collarR=20, neckR=12, filletR=5, shoulder=-24, hub0=12, hub1=44
+    cylinder([-60,axisY,0],[shoulder,axisY,0],collarR,false,32) // collar; its right cap is the shoulder face
+    // The fillet: a concave quarter circle centred at (shoulder + r, neck + r), from the shoulder face
+    // at radius neck + r curving in to the neck. A few wide bands: thin outlined bands read as a groove.
+    const steps=4
+    const fillet=(phi:number):[number,number]=>[shoulder+filletR*(1-Math.cos(phi)),neckR+filletR*(1-Math.sin(phi))]
+    for(let k=0;k<steps;k++){
+      const [x0,r0]=fillet(k/steps*Math.PI/2), [x1,r1]=fillet((k+1)/steps*Math.PI/2)
+      frustumX(x0,r0,x1,r1,axisY)
     }
-    cylinder([shoulder+filletR,axisY,0],[78,axisY,0],neckR,false,32)
+    frustumX(shoulder+filletR,neckR,hub0,neckR,axisY) // neck up to the hub
     layer = 1
-    cylinder([10,axisY,0],[46,axisY,0],23,true,32) // the wheel hub around the load line, clear of the fillet
-    load=[30,axisY+23,0]
-  }else if(kind==="rod"){
-    // Stress and Strain I (task 72): a straight solid round hanger rod in tension, pinned in a
-    // clevis under a roof beam and carrying a load block on a second clevis; the load acts
-    // through the rod's axis. Generic proportions, not the challenge's reference design.
-    box(-92,118,-24,184,14,48,true) // roof beam
-    box(-14,111,-14,28,7,28,true) // clevis base plate on the beam
-    cylinder([0,30,0],[0,111,0],6,false,20) // the rod, the component as modeled
-    layer = 1
-    for(const z of [-9,5]){ // clevis cheeks either side of the rod ends, with their pins
-      box(-8,92,z,16,19,4,true)
-      box(-8,14,z,16,19,4,true)
-    }
-    cylinder([0,100,-12],[0,100,12],2.6,true,8)
-    cylinder([0,22,-12],[0,22,12],2.6,true,8)
+    cylinder([hub0,axisY,0],[hub1,axisY,0],22,true,32) // the wheel hub on the neck
     layer = 2
-    box(-26,-22,-20,52,36,40,true) // the hanging load
-    load=[0,-54,0]
+    frustumX(hub1,neckR,76,neckR,axisY) // the axle end, out of the hub's centre
+    face(Array.from({length:32},(_,k)=>[76,axisY+neckR*Math.cos(k*Math.PI*2/32),neckR*Math.sin(k*Math.PI*2/32)] as Point),28)
+    load=[(hub0+hub1)/2,axisY+22,0]
+  }else if(kind==="rod"){
+    // Stress and Strain I (task 72; redrawn 2026-10-20): a straight round hanger rod in tension. At the
+    // top it is pinned between two clevis plates welded under a ceiling beam; at the bottom a second
+    // clevis on the load block hangs from it, so the weight acts along the rod's axis. Generic
+    // proportions, not the challenge's reference design.
+    box(-80,122,-22,160,14,44,true) // ceiling beam
+    box(-13,114,-13,26,8,26,true) // welded lug plate under the beam
+    box(-13,8,-13,26,7,26,true) // lug plate on the load block
+    for(const z of [-10,6]){ // clevis plates either side of the rod ends (symmetric about the rod)
+      box(-9,94,z,18,20,4,true)
+      box(-9,15,z,18,20,4,true)
+    }
+    cylinder([0,25,0],[0,104,0],5,false,20) // the rod, the component as modeled
+    cylinder([0,104,-12],[0,104,12],2.4,true,10) // top pin through the plates and the rod
+    cylinder([0,25,-12],[0,25,12],2.4,true,10) // bottom pin
+    box(-26,-26,-20,52,34,40,true) // the hanging load
+    load=[0,-58,0]
   }else{
     // A sprung instrument platform: real helical coils between two solid plates.
     box(-49,0,-35,98,9,70,true)
