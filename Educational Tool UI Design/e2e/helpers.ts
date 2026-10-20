@@ -97,9 +97,9 @@ export async function audit(page: Page) {
 }
 export async function setDimension(page: Page, param: SectionParam, value: string, keyboard = false) {
   const field = page.locator(`#dim-${param}`)
-  await field.scrollIntoViewIfNeeded()
+  // Task 77: the keyboard path skips the pre-scroll; tabTo focuses the field and the browser scrolls it into view.
   if (keyboard) { await tabTo(page, field); await field.press('ControlOrMeta+A'); await field.pressSequentially(value) }
-  else await field.fill(value)
+  else { await field.scrollIntoViewIfNeeded(); await field.fill(value) }
   await field.press('Enter')
   await expect(field).not.toHaveAttribute('aria-invalid', 'true')
 }

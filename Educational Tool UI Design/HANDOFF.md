@@ -81,6 +81,7 @@ catalog gate), 35.2 (Milestone 5 checkpoint), then 74 onward.
 
 | Task | Date | Commit | CI run | Decision |
 | --- | --- | --- | --- | --- |
+| 77 learningLoop keyboard/mouse E2E split; keyboard path no longer pre-scrolls | 2026-10-20 | this branch | pending | — |
 | Card art: Fatigue Analysis I spindle, Stress and Strain I hanger rod (owner) | 2026-10-20 | 618e2ee | 39368119809 passed | — |
 | 73 Difficulty order, numbers 001–010; CI split into `verify` + 4 shards; cleanup | 2026-10-19 | 5c9e2ba | 39363320472 passed (9.9 min) | D-63 |
 | Pressure Vessel I internal-pressure arrows (2D, 3D cutaway, card art) | 2026-10-19 | ed58280 | not recorded | — |
@@ -127,6 +128,9 @@ catalog gate), 35.2 (Milestone 5 checkpoint), then 74 onward.
   thousands of errors. Delete that git-ignored folder.
 - E2E cases that time out while the machine's load average is above 40 have passed on a serial
   rerun. Rerun serially before treating them as regressions.
+- GitHub runners can be 2–3× slower than local; `learningLoop` keyboard flow ran 72–96 s against a
+  90 s budget before task 77 split it. Treat a single-job E2E timeout with no assertion failure as a
+  runner-speed flake: re-run the failed job first.
 - Saves: the beam's v1 format is frozen, because `deserializeSession` compares stored results key
   for key. Other models use v2 envelopes. There is no v1 → v2 migration.
 - Content versions are part of the storage key `ei:session:<id>:v<n>` (Learn: `ei:learn:<id>:v<n>`).

@@ -95,6 +95,8 @@ These tasks need the owner and real students. Agents prepare materials and recor
   - [ ] 76.1 Specify in `.kiro/specs/teacher-handin/`: a shareable challenge link that preselects challenge and mode; a hand-in file (design JSON v2 + tested results + reflection + build id) a student downloads and a teacher can open read-only; no network, no accounts, CSP unchanged.
   - [ ] 76.2 Implement and verify: export/import round-trip, read-only viewer, E2E on desktop and Pixel 7, axe gates; owner review before release.
 
+- [x] 77. Split the learningLoop keyboard/mouse E2E test and drop its keyboard pre-scroll (director, 2026-10-20, after CI run 39371364350 shard 2 timed out on a slow runner; no assertion weakened) — see HANDOFF
+
 ### (d) Milestone 6: scoped platform extensions
 
 Original-catalog model work is now explicitly tracked in 45–51 rather than blocked behind this milestone. This milestone groups the previously named future areas: Freeform, advanced physics, accounts and AI. Their implementation scope is not yet specified. Task 36 defines feature boundaries and delivery order; each track requires its own requirements/design/test plan before implementation. A decision to defer a track must remain visible in the roadmap rather than being checked off as implemented.
