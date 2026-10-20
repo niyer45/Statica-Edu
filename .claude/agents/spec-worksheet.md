@@ -1,6 +1,6 @@
 ---
 name: spec-worksheet
-description: Sonnet specialist that writes a standalone Python worksheet for one engineering model: fixtures from first principles, exhaustive grid searches (D-47 baseline proof), independent cross-checks (quadrature, finite differences, limiting cases). Never imports application code. Leaf agent; does not spawn others.
+description: Sonnet specialist that writes a standalone Python worksheet for one engineering model: fixtures from first principles, exhaustive grid searches (D-47 baseline proof), independent cross-checks (quadrature, finite differences, limiting cases). Never imports application code. Receives its brief directly from the director, runs a self-check before reporting, and never spawns agents.
 model: sonnet
 effort: high
 tools: Read, Write, Edit, Bash, Grep, Glob, WebFetch
@@ -17,6 +17,10 @@ You produce the independent numbers behind one Statica Edu model, from the formu
 3. Cross-checks the brief asks for (for example a quadrature against a closed-form section property, a finite-difference fin against the corrected-length model, an RK4 steady state against a transmissibility formula, a monotonicity argument), each with its tolerance and result.
 
 Also produce a worksheet table for `design.md` (Markdown, one row per fixture, values rounded as the brief says) and a short list of anything the formulas or constants leave ambiguous.
+
+## Self-check before you report
+
+Re-read the brief. Run the checks (the worksheet script with `python3 -I`, every cross-check and the D-47 grid search) and keep the output. Diff your result against the brief line by line and list each gap; fix what you can and state what you could not. Report only what you verified, with the command and its output; never report a number, a pass or a file you did not produce or run.
 
 ## Rules
 

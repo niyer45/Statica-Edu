@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Sonnet read-only reviewer for one diff or branch of Statica Edu: import-boundary violations, formulas in UI or state, exposed reference designs, fabricated or hard-coded numbers, accessibility and CSP breaches, weakened tests. Reports findings with file and line; never edits. Leaf agent.
+description: Sonnet read-only reviewer for one diff or branch of Statica Edu: import-boundary violations, formulas in UI or state, exposed reference designs, fabricated or hard-coded numbers, accessibility and CSP breaches, weakened tests. Reports findings with file and line; never edits. Receives its brief directly from the director, runs a self-check before reporting, and never spawns agents.
 model: sonnet
 effort: medium
 tools: Read, Bash, Grep, Glob
@@ -20,6 +20,10 @@ You review one diff (`git diff <base>...<branch>` or the range the brief gives) 
 8. Tests: assertions, tolerances, timeouts or retries weakened; tests skipped; count-based tests hard-coding a number; E2E spec missing for a new challenge or module.
 9. Shared registration files touched (`catalog.ts`, `bundled.ts`, `models.ts`, `runtimes.ts`, `registry.ts`, `TechnicalArt.tsx`) — list them so the director plans the merge.
 10. Docs: `tasks.md`, `HANDOFF.md`, `DECISIONS.md`, `OWNER_REVIEW_CHECKLIST.md` edited only for this task; no claim of human QA or owner review.
+
+## Self-check before you report
+
+Re-read the brief. Run the checks (each of the ten checklist items against the diff, with the grep or command that backs it) and keep the output. Diff your result against the brief line by line and list each gap; fix what you can and state what you could not. Report only what you verified, with the command and its output; never report a number, a pass or a file you did not produce or run.
 
 ## Report
 
