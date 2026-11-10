@@ -56,7 +56,7 @@ test('Guided: the step dialog is open and modal on entry; the page behind is blo
   await expect(dialog).toHaveAttribute('aria-modal', 'true')
   await expect(dialog.getByRole('heading', { name: 'Grow the circle' })).toBeVisible()
   await expect(dialog.getByText('Editable now:')).toBeVisible()
-  await expect(dialog.locator('#guided-lock-line')).toContainText('Locked in this step: everything except diameter.')
+  await expect(dialog.locator('.guided-focus')).toHaveText('Editable now: Diameter. Other parameters stay locked until a later step.')
   await expect(dialog.getByText('Hint', { exact: true })).toBeVisible()
   await expect(dialog.locator('details')).not.toHaveAttribute('open', '')
   await expect(current).toHaveAttribute('aria-haspopup', 'dialog')
@@ -91,13 +91,30 @@ test('Guided: the step dialog is open and modal on entry; the page behind is blo
   // The step name reopens it; Escape closes it again and focus returns to the step button.
   await current.click()
   await expect(dialog).toBeVisible()
-  await expect(dialog.locator('#guided-lock-line')).toContainText('Locked in this step: everything except diameter.')
+  await expect(dialog.locator('.guided-focus')).toHaveText('Editable now: Diameter. Other parameters stay locked until a later step.')
   await page.keyboard.press('Escape')
   await expect(dialog).toBeHidden()
   await expect(current).toBeFocused()
   // No "Step N of M" chip in the page, and no failed-attempt line without an attempt.
   await expect(page.getByText(/Step \d+ of \d+/)).toHaveCount(0)
   await expect(page.locator('.guided-feedback')).toHaveCount(0)
+})
+
+// Task 78.5 (WD-50, WD-51): the dialog opens after a short delay, so the workbench is seen first; the
+// step name opens it with no delay.
+test('Guided: the workbench shows first and the step dialog opens after a delay; the step name opens it at once', async ({ page }) => {
+  await enter(page, 'Cantilever Beam I', 'Guided')
+  const dialog = stepDialog(page)
+  // The workbench is visible and nothing covers it yet.
+  await expect(page.getByRole('button', { name: 'Zoom in', exact: true })).toBeVisible()
+  await expect(dialog).toHaveCount(0)
+  // Then it opens by itself (the default expect timeout covers the 800 ms delay).
+  await expect(dialog).toBeVisible()
+  await dialog.getByRole('button', { name: 'Got it', exact: true }).click()
+  await expect(dialog).toBeHidden()
+  // The step name opens it without a delay.
+  await page.getByRole('navigation', { name: 'Guided steps' }).getByRole('button').click()
+  await expect(dialog).toBeVisible({ timeout: 500 })
 })
 
 test('Guided: nothing is pushed down; the workbench starts below the stepper exactly as far below the band as in Parametric', async ({ page }) => {
@@ -197,6 +214,15 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       return [follows(document.querySelector('.results-panel')!, about), follows(about, document.querySelector('.page-footer')!)]
     })
     expect(order).toEqual([true, true])
+    // Task 78.5 (WD-49): a visible gap (at least 12 px) above the About row and below it, above the footer.
+    const gaps = await page.evaluate(() => {
+      const about = document.querySelector('.workspace-context')!.getBoundingClientRect()
+      const above = document.querySelector('.results-panel')!.getBoundingClientRect()
+      const footer = document.querySelector('.page-footer')!.getBoundingClientRect()
+      return { above: about.top - above.bottom, below: footer.top - about.bottom }
+    })
+    expect(gaps.above).toBeGreaterThanOrEqual(12)
+    expect(gaps.below).toBeGreaterThanOrEqual(12)
     await closeStepDialog(page) // a no-op in Parametric
     await about.locator('summary').click()
     await expect(about.locator('.ei-disclosure-body p').first()).toBeVisible()
@@ -223,8 +249,10 @@ for (const mode of ['Guided', 'Parametric'] as const) {
         const bandEl = document.querySelector('.challenge-band')!
         const stepper = document.querySelector('.guided-stepper')
         const chain = [document.querySelector('h1')!, bandEl, ...(stepper === null ? [] : [stepper]), document.querySelector('.design-panel')!, document.querySelector('.results-panel')!, document.querySelector('.about-model')!, document.querySelector('.page-footer')!]
-        return [...chain.slice(0, -1).map((el, i) => follows(el, chain[i + 1]!)), document.querySelectorAll('.challenge-band').length === 1, (stepper !== null) === (document.querySelector('[role="dialog"][data-dialog-kind="guided-step"]') !== null)]
+        return [...chain.slice(0, -1).map((el, i) => follows(el, chain[i + 1]!)), document.querySelectorAll('.challenge-band').length === 1, stepper !== null]
       })
+      // The stepper row is present exactly in Guided (the step dialog itself opens after a delay, task 78.5).
+      expect(order.pop(), 'stepper row only in Guided').toBe(mode === 'Guided')
       expect(order.every(Boolean), JSON.stringify(order)).toBe(true)
       // Full width above 870 px: the band spans the workbench row and sits above it.
       const bandBox = (await band.boundingBox())!

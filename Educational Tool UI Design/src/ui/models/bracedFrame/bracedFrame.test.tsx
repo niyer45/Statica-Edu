@@ -212,9 +212,9 @@ describe('Braced Frame I workbench', () => {
     expect(within(dialog).getByText(/does not include: rigid or semi-rigid joints/)).toBeTruthy()
   })
 
-  it('Guided shows frame experiments without reference values and locks sections at first; Parametric is open design (task 58)', () => {
+  it('Guided shows frame experiments without reference values and locks sections at first; Parametric is open design (task 58)', async () => {
     renderFrame('guided')
-    expect(screen.getByRole('heading', { name: 'Rearrange the bracing' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Rearrange the bracing' }, { timeout: 3000 })).toBeTruthy()
     const allGuidance = bracedFrameUi.guided.steps.map((s) => `${s.instruction} ${s.hint}`).join(' ')
     expect(allGuidance).not.toMatch(/\d|CHS|always best/)
     expect((screen.getByLabelText(/^Lower left column/) as HTMLSelectElement).disabled).toBe(true)

@@ -245,9 +245,9 @@ describe('Mounting Bracket I workbench', () => {
     for (const label of Object.values(BRACKET_PARAM_LABELS)) expect((screen.getByLabelText(label) as HTMLInputElement).readOnly).toBe(false)
   })
 
-  it('Guided steps never reveal the reference dimensions', () => {
+  it('Guided steps never reveal the reference dimensions', async () => {
     renderBracket('guided')
-    expect(screen.getByRole('heading', { name: bracketUi.guided.steps[0]!.title })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: bracketUi.guided.steps[0]!.title }, { timeout: 3000 })).toBeTruthy()
     const text = bracketUi.guided.steps.map((s) => `${s.instruction} ${s.hint}`).join(' ')
     expect(text).not.toMatch(/\d/)
   })

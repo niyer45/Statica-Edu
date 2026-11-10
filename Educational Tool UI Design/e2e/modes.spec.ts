@@ -35,7 +35,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       // Step 1 (the Baseline is a solid Ø31 mm circle): only the diameter is editable; the section
       // shape is locked with a visible reason.
       // The dialog is open on entry and holds the lock line; close it by keyboard.
-      await expect(stepDialog(page).locator('#guided-lock-line')).toContainText('Locked in this step: everything except diameter.')
+      await expect(stepDialog(page).locator('.guided-focus')).toHaveText('Editable now: Diameter. Other parameters stay locked until a later step.')
       await closeStepDialog(page, true)
       await expectGuidedStep(page, 'Grow the circle')
       await expect(iSection).toHaveAttribute('aria-disabled', 'true')

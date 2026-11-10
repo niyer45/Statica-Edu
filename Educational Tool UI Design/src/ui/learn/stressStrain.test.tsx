@@ -109,7 +109,7 @@ describe('Stress and strain module (task 72)', () => {
     expect(readout('Stress')).toBe(mpa(steel.stressPa))
   })
 
-  it('Apply it opens Stress and Strain I in Guided mode through the shell', () => {
+  it('Apply it opens Stress and Strain I in Guided mode through the shell', async () => {
     const storage = memory()
     storage.storage.setItem(learnKey(stressStrain), JSON.stringify({ schemaVersion: 1, answers: { area: 'quarter' } }))
     renderHost(storage)
@@ -120,6 +120,6 @@ describe('Stress and strain module (task 72)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Open Stress and Strain I in Guided mode' }))
     expect(screen.getByTestId('workbench-host').hidden).toBe(false)
     expect(window.__EI_STATE__).toMatchObject({ challengeId: 'stress-strain-1', mode: 'guided' })
-    expect(screen.getByRole('heading', { name: 'Thicken the rod' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Thicken the rod' }, { timeout: 3000 })).toBeTruthy()
   })
 })

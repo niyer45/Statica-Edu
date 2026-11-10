@@ -235,13 +235,13 @@ describe('Pressure Vessel I workbench', () => {
     expect(within(dialog).getByText(/not a real-world approval or a pressure-vessel code/)).toBeTruthy()
   })
 
-  it('Guided locks every dimension but the step one; Parametric is open design (D-49)', () => {
+  it('Guided locks every dimension but the step one; Parametric is open design (D-49)', async () => {
     renderVessel('guided')
     const unlocked = vesselUi.guided.steps[0]!.unlocks as readonly string[]
     for (const [param, label] of Object.entries(VESSEL_PARAM_LABELS)) {
       expect((screen.getByLabelText(label) as HTMLInputElement).readOnly).toBe(!unlocked.includes(param))
     }
-    expect(screen.getByRole('heading', { name: 'Thicken the shell' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Thicken the shell' }, { timeout: 3000 })).toBeTruthy()
     cleanup()
     renderVessel('parametric')
     expect(screen.queryByRole('region', { name: 'Guided experiments' })).toBeNull()

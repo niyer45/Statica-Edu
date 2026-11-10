@@ -52,35 +52,33 @@ function GuidedExperiments() {
       autoOpenKey={allDone ? 'done' : String(progress.current)}
       feedback={notMetText}
     >
-      {step !== undefined ? (
-        <>
-          <p>{step.instruction}</p>
-          <p className="guided-focus">
-            Editable now: <strong>{step.focus}</strong>
-            {step.unlocks === 'all' ? '.' : '. Other parameters stay locked until a later step.'}
-          </p>
-          {locksSomething && (
-            <p id="guided-lock-line" className="guided-lock-line">
-              <Icon name="lock" size={10} /> Locked in this step: everything except {step.focus.toLowerCase()}. Others unlock in later steps.
+      <div className="guided-body">
+        {step !== undefined ? (
+          <>
+            <p>{step.instruction}</p>
+            <p className="guided-focus">
+              {locksSomething && <Icon name="lock" size={11} />}
+              <span>
+                Editable now: <strong>{step.focus}</strong>
+                {step.unlocks === 'all' ? '.' : '. Other parameters stay locked until a later step.'}
+              </span>
             </p>
-          )}
-          <Disclosure key={step.id} summary="Hint">
-            <p>{step.hint}</p>
-          </Disclosure>
-        </>
-      ) : (
-        <>
+            <Disclosure key={step.id} summary="Hint">
+              <p>{step.hint}</p>
+            </Disclosure>
+          </>
+        ) : (
           <p>Every parameter is unlocked. Open Explain & submit to record your design and what your experiments showed.</p>
-        </>
-      )}
-      {notMetText !== undefined && <p className="guided-result">{notMetText}</p>}
-      {notMet === undefined && last !== undefined && lastStep !== undefined && (
-        <p className="guided-result">
-          <Icon name="check" size={11} /> {lastStep.title} complete: {iterationName(history, last.resultId)}
-          {last.comparedWithId !== undefined && <> compared with {iterationName(history, last.comparedWithId)}</>}
-          {seen.length > 0 ? `. ${seen.map((o) => `${o.label} ${o.change === 'unavailable' ? 'not available' : o.change === 'unchanged' ? 'did not change' : o.change}`).join('; ')}.` : '.'}
-        </p>
-      )}
+        )}
+        {notMetText !== undefined && <p className="guided-result">{notMetText}</p>}
+        {notMet === undefined && last !== undefined && lastStep !== undefined && (
+          <p className="guided-result">
+            <Icon name="check" size={11} /> {lastStep.title} complete: {iterationName(history, last.resultId)}
+            {last.comparedWithId !== undefined && <> compared with {iterationName(history, last.comparedWithId)}</>}
+            {seen.length > 0 ? `. ${seen.map((o) => `${o.label} ${o.change === 'unavailable' ? 'not available' : o.change === 'unchanged' ? 'did not change' : o.change}`).join('; ')}.` : '.'}
+          </p>
+        )}
+      </div>
     </GuidedStepDialog>
   )
 }

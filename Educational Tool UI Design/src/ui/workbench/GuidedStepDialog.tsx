@@ -12,9 +12,13 @@ import Icon from '../icons/Icon'
 //   Escape, dimmed backdrop. Initial focus is the dialog's first focusable (its Close button), as in
 //   every other dialog. A backdrop click does not dismiss it: "Got it", Close or Escape do, and focus
 //   then returns to the current step button.
-// - It opens when the workbench becomes visible (entering a challenge in Guided, including reload
-//   and resume) and whenever `autoOpenKey` changes (a new step, or all steps complete). A failed attempt does not change the key. It never
-//   opens on top of another dialog: while one is open it waits and opens when that one closes.
+// - It opens by itself after a short delay (task 78.5, WD-48): STEP_DIALOG_ENTRY_DELAY_MS after the
+//   workbench becomes visible (entering a challenge in Guided, including reload and resume) and
+//   STEP_DIALOG_STEP_DELAY_MS after `autoOpenKey` changes (a new step, or all steps complete), so the
+//   test result is seen first. The timer is cancelled on unmount, when the host is hidden and when
+//   the step changes again; nothing is trapped during the delay. A click on the step name opens it
+//   at once. A failed attempt does not change the key. It never opens on top of another dialog:
+//   while one is open it waits and opens when that one closes.
 // - `feedback` is one short line directly under the row; it adds no live region. Open/closed state is
 //   UI state only and is never persisted.
 
@@ -28,6 +32,11 @@ export interface StepperStep {
 
 const STATE_TEXT: Record<StepState, string> = { complete: 'completed', current: 'current step', locked: 'locked' }
 const KIND = 'guided-step'
+
+/** Wait before the dialog opens on entering a Guided challenge (including reload and resume). */
+export const STEP_DIALOG_ENTRY_DELAY_MS = 800
+/** Wait before the dialog opens when a new step begins (including completion), so the result is seen first. */
+export const STEP_DIALOG_STEP_DELAY_MS = 1500
 
 /** True while any dialog other than a step dialog is in the document. */
 function otherDialogOpen(): boolean {
@@ -73,19 +82,37 @@ export interface GuidedStepDialogProps {
 }
 
 export default function GuidedStepDialog({ steps, completeLabel, label, title, autoOpenKey, feedback, children }: GuidedStepDialogProps) {
-  const [wanted, setWanted] = useState(true)
-  const [seenKey, setSeenKey] = useState(autoOpenKey)
-  if (seenKey !== autoOpenKey) {
-    // Derived during render (no effect, no extra paint): a new step reopens it.
-    setSeenKey(autoOpenKey)
-    setWanted(true)
-  }
+  const [wanted, setWanted] = useState(false)
   const row = useRef<HTMLElement>(null)
   const { blocked, visible } = useDocumentState(row)
-  // Entering the challenge (the workbench becoming visible) opens it again.
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const wasVisible = useRef(false)
+  const cancel = () => {
+    if (timer.current !== undefined) clearTimeout(timer.current)
+    timer.current = undefined
+  }
+  // Entering the challenge (the host becoming visible) or a new step schedules the opening; hiding
+  // the host, a further step change or unmounting cancels it.
   useEffect(() => {
-    if (visible) setWanted(true)
-  }, [visible])
+    cancel()
+    if (!visible) {
+      wasVisible.current = false
+      setWanted(false)
+      return cancel
+    }
+    const delay = wasVisible.current ? STEP_DIALOG_STEP_DELAY_MS : STEP_DIALOG_ENTRY_DELAY_MS
+    wasVisible.current = true
+    setWanted(false)
+    timer.current = setTimeout(() => {
+      timer.current = undefined
+      setWanted(true)
+    }, delay)
+    return cancel
+  }, [visible, autoOpenKey])
+  const open = () => {
+    cancel()
+    setWanted(true)
+  }
   const shown = wanted && visible && !blocked
   const toggle = useRef<HTMLButtonElement>(null)
   const returnFocus = useRef(false)
@@ -109,7 +136,7 @@ export default function GuidedStepDialog({ steps, completeLabel, label, title, a
           {steps.map((s, i) => (
             <li key={s.id} className={`guided-step ${s.state}`} aria-current={s.state === 'current' ? 'step' : undefined}>
               {s.state === 'current' ? (
-                <button ref={toggle} type="button" className="guided-step-body" aria-haspopup="dialog" onClick={() => setWanted(true)}>
+                <button ref={toggle} type="button" className="guided-step-body" aria-haspopup="dialog" onClick={open}>
                   <span className="guided-step-dot" aria-hidden="true">{i + 1}</span>
                   <span className="guided-step-label">{s.title}</span>
                   <span className="sr-only">, {STATE_TEXT[s.state]}</span>
@@ -126,7 +153,7 @@ export default function GuidedStepDialog({ steps, completeLabel, label, title, a
           ))}
         </ol>
         {completeLabel !== undefined && (
-          <button ref={toggle} type="button" className="guided-complete" aria-haspopup="dialog" onClick={() => setWanted(true)}>
+          <button ref={toggle} type="button" className="guided-complete" aria-haspopup="dialog" onClick={open}>
             <Icon name="check" size={12} />
             {completeLabel}
           </button>

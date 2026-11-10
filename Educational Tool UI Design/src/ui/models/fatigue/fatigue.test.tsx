@@ -215,7 +215,7 @@ describe('Fatigue Analysis I workbench', () => {
     expect(within(dialog).getByText(/not a fatigue certification/)).toBeTruthy()
   })
 
-  it('Guided locks everything but the step parameter; Parametric is open design (task 58)', () => {
+  it('Guided locks everything but the step parameter; Parametric is open design (task 58)', async () => {
     renderFatigue('guided')
     const unlocked = fatigueUi.guided.steps[0]!.unlocks as readonly string[]
     for (const [param, label] of Object.entries(FATIGUE_PARAM_LABELS)) {
@@ -223,7 +223,7 @@ describe('Fatigue Analysis I workbench', () => {
       expect((screen.getByLabelText(label) as HTMLInputElement).readOnly).toBe(!unlocked.includes(param))
     }
     expect((screen.getByRole('radio', { name: 'Ground' }) as HTMLInputElement).disabled).toBe(true)
-    expect(screen.getByRole('heading', { name: 'Round the fillet' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Round the fillet' }, { timeout: 3000 })).toBeTruthy()
     expect(fatigueUi.guided.steps.map((s) => `${s.instruction} ${s.hint}`).join(' ')).not.toMatch(/\d/)
     cleanup()
     renderFatigue('parametric')

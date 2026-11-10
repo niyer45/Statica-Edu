@@ -220,9 +220,9 @@ describe('Stress and Strain I workbench', () => {
     expect(within(dialog).getByText(/not a real-world approval/)).toBeTruthy()
   })
 
-  it('Guided locks the material in step one; Parametric is open design', () => {
+  it('Guided locks the material in step one; Parametric is open design', async () => {
     renderRod('guided')
-    expect(screen.getByRole('heading', { name: 'Thicken the rod' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Thicken the rod' }, { timeout: 3000 })).toBeTruthy()
     expect((screen.getByLabelText('Diameter') as HTMLInputElement).readOnly).toBe(false)
     expect((screen.getByRole('radio', { name: /^Titanium/ }) as HTMLInputElement).disabled).toBe(true)
     cleanup()

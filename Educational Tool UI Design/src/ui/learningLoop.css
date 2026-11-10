@@ -183,13 +183,16 @@
 .guided-step-label { min-width: 0; overflow-wrap: break-word; }
 .guided-complete { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; border: 1px solid #a4b496; border-radius: 999px; padding: 5px 12px; background: #fff; color: #345640; font-size: 11px; font-weight: 600; transition: none; }
 .guided-step-body:focus-visible, .guided-complete:focus-visible, .ei-disclosure > summary:focus-visible { outline: 2px solid #345640; outline-offset: 3px; }
-.guided-lock-line { display: flex; align-items: center; gap: 4px; margin: 0; min-width: 0; }
 /* One short feedback line under the row after an attempt that did not meet the step (WD-43). */
 .guided-feedback { margin: 8px 4px 0; font-weight: 500; }
-.modal .guided-focus, .modal .guided-lock-line, .modal .guided-result { font-size: 12px; line-height: 1.7; }
-.modal .guided-lock-line { color: #6b785f; }
-.guided-focus { font-weight: 500; }
-.guided-result { border-top: 1px solid #dce3d4; padding-top: 6px; }
+/* Step dialog body (task 78.5, WD-48): one type size, one line height, one gap between blocks, one left edge. */
+.guided-body { display: flex; flex-direction: column; gap: 10px; min-width: 0; font-size: 12px; line-height: 1.6; color: #6b785f; }
+.guided-body p, .guided-body .ei-disclosure, .guided-body .ei-disclosure p { margin: 0; font-size: 12px; line-height: 1.6; }
+.guided-body .ei-disclosure > summary { padding: 0; }
+.guided-body .ei-disclosure-body { padding-top: 6px; }
+.guided-body .guided-focus { display: flex; align-items: flex-start; gap: 6px; font-weight: 500; }
+.guided-body .guided-focus > svg { margin-top: 0.3em; }
+.guided-body .guided-result { border-top: 1px solid #dce3d4; padding-top: 10px; }
 @media (max-width: 870px) {
   .guided-stepper ol { flex: 1 1 100%; flex-direction: column; align-items: stretch; }
   .guided-step, .guided-step:last-child { flex: none; padding: 4px 0; }
@@ -206,6 +209,8 @@
 .ei-disclosure[open] > summary::after { content: '\25B4'; }
 .ei-disclosure-body { padding-top: 4px; }
 .ei-disclosure-body > :first-child { margin-top: 0; }
+/* Task 78.5 (WD-49): the same 19px the page puts between the workbench row and the results panel. */
+.workspace-context { margin-top: 19px; }
 .about-model { margin-top: 0; flex: 1 1 260px; }
 .about-model p { margin: 4px 0; }
 .shape-tile.locked { cursor: not-allowed; opacity: .6; }
