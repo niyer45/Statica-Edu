@@ -70,9 +70,20 @@ describe('Vibration Isolation I workbench', () => {
     // Task 56 follow-up: the challenge panel matches Cantilever Beam I: visible statement, then the
     // value/limit checks with short names; full labels stay in Test details.
     const panel = screen.getByRole('complementary', { name: 'The challenge' })
-    const statement = within(panel).getByText(/it does not simulate motion over time\./)
-    expect(statement.tagName).toBe('P')
-    expect(statement.closest('details')).toBeNull()
+    // Task 78 (D-65): the two lead sentences are a visible paragraph; the remainder (including the
+    // steady-state sentence) is word for word inside the collapsed "More about this challenge".
+    const lead = within(panel).getByText(/A rigid component sits on mounts so stiff/)
+    expect(lead.tagName).toBe('P')
+    expect(lead.closest('details')).toBeNull()
+    expect(lead.textContent).toBe(ch.statement.slice(0, lead.textContent!.length))
+    const more = within(panel).getByText('More about this challenge').closest('details')!
+    expect(more.open).toBe(false)
+    const statement = within(more).getByText(/it does not simulate motion over time\./)
+    expect(statement.textContent).toBe(ch.statement.slice(lead.textContent!.length).trim())
+    fireEvent.click(within(more).getByText('More about this challenge'))
+    expect(more.open).toBe(true)
+    // The chart reading note is collapsed too.
+    expect(screen.getByText(/Natural frequency 30\.20 Hz, inside the operating band/).closest('details')!.open).toBe(false)
     expect(requirements.closest('aside')).toBe(panel)
     expect(within(requirements).getAllByRole('listitem').map((li) => li.firstElementChild!.textContent)).toEqual(['Vibration in band', 'Sag', 'Resonance peak', 'Rattle space'])
     expect(screen.getByText(/Natural frequency 30\.20 Hz, inside the operating band \(25\.00–50\.00 Hz\)/)).toBeTruthy()

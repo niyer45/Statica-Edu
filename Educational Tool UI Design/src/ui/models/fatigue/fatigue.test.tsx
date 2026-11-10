@@ -92,11 +92,26 @@ describe('Fatigue Analysis I workbench', () => {
     expect(within(requirements).getAllByText('✗ Fail')).toHaveLength(3)
     expect(within(requirements).getAllByText('✓ Pass')).toHaveLength(1)
     expect(screen.getByText(FATIGUE_LIMITS_NOTICE)).toBeTruthy()
-    expect(screen.getByText(/fatigue safety factor 0\.62 \(fail\), Kf 2\.001, predicted life 6\.99 × 10³ cycles/)).toBeTruthy()
+    // Task 78 (D-65): the statement's two lead sentences are a visible paragraph; the remainder is
+    // word for word in the collapsed "More about this challenge" (visible after opening).
+    const panel = screen.getByRole('complementary', { name: 'The challenge' })
+    const lead = within(panel).getByText(/A steel stub-axle spindle is held by its collar/)
+    expect(lead.tagName).toBe('P')
+    expect(lead.closest('details')).toBeNull()
+    expect(lead.textContent).toBe(ch.statement.slice(0, lead.textContent!.length))
+    const more = within(panel).getByText('More about this challenge').closest('details')!
+    expect(more.open).toBe(false)
+    expect(within(more).getByText(/The load, its position, the lengths and the material are fixed\./).textContent).toBe(ch.statement.slice(lead.textContent!.length).trim())
+    fireEvent.click(within(more).getByText('More about this challenge'))
+    expect(more.open).toBe(true)
+    // The test summary, the S-N diagram and its values are collapsed by default.
+    const summary = screen.getByText(/fatigue safety factor 0\.62 \(fail\), Kf 2\.001, predicted life 6\.99 × 10³ cycles/)
+    expect(summary.closest('details')!.open).toBe(false)
     // jsdom has no WebGL2: the 2D side view shows with a notice, plus the S-N diagram.
     expect(screen.getByRole('img', { name: ELEVATION_LABEL })).toBeTruthy()
     expect(screen.getAllByText(FATIGUE_FALLBACK_NOTICE).length).toBeGreaterThan(0)
     const sn = screen.getByRole('img', { name: SN_LABEL })
+    expect(sn.closest('details')!.open).toBe(false)
     expect(sn.querySelectorAll('polyline.fatigue-sn-line')).toHaveLength(1)
     expect(sn.querySelectorAll('circle.fatigue-sn-point')).toHaveLength(1)
     const table = screen.getByRole('table', { name: 'S-N values of the latest tested design' })

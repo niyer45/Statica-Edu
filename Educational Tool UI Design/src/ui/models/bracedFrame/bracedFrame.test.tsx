@@ -89,9 +89,18 @@ describe('Braced Frame I workbench', () => {
     // Task 56 follow-up: the challenge panel matches Cantilever Beam I: visible statement with the
     // pin-jointed idealization (BFR-01), then the value/limit checks with short names.
     const panel = screen.getByRole('complementary', { name: 'The challenge' })
-    const statement = within(panel).getByText(/This frame is modeled as pin-jointed: every joint is a hinge/)
-    expect(statement.tagName).toBe('P')
-    expect(statement.closest('details')).toBeNull()
+    // Task 78 (D-65): the two lead sentences are a visible paragraph; the remainder, including the
+    // pin-jointed idealization sentence, is word for word inside the collapsed disclosure.
+    const lead = within(panel).getByText(/Under sideways load, this two-storey steel frame/)
+    expect(lead.tagName).toBe('P')
+    expect(lead.closest('details')).toBeNull()
+    expect(lead.textContent).toBe(ch.statement.slice(0, lead.textContent!.length))
+    const more = within(panel).getByText('More about this challenge').closest('details')!
+    expect(more.open).toBe(false)
+    const statement = within(more).getByText(/This frame is modeled as pin-jointed: every joint is a hinge/)
+    expect(statement.textContent).toBe(ch.statement.slice(lead.textContent!.length).trim())
+    fireEvent.click(within(more).getByText('More about this challenge'))
+    expect(more.open).toBe(true)
     expect(list.closest('aside')).toBe(panel)
     expect(within(list).getAllByRole('listitem').map((li) => li.firstElementChild!.textContent)).toEqual(['Stability', 'Roof drift', 'Member utilization', 'Mass'])
     expect(within(panel).getByText('Governing member: Lower diagonal (bottom right to top left), compression, Euler buckling.')).toBeTruthy()

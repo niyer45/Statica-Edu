@@ -95,7 +95,19 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await expect(page.getByText('3D view is unavailable. Showing the 2D side view of the spindle instead.').first()).toBeVisible()
       await expect(page.locator('canvas')).toHaveCount(0)
     }
-    await expect(page.getByRole('img', { name: /^S-N diagram of the latest tested design/ })).toBeVisible()
+    // Task 78: the S-N diagram and the statement remainder are collapsed until opened.
+    const snDiagram = page.getByRole('img', { name: /^S-N diagram of the latest tested design/ })
+    await expect(snDiagram).toBeHidden()
+    await page.getByText('S-N diagram', { exact: true }).click()
+    await expect(snDiagram).toBeVisible()
+    const challenge = page.getByRole('complementary', { name: 'The challenge', exact: true })
+    await expect(challenge.getByText(/A steel stub-axle spindle is held by its collar/)).toBeVisible()
+    const fixedNote = challenge.getByText(/The load, its position, the lengths and the material are fixed/)
+    await expect(fixedNote).toBeHidden()
+    // The Guided step popover hangs over the challenge column at desktop width; Escape dismisses it (WD-11).
+    await page.keyboard.press('Escape')
+    await challenge.getByText('More about this challenge', { exact: true }).click()
+    await expect(fixedNote).toBeVisible()
     await expect(page.getByText(/Stress-life screening of a stepped spindle/)).toBeVisible()
     const collar = page.getByLabel('Collar diameter', { exact: true })
     if (mode === 'Guided') {

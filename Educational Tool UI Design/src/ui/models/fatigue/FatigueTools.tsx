@@ -5,6 +5,7 @@ import { fatiguePermissibleRange } from '../../../geometry/fatigue/edit'
 import { FATIGUE_PARAM_LABELS } from '../../../geometry/fatigue/validate'
 import { formatMm, mmToM, mToMm, parseMmInput } from '../../../units/units'
 import Icon from '../../icons/Icon'
+import Disclosure from '../../workbench/Disclosure'
 import LockNote from '../../workbench/LockNote'
 import { useGuided } from '../../workbench/useGuided'
 import { finishName, useFatigueStore } from './shared'
@@ -69,7 +70,9 @@ export default function FatigueTools({ onAnnounce }: { onAnnounce: (message: str
       <div className="section-heading">
         STEPPED SPINDLE <span>01</span>
       </div>
-      <p className="bracket-step-note">A collar held in its housing, a shoulder fillet, and a neck that carries the fluctuating wheel load.</p>
+      <Disclosure summary="About the spindle">
+        <p className="bracket-step-note">A collar held in its housing, a shoulder fillet, and a neck that carries the fluctuating wheel load.</p>
+      </Disclosure>
       <div className="section-heading dimensions-heading">DIMENSIONS</div>
       {FATIGUE_PARAMS.map((param) => {
         const range = fatiguePermissibleRange(param, ch.designLimits)!
