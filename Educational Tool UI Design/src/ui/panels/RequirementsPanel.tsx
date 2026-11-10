@@ -1,6 +1,8 @@
 import { selectLatestResult } from '../../state/selectors'
 import { formatMm } from '../../units/units'
 import Icon from '../icons/Icon'
+import ChallengeStatement from '../workbench/ChallengeStatement'
+import Disclosure from '../workbench/Disclosure'
 import { useStore } from '../state/store'
 import { formatConstraint } from './resultPresentation'
 
@@ -14,7 +16,7 @@ export default function RequirementsPanel({ onOpenHelp }: { onOpenHelp: () => vo
   return <>
     <div className="panel-title"><Icon name="book" size={16} /><h2>The challenge</h2><span className="challenge-number">01 / 01</span></div>
     <div className="challenge-body">
-      <p>{ch.statement}</p>
+      <ChallengeStatement text={ch.statement} />
       <div className="section-heading requirements-title">VALUE / LIMIT <Icon name="lock" size={11} /></div>
       <ul aria-label="Design requirements">
         {evaluation.constraints.filter((c) => ['deflection', 'stress', 'mass'].includes(c.id)).map((c) => <li className="requirement" key={c.id}><span>{c.id === 'stress' ? 'Bending stress' : c.label}</span><strong><span>{formatConstraint(c.value, c.unit)}</span> / <span>{formatConstraint(c.limit, c.unit)}</span>{outside && <small>Outside model assumptions</small>}</strong><span className={c.passed ? 'pass-mark' : 'fail-mark'}>{c.passed ? '✓ Pass' : '✗ Fail'}</span></li>)}
@@ -23,11 +25,11 @@ export default function RequirementsPanel({ onOpenHelp }: { onOpenHelp: () => vo
       </ul>
       {outside && <ul aria-label="Model applicability reasons">{analysis.notApplicableReasons.map((reason) => <li key={reason.code}>{reason.message}</li>)}</ul>}
       <ul aria-label="Model warnings">{analysis.warnings.map((warning) => <li key={warning.code}>{warning.message}</li>)}</ul>
-      <details className="result-details"><summary>Test details</summary>
+      <Disclosure summary="Test details" className="result-details">
       <table aria-label="Latest tested results"><thead><tr><th scope="col">Constraint</th><th scope="col">Value</th><th scope="col">Limit</th><th scope="col">Result</th></tr></thead>
         <tbody>{evaluation.constraints.map((c) => <tr key={c.id}><th scope="row">{c.label}</th><td>{formatConstraint(c.value, c.unit)}{outside && c.unit !== 'bool' && <small> Outside model assumptions</small>}</td><td>{c.unit === 'bool' ? '' : formatConstraint(c.limit, c.unit)}</td><td>{c.passed ? '✓ Pass' : '✗ Fail'}</td></tr>)}</tbody>
       </table>
-      </details>
+      </Disclosure>
       {state.draftErrors.length > 0 && <ul aria-label="Design errors">{state.draftErrors.map((e, i) => <li key={i}>{e.message}</li>)}</ul>}
       {state.ui.notice?.kind === 'error' && <p role="alert">{state.ui.notice.message}</p>}
       <div className="insight"><Icon name="bulb" size={18} /><button type="button" onClick={onOpenHelp}>Section stiffness reference <Icon name="arrow" size={12} /></button></div>

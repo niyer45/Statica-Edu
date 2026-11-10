@@ -24,6 +24,15 @@ function mount(design?: typeof reference.design, details = true) {
   render(<StoreProvider challenge={{ ...ch, content: { ...ch.content, collegeDetails: details } }} initialSession={s}><Probe /><RequirementsPanel onOpenHelp={() => {}} /><PredictionDialog /></StoreProvider>)
   return () => store!
 }
+it('keeps the statement lead visible and collapses the remainder (task 78)', () => {
+  mount()
+  expect(screen.getByText(/^The cantilevered component deflects too much and is over its mass limit\./)).toBeTruthy()
+  const more = screen.getByText('More about this challenge').closest('details')!
+  expect(more.open).toBe(false)
+  expect(more.textContent).toContain('The span, support interface, material, and applied load are fixed.')
+  fireEvent.click(screen.getByText('More about this challenge'))
+  expect(more.open).toBe(true)
+})
 it('shows only the stored constraint table inside collapsed test details', () => {
   const store = mount(reference.design)
   const disclosure = screen.getByText('Test details').closest('details')!
