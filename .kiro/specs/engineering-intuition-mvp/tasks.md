@@ -104,6 +104,7 @@ These tasks need the owner and real students. Agents prepare materials and recor
   - [x] 78.I Integration: merge of the slices, `e2e/disclosure.spec.ts` over all ten challenges with explicit popover dismissal (`dismissGuidedPopover`), popover/chip and Parametric assertions, before/after word counts, docs, full gate
   - [x] 78.2 The challenge comes first (owner, 2026-11-09; D-65 amendment; WD-20–WD-24): full-width `ChallengeBand` above the "About this model" row and the Guided chip on all ten challenges, with the card goal line and the first sentence visible and the rest under "More about this challenge"; the right-hand panel is now "Checks"
   - [x] 78.3 Guided steps as a stepper row under the challenge band (replaces the "Step N of M" chip; the popover holds the current step and the lock line), and "Guided mode / About this model" moves to the bottom above the footer (owner, 2026-11-09, with a reference image; D-65 amendment 2; WD-30–WD-36)
+  - [x] 78.4 The Guided step instruction is a modal dialog opened on entry and on each new step, reopened from the current step in the stepper; one feedback line under the row after a failed attempt (owner, 2026-11-10; D-65 amendment 3; WD-40–WD-47; supersedes the non-modal popover)
 
 ### (d) Milestone 6: scoped platform extensions
 

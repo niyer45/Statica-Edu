@@ -353,3 +353,15 @@ Owner, after seeing the challenge-first preview, with a reference image: "Move t
 - "Guided mode / About this model" (Parametric: "Parametric mode") moves from under the title to the bottom of the workbench, after the results and before the limits footer, in both modes; its content is unchanged.
 - **Placement choice:** the popover is in flow directly under the stepper at every width, not hung under the current step over the workbench, because above 870 px a hanging popover under steps 2 and 3 would cover the 3D view (D-26). This supersedes the D-65 rule that it hangs over the challenge column above 870 px.
 - No challenge JSON, catalog text, physics, evaluation, reducer, guided-plan or save-format change, so no content version bump (MM-04).
+
+### D-65 amendment 3: the Guided step instruction is a modal dialog (2026-11-10)
+
+Owner, after seeing the stepper preview (task 78.4): "The 'Grow the circle' popup should be a popup that takes over the screen and must be read and then closed. It can then be reopened by clicking on the 'Grow the circle' text."
+
+- **Rule:** the current step's instruction is a modal dialog (spec WD-40 to WD-47), built on the shared `Dialog`: centered over a dimmed backdrop, `aria-modal`, focus trap, Escape, accessible name "Step N of M: <title>", content step title, instruction, "Editable now", the lock line, Hint (collapsed) and a primary "Got it". Backdrop clicks do not dismiss it. Closing returns focus to the current step button in the stepper, which reopens it (`aria-haspopup="dialog"`; `aria-expanded` and `aria-controls` dropped).
+- **Auto-open:** on entering a challenge in Guided (including reload and resume) and whenever the current step changes (a new step, or all steps complete, shown once). It does not open after an attempt that fails to meet the step.
+- **Feedback line:** after such an attempt, the existing "Iteration N did not complete this step yet..." text is one short line directly under the stepper row (no new live region), and also inside the dialog when reopened. It is absent when there is no feedback.
+- **One dialog at a time:** it queues behind the Prediction, submit, import-error and reference dialogs and opens when they close. Run Test to Prediction is unchanged.
+- **D-26:** a modal dialog over the whole app is the same class as the existing Prediction dialog; it is not an overlay on the 3D model, so it is allowed.
+- **Supersedes** the non-modal popover of D-65 (WD-10 to WD-13, WD-31, WD-32) and the in-flow box of amendment 2; the stepper row, the band and the bottom "About this model" are unchanged. No JSON, physics, evaluation, reducer, guided-plan or save-format change, so no content version bump (MM-04).
+- Open for the owner: whether the dialog opening on every entry and reload and on each new step is the wanted frequency.
