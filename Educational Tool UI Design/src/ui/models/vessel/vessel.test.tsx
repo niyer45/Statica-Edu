@@ -109,6 +109,22 @@ describe('Pressure Vessel I workbench', () => {
     expect(screen.queryByText(/bracket|torsion|twist|deflection|cantilever/i)).toBeNull()
   })
 
+  it('keeps the caption, view text, vessel note and statement remainder collapsed until their disclosures are opened', () => {
+    renderVessel()
+    const pairs = [
+      [screen.getByText(ELEVATION_CAPTION), 'About this drawing'],
+      [screen.getByText(/Latest tested: hoop stress/), 'Vessel details'],
+      [screen.getByText(/The shell length is the straight part between the heads/), 'About the vessel'],
+      [screen.getByText('More about this challenge'), 'More about this challenge'],
+    ] as const
+    for (const [el, label] of pairs) {
+      const d = el.closest('details')!
+      expect(d.open).toBe(false)
+      fireEvent.click(within(d).getByText(label))
+      expect(d.open).toBe(true)
+    }
+  })
+
   it('draws the draft section: two walls, the air space and the axis, with no text on the drawing', () => {
     renderVessel()
     const svg = screen.getByRole('img', { name: ELEVATION_LABEL })

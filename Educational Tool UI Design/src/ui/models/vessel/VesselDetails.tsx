@@ -1,4 +1,5 @@
 import type { VesselAnalysis } from '../../../physics/vessel/types'
+import Disclosure from '../../workbench/Disclosure'
 import { formatLimit, formatVessel, useVesselStore } from './shared'
 
 // Pressure vessel result details shown under the 3D or 2D view (task 69; MM-22, D-26). A text
@@ -26,13 +27,14 @@ export default function VesselDetails() {
   ]
   return (
     <>
-      <p id={SUMMARY_ID} className="viewport-label vessel-summary" aria-live="off">
-        A steel air receiver: a cylindrical shell closed by two hemispherical heads, cut away to show both walls.
-        {' '}Latest tested: {stressSummary(a)}
-        {state.draftStatus === 'draft' && ' · draft changed since this test'}
-      </p>
-      <details className="vessel-sections">
-        <summary>Checked stresses</summary>
+      <Disclosure summary="Vessel details">
+        <p id={SUMMARY_ID} className="viewport-label vessel-summary" aria-live="off">
+          A steel air receiver: a cylindrical shell closed by two hemispherical heads, cut away to show both walls.
+          {' '}Latest tested: {stressSummary(a)}
+          {state.draftStatus === 'draft' && ' · draft changed since this test'}
+        </p>
+      </Disclosure>
+      <Disclosure summary="Checked stresses" className="vessel-sections">
         <table aria-label="Checked stresses of the latest tested design">
           <thead>
             <tr>
@@ -56,7 +58,7 @@ export default function VesselDetails() {
             })}
           </tbody>
         </table>
-      </details>
+      </Disclosure>
     </>
   )
 }

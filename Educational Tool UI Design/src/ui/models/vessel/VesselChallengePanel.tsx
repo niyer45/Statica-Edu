@@ -1,5 +1,6 @@
 import { STATUS_LABELS } from '../../panels/resultPresentation'
 import Icon from '../../icons/Icon'
+import ChallengeStatement from '../../workbench/ChallengeStatement'
 import { formatLimit, formatVessel, useVesselStore } from './shared'
 
 // Pressure vessel challenge panel (task 69; PVS-15, D-48 amendment). The Cantilever layout: the
@@ -32,7 +33,7 @@ export default function VesselChallengePanel({ onOpenHelp }: { onOpenHelp: () =>
         <h2>The challenge</h2>
       </div>
       <div className="challenge-body">
-        <p>{ch.statement}</p>
+        <ChallengeStatement text={ch.statement} />
         <div className="section-heading requirements-title">
           VALUE / LIMIT <Icon name="lock" size={11} />
         </div>
