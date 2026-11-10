@@ -4,6 +4,7 @@ import { bracketPermissibleRange } from '../../../geometry/bracket/edit'
 import { BRACKET_PARAM_LABELS } from '../../../geometry/bracket/validate'
 import { formatMm, mmToM, mToMm, parseMmInput } from '../../../units/units'
 import Icon from '../../icons/Icon'
+import Disclosure from '../../workbench/Disclosure'
 import LockNote from '../../workbench/LockNote'
 import { useGuided } from '../../workbench/useGuided'
 import { useBracketStore } from './shared'
@@ -67,9 +68,11 @@ export default function BracketTools({ onAnnounce }: { onAnnounce: (message: str
       <div className="section-heading">
         L-BRACKET <span>01</span>
       </div>
-      <p className="bracket-step-note">
-        A vertical flange bolted flat to the wall, a bend with an inner radius, and a horizontal arm that carries the hanging load.
-      </p>
+      <Disclosure summary="About this part">
+        <p className="bracket-step-note">
+          A vertical flange bolted flat to the wall, a bend with an inner radius, and a horizontal arm that carries the hanging load.
+        </p>
+      </Disclosure>
       <div className="section-heading dimensions-heading">DIMENSIONS</div>
       {BRACKET_PARAMS.map((param) => {
         const range = bracketPermissibleRange(param, ch.designLimits)!
@@ -112,10 +115,14 @@ export default function BracketTools({ onAnnounce }: { onAnnounce: (message: str
           </div>
         )
       })}
-      <details className="locked-features">
-        <summary>
-          <Icon name="lock" size={14} /> Some things are fixed.
-        </summary>
+      <Disclosure
+        className="locked-features"
+        summary={
+          <>
+            <Icon name="lock" size={14} /> Some things are fixed.
+          </>
+        }
+      >
         <dl>
           <dt>Load</dt>
           <dd>{ch.load.forceN} N hanging from the arm</dd>
@@ -132,7 +139,7 @@ export default function BracketTools({ onAnnounce }: { onAnnounce: (message: str
           <dt>Support</dt>
           <dd>Flange bolted flat to a rigid wall</dd>
         </dl>
-      </details>
+      </Disclosure>
     </>
   )
 }

@@ -120,6 +120,11 @@ describe('Mounting Bracket I workbench', () => {
     // jsdom has no WebGL2: the 2D side view (wall, L-bracket, bolts, hanging load) shows with a notice.
     expect(screen.getByRole('img', { name: ELEVATION_LABEL })).toBeTruthy()
     expect(screen.getAllByText(BRACKET_FALLBACK_NOTICE).length).toBeGreaterThan(0)
+    // Task 78: the moment-path paragraph, graph and section table sit in one collapsed Disclosure.
+    const momentPath = screen.getByText('Moment path').closest('details')!
+    expect(momentPath.open).toBe(false)
+    fireEvent.click(screen.getByText('Moment path'))
+    expect(momentPath.open).toBe(true)
     expect(screen.getByText(/An L-bracket: its vertical flange is bolted flat to the wall/)).toBeTruthy()
     const view = screen.getByRole('img', { name: STRIP_LABEL })
     // The bend is a distinct shape (filled triangle) and the bolt row an open circle, not only a color.

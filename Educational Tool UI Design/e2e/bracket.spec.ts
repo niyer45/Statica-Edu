@@ -85,7 +85,14 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await expect(page.getByText('3D view is unavailable. Showing the 2D side view of the bracket instead.').first()).toBeVisible()
       await expect(page.locator('canvas')).toHaveCount(0)
     }
-    await expect(page.getByRole('img', { name: /^Bending-moment path of the latest tested design/ })).toBeVisible()
+    // Task 78: the moment path is collapsed until its Disclosure is opened.
+    const momentPath = page.getByRole('img', { name: /^Bending-moment path of the latest tested design/ })
+    await expect(momentPath).toBeHidden()
+    // The canvas description still resolves while the Disclosure is closed.
+    if (mode === 'Guided') await expect(page.locator('canvas')).toHaveAccessibleDescription(/An L-bracket: its vertical flange is bolted flat to the wall/)
+    await page.getByText('Moment path', { exact: true }).click()
+    await expect(momentPath).toBeVisible()
+    await expect(page.getByText(/An L-bracket: its vertical flange is bolted flat to the wall/)).toBeVisible()
     await expect(page.getByText(/Idealized bolted L-bracket: statics, Winkler–Bach curved-beam bend stress/)).toBeVisible()
     const width = page.getByLabel('Width', { exact: true })
     if (mode === 'Guided') {

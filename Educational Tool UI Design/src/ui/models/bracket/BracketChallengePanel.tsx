@@ -1,4 +1,6 @@
 import { STATUS_LABELS } from '../../panels/resultPresentation'
+import ChallengeStatement from '../../workbench/ChallengeStatement'
+import Disclosure from '../../workbench/Disclosure'
 import Icon from '../../icons/Icon'
 import { formatBracket, useBracketStore } from './shared'
 
@@ -31,7 +33,7 @@ export default function BracketChallengePanel({ onOpenHelp }: { onOpenHelp: () =
         <h2>The challenge</h2>
       </div>
       <div className="challenge-body">
-        <p>{ch.statement}</p>
+        <ChallengeStatement text={ch.statement} />
         <div className="section-heading requirements-title">
           VALUE / LIMIT <Icon name="lock" size={11} />
         </div>
@@ -54,8 +56,7 @@ export default function BracketChallengePanel({ onOpenHelp }: { onOpenHelp: () =
             ))}
           </ul>
         )}
-        <details className="result-details">
-          <summary>Test details</summary>
+        <Disclosure summary="Test details" className="result-details">
           {a.warnings.length > 0 && (
             <ul aria-label="Model warnings">
               {a.warnings.map((w) => (
@@ -94,7 +95,7 @@ export default function BracketChallengePanel({ onOpenHelp }: { onOpenHelp: () =
             </tbody>
           </table>
           <p>Status: {STATUS_LABELS[evaluation.status]}</p>
-        </details>
+        </Disclosure>
         {state.draftErrors.length > 0 && (
           <ul aria-label="Design errors">
             {state.draftErrors.map((e, i) => (

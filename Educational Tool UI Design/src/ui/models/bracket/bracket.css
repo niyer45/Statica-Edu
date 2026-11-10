@@ -15,6 +15,9 @@
 .bracket-sections summary { cursor: pointer; font-weight: 600; }
 .bracket-sections table { border-collapse: collapse; margin-top: 6px; }
 .bracket-sections th, .bracket-sections td { padding: 2px 8px 2px 0; text-align: left; white-space: nowrap; }
+.bracket-section-table { margin-top: 6px; font-size: 11px; max-width: 100%; }
+.bracket-section-table table { border-collapse: collapse; width: 100%; }
+.bracket-section-table th, .bracket-section-table td { padding: 2px 8px 2px 0; text-align: left; }
 .bracket-step-note { margin: 0 0 8px; font-size: 11px; color: #46583b; }
 .bracket-view .bracket-elevation { min-height: 0; max-height: 300px; touch-action: auto; user-select: auto; }
 .bracket-view .bracket-moment { max-height: 96px; margin-top: 4px; }
