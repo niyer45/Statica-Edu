@@ -8,11 +8,11 @@ Read these in order before editing (paths from the repository root):
 2. `Educational Tool UI Design/AGENTS.md`: the development rules.
 3. `Educational Tool UI Design/HANDOFF.md`: the state right now and what waits on the owner.
 4. `.kiro/specs/engineering-intuition-mvp/tasks.md`: the task list.
-5. `Educational Tool UI Design/DECISIONS.md`: decisions D-01–D-63.
+5. `Educational Tool UI Design/DECISIONS.md`: decisions D-01–D-65.
 
 App commands (Node 22, pnpm 10.34.3) run in `Educational Tool UI Design/`. Specifications live in
-`.kiro/specs/`. Agent definitions live in `.claude/agents/`: the director runs on Fable, developers
-on Opus, specialists on Sonnet.
+`.kiro/specs/`. Agent definitions live in `.claude/agents/`: the director runs on Fable and briefs
+Sonnet workers directly; `release-verifier` is the one Opus critic.
 
 Three rules never bend: never fabricate human QA or owner review; activating a card or deploying
 needs explicit owner approval; update `tasks.md` and `HANDOFF.md` after every task.

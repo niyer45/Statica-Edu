@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, expectGuidedStep, expectParametricNote, readState, runAnyTest, tabTo } from './helpers'
+import { dismissGuidedPopover, audit, expectGuidedStep, expectParametricNote, readState, runAnyTest, tabTo } from './helpers'
 
 // Vibration Isolation I (task 50.3; VIB-14–VIB-16, MM-16, MM-22): chosen before entry from the
 // library, full prediction/test loop to an Accepted reference-class mount, saved under its own
@@ -83,8 +83,8 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     await expect(challenge.getByText(/A rigid component sits on mounts so stiff/)).toBeVisible()
     const steady = challenge.getByText(/it does not simulate motion over time/)
     await expect(steady).toBeHidden()
-    // The Guided step popover hangs over the challenge column at desktop width; Escape dismisses it (WD-11).
-    await page.keyboard.press('Escape')
+    // The Guided step popover hangs over the challenge column at desktop width; dismiss it (WD-11).
+    await dismissGuidedPopover(page)
     await challenge.getByText('More about this challenge', { exact: true }).click()
     await expect(steady).toBeVisible()
     const requirements = challenge.getByRole('list', { name: 'Design requirements' })

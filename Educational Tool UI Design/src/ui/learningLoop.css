@@ -171,7 +171,7 @@
    flow under the chip, so it cannot cover the design view, the controls or the Run Test button. */
 .guided-instructions { position: relative; min-width: 0; margin-bottom: 14px; color: #46583b; font-size: 11px; line-height: 1.6; overflow-wrap: break-word; }
 .guided-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
-.guided-chip { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; border: 1px solid #345640; border-radius: 999px; padding: 6px 12px; background: #345640; color: #fff; font-size: 11px; font-weight: 600; text-align: left; }
+.guided-chip { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; border: 1px solid #345640; border-radius: 999px; padding: 6px 12px; background: #345640; color: #fff; font-size: 11px; font-weight: 600; text-align: left; transition: none; }
 .guided-chip::after { content: '\25BE'; margin-left: 2px; }
 .guided-chip[aria-expanded='true'] { background: #fff; color: #345640; }
 .guided-chip[aria-expanded='true']::after { content: '\25B4'; }

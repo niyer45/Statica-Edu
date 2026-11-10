@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, expectGuidedStep, expectParametricNote, readState, tabTo } from './helpers'
+import { dismissGuidedPopover, audit, expectGuidedStep, expectParametricNote, readState, tabTo } from './helpers'
 
 // Braced Frame I (task 49.3; braced-frame-1 BFR-16–BFR-18, MM-16, MM-22): chosen before entry
 // from the library, diagonals toggled from the keyboard, a mechanism shown as unstable with a
@@ -90,8 +90,8 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     await expect(challenge.getByText(/Under sideways load, this two-storey steel frame/)).toBeVisible()
     const idealization = challenge.getByText(/This frame is modeled as pin-jointed: every joint is a hinge/)
     await expect(idealization).toBeHidden()
-    // The Guided step popover hangs over the challenge column at desktop width; Escape dismisses it (WD-11).
-    await page.keyboard.press('Escape')
+    // The Guided step popover hangs over the challenge column at desktop width; dismiss it (WD-11).
+    await dismissGuidedPopover(page)
     await challenge.getByText('More about this challenge', { exact: true }).click()
     await expect(idealization).toBeVisible()
     const requirements = challenge.getByRole('list', { name: 'Design requirements' })

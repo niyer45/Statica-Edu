@@ -96,6 +96,12 @@ These tasks need the owner and real students. Agents prepare materials and recor
   - [ ] 76.2 Implement and verify: export/import round-trip, read-only viewer, E2E on desktop and Pixel 7, axe gates; owner review before release.
 
 - [x] 77. Split the learningLoop keyboard/mouse E2E test and drop its keyboard pre-scroll (director, 2026-10-20, after CI run 39371364350 shard 2 timed out on a slow runner; no assertion weakened) — see HANDOFF; 77.2: (b) compares against a committed normalized fixture (`e2e/fixtures/learningLoop/`) instead of rebuilding the keyboard state
+- [x] 78. Declutter the challenge workbench: Guided step popover, collapsed sections, two-sentence statements (owner, 2026-11-09: "way too cluttered… too many words"; D-65) — see HANDOFF
+  - [x] 78.0 Foundation: spec `.kiro/specs/workbench-declutter/`, shared `Disclosure`, `ChallengeStatement`, Guided step popover, lock line and marks
+  - [x] 78.A Per-model slice A: Cantilever Beam I, Torsion Shaft I, Mounting Bracket I
+  - [x] 78.B Per-model slice B: Column Buckling I, Stress and Strain I, Heat Sink I, Pressure Vessel I
+  - [x] 78.C Per-model slice C: Braced Frame I, Vibration Isolation I, Fatigue Analysis I
+  - [x] 78.I Integration: merge of the slices, `e2e/disclosure.spec.ts` over all ten challenges with explicit popover dismissal (`dismissGuidedPopover`), popover/chip and Parametric assertions, before/after word counts, docs, full gate
 
 ### (d) Milestone 6: scoped platform extensions
 

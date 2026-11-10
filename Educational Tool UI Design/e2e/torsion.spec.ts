@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { audit, expectGuidedStep, expectParametricNote, readState, runAnyTest, tabTo } from './helpers'
+import { dismissGuidedPopover, audit, expectGuidedStep, expectParametricNote, readState, runAnyTest, tabTo } from './helpers'
 
 // Torsion Shaft I (task 47.3; TSH-14–TSH-16, MM-16, MM-22): chosen before entry from the
 // library, full prediction/test loop to an Accepted hollow shaft, saved under its own key,
@@ -76,8 +76,8 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     // Task 78: the statement remainder and the shaft summary are collapsed until their Disclosures open.
     const fixedSentence = page.getByText('The length, end support, material, and applied torque are fixed.')
     await expect(fixedSentence).toBeHidden()
-    // Above 870 px the Guided popover hangs over the challenge column; Escape dismisses it (WD-11).
-    if (mode === 'Guided') await page.keyboard.press('Escape')
+    // Above 870 px the Guided popover hangs over the challenge column; dismiss it (WD-11).
+    await dismissGuidedPopover(page)
     await page.getByText('More about this challenge', { exact: true }).click()
     await expect(fixedSentence).toBeVisible()
     const shaftSummary = page.getByText(/latest tested twist 2\.73°/)

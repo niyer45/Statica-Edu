@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers'
+import { dismissGuidedPopover, audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers'
 
 // Fatigue Analysis I (task 70, D-60): the stepped stub-axle spindle, chosen before entry from the
 // library, the full prediction/test loop from a Baseline that fails fatigue, yield and mass to the
@@ -104,8 +104,8 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     await expect(challenge.getByText(/A steel stub-axle spindle is held by its collar/)).toBeVisible()
     const fixedNote = challenge.getByText(/The load, its position, the lengths and the material are fixed/)
     await expect(fixedNote).toBeHidden()
-    // The Guided step popover hangs over the challenge column at desktop width; Escape dismisses it (WD-11).
-    await page.keyboard.press('Escape')
+    // The Guided step popover hangs over the challenge column at desktop width; dismiss it (WD-11).
+    await dismissGuidedPopover(page)
     await challenge.getByText('More about this challenge', { exact: true }).click()
     await expect(fixedNote).toBeVisible()
     await expect(page.getByText(/Stress-life screening of a stepped spindle/)).toBeVisible()

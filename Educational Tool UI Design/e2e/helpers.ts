@@ -65,6 +65,17 @@ export async function expectGuidedStep(page: Page, title: string) {
   await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('button', { name: new RegExp(`^Step \\d+ of \\d+: ${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*[\\u25BE\\u25B4]?$`) })).toBeVisible()
 }
 
+/**
+ * Dismisses the auto-opened Guided step popover (WD-11) so it no longer sits over the challenge
+ * column, and asserts it is hidden. No-op when the popover is not open (Parametric, or already closed).
+ */
+export async function dismissGuidedPopover(page: Page) {
+  const popover = page.locator('.guided-popover')
+  if (await popover.count() === 0 || !(await popover.isVisible())) return
+  await page.keyboard.press('Escape')
+  await expect(popover).toBeHidden()
+}
+
 /** Opens the collapsed "About this model" disclosure in the workbench chrome (task 78). */
 export async function openAbout(page: Page) {
   const about = page.locator('.workspace-context details.ei-disclosure')

@@ -1,6 +1,6 @@
 # Statica Edu handoff
 
-Last updated: 2026-10-20 (commit 618e2ee, CI run 39368119809 passed).
+Last updated: 2026-11-09 (task 78 declutter on branch `task-78-declutter`, PR to `main` pending CI; last green `main` run is 39368119809).
 
 This file is the current state. Rules are in `AGENTS.md`, the plan is in `../PROGRAM.md`, and
 everything older is in `HANDOFF_HISTORY.md`. CI run links follow the pattern
@@ -26,7 +26,7 @@ everything older is in `HANDOFF_HISTORY.md`. CI run links follow the pattern
 - Deployment: a manual, CI-gated GitHub Pages workflow (`DEPLOY.md`). Site:
   https://niyer45.github.io/Statica-Edu/. The Home footer shows the build id. No deployment is
   recorded in these documents yet.
-- Tests: 3216 unit tests and 110/110 Playwright E2E cases (desktop and Pixel 7). CI takes about
+- Tests (task 78 branch, local): 3241 unit tests and 123/123 Playwright E2E cases (desktop and Pixel 7). CI takes about
   10 minutes: the `verify` job about 1.8 minutes, then four Playwright shards.
 - Every new challenge and module since 2026-10-19 awaits owner engineering review (section 3).
 - Known gaps: no password recovery or cross-tab session sync for local accounts; the 2D bracket
@@ -67,6 +67,11 @@ open questions:
   Euler range (D-58). Confirm.
 - Pressure Vessel I adds an overall-length limit (1000 mm) so that volume is a real check (D-59).
   Confirm.
+- Task 78 (D-65): review the decluttered screens on every challenge. The Guided step popover covers part of the
+  challenge column on entry until dismissed (Escape or Close): confirm, or ask for a different placement or for it
+  to open on request only. Heat Sink I's "coefficient is given, not computed" note and Vibration Isolation I's
+  "steady-state" sentence are now one click away rather than always visible (the specs require them to be stated,
+  not always visible): confirm. A screen-reader check of the descriptions inside collapsed sections has not been done.
 - Older open items: the backend choice for cross-device sync (38.1), and the manual checks that keep
   44.3, 30 and gate 51 open.
 
@@ -81,6 +86,7 @@ catalog gate), 35.2 (Milestone 5 checkpoint), then 74 onward.
 
 | Task | Date | Commit | CI run | Decision |
 | --- | --- | --- | --- | --- |
+| 78 Workbench declutter (owner, pilot feedback): Guided steps move to a non-modal popover under an always-visible "Step N of M" chip; statements show two lead sentences with the rest under "More about this challenge"; lock notes become one line plus lock marks; tagline, solver and mode sentence sit in "About this model"; secondary charts, captions and duplicate tables are collapsed in the shared `Disclosure`, for all ten challenges. No wording, JSON, physics or save-format change. `e2e/disclosure.spec.ts` now covers all ten challenges in Guided with explicit popover dismissal (`dismissGuidedPopover`) plus chip/popover and Parametric assertions; `.guided-chip` has `transition: none` because axe sampled its colour mid-transition. Visible workbench words (excluding headings, labels, buttons, requirement rows, results and footer; same script on `main` and on this branch, 1280×800, Guided popover dismissed): 164 vs 240 (beam), 125 vs 203 (torsion), 118 vs 231 (column), 105 vs 234 (stress and strain), 136 vs 258 (bracket), 142 vs 254 (heat sink), 139 vs 273 (vessel), 244 vs 367 (frame), 152 vs 263 (vibration), 131 vs 299 (fatigue) | 2026-11-09 | this branch | pending | D-65 |
 | 77 learningLoop keyboard/mouse E2E split; keyboard path no longer pre-scrolls; 77.2: mouse test compares against a committed normalized fixture (`e2e/fixtures/learningLoop/`) instead of rebuilding the keyboard flow, and the keyboard reflection is entered with `fill()` instead of `pressSequentially` | 2026-10-20 | this branch | pending | — |
 | Card art: Fatigue Analysis I spindle, Stress and Strain I hanger rod (owner) | 2026-10-20 | 618e2ee | 39368119809 passed | — |
 | 73 Difficulty order, numbers 001–010; CI split into `verify` + 4 shards; cleanup | 2026-10-19 | 5c9e2ba | 39363320472 passed (9.9 min) | D-63 |
