@@ -1,5 +1,6 @@
 import { HEAT_SINK_COMPARISON_METRICS } from '../../../evaluation/heatSink/metrics'
 import Icon from '../../icons/Icon'
+import ChallengeStatement from '../../workbench/ChallengeStatement'
 import { STATUS_LABELS } from '../../panels/resultPresentation'
 import { formatConstraint, formatLimit, METRIC_DISPLAY, useHeatSinkStore } from './shared'
 
@@ -21,7 +22,7 @@ export default function HeatSinkChallengePanel({ onOpenHelp }: { onOpenHelp: () 
         <h2>The challenge</h2>
       </div>
       <div className="challenge-body">
-        <p>{ch.statement}</p>
+        <ChallengeStatement text={ch.statement} />
         <div className="section-heading requirements-title">
           VALUE / LIMIT <Icon name="lock" size={11} />
         </div>
