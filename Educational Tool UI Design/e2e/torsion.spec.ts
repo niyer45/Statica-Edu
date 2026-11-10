@@ -73,6 +73,17 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     await expect(requirements.getByText('2.73°', { exact: true })).toBeVisible()
     await expect(requirements.getByText('4.588 kg', { exact: true })).toBeVisible()
     await expect(page.getByText('Idealized circular-shaft torsion, not a structural certification')).toBeVisible()
+    // Task 78: the statement remainder and the shaft summary are collapsed until their Disclosures open.
+    const fixedSentence = page.getByText('The length, end support, material, and applied torque are fixed.')
+    await expect(fixedSentence).toBeHidden()
+    // Above 870 px the Guided popover hangs over the challenge column; Escape dismisses it (WD-11).
+    if (mode === 'Guided') await page.keyboard.press('Escape')
+    await page.getByText('More about this challenge', { exact: true }).click()
+    await expect(fixedSentence).toBeVisible()
+    const shaftSummary = page.getByText(/latest tested twist 2\.73°/)
+    await expect(shaftSummary).toBeHidden()
+    await page.getByText('Shaft summary', { exact: true }).click()
+    await expect(shaftSummary).toBeVisible()
     const hollow = page.getByRole('button', { name: 'Hollow tube', exact: true })
     if (mode === 'Guided') {
       // Task 58: structured experiments; since task 71 (D-61) step 1 unlocks only the shaft type.

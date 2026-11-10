@@ -58,6 +58,11 @@ describe('Torsion design view slot (task 54.2)', () => {
     expect(screen.queryByTestId('mock-3d')).toBeNull()
     expect(document.querySelector('canvas')).toBeNull()
     expect(screen.getByText(/latest tested twist 2\.73°/)).toBeTruthy()
+    // Task 78: the text summary sits in a collapsed Disclosure until opened.
+    const summaryDetails = screen.getByText('Shaft summary').closest('details')!
+    expect(summaryDetails.open).toBe(false)
+    fireEvent.click(screen.getByText('Shaft summary'))
+    expect(summaryDetails.open).toBe(true)
     expect(notify.mock.calls).toEqual([[FALLBACK_NOTICE]])
     expect(store.state).toBe(before)
   })

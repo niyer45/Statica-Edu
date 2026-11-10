@@ -1,4 +1,6 @@
 import { STATUS_LABELS } from '../../panels/resultPresentation'
+import ChallengeStatement from '../../workbench/ChallengeStatement'
+import Disclosure from '../../workbench/Disclosure'
 import Icon from '../../icons/Icon'
 import { formatTorsion, useTorsionStore } from './shared'
 
@@ -19,7 +21,7 @@ export default function TorsionChallengePanel({ onOpenHelp }: { onOpenHelp: () =
         <h2>The challenge</h2>
       </div>
       <div className="challenge-body">
-        <p>{ch.statement}</p>
+        <ChallengeStatement text={ch.statement} />
         <div className="section-heading requirements-title">
           VALUE / LIMIT <Icon name="lock" size={11} />
         </div>
@@ -47,8 +49,7 @@ export default function TorsionChallengePanel({ onOpenHelp }: { onOpenHelp: () =
             <li key={w.code}>{w.message}</li>
           ))}
         </ul>
-        <details className="result-details">
-          <summary>Test details</summary>
+        <Disclosure summary="Test details" className="result-details">
           <table aria-label="Latest tested results">
             <thead>
               <tr>
@@ -70,7 +71,7 @@ export default function TorsionChallengePanel({ onOpenHelp }: { onOpenHelp: () =
             </tbody>
           </table>
           <p>Status: {STATUS_LABELS[evaluation.status]}</p>
-        </details>
+        </Disclosure>
         {state.draftErrors.length > 0 && (
           <ul aria-label="Design errors">
             {state.draftErrors.map((e, i) => (
