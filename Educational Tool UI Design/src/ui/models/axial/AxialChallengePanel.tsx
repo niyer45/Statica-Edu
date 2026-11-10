@@ -1,5 +1,6 @@
 import { STATUS_LABELS } from '../../panels/resultPresentation'
 import Icon from '../../icons/Icon'
+import ChallengeStatement from '../../workbench/ChallengeStatement'
 import { formatAxial, materialName, useAxialStore } from './shared'
 
 // Stress and Strain I challenge panel (task 72; SSR-06, SSR-07, SSR-10, D-48 amendment). The
@@ -31,7 +32,7 @@ export default function AxialChallengePanel({ onOpenHelp }: { onOpenHelp: () => 
         <h2>The challenge</h2>
       </div>
       <div className="challenge-body">
-        <p>{ch.statement}</p>
+        <ChallengeStatement text={ch.statement} />
         <div className="section-heading requirements-title">
           VALUE / LIMIT <Icon name="lock" size={11} />
         </div>
