@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers'
+import { audit, expectGuidedStep, expectParametricNote, readState, runAnyTest, tabTo } from './helpers'
 
 // Mounting Bracket I (tasks 46.3, 55; MM-16, MM-22): the bolted L-bracket, chosen before entry
 // from the library, full prediction/test loop from a baseline that fails all four checks to the
@@ -94,7 +94,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await expect(width).toHaveAttribute('readonly', '')
     } else {
       await expect(page.getByRole('region', { name: 'Guided experiments' })).toHaveCount(0)
-      await expect(page.getByText(/Every parameter is editable from the start/)).toBeVisible()
+      await expectParametricNote(page)
       await expect(width).not.toHaveAttribute('readonly', '')
     }
     await audit(page)

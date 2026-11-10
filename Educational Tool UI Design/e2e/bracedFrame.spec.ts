@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, expectGuidedStep, readState, tabTo } from './helpers'
+import { audit, expectGuidedStep, expectParametricNote, readState, tabTo } from './helpers'
 
 // Braced Frame I (task 49.3; braced-frame-1 BFR-16–BFR-18, MM-16, MM-22): chosen before entry
 // from the library, diagonals toggled from the keyboard, a mechanism shown as unstable with a
@@ -123,7 +123,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await expect(lowerLeft).toBeDisabled()
     } else {
       await expect(page.getByRole('region', { name: 'Guided experiments' })).toHaveCount(0)
-      await expect(page.getByText(/Every parameter is editable from the start/)).toBeVisible()
+      await expectParametricNote(page)
       await expect(lowerLeft).toBeEnabled()
     }
     await audit(page)

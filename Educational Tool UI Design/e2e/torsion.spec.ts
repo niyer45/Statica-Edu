@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers'
+import { audit, expectGuidedStep, expectParametricNote, readState, runAnyTest, tabTo } from './helpers'
 
 // Torsion Shaft I (task 47.3; TSH-14–TSH-16, MM-16, MM-22): chosen before entry from the
 // library, full prediction/test loop to an Accepted hollow shaft, saved under its own key,
@@ -81,7 +81,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await expect(page.getByLabel('Diameter', { exact: true })).toHaveAttribute('readonly', '')
     } else {
       await expect(page.getByRole('region', { name: 'Guided experiments' })).toHaveCount(0)
-      await expect(page.getByText(/Every parameter is editable from the start/)).toBeVisible()
+      await expectParametricNote(page)
       await expect(hollow).not.toHaveAttribute('aria-disabled', 'true')
     }
     await audit(page)

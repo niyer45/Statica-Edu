@@ -57,9 +57,25 @@ export async function runAnyTest(page: Page, keyboard = false) {
   await expect.poll(async () => (await readState(page)).history.length).toBe(before + 1)
 }
 
-/** Asserts the current Guided experiment step by its heading (task 58). */
+/**
+ * Asserts the current Guided experiment step by its title (task 78). The always-visible chip
+ * "Step N of M: <title>" carries the title whether or not the step popover is open.
+ */
 export async function expectGuidedStep(page: Page, title: string) {
-  await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('heading', { name: title, exact: true })).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('button', { name: new RegExp(`^Step \\d+ of \\d+: ${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*[\\u25BE\\u25B4]?$`) })).toBeVisible()
+}
+
+/** Opens the collapsed "About this model" disclosure in the workbench chrome (task 78). */
+export async function openAbout(page: Page) {
+  const about = page.locator('.workspace-context details.ei-disclosure')
+  if (!(await about.evaluate((el: HTMLDetailsElement) => el.open))) await about.locator('summary').click()
+  return about
+}
+
+/** Parametric's one explanatory sentence lives in "About this model" (task 78, WD-03). */
+export async function expectParametricNote(page: Page) {
+  const about = await openAbout(page)
+  await expect(about.getByText(/Every parameter is editable from the start/)).toBeVisible()
 }
 
 /** Fills a labelled numeric field and commits it with Enter. */

@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers'
+import { audit, expectGuidedStep, expectParametricNote, openAbout, readState, runAnyTest, tabTo } from './helpers'
 
 // Heat Sink I (task 48.3; HSK-14–HSK-16, MM-16, MM-22): chosen before entry from the library,
 // full prediction/test loop to an Accepted fin array, saved under its own key, isolated from
@@ -70,9 +70,10 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await expect(page.getByRole('button', { name: 'Add a fin' })).toBeEnabled()
     } else {
       await expect(page.getByRole('region', { name: 'Guided experiments' })).toHaveCount(0)
-      await expect(page.getByText(/Every parameter is editable from the start/)).toBeVisible()
+      await expectParametricNote(page)
       await expect(height).not.toHaveAttribute('readonly', '')
     }
+    await openAbout(page)
     await expect(page.getByText(/convection coefficient is a given fan-assisted value/)).toBeVisible()
     await audit(page)
 

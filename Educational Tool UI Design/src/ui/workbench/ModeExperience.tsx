@@ -1,6 +1,8 @@
 import { observations, type GuidedResult } from '../../evaluation/guided/plan'
 import Icon from '../icons/Icon'
 import { useModelStore } from '../state/store'
+import Disclosure from './Disclosure'
+import GuidedStepPopover from './GuidedStepPopover'
 import { useGuided } from './useGuided'
 
 // Mode experience (task 58; replaces the task 44 Inspect/Experiment/Compare/Explain prompts).
@@ -12,6 +14,8 @@ import { useGuided } from './useGuided'
 //   final step opens every parameter and is met by an Accepted test.
 // - Parametric = open design. Every parameter editable from the start, no steps: the goal and
 //   the checks stay in the challenge panel.
+// Task 78: the Guided block is a chip plus a non-modal popover (GuidedStepPopover); the locked
+// controls share one line beside the chip instead of one sentence each.
 
 const STATE_TEXT = { complete: 'complete', current: 'current step', locked: 'locked' } as const
 
@@ -31,11 +35,21 @@ function GuidedExperiments() {
   const notMet = step !== undefined && history.length - 1 > lastIndex ? latest : undefined
   const seen = last === undefined ? [] : observations(plan, last, history)
   const lastStep = last === undefined ? undefined : plan.steps.find((s) => s.id === last.stepId)
+  const chipLabel = progress.complete || step === undefined ? `All ${total} steps complete` : `Step ${progress.current + 1} of ${total}: ${step.title}`
+  const locksSomething = step !== undefined && step.unlocks !== 'all'
   return (
-    <section className="guided-instructions" aria-label="Guided experiments">
-      <p className="guided-mode-label">
-        <strong>Guided experiments</strong> · {progress.complete ? `All ${total} steps complete` : `Step ${progress.current + 1} of ${total}`}
-      </p>
+    <GuidedStepPopover
+      chipLabel={chipLabel}
+      label="Guided step instructions"
+      autoOpenKey={`${progress.current}:${notMet?.id ?? ''}`}
+      strip={
+        locksSomething ? (
+          <p id="guided-lock-line" className="guided-lock-line">
+            <Icon name="lock" size={10} /> Locked in this step: everything except {step.focus.toLowerCase()}. Others unlock in later steps.
+          </p>
+        ) : undefined
+      }
+    >
       <ol className="guidance-steps" aria-label="Experiment steps">
         {plan.steps.map((s, i) => {
           const state = i < progress.current ? 'complete' : i === progress.current ? 'current' : 'locked'
@@ -56,10 +70,9 @@ function GuidedExperiments() {
             Editable now: <strong>{step.focus}</strong>
             {step.unlocks === 'all' ? '.' : '. Other parameters stay locked until a later step.'}
           </p>
-          <details key={step.id}>
-            <summary>Hint</summary>
+          <Disclosure key={step.id} summary="Hint">
             <p>{step.hint}</p>
-          </details>
+          </Disclosure>
         </>
       ) : (
         <>
@@ -79,17 +92,13 @@ function GuidedExperiments() {
           {seen.length > 0 ? `. ${seen.map((o) => `${o.label} ${o.change === 'unavailable' ? 'not available' : o.change === 'unchanged' ? 'did not change' : o.change}`).join('; ')}.` : '.'}
         </p>
       )}
-    </section>
+    </GuidedStepPopover>
   )
 }
 
+// Parametric shows no panel here: its one explanatory sentence lives in the workbench chrome's
+// "About this model" Disclosure (task 78, WD-03).
 export default function ModeExperience() {
   const { active } = useGuided()
-  return active ? (
-    <GuidedExperiments />
-  ) : (
-    <p className="parametric-context">
-      <strong>Parametric · Open design.</strong> Every parameter is editable from the start. Meet all the checks in The challenge panel.
-    </p>
-  )
+  return active ? <GuidedExperiments /> : null
 }

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { audit, expectGuidedStep, normalizeState, openWorkbench, readState, referenceDesign, runAnyTest, setDimension, tabTo } from './helpers'
+import { audit, expectGuidedStep, expectParametricNote, normalizeState, openWorkbench, readState, referenceDesign, runAnyTest, setDimension, tabTo } from './helpers'
 
 // Task 58: Guided = structured experiments (one variable per step, the rest locked, progress from
 // tested results); Parametric = open design (everything editable, no steps). Both are chosen in
@@ -37,7 +37,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await expectGuidedStep(page, 'Grow the circle')
       await expect(iSection).toHaveAttribute('aria-disabled', 'true')
       await expect(page.locator('#dim-diameterM')).not.toHaveAttribute('readonly', '')
-      await expect(page.getByText('Locked in this step. Editable now: Diameter.').first()).toBeVisible()
+      await expect(page.locator('#guided-lock-line')).toContainText('Locked in this step: everything except diameter.')
       // aria-disabled: a forced click still reaches the tile but changes nothing.
       const before = await readState(page)
       await page.getByRole('button', { name: /Rectangle/ }).filter({ has: page.locator('svg') }).first().click({ force: true })
@@ -66,7 +66,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await expect(guide).toHaveCount(0)
       await expect(page.getByRole('list', { name: 'Experiment steps' })).toHaveCount(0)
       await expect(page.locator('canvas')).toHaveCount(0)
-      await expect(page.getByText(/Every parameter is editable from the start/)).toBeVisible()
+      await expectParametricNote(page)
       await expect(page.getByText(/Locked in this step/)).toHaveCount(0)
       await expect(iSection).not.toHaveAttribute('aria-disabled', 'true')
       await referenceDesign(page)

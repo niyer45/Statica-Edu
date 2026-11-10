@@ -1,3 +1,4 @@
+import './vessel.css'
 import { VESSEL_GUIDED_PLAN } from '../../../evaluation/guided/vessel'
 import type { VesselEfficiency } from '../../../evaluation/vessel/types'
 import type { ModelUi } from '../types'

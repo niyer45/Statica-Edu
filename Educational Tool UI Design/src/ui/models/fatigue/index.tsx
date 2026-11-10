@@ -1,3 +1,4 @@
+import './fatigue.css'
 import type { FatigueEfficiency } from '../../../evaluation/fatigue/types'
 import { FATIGUE_GUIDED_PLAN } from '../../../evaluation/guided/fatigue'
 import type { ModelUi } from '../types'

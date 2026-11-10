@@ -137,6 +137,52 @@ describe('Guided structured experiments (task 58)', () => {
   })
 })
 
+describe('Guided chip, popover and lock line (task 78)', () => {
+  it('shows a compact chip and the instruction in a non-modal popover that opens by itself', () => {
+    setup()
+    const guide = screen.getByRole('region', { name: 'Guided experiments' })
+    const chip = within(guide).getByRole('button', { name: 'Step 1 of 4: Grow the circle' })
+    expect(chip.getAttribute('aria-expanded')).toBe('true')
+    const popover = within(guide).getByRole('group', { name: 'Guided step instructions' })
+    expect(popover.getAttribute('id')).toBe(chip.getAttribute('aria-controls'))
+    expect(within(popover).getByText(/Increase only the diameter of the solid circle/)).toBeTruthy()
+    expect(within(popover).getByRole('heading', { name: 'Grow the circle' })).toBeTruthy()
+    expect(document.activeElement).toBe(document.body)
+    // The step instruction is no longer inline in the strip.
+    expect(popover.querySelector('details')?.open).toBe(false)
+  })
+
+  it('reopens on a new step, leaves a closed popover closed on a retest of the same step', () => {
+    setup()
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+    expect(screen.getByRole('button', { name: /^Step 1 of 4/ }).getAttribute('aria-expanded')).toBe('false')
+    // A step change reopens it, still without focus.
+    grow()
+    test()
+    const chip = screen.getByRole('button', { name: 'Step 2 of 4: Try another shape' })
+    expect(chip.getAttribute('aria-expanded')).toBe('true')
+    expect(document.activeElement).toBe(document.body)
+  })
+
+  it('replaces the per-control sentences with one lock line and a lock mark per locked control', () => {
+    setup(fresh('guided'), undefined, challenge, true)
+    const line = document.getElementById('guided-lock-line')!
+    expect(line.textContent).toContain('Locked in this step: everything except diameter. Others unlock in later steps.')
+    expect(document.querySelectorAll('p.guided-lock')).toHaveLength(0)
+    const rectangle = screen.getByRole('button', { name: /Rectangle/ })
+    expect(rectangle.getAttribute('aria-disabled')).toBe('true')
+    const mark = document.getElementById(rectangle.getAttribute('aria-describedby')!)!
+    expect(mark.className).toBe('guided-lock-mark')
+    expect(mark.querySelector('svg')).toBeTruthy()
+    expect(mark.textContent).toBe('Locked in this step. Editable now: Diameter.')
+  })
+
+  it('shows no lock line when nothing is locked (Parametric, or the final step)', () => {
+    setup(fresh('parametric'), undefined, challenge, true)
+    expect(document.getElementById('guided-lock-line')).toBeNull()
+  })
+})
+
 describe('mode is chosen before entry and fixed in the workbench (D-37)', () => {
   it.each(['guided', 'parametric'] as const)('keeps %s fixed with no mode-changing control and labels the mode', (mode) => {
     setup(fresh(mode), undefined, challenge, true)

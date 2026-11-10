@@ -149,7 +149,9 @@ describe('model UI registry', () => {
 
   it('shows open design and no guided experiments in Parametric mode', () => {
     renderTorsion('parametric')
-    expect(screen.getByText(/Every parameter is editable from the start/)).toBeTruthy()
+    const sentence = screen.getByText(/Every parameter is editable from the start/)
+    // The sentence lives in the collapsed "About this model" disclosure (task 78).
+    expect(sentence.closest('details')?.querySelector('summary')?.textContent).toBe('About this model')
     expect(screen.queryByText('Find the limit the solid shaft misses.')).toBeNull()
   })
 

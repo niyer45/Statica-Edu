@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers'
+import { audit, expectGuidedStep, expectParametricNote, readState, runAnyTest, tabTo } from './helpers'
 
 // Vibration Isolation I (task 50.3; VIB-14–VIB-16, MM-16, MM-22): chosen before entry from the
 // library, full prediction/test loop to an Accepted reference-class mount, saved under its own
@@ -95,7 +95,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await expect(neoprene).toBeDisabled()
     } else {
       await expect(page.getByRole('region', { name: 'Guided experiments' })).toHaveCount(0)
-      await expect(page.getByText(/Every parameter is editable from the start/)).toBeVisible()
+      await expectParametricNote(page)
       await expect(neoprene).toBeEnabled()
     }
     await audit(page)

@@ -48,6 +48,21 @@ describe('Workbench', () => {
   })
 })
 
+describe('About this model disclosure (task 78, WD-03)', () => {
+  it('folds the tagline, mode sentence and solver label into one collapsed disclosure; the footer notice stays visible', () => {
+    const { container } = renderWorkbench()
+    const about = container.querySelector('.workspace-context details.ei-disclosure')!
+    expect(about.querySelector('summary')?.textContent).toBe('About this model')
+    expect((about as HTMLDetailsElement).open).toBe(false)
+    expect(about.textContent).toContain('Structured experiments')
+    expect(about.querySelector('.solver-label')?.textContent).not.toBe('')
+    // The tagline is no longer a permanent paragraph in the page heading.
+    expect(container.querySelector('.page-heading p')).toBeNull()
+    // The model-limits notice is outside every disclosure (Req 29.7).
+    expect(screen.getByText(MODEL_LIMITS_NOTICE).closest('details')).toBeNull()
+  })
+})
+
 describe('LiveRegion', () => {
   it('is always present, replaces its message, and re-announces duplicates', () => {
     const { rerender } = render(<LiveRegion announcement={null} />)

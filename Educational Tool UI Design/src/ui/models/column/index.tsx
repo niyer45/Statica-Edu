@@ -1,3 +1,4 @@
+import './column.css'
 import { COLUMN_GUIDED_PLAN } from '../../../evaluation/guided/column'
 import type { ColumnEfficiency } from '../../../evaluation/column/types'
 import type { ModelUi } from '../types'

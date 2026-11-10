@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers'
+import { audit, expectGuidedStep, expectParametricNote, readState, runAnyTest, tabTo } from './helpers'
 
 // Column Buckling I (task 68, D-58; CBK-18–CBK-20, MM-16, MM-22): the owner-requested introductory
 // challenge, chosen before entry from the library; the full prediction/test loop from a solid bar
@@ -103,7 +103,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await expect(tile).toHaveAttribute('aria-disabled', 'true')
     } else {
       await expect(page.getByRole('region', { name: 'Guided experiments' })).toHaveCount(0)
-      await expect(page.getByText(/Every parameter is editable from the start/)).toBeVisible()
+      await expectParametricNote(page)
     }
     await audit(page)
 

@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers'
+import { audit, expectGuidedStep, expectParametricNote, readState, runAnyTest, tabTo } from './helpers'
 
 // Stress and Strain I (task 72, D-62; SSR-15–SSR-19, MM-16, MM-22): chosen before entry from the
 // library, the full prediction/test loop from a steel baseline failing stress and mass to the
@@ -104,7 +104,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await expect(titanium).toBeDisabled()
     } else {
       await expect(page.getByRole('region', { name: 'Guided experiments' })).toHaveCount(0)
-      await expect(page.getByText(/Every parameter is editable from the start/)).toBeVisible()
+      await expectParametricNote(page)
       await expect(titanium).toBeEnabled()
     }
     await audit(page)

@@ -1,3 +1,4 @@
+import './heatSink.css'
 import type { HeatSinkEfficiency } from '../../../evaluation/heatSink/types'
 import { mToMm } from '../../../units/units'
 import type { ModelUi } from '../types'

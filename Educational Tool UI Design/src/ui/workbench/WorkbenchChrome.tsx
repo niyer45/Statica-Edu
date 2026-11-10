@@ -4,6 +4,7 @@ import { catalog } from '../../challenge/catalog'
 import Icon from '../icons/Icon'
 import { useModelUi } from '../models/registry'
 import { useChallenge, useSession } from '../state/store'
+import Disclosure from './Disclosure'
 
 // Template Workbench chrome (task 13.3): `aside.sidebar`, `header.topbar`, `.page-heading`,
 // and `.workspace-context`, with the template class names so index.css / platform*.css apply.
@@ -16,7 +17,7 @@ export const MODE_LABELS: Record<InteractionMode, string> = {
   freeform: 'Freeform',
 }
 
-/** One sentence per mode (task 58), shared by the challenge drawer and the workspace context. */
+/** One sentence per mode (task 58), shared by the challenge drawer, the library and the "About this model" Disclosure (task 78). */
 export const MODE_SENTENCES: Record<InteractionMode, string> = {
   guided: 'Structured experiments: change one variable per step while the rest stay locked, then design freely once every step is met.',
   parametric: 'Open design: every parameter is editable from the start, with just the goal and the checks.',
@@ -139,7 +140,6 @@ export default function WorkbenchChrome({ onExit, onOpenHelp, onShowDesigns, chi
                 </span>
               </div>
               <h1>{ch.title}</h1>
-              <p>{copy.tagline}</p>
             </div>
             <button type="button" className="secondary exit" onClick={onExit}>
               <Icon name="back" size={15} />
@@ -151,11 +151,19 @@ export default function WorkbenchChrome({ onExit, onOpenHelp, onShowDesigns, chi
               <Icon name={sessionMode === 'guided' ? 'tune' : 'cube'} size={15} />
               {mode} mode
             </span>
-            <span>
-              {MODE_SENTENCES[sessionMode]}
-              {copy.contextNote !== undefined && ` ${copy.contextNote}`}
-            </span>
-            <span className="solver-label">{copy.solverLabel}</span>
+            <Disclosure summary="About this model" className="about-model">
+              <p>{copy.tagline}</p>
+              <p>
+                {MODE_SENTENCES[sessionMode]}
+                {copy.contextNote !== undefined && ` ${copy.contextNote}`}
+              </p>
+              {sessionMode !== 'guided' && (
+                <p>
+                  <strong>Parametric · Open design.</strong> Every parameter is editable from the start. Meet all the checks in The challenge panel.
+                </p>
+              )}
+              <p className="solver-label">{copy.solverLabel}</p>
+            </Disclosure>
           </div>
           {children}
         </main>
