@@ -78,14 +78,16 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     expect(initial.mode).toBe(mode.toLowerCase())
     // Task 56 follow-up: the challenge panel matches Cantilever Beam I: the visible statement
     // followed by the value/limit checks.
-    const challenge = page.getByRole('complementary', { name: 'The challenge', exact: true })
-    // Task 78 (D-65): two lead sentences visible; the steady-state sentence is collapsed until opened.
-    await expect(challenge.getByText(/A rigid component sits on mounts so stiff/)).toBeVisible()
-    const steady = challenge.getByText(/it does not simulate motion over time/)
+    const challenge = page.getByRole('complementary', { name: 'Checks', exact: true })
+    // Task 78.2: the challenge band is first; its first sentence is visible and the steady-state sentence is collapsed until opened.
+    const band = page.getByRole('region', { name: 'The challenge', exact: true })
+    await expect(band.getByText(/A rigid component sits on mounts so stiff/)).toBeVisible()
+    await expect(challenge.getByText(/A rigid component sits on mounts so stiff/)).toHaveCount(0)
+    const steady = band.getByText(/it does not simulate motion over time/)
     await expect(steady).toBeHidden()
     // The Guided step popover hangs over the challenge column at desktop width; dismiss it (WD-11).
     await dismissGuidedPopover(page)
-    await challenge.getByText('More about this challenge', { exact: true }).click()
+    await band.getByText('More about this challenge', { exact: true }).click()
     await expect(steady).toBeVisible()
     const requirements = challenge.getByRole('list', { name: 'Design requirements' })
     await expect(requirements.getByText('10.1', { exact: true })).toHaveCount(2)

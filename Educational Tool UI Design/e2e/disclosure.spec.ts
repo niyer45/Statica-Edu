@@ -35,7 +35,7 @@ for (const name of NAMES) {
     // Let the lazy 3D view (or its 2D fallback) settle before the baseline measurement.
     await page.waitForTimeout(1000)
     const before = await height()
-    const summaries = page.getByRole('complementary', { name: 'The challenge' }).locator('details > summary')
+    const summaries = page.locator('.challenge-band details > summary, aside[aria-label="Checks"] details > summary')
     expect(await summaries.count()).toBeGreaterThan(0)
     for (let i = 0; i < await summaries.count(); i++) {
       await summaries.nth(i).click()
@@ -59,7 +59,7 @@ test('Guided: the step popover is visible on entry; after Close the chip remains
   await expect(chip).toBeVisible()
   await expect(chip).toHaveAttribute('aria-expanded', 'false')
   // The challenge-column disclosure can now be clicked and opens.
-  const more = page.getByRole('complementary', { name: 'The challenge' }).locator('details > summary').first()
+  const more = page.locator('.challenge-band details > summary').first()
   await more.click()
   await expect(more.locator('xpath=..')).toHaveAttribute('open', '')
   // The chip reopens the popover.
@@ -73,3 +73,50 @@ test('Parametric: there is no Guided chip or popover', async ({ page }) => {
   await expect(page.locator('.guided-popover')).toHaveCount(0)
   await expect(page.getByRole('button', { name: /^Step \d+ of \d+:/ })).toHaveCount(0)
 })
+
+// Task 78.2 (WD-20–WD-23): the challenge band is the first workbench content, uncovered by the
+// Guided popover, and its disclosure works with the popover still open.
+for (const mode of ['Guided', 'Parametric'] as const) {
+  for (const name of NAMES) {
+    test(`${name} (${mode}): the challenge band is first, shows the goal line and one visible sentence`, async ({ page }) => {
+      test.skip(!catalog.find((e) => e.title === name)?.available, `${name} is not active`)
+      const entry = catalog.find((e) => e.title === name)!
+      await enter(page, name, mode)
+      const band = page.getByRole('region', { name: 'The challenge', exact: true })
+      await expect(band).toBeVisible()
+      await expect(band.getByRole('heading', { level: 2, name: 'The challenge' })).toBeVisible()
+      await expect(band.locator('.challenge-goal')).toHaveText(entry.description)
+      await expect(band.locator('> p:not(.challenge-goal)')).toBeVisible()
+      await expect(page.getByRole('complementary', { name: 'Checks', exact: true })).toBeVisible()
+      // DOM order: title, band, then the About row and the design tools.
+      const order = await page.evaluate(() => {
+        const follows = (a: Element, b: Element) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0
+        const bandEl = document.querySelector('.challenge-band')!
+        return [
+          follows(document.querySelector('h1')!, bandEl),
+          follows(bandEl, document.querySelector('.about-model')!),
+          follows(bandEl, document.querySelector('.design-panel')!),
+          document.querySelectorAll('.challenge-band').length === 1,
+        ]
+      })
+      expect(order).toEqual([true, true, true, true])
+      // Full width above 870 px: the band spans the workbench row and sits above it.
+      const bandBox = (await band.boundingBox())!
+      const rowBox = (await page.locator('.workbench').boundingBox())!
+      expect(bandBox.width).toBeGreaterThanOrEqual(rowBox.width - 2)
+      expect(bandBox.y + bandBox.height).toBeLessThanOrEqual(rowBox.y)
+      if (mode === 'Guided') {
+        // The popover is open on entry and does not cover the band.
+        const popover = page.locator('.guided-popover')
+        await expect(popover).toBeVisible()
+        const p = (await popover.boundingBox())!
+        expect(p.y).toBeGreaterThanOrEqual(bandBox.y + bandBox.height - 1)
+        const more = band.getByText('More about this challenge', { exact: true })
+        if (await more.count() > 0) {
+          await more.click()
+          await expect(band.locator('details')).toHaveAttribute('open', '')
+        }
+      }
+    })
+  }
+}

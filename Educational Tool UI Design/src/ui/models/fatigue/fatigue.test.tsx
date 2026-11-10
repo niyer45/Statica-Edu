@@ -92,14 +92,16 @@ describe('Fatigue Analysis I workbench', () => {
     expect(within(requirements).getAllByText('✗ Fail')).toHaveLength(3)
     expect(within(requirements).getAllByText('✓ Pass')).toHaveLength(1)
     expect(screen.getByText(FATIGUE_LIMITS_NOTICE)).toBeTruthy()
-    // Task 78 (D-65): the statement's two lead sentences are a visible paragraph; the remainder is
+    // Task 78 (D-65): task 78.2: the first sentence is a visible paragraph in the challenge band; the remainder is
     // word for word in the collapsed "More about this challenge" (visible after opening).
-    const panel = screen.getByRole('complementary', { name: 'The challenge' })
-    const lead = within(panel).getByText(/A steel stub-axle spindle is held by its collar/)
+    const panel = screen.getByRole('complementary', { name: 'Checks' })
+    const band = screen.getByRole('region', { name: 'The challenge' })
+    const lead = within(band).getByText(/A steel stub-axle spindle is held by its collar/)
     expect(lead.tagName).toBe('P')
     expect(lead.closest('details')).toBeNull()
+    expect(panel.textContent).not.toContain(lead.textContent!)
     expect(lead.textContent).toBe(ch.statement.slice(0, lead.textContent!.length))
-    const more = within(panel).getByText('More about this challenge').closest('details')!
+    const more = within(band).getByText('More about this challenge').closest('details')!
     expect(more.open).toBe(false)
     expect(within(more).getByText(/The load, its position, the lengths and the material are fixed\./).textContent).toBe(ch.statement.slice(lead.textContent!.length).trim())
     fireEvent.click(within(more).getByText('More about this challenge'))

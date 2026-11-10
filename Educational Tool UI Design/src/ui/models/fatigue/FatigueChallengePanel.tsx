@@ -1,6 +1,5 @@
 import { STATUS_LABELS } from '../../panels/resultPresentation'
 import Icon from '../../icons/Icon'
-import ChallengeStatement from '../../workbench/ChallengeStatement'
 import Disclosure from '../../workbench/Disclosure'
 import { formatFatigue, formatLimit, lifeText, useFatigueStore } from './shared'
 
@@ -32,10 +31,9 @@ export default function FatigueChallengePanel({ onOpenHelp }: { onOpenHelp: () =
     <>
       <div className="panel-title">
         <Icon name="book" size={16} />
-        <h2>The challenge</h2>
+        <h2>Checks</h2>
       </div>
       <div className="challenge-body">
-        <ChallengeStatement text={ch.statement} />
         <div className="section-heading requirements-title">
           VALUE / LIMIT <Icon name="lock" size={11} />
         </div>

@@ -108,7 +108,7 @@ describe('Mounting Bracket I workbench', () => {
     expect(within(requirements).getAllByText('✗ Fail')).toHaveLength(4)
     expect(screen.getAllByText(/Bend stress 231\.0 MPa at the inside of the bend \(curved-beam factor 1\.73\) · 333 N per bolt/).length).toBeGreaterThan(0)
     // Owner feedback (task 61): no extra lines under the checks; the cautions sit in Test details.
-    const panel = screen.getByRole('complementary', { name: 'The challenge' })
+    const panel = screen.getByRole('complementary', { name: 'Checks' })
     expect(within(panel).queryByText(/^Bend stress .* per bolt$/)).toBeNull()
     const warnings = within(panel).getByRole('list', { name: 'Model warnings', hidden: true })
     expect(warnings.closest('details')?.querySelector('summary')?.textContent).toBe('Test details')

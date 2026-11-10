@@ -81,7 +81,7 @@ export default function Workbench({ onExit }: WorkbenchProps) {
             </div>
             <ui.View onUnavailable={notify} />
           </section>
-          <aside className="challenge-panel panel" aria-label="The challenge">
+          <aside className="challenge-panel panel" aria-label="Checks">
             <ui.ChallengePanel onOpenHelp={openHelp} />
           </aside>
         </div>

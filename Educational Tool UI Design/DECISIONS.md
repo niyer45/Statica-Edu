@@ -335,3 +335,11 @@ Owner, from pilot feedback (task 78, 2026-11-09): "the main menu is way too clut
 - **Stays visible:** the limits footer (MVP Req 29.7, wording and placement unchanged), warnings, not-applicable reasons and the checks. Secondary charts, captions, formulas and duplicate tables (for example the Mounting Bracket moment-path graph and the paragraph above it) are collapsed.
 - **No wording, JSON, physics or save-format change**, so no content version bump and no new storage key (MM-04). Disclosure and popover state are UI state only: never persisted, never in the reducer, never announced.
 - Open for the owner: the popover covers part of the challenge column on entry; Heat Sink's "coefficient is given, not computed" note and Vibration's "steady-state" sentence are now one click away (OWNER_REVIEW_CHECKLIST.md §8). Not reviewed with a screen reader.
+
+### D-65 amendment: the challenge comes first (2026-11-09)
+
+Owner, after seeing the decluttered preview (task 78.2): "'The Challenge' should also be somewhat simplified and put at the top. That should be the first thing that I see. I need to see the challenge first, and then process after."
+
+- **Rule:** a full-width challenge band is the first workbench content on all ten challenges, directly under the page title and above "About this model" and the Guided chip. It shows the card goal line (the challenge's library card summary, from `challenge/catalog.ts`) as the headline and the first sentence of the statement as a visible paragraph; the rest of the statement stays word for word under "More about this challenge". The visible statement is now the card goal line plus the first sentence (was two lead sentences in the right-hand column). This amends the "Statements" bullet of D-65 and WD-01/WD-04 (spec WD-20–WD-24).
+- The right-hand panel is renamed "Checks" and no longer repeats the statement; the checks, Run Test, results, warnings, not-applicable reasons and Test details are unchanged. Model-limit sentences (D-48) stay in the DOM and one click away.
+- No challenge JSON, catalog text, physics, evaluation, reducer, guided-plan or save-format change, so no content version bump (MM-04).

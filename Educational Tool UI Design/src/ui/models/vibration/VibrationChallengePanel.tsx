@@ -1,6 +1,5 @@
 import { STATUS_LABELS } from '../../panels/resultPresentation'
 import Icon from '../../icons/Icon'
-import ChallengeStatement from '../../workbench/ChallengeStatement'
 import Disclosure from '../../workbench/Disclosure'
 import { CHECK_LABELS, formatVibration, useVibrationStore } from './shared'
 
@@ -11,7 +10,7 @@ import { CHECK_LABELS, formatVibration, useVibrationStore } from './shared'
 // (D-30), draft errors, the reference link and Run Test.
 
 export default function VibrationChallengePanel({ onOpenHelp }: { onOpenHelp: () => void }) {
-  const { state, challenge: ch, runTest } = useVibrationStore()
+  const { state, runTest } = useVibrationStore()
   const latest = state.history[state.history.length - 1]!
   const { analysis, evaluation } = latest
   const outside = evaluation.status === 'modelNotApplicable'
@@ -19,11 +18,10 @@ export default function VibrationChallengePanel({ onOpenHelp }: { onOpenHelp: ()
     <>
       <div className="panel-title">
         <Icon name="book" size={16} />
-        <h2>The challenge</h2>
+        <h2>Checks</h2>
         <span className="challenge-number">01 / 01</span>
       </div>
       <div className="challenge-body">
-        <ChallengeStatement text={ch.statement} />
         <div className="section-heading requirements-title">
           VALUE / LIMIT <Icon name="lock" size={11} />
         </div>

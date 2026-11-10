@@ -235,3 +235,13 @@
 .theme-fatigue { --art-background: #eef0ea; --art-color: #8f9a7c; }
 /* Library card and drawer art tint for the column, alongside the template's .theme-* rules. */
 .theme-column { --art-background: #ecf0f2; --art-color: #7f939b; }
+
+/* Task 78.2: the challenge band, first workbench content under the title (WD-20–WD-24). Full width,
+   no heavier chrome than the "About this model" row. The goal line uses the heading type style. */
+.challenge-band { margin: 0 0 14px; padding: 12px 16px; border: 1px solid #e0e5d9; border-radius: 7px; background: #fcfdf9; min-width: 0; overflow-wrap: break-word; }
+.challenge-band h2 { margin: 0 0 4px; font-size: 8px; letter-spacing: 1.2px; text-transform: uppercase; font-weight: 600; color: #56644a; }
+.challenge-band .challenge-goal { margin: 0 0 6px; font-family: Manrope, sans-serif; font-weight: 650; font-size: 16px; letter-spacing: -.3px; line-height: 1.4; color: #2e4232; }
+.challenge-band p { margin: 0 0 4px; font-size: 12px; line-height: 1.7; color: #46583b; }
+.challenge-band .challenge-goal + p { margin-top: 0; }
+.challenge-band .ei-disclosure { margin-top: 2px; }
+.challenge-band .ei-disclosure p { font-size: 11px; }

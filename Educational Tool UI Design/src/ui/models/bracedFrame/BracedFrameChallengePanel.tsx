@@ -1,7 +1,6 @@
 import { BRACED_FRAME_CONSTRAINT_LABELS } from '../../../evaluation/bracedFrame/constraints'
 import { STATUS_LABELS } from '../../panels/resultPresentation'
 import Icon from '../../icons/Icon'
-import ChallengeStatement from '../../workbench/ChallengeStatement'
 import Disclosure from '../../workbench/Disclosure'
 import { boolText, CHECK_LABELS, constraintRows, formatFrame, MODE_PHRASES, memberName, NOT_APPLICABLE, unstableText, useFrameStore } from './shared'
 
@@ -15,7 +14,7 @@ import { boolText, CHECK_LABELS, constraintRows, formatFrame, MODE_PHRASES, memb
 // are shown as "Not applicable", never as numbers or as failed.
 
 export default function BracedFrameChallengePanel({ onOpenHelp }: { onOpenHelp: () => void }) {
-  const { state, challenge: ch, runTest } = useFrameStore()
+  const { state, runTest } = useFrameStore()
   const latest = state.history[state.history.length - 1]!
   const { analysis, evaluation } = latest
   const outside = evaluation.status === 'modelNotApplicable'
@@ -24,11 +23,10 @@ export default function BracedFrameChallengePanel({ onOpenHelp }: { onOpenHelp: 
     <>
       <div className="panel-title">
         <Icon name="book" size={16} />
-        <h2>The challenge</h2>
+        <h2>Checks</h2>
         <span className="challenge-number">01 / 01</span>
       </div>
       <div className="challenge-body">
-        <ChallengeStatement text={ch.statement} />
         <div className="section-heading requirements-title">
           VALUE / LIMIT <Icon name="lock" size={11} />
         </div>

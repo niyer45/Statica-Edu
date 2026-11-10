@@ -1,7 +1,6 @@
 import { selectLatestResult } from '../../state/selectors'
 import { formatMm } from '../../units/units'
 import Icon from '../icons/Icon'
-import ChallengeStatement from '../workbench/ChallengeStatement'
 import Disclosure from '../workbench/Disclosure'
 import { useStore } from '../state/store'
 import { formatConstraint } from './resultPresentation'
@@ -14,9 +13,8 @@ export default function RequirementsPanel({ onOpenHelp }: { onOpenHelp: () => vo
   const envelopePassed = evaluation.constraints.filter((c) => c.id === 'envelopeWidth' || c.id === 'envelopeHeight').every((c) => c.passed)
   const featurePassed = evaluation.constraints.find((c) => c.id === 'featureGeometry')!.passed
   return <>
-    <div className="panel-title"><Icon name="book" size={16} /><h2>The challenge</h2><span className="challenge-number">01 / 01</span></div>
+    <div className="panel-title"><Icon name="book" size={16} /><h2>Checks</h2><span className="challenge-number">01 / 01</span></div>
     <div className="challenge-body">
-      <ChallengeStatement text={ch.statement} />
       <div className="section-heading requirements-title">VALUE / LIMIT <Icon name="lock" size={11} /></div>
       <ul aria-label="Design requirements">
         {evaluation.constraints.filter((c) => ['deflection', 'stress', 'mass'].includes(c.id)).map((c) => <li className="requirement" key={c.id}><span>{c.id === 'stress' ? 'Bending stress' : c.label}</span><strong><span>{formatConstraint(c.value, c.unit)}</span> / <span>{formatConstraint(c.limit, c.unit)}</span>{outside && <small>Outside model assumptions</small>}</strong><span className={c.passed ? 'pass-mark' : 'fail-mark'}>{c.passed ? '✓ Pass' : '✗ Fail'}</span></li>)}

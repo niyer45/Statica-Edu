@@ -102,6 +102,7 @@ These tasks need the owner and real students. Agents prepare materials and recor
   - [x] 78.B Per-model slice B: Column Buckling I, Stress and Strain I, Heat Sink I, Pressure Vessel I
   - [x] 78.C Per-model slice C: Braced Frame I, Vibration Isolation I, Fatigue Analysis I
   - [x] 78.I Integration: merge of the slices, `e2e/disclosure.spec.ts` over all ten challenges with explicit popover dismissal (`dismissGuidedPopover`), popover/chip and Parametric assertions, before/after word counts, docs, full gate
+  - [x] 78.2 The challenge comes first (owner, 2026-11-09; D-65 amendment; WD-20–WD-24): full-width `ChallengeBand` above the "About this model" row and the Guided chip on all ten challenges, with the card goal line and the first sentence visible and the rest under "More about this challenge"; the right-hand panel is now "Checks"
 
 ### (d) Milestone 6: scoped platform extensions
 

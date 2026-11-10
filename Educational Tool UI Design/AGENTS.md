@@ -44,7 +44,7 @@ Product behaviour
   The reducer never reads the time itself.
 - Keep the compact challenge, history, compare and My designs presentation (D-28–D-33): no permanent
   explanatory paragraphs, no exclamation prefix on Not accepted, no dense results table.
-- Workbench text follows `.kiro/specs/workbench-declutter/` (D-65): only the two-sentence goal, checks, controls, primary view, Run Test, results, warnings and the limits footer are visible by default; put anything else in the shared `Disclosure`; Guided instructions live in the step popover.
+- Workbench text follows `.kiro/specs/workbench-declutter/` (D-65): the challenge band (goal line and first sentence) comes first; then the checks, controls, primary view, Run Test, results, warnings and the limits footer are visible by default; put anything else in the shared `Disclosure`; Guided instructions live in the step popover.
 - Do not regenerate completed requirements or design or rewrite completed features; add scoped specs.
   Later tasks fill existing stub files in place; do not create parallel components.
 

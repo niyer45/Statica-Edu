@@ -1,5 +1,4 @@
 import { STATUS_LABELS } from '../../panels/resultPresentation'
-import ChallengeStatement from '../../workbench/ChallengeStatement'
 import Disclosure from '../../workbench/Disclosure'
 import Icon from '../../icons/Icon'
 import { formatTorsion, useTorsionStore } from './shared'
@@ -9,7 +8,7 @@ import { formatTorsion, useTorsionStore } from './shared'
 // a table-only Test details disclosure (D-30), draft errors and Run Test.
 
 export default function TorsionChallengePanel({ onOpenHelp }: { onOpenHelp: () => void }) {
-  const { state, challenge: ch, runTest } = useTorsionStore()
+  const { state, runTest } = useTorsionStore()
   const latest = state.history[state.history.length - 1]!
   const { analysis, evaluation } = latest
   const outside = evaluation.status === 'modelNotApplicable'
@@ -18,10 +17,9 @@ export default function TorsionChallengePanel({ onOpenHelp }: { onOpenHelp: () =
     <>
       <div className="panel-title">
         <Icon name="book" size={16} />
-        <h2>The challenge</h2>
+        <h2>Checks</h2>
       </div>
       <div className="challenge-body">
-        <ChallengeStatement text={ch.statement} />
         <div className="section-heading requirements-title">
           VALUE / LIMIT <Icon name="lock" size={11} />
         </div>

@@ -88,14 +88,16 @@ describe('Braced Frame I workbench', () => {
     expect(within(list).getAllByText('✗ Fail')).toHaveLength(3)
     // Task 56 follow-up: the challenge panel matches Cantilever Beam I: visible statement with the
     // pin-jointed idealization (BFR-01), then the value/limit checks with short names.
-    const panel = screen.getByRole('complementary', { name: 'The challenge' })
-    // Task 78 (D-65): the two lead sentences are a visible paragraph; the remainder, including the
+    const panel = screen.getByRole('complementary', { name: 'Checks' })
+    const band = screen.getByRole('region', { name: 'The challenge' })
+    // Task 78 (D-65): task 78.2: the first sentence is a visible paragraph in the challenge band; the remainder, including the
     // pin-jointed idealization sentence, is word for word inside the collapsed disclosure.
-    const lead = within(panel).getByText(/Under sideways load, this two-storey steel frame/)
+    const lead = within(band).getByText(/Under sideways load, this two-storey steel frame/)
     expect(lead.tagName).toBe('P')
     expect(lead.closest('details')).toBeNull()
+    expect(panel.textContent).not.toContain(lead.textContent!)
     expect(lead.textContent).toBe(ch.statement.slice(0, lead.textContent!.length))
-    const more = within(panel).getByText('More about this challenge').closest('details')!
+    const more = within(band).getByText('More about this challenge').closest('details')!
     expect(more.open).toBe(false)
     const statement = within(more).getByText(/This frame is modeled as pin-jointed: every joint is a hinge/)
     expect(statement.textContent).toBe(ch.statement.slice(lead.textContent!.length).trim())
@@ -150,7 +152,7 @@ describe('Braced Frame I workbench', () => {
     expect(within(list).queryByText(/mm$|%$/)).toBeNull()
     expect(within(list).getByText('184.0 kg')).toBeTruthy()
     expect(screen.getByText(/Unstable mechanism\. Unstable: storey 2 has no diagonal\. Member forces and drift are not defined/)).toBeTruthy()
-    expect(within(screen.getByRole('complementary', { name: 'The challenge' })).getByText('Unstable: storey 2 has no diagonal.')).toBeTruthy()
+    expect(within(screen.getByRole('complementary', { name: 'Checks' })).getByText('Unstable: storey 2 has no diagonal.')).toBeTruthy()
     expect(forceTable()).toBeNull()
     expect(document.querySelectorAll('.frame-label')).toHaveLength(0)
     expect(screen.getByRole('list', { name: 'Model applicability reasons' }).textContent).toMatch(/mechanism/)

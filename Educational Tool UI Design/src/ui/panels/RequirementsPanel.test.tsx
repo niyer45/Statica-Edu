@@ -24,14 +24,13 @@ function mount(design?: typeof reference.design, details = true) {
   render(<StoreProvider challenge={{ ...ch, content: { ...ch.content, collegeDetails: details } }} initialSession={s}><Probe /><RequirementsPanel onOpenHelp={() => {}} /><PredictionDialog /></StoreProvider>)
   return () => store!
 }
-it('keeps the statement lead visible and collapses the remainder (task 78)', () => {
+it('is the Checks panel: the statement lives in the challenge band, not here (task 78.2)', () => {
   mount()
-  expect(screen.getByText(/^The cantilevered component deflects too much and is over its mass limit\./)).toBeTruthy()
-  const more = screen.getByText('More about this challenge').closest('details')!
-  expect(more.open).toBe(false)
-  expect(more.textContent).toContain('The span, support interface, material, and applied load are fixed.')
-  fireEvent.click(screen.getByText('More about this challenge'))
-  expect(more.open).toBe(true)
+  expect(screen.getByRole('heading', { name: 'Checks' })).toBeTruthy()
+  expect(screen.queryByRole('heading', { name: 'The challenge' })).toBeNull()
+  expect(screen.queryByText('More about this challenge')).toBeNull()
+  expect(screen.queryByText(/The cantilevered component deflects too much/)).toBeNull()
+  expect(screen.getByRole('list', { name: 'Design requirements' })).toBeTruthy()
 })
 it('shows only the stored constraint table inside collapsed test details', () => {
   const store = mount(reference.design)

@@ -1,6 +1,5 @@
 import { STATUS_LABELS } from '../../panels/resultPresentation'
 import Icon from '../../icons/Icon'
-import ChallengeStatement from '../../workbench/ChallengeStatement'
 import { formatColumn, formatLimit, useColumnStore } from './shared'
 
 // Column challenge panel (task 68; CBK-07, CBK-08, CBK-11, CBK-12, D-48 amendment). The Cantilever
@@ -27,10 +26,9 @@ export default function ColumnChallengePanel({ onOpenHelp }: { onOpenHelp: () =>
     <>
       <div className="panel-title">
         <Icon name="book" size={16} />
-        <h2>The challenge</h2>
+        <h2>Checks</h2>
       </div>
       <div className="challenge-body">
-        <ChallengeStatement text={ch.statement} />
         <div className="section-heading requirements-title">
           VALUE / LIMIT <Icon name="lock" size={11} />
         </div>

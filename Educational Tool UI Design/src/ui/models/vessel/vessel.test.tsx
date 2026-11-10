@@ -175,7 +175,7 @@ describe('Pressure Vessel I workbench', () => {
     renderVessel()
     setMm('Shell thickness', '2')
     runTest(/Decrease/)
-    const panel = screen.getByRole('complementary', { name: 'The challenge' })
+    const panel = screen.getByRole('complementary', { name: 'Checks' })
     const warnings = within(panel).getByRole('list', { name: 'Model warnings', hidden: true })
     expect(warnings.closest('details')?.querySelector('summary')?.textContent).toBe('Test details')
     expect(within(warnings).getByText(/Largest membrane stress divided by yield stress is 0\.96/, undefined)).toBeTruthy()

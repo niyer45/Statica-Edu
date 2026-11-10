@@ -69,14 +69,16 @@ describe('Vibration Isolation I workbench', () => {
     expect(within(requirements).getAllByText('✗ Fail')).toHaveLength(3)
     // Task 56 follow-up: the challenge panel matches Cantilever Beam I: visible statement, then the
     // value/limit checks with short names; full labels stay in Test details.
-    const panel = screen.getByRole('complementary', { name: 'The challenge' })
-    // Task 78 (D-65): the two lead sentences are a visible paragraph; the remainder (including the
+    const panel = screen.getByRole('complementary', { name: 'Checks' })
+    const band = screen.getByRole('region', { name: 'The challenge' })
+    // Task 78 (D-65): task 78.2: the first sentence is a visible paragraph in the challenge band; the remainder (including the
     // steady-state sentence) is word for word inside the collapsed "More about this challenge".
-    const lead = within(panel).getByText(/A rigid component sits on mounts so stiff/)
+    const lead = within(band).getByText(/A rigid component sits on mounts so stiff/)
     expect(lead.tagName).toBe('P')
     expect(lead.closest('details')).toBeNull()
+    expect(panel.textContent).not.toContain(lead.textContent!)
     expect(lead.textContent).toBe(ch.statement.slice(0, lead.textContent!.length))
-    const more = within(panel).getByText('More about this challenge').closest('details')!
+    const more = within(band).getByText('More about this challenge').closest('details')!
     expect(more.open).toBe(false)
     const statement = within(more).getByText(/it does not simulate motion over time\./)
     expect(statement.textContent).toBe(ch.statement.slice(lead.textContent!.length).trim())

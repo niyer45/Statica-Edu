@@ -5,6 +5,7 @@ import Icon from '../icons/Icon'
 import { useModelUi } from '../models/registry'
 import { useChallenge, useSession } from '../state/store'
 import Disclosure from './Disclosure'
+import ChallengeBand from './ChallengeBand'
 
 // Template Workbench chrome (task 13.3): `aside.sidebar`, `header.topbar`, `.page-heading`,
 // and `.workspace-context`, with the template class names so index.css / platform*.css apply.
@@ -146,6 +147,7 @@ export default function WorkbenchChrome({ onExit, onOpenHelp, onShowDesigns, chi
               All challenges
             </button>
           </section>
+          <ChallengeBand />
           <div className="workspace-context" aria-label="Design mode">
             <span className="mode-badge">
               <Icon name={sessionMode === 'guided' ? 'tune' : 'cube'} size={15} />
@@ -159,7 +161,7 @@ export default function WorkbenchChrome({ onExit, onOpenHelp, onShowDesigns, chi
               </p>
               {sessionMode !== 'guided' && (
                 <p>
-                  <strong>Parametric · Open design.</strong> Every parameter is editable from the start. Meet all the checks in The challenge panel.
+                  <strong>Parametric · Open design.</strong> Every parameter is editable from the start. Meet all the checks in the Checks panel.
                 </p>
               )}
               <p className="solver-label">{copy.solverLabel}</p>
