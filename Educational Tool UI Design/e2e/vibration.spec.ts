@@ -79,11 +79,23 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     // Task 56 follow-up: the challenge panel matches Cantilever Beam I: the visible statement
     // followed by the value/limit checks.
     const challenge = page.getByRole('complementary', { name: 'The challenge', exact: true })
-    await expect(challenge.getByText(/it does not simulate motion over time/)).toBeVisible()
+    // Task 78 (D-65): two lead sentences visible; the steady-state sentence is collapsed until opened.
+    await expect(challenge.getByText(/A rigid component sits on mounts so stiff/)).toBeVisible()
+    const steady = challenge.getByText(/it does not simulate motion over time/)
+    await expect(steady).toBeHidden()
+    // The Guided step popover hangs over the challenge column at desktop width; Escape dismisses it (WD-11).
+    await page.keyboard.press('Escape')
+    await challenge.getByText('More about this challenge', { exact: true }).click()
+    await expect(steady).toBeVisible()
     const requirements = challenge.getByRole('list', { name: 'Design requirements' })
     await expect(requirements.getByText('10.1', { exact: true })).toHaveCount(2)
     await expect(page.getByText('Idealized steady-state vibration isolation, not an engineering certification')).toBeVisible()
     await expect(page.getByRole('img', { name: /Steady-state frequency response/ })).toBeVisible()
+    // The chart reading note is collapsed by default and visible once opened (task 78).
+    const reading = page.getByText(/Natural frequency 30\.20 Hz, inside the operating band/)
+    await expect(reading).toBeHidden()
+    await page.getByText('Reading the chart', { exact: true }).click()
+    await expect(reading).toBeVisible()
     // The full response table is collapsed by default (task 56).
     await expect(page.getByRole('table', { name: 'Frequency response values' })).toBeHidden()
     await page.getByText('All response values', { exact: true }).click()

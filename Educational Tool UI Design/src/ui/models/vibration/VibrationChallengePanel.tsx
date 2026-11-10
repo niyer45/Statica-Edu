@@ -1,9 +1,11 @@
 import { STATUS_LABELS } from '../../panels/resultPresentation'
 import Icon from '../../icons/Icon'
+import ChallengeStatement from '../../workbench/ChallengeStatement'
+import Disclosure from '../../workbench/Disclosure'
 import { CHECK_LABELS, formatVibration, useVibrationStore } from './shared'
 
 // Vibration challenge panel (task 50.3; task 56 follow-up: same structure and styling as
-// Cantilever Beam I's RequirementsPanel; VIB-06, VIB-07, VIB-10). The visible statement, the
+// Cantilever Beam I's RequirementsPanel; VIB-06, VIB-07, VIB-10). The statement lead (the rest in a collapsed disclosure, task 78), the
 // stored value/limit list of the latest test with Pass/Fail marks (short check names; full
 // labels in Test details), applicability reasons/warnings, a table-only Test details disclosure
 // (D-30), draft errors, the reference link and Run Test.
@@ -21,7 +23,7 @@ export default function VibrationChallengePanel({ onOpenHelp }: { onOpenHelp: ()
         <span className="challenge-number">01 / 01</span>
       </div>
       <div className="challenge-body">
-        <p>{ch.statement}</p>
+        <ChallengeStatement text={ch.statement} />
         <div className="section-heading requirements-title">
           VALUE / LIMIT <Icon name="lock" size={11} />
         </div>
@@ -51,8 +53,7 @@ export default function VibrationChallengePanel({ onOpenHelp }: { onOpenHelp: ()
             <li key={w.code}>{w.message}</li>
           ))}
         </ul>
-        <details className="result-details">
-          <summary>Test details</summary>
+        <Disclosure summary="Test details" className="result-details">
           <table aria-label="Latest tested results">
             <thead>
               <tr>
@@ -74,7 +75,7 @@ export default function VibrationChallengePanel({ onOpenHelp }: { onOpenHelp: ()
             </tbody>
           </table>
           <p>Status: {STATUS_LABELS[evaluation.status]}</p>
-        </details>
+        </Disclosure>
         {state.draftErrors.length > 0 && (
           <ul aria-label="Design errors">
             {state.draftErrors.map((e, i) => (
