@@ -2,6 +2,7 @@ import { Canvas } from '@react-three/fiber'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { DIAGONAL_IDS } from '../../../geometry/bracedFrame/template'
 import Icon from '../../icons/Icon'
+import Disclosure from '../../workbench/Disclosure'
 import type { ViewportProps } from '../../viewport/FallbackViewport'
 import BracedFrameFallback from './BracedFrameFallback'
 import BracedFrameScene from './BracedFrameScene'
@@ -42,8 +43,7 @@ function SceneDescription() {
 
 function PatternKey() {
   return (
-    <details className="frame-key">
-      <summary>Drawing key</summary>
+    <Disclosure summary="Drawing key" className="frame-key">
       <ul className="frame-legend" aria-label="3D pattern key">
         <li>
           <svg viewBox="0 0 24 8" aria-hidden="true">
@@ -78,7 +78,7 @@ function PatternKey() {
         </li>
         <li>Tube widths ×{TUBE_DIAMETER_EXAGGERATION}, proportional to each section</li>
       </ul>
-    </details>
+    </Disclosure>
   )
 }
 

@@ -86,7 +86,14 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     // Task 56 follow-up: the challenge panel matches Cantilever Beam I: the visible statement (with
     // the pin-jointed idealization, BFR-01) followed by the value/limit checks.
     const challenge = page.getByRole('complementary', { name: 'The challenge', exact: true })
-    await expect(challenge.getByText(/This frame is modeled as pin-jointed: every joint is a hinge/)).toBeVisible()
+    // Task 78 (D-65): two lead sentences visible; the pin-jointed sentence is collapsed until opened.
+    await expect(challenge.getByText(/Under sideways load, this two-storey steel frame/)).toBeVisible()
+    const idealization = challenge.getByText(/This frame is modeled as pin-jointed: every joint is a hinge/)
+    await expect(idealization).toBeHidden()
+    // The Guided step popover hangs over the challenge column at desktop width; Escape dismisses it (WD-11).
+    await page.keyboard.press('Escape')
+    await challenge.getByText('More about this challenge', { exact: true }).click()
+    await expect(idealization).toBeVisible()
     const requirements = challenge.getByRole('list', { name: 'Design requirements' })
     // The baseline fails roof drift, member utilization and mass (task 59).
     await expect(requirements.getByText('12.61 mm', { exact: true })).toBeVisible()

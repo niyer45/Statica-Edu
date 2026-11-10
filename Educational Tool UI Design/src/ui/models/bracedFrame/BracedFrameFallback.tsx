@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { FRAME_MEMBER_IDS, FRAME_MEMBERS, frameJointCoordinates, isDiagonalId, type FrameJointId, type FrameMemberId } from '../../../geometry/bracedFrame/template'
 import type { BracedFrameMemberResult } from '../../../physics/bracedFrame/types'
+import Disclosure from '../../workbench/Disclosure'
 import type { ViewportProps } from '../../viewport/FallbackViewport'
 import { formatKn, FRAME_FALLBACK_NOTICE, FRAME_SUMMARY_ID, memberName, SENSE_KEYS, useFrameStore } from './shared'
 
@@ -130,8 +131,7 @@ function BracedFrameElevation() {
           return <circle key={j} cx={x} cy={y} r={3} className="frame-joint" />
         })}
       </svg>
-      <details className="frame-key">
-        <summary>Drawing key</summary>
+      <Disclosure summary="Drawing key" className="frame-key">
         <ul className="frame-legend" aria-label="Line pattern key">
           <li>
             <svg viewBox="0 0 24 8" aria-hidden="true">
@@ -159,7 +159,7 @@ function BracedFrameElevation() {
             Faint dashed: not present
           </li>
         </ul>
-      </details>
+      </Disclosure>
     </>
   )
 }
