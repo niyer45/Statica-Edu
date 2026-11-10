@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, expectGuidedStep, expectParametricNote, readState, runAnyTest, tabTo } from './helpers'
+import { audit, closeStepDialog, expectAllStepsComplete, expectGuidedStep, expectParametricNote, readState, runAnyTest, tabTo } from './helpers'
 
 // Stress and Strain I (task 72, D-62; SSR-15–SSR-19, MM-16, MM-22): chosen before entry from the
 // library, the full prediction/test loop from a steel baseline failing stress and mass to the
@@ -26,6 +26,8 @@ async function openRod(page: Page, mode: 'Guided' | 'Parametric', keyboard: bool
     await drawer.getByRole('button', { name: /^(Open|Continue) challenge$/ }).click()
   }
   await expect(page.getByRole('button', { name: 'Run Test', exact: true })).toBeVisible()
+  // The step dialog opens on every Guided entry and on reload (task 78.4); read it, then close it.
+  if (mode === 'Guided') await closeStepDialog(page, keyboard)
   await expect.poll(async () => (await readState(page)).challengeId).toBe('stress-strain-1')
 }
 
@@ -120,14 +122,16 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await setDiameter(page, '14.5', keyboard)
       await runAnyTest(page, keyboard)
       await expectGuidedStep(page, 'Change the material')
+      await closeStepDialog(page, keyboard)
       await expect(page.getByLabel('Diameter', { exact: true })).toHaveAttribute('readonly', '')
       await chooseMaterial(page, /^Titanium alloy/, keyboard)
       await runAnyTest(page, keyboard)
       await expectGuidedStep(page, 'Meet every check')
+      await closeStepDialog(page, keyboard)
       await setDiameter(page, '20', keyboard)
       await chooseMaterial(page, /^Aluminium alloy 6061-T6/, keyboard)
       await runAnyTest(page, keyboard)
-      await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('heading', { name: 'All experiments complete' })).toBeVisible()
+      await expectAllStepsComplete(page, keyboard)
     } else {
       await setDiameter(page, '20', keyboard)
       await chooseMaterial(page, /^Aluminium alloy 6061-T6/, keyboard)

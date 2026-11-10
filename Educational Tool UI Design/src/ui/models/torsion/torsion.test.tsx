@@ -118,9 +118,8 @@ describe('Torsion Shaft I workbench', () => {
 
   it('Guided runs structured experiments with locked controls; Parametric is open design (task 58)', () => {
     renderShaft('guided')
-    const guide = screen.getByRole('region', { name: 'Guided experiments' })
     // Task 71 (D-61): step 1 hollows the shaft, so only the shaft type is editable.
-    expect(within(guide).getByRole('heading', { name: 'Hollow it out' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Hollow it out' })).toBeTruthy()
     expect((screen.getByLabelText('Diameter') as HTMLInputElement).readOnly).toBe(true)
     expect(screen.getByText('Locked in this step. Editable now: Shaft type (solid or hollow).')).toBeTruthy()
     const hollow = screen.getByRole('button', { name: /Hollow tube/ })

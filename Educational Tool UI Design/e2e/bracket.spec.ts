@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, expectGuidedStep, expectParametricNote, readState, runAnyTest, tabTo } from './helpers'
+import { audit, closeStepDialog, expectAllStepsComplete, expectGuidedStep, expectParametricNote, readState, runAnyTest, tabTo } from './helpers'
 
 // Mounting Bracket I (tasks 46.3, 55; MM-16, MM-22): the bolted L-bracket, chosen before entry
 // from the library, full prediction/test loop from a baseline that fails all four checks to the
@@ -25,6 +25,8 @@ async function openBracket(page: Page, mode: 'Guided' | 'Parametric', keyboard: 
     await drawer.getByRole('button', { name: 'Open challenge', exact: true }).click()
   }
   await expect(page.getByRole('button', { name: 'Run Test', exact: true })).toBeVisible()
+  // The step dialog opens on every Guided entry and on reload (task 78.4); read it, then close it.
+  if (mode === 'Guided') await closeStepDialog(page, keyboard)
   // The dev snapshot follows the newly mounted store after the switch; wait for it.
   await expect.poll(async () => (await readState(page)).challengeId).toBe('mounting-bracket-1')
 }
@@ -111,18 +113,21 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await setDimension(page, 'Thickness', '4', keyboard)
       await runAnyTest(page, keyboard)
       await expectGuidedStep(page, 'Open up the bend')
+      await closeStepDialog(page, keyboard)
       await expect(page.getByLabel('Thickness', { exact: true })).toHaveAttribute('readonly', '')
       await setDimension(page, 'Inner bend radius', '3', keyboard)
       await runAnyTest(page, keyboard)
       await expectGuidedStep(page, 'Taller flange')
+      await closeStepDialog(page, keyboard)
       await setDimension(page, 'Flange height', '80', keyboard)
       await runAnyTest(page, keyboard)
       await expectGuidedStep(page, 'Meet every check')
+      await closeStepDialog(page, keyboard)
       await setDimension(page, 'Thickness', '7', keyboard)
       await setDimension(page, 'Width', '40', keyboard)
       await setDimension(page, 'Inner bend radius', '6', keyboard)
       await runAnyTest(page, keyboard)
-      await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('heading', { name: 'All experiments complete' })).toBeVisible()
+      await expectAllStepsComplete(page, keyboard)
     } else {
       await setDimension(page, 'Thickness', '7', keyboard)
       await setDimension(page, 'Width', '40', keyboard)

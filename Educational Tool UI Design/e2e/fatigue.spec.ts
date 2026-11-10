@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { dismissGuidedPopover, audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers'
+import { audit, closeStepDialog, expectAllStepsComplete, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers'
 
 // Fatigue Analysis I (task 70, D-60): the stepped stub-axle spindle, chosen before entry from the
 // library, the full prediction/test loop from a Baseline that fails fatigue, yield and mass to the
@@ -27,6 +27,8 @@ async function openFatigue(page: Page, mode: 'Guided' | 'Parametric', keyboard: 
     await drawer.getByRole('button', { name: /^(Open|Continue) challenge$/ }).click()
   }
   await expect(page.getByRole('button', { name: 'Run Test', exact: true })).toBeVisible()
+  // The step dialog opens on every Guided entry and on reload (task 78.4); read it, then close it.
+  if (mode === 'Guided') await closeStepDialog(page, keyboard)
   await expect.poll(async () => (await readState(page)).challengeId).toBe('fatigue-analysis-1')
 }
 
@@ -106,8 +108,6 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     await expect(challenge.getByText(/A steel stub-axle spindle is held by its collar/)).toHaveCount(0)
     const fixedNote = band.getByText(/The load, its position, the lengths and the material are fixed/)
     await expect(fixedNote).toBeHidden()
-    // The Guided step popover hangs over the challenge column at desktop width; dismiss it (WD-11).
-    await dismissGuidedPopover(page)
     await band.getByText('More about this challenge', { exact: true }).click()
     await expect(fixedNote).toBeVisible()
     await expect(page.getByText(/Stress-life screening of a stepped spindle/)).toBeVisible()
@@ -127,15 +127,18 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await setDimension(page, 'Fillet radius', '2', keyboard)
       await runAnyTest(page, keyboard)
       await expectGuidedStep(page, 'Improve the surface')
+      await closeStepDialog(page, keyboard)
       await chooseMachined(page, keyboard)
       await runAnyTest(page, keyboard)
       await expectGuidedStep(page, 'Thicken the neck')
+      await closeStepDialog(page, keyboard)
       await setDimension(page, 'Neck diameter', '24.5', keyboard)
       await runAnyTest(page, keyboard)
       await expectGuidedStep(page, 'Meet every check')
+      await closeStepDialog(page, keyboard)
       await setDimension(page, 'Collar diameter', '34', keyboard)
       await runAnyTest(page, keyboard)
-      await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('heading', { name: 'All experiments complete' })).toBeVisible()
+      await expectAllStepsComplete(page, keyboard)
     } else {
       await setDimension(page, 'Collar diameter', '34', keyboard)
       await setDimension(page, 'Neck diameter', '24.5', keyboard)

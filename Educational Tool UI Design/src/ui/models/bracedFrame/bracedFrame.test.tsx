@@ -214,8 +214,7 @@ describe('Braced Frame I workbench', () => {
 
   it('Guided shows frame experiments without reference values and locks sections at first; Parametric is open design (task 58)', () => {
     renderFrame('guided')
-    const guided = screen.getByRole('region', { name: 'Guided experiments' })
-    expect(within(guided).getByRole('heading', { name: 'Rearrange the bracing' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Rearrange the bracing' })).toBeTruthy()
     const allGuidance = bracedFrameUi.guided.steps.map((s) => `${s.instruction} ${s.hint}`).join(' ')
     expect(allGuidance).not.toMatch(/\d|CHS|always best/)
     expect((screen.getByLabelText(/^Lower left column/) as HTMLSelectElement).disabled).toBe(true)

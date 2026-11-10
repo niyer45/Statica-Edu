@@ -223,8 +223,7 @@ describe('Fatigue Analysis I workbench', () => {
       expect((screen.getByLabelText(label) as HTMLInputElement).readOnly).toBe(!unlocked.includes(param))
     }
     expect((screen.getByRole('radio', { name: 'Ground' }) as HTMLInputElement).disabled).toBe(true)
-    const guidance = screen.getByRole('region', { name: 'Guided experiments' })
-    expect(within(guidance).getByRole('heading', { name: 'Round the fillet' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Round the fillet' })).toBeTruthy()
     expect(fatigueUi.guided.steps.map((s) => `${s.instruction} ${s.hint}`).join(' ')).not.toMatch(/\d/)
     cleanup()
     renderFatigue('parametric')

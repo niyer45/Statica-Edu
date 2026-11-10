@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers'
+import { audit, closeStepDialog, expectAllStepsComplete, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers'
 
 // Pressure Vessel I (task 69, D-59; PVS-14–PVS-17, MM-16, MM-22): chosen before entry from the
 // library, full prediction/test loop from a baseline that fails hoop stress, head stress, volume
@@ -27,6 +27,8 @@ async function openVessel(page: Page, mode: 'Guided' | 'Parametric', keyboard: b
     await drawer.getByRole('button', { name: /^(Open|Continue) challenge$/ }).click()
   }
   await expect(page.getByRole('button', { name: 'Run Test', exact: true })).toBeVisible()
+  // The step dialog opens on every Guided entry and on reload (task 78.4); read it, then close it.
+  if (mode === 'Guided') await closeStepDialog(page, keyboard)
   await expect.poll(async () => (await readState(page)).challengeId).toBe('pressure-vessel-1')
 }
 
@@ -122,19 +124,23 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await setDimension(page, 'Shell thickness', '4', keyboard)
       await runAnyTest(page, keyboard)
       await expectGuidedStep(page, 'Widen the vessel')
+      await closeStepDialog(page, keyboard)
       await expect(page.getByLabel('Shell thickness', { exact: true })).toHaveAttribute('readonly', '')
       await setDimension(page, 'Inner diameter', '400', keyboard)
       await runAnyTest(page, keyboard)
       await expectGuidedStep(page, 'Shorten the shell')
+      await closeStepDialog(page, keyboard)
       await setDimension(page, 'Shell length', '530', keyboard)
       await runAnyTest(page, keyboard)
       await expectGuidedStep(page, 'Size the heads')
+      await closeStepDialog(page, keyboard)
       await setDimension(page, 'Head thickness', '3.5', keyboard)
       await runAnyTest(page, keyboard)
       await expectGuidedStep(page, 'Meet every check')
+      await closeStepDialog(page, keyboard)
       await setDimension(page, 'Shell thickness', '6.5', keyboard)
       await runAnyTest(page, keyboard)
-      await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('heading', { name: 'All experiments complete' })).toBeVisible()
+      await expectAllStepsComplete(page, keyboard)
     } else {
       await setDimension(page, 'Inner diameter', '400', keyboard)
       await setDimension(page, 'Shell length', '530', keyboard)

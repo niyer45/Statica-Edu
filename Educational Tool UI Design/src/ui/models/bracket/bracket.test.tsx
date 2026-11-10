@@ -247,8 +247,7 @@ describe('Mounting Bracket I workbench', () => {
 
   it('Guided steps never reveal the reference dimensions', () => {
     renderBracket('guided')
-    const guidance = screen.getByRole('region', { name: 'Guided experiments' })
-    expect(within(guidance).getByRole('heading', { name: bracketUi.guided.steps[0]!.title })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: bracketUi.guided.steps[0]!.title })).toBeTruthy()
     const text = bracketUi.guided.steps.map((s) => `${s.instruction} ${s.hint}`).join(' ')
     expect(text).not.toMatch(/\d/)
   })

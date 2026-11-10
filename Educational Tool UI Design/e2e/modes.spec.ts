@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { audit, expectGuidedStep, expectParametricNote, normalizeState, openWorkbench, readState, referenceDesign, runAnyTest, setDimension, tabTo } from './helpers'
+import { audit, closeStepDialog, expectAllStepsComplete, expectGuidedStep, stepDialog, expectParametricNote, normalizeState, openWorkbench, readState, referenceDesign, runAnyTest, setDimension, tabTo } from './helpers'
 
 // Task 58: Guided = structured experiments (one variable per step, the rest locked, progress from
 // tested results); Parametric = open design (everything editable, no steps). Both are chosen in
@@ -34,10 +34,12 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     if (mode === 'Guided') {
       // Step 1 (the Baseline is a solid Ø31 mm circle): only the diameter is editable; the section
       // shape is locked with a visible reason.
+      // The dialog is open on entry and holds the lock line; close it by keyboard.
+      await expect(stepDialog(page).locator('#guided-lock-line')).toContainText('Locked in this step: everything except diameter.')
+      await closeStepDialog(page, true)
       await expectGuidedStep(page, 'Grow the circle')
       await expect(iSection).toHaveAttribute('aria-disabled', 'true')
       await expect(page.locator('#dim-diameterM')).not.toHaveAttribute('readonly', '')
-      await expect(page.locator('#guided-lock-line')).toContainText('Locked in this step: everything except diameter.')
       // aria-disabled: a forced click still reaches the tile but changes nothing.
       const before = await readState(page)
       await page.getByRole('button', { name: /Rectangle/ }).filter({ has: page.locator('svg') }).first().click({ force: true })
@@ -46,22 +48,25 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await runAnyTest(page)
       // Step 2: the shape unlocks and the diameter locks.
       await expectGuidedStep(page, 'Try another shape')
-      await expect(guide).toContainText('Grow the circle complete: Iteration 1 compared with the Baseline. Tip deflection decreased; Mass increased; Bending stress decreased.')
+      await expect(stepDialog(page)).toContainText('Grow the circle complete: Iteration 1 compared with the Baseline. Tip deflection decreased; Mass increased; Bending stress decreased.')
+      await closeStepDialog(page)
       await expect(page.locator('#dim-diameterM')).toHaveAttribute('readonly', '')
       await expect(iSection).not.toHaveAttribute('aria-disabled', 'true')
       await iSection.click()
       await runAnyTest(page)
       // Step 3: one dimension of the new shape.
       await expectGuidedStep(page, 'Tune one dimension')
+      await closeStepDialog(page)
       await expect(flange).not.toHaveAttribute('readonly', '')
       await setDimension(page, 'heightM', '60')
       await runAnyTest(page)
       // Step 4: everything open; an Accepted test completes the experiments.
       await expectGuidedStep(page, 'Meet every check')
+      await closeStepDialog(page)
       await expect(page.getByText(/Locked in this step/)).toHaveCount(0)
       await referenceDesign(page)
       await runAnyTest(page)
-      await expect(guide.getByRole('heading', { name: 'All experiments complete' })).toBeVisible()
+      await expectAllStepsComplete(page)
     } else {
       await expect(guide).toHaveCount(0)
       await expect(page.getByRole('list', { name: 'Experiment steps' })).toHaveCount(0)
@@ -94,10 +99,11 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     expect(before.mode).toBe(mode.toLowerCase())
     await audit(page)
     await page.reload()
-    await openWorkbench(page, false)
+    await openWorkbench(page, false, false, undefined, false)
     expect(normalizeState(await readState(page))).toEqual(normalizeState(before))
     await expect(page.getByRole('combobox', { name: 'Interaction mode' })).toHaveCount(0)
-    if (mode === 'Guided') await expect(guide.getByRole('heading', { name: 'All experiments complete' })).toBeVisible()
+    // A resumed Guided challenge opens its step dialog again (here with the completion message).
+    if (mode === 'Guided') await expectAllStepsComplete(page)
     else await expect(guide).toHaveCount(0)
     await page.setViewportSize({ width: 320, height: 1000 })
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320)
@@ -110,6 +116,7 @@ test('Guided step progress is derived from tested history and survives reload mi
   await setDimension(page, 'diameterM', '34')
   await runAnyTest(page)
   await expectGuidedStep(page, 'Try another shape')
+  await closeStepDialog(page)
   await page.reload()
   await openWorkbench(page, false)
   expect((await readState(page)).mode).toBe('guided')

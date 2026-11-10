@@ -241,8 +241,7 @@ describe('Pressure Vessel I workbench', () => {
     for (const [param, label] of Object.entries(VESSEL_PARAM_LABELS)) {
       expect((screen.getByLabelText(label) as HTMLInputElement).readOnly).toBe(!unlocked.includes(param))
     }
-    const guidance = screen.getByRole('region', { name: 'Guided experiments' })
-    expect(within(guidance).getByRole('heading', { name: 'Thicken the shell' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Thicken the shell' })).toBeTruthy()
     cleanup()
     renderVessel('parametric')
     expect(screen.queryByRole('region', { name: 'Guided experiments' })).toBeNull()

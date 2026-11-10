@@ -186,7 +186,7 @@ describe('Vibration Isolation I workbench', () => {
 
   it('Guided shows structured experiments without revealing the reference design', () => {
     renderMount('guided')
-    expect(within(screen.getByRole('region', { name: 'Guided experiments' })).getByRole('heading', { name: 'Soften the mount' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Soften the mount' })).toBeTruthy()
     for (const step of vibrationUi.guided.steps) {
       const text = `${step.instruction} ${step.hint}`
       expect(text).not.toMatch(/\d/)

@@ -176,7 +176,7 @@ describe('Heat Sink I workbench', () => {
 
   it('Guided locks all but the step parameter; Parametric is open design; both disclose the given coefficient (task 58)', () => {
     renderHeatSink('guided')
-    expect(within(screen.getByRole('region', { name: 'Guided experiments' })).getByRole('heading', { name: 'More fins' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'More fins' })).toBeTruthy()
     expect((screen.getByLabelText('Fin count') as HTMLInputElement).readOnly).toBe(false)
     expect((screen.getByRole('button', { name: 'Add a fin' }) as HTMLButtonElement).disabled).toBe(false)
     expect((screen.getByLabelText('Fin height') as HTMLInputElement).readOnly).toBe(true)

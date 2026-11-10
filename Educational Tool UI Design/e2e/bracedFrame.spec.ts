@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { dismissGuidedPopover, audit, expectGuidedStep, expectParametricNote, readState, tabTo } from './helpers'
+import { audit, closeStepDialog, expectAllStepsComplete, expectGuidedStep, expectParametricNote, readState, tabTo } from './helpers'
 
 // Braced Frame I (task 49.3; braced-frame-1 BFR-16–BFR-18, MM-16, MM-22): chosen before entry
 // from the library, diagonals toggled from the keyboard, a mechanism shown as unstable with a
@@ -28,6 +28,8 @@ async function openFrame(page: Page, mode: 'Guided' | 'Parametric', keyboard: bo
     await drawer.getByRole('button', { name: 'Open challenge', exact: true }).click()
   }
   await expect(page.getByRole('button', { name: 'Run Test', exact: true })).toBeVisible()
+  // The step dialog opens on every Guided entry and on reload (task 78.4); read it, then close it.
+  if (mode === 'Guided') await closeStepDialog(page, keyboard)
   // The dev snapshot follows the newly mounted store after the switch; wait for it.
   await expect.poll(async () => (await readState(page)).challengeId).toBe('braced-frame-1')
 }
@@ -92,8 +94,6 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     await expect(challenge.getByText(/Under sideways load, this two-storey steel frame/)).toHaveCount(0)
     const idealization = band.getByText(/This frame is modeled as pin-jointed: every joint is a hinge/)
     await expect(idealization).toBeHidden()
-    // The Guided step popover hangs over the challenge column at desktop width; dismiss it (WD-11).
-    await dismissGuidedPopover(page)
     await band.getByText('More about this challenge', { exact: true }).click()
     await expect(idealization).toBeVisible()
     const requirements = challenge.getByRole('list', { name: 'Design requirements' })
@@ -162,11 +162,13 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     if (mode === 'Guided') {
       // The bracing experiment is complete; now only member sections are editable.
       await expectGuidedStep(page, 'Resize members')
+      await closeStepDialog(page, keyboard)
       await expect(page.getByRole('button', { name: 'Storey 1 diagonal, bottom left to top right', exact: true })).toBeDisabled()
       await setSection(page, /^Lower left column/, 'CHS60.3x4.0')
       await page.getByRole('button', { name: 'Run Test', exact: true }).click()
       await expect.poll(async () => (await readState(page)).history.length).toBe(3)
       await expectGuidedStep(page, 'Meet every check')
+      await closeStepDialog(page, keyboard)
     }
 
     // The reference frame (BFR-05): tension diagonals and resized members (iteration 2, or the
@@ -190,7 +192,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     expect(tested.history[accepted].evaluation.status).toBe('accepted')
     await expect(requirements.getByText('10.38 mm', { exact: true })).toBeVisible()
     if (mode === 'Guided') {
-      await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('heading', { name: 'All experiments complete' })).toBeVisible()
+      await expectAllStepsComplete(page, keyboard)
       await audit(page)
       await noHorizontalOverflow(page)
     }

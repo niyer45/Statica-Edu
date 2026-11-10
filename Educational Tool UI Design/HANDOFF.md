@@ -1,6 +1,6 @@
 # Statica Edu handoff
 
-Last updated: 2026-11-09 (task 78 declutter on branch `task-78-declutter`, PR to `main` pending CI; last green `main` run is 39368119809).
+Last updated: 2026-11-10 (task 78 declutter on branch `task-78-declutter`, PR to `main` pending CI; last green `main` run is 39368119809).
 
 This file is the current state. Rules are in `AGENTS.md`, the plan is in `../PROGRAM.md`, and
 everything older is in `HANDOFF_HISTORY.md`. CI run links follow the pattern
@@ -26,7 +26,7 @@ everything older is in `HANDOFF_HISTORY.md`. CI run links follow the pattern
 - Deployment: a manual, CI-gated GitHub Pages workflow (`DEPLOY.md`). Site:
   https://niyer45.github.io/Statica-Edu/. The Home footer shows the build id. No deployment is
   recorded in these documents yet.
-- Tests (task 78 branch, local): 3248 unit tests and 190 Playwright E2E cases (desktop and Pixel 7; the task 78.3 full run, `--workers=2`, passed 190 of 190 with no rerun). CI takes about
+- Tests (task 78 branch, local): 3258 unit tests and 194 Playwright E2E cases (desktop and Pixel 7; the task 78.4 full run, `--workers=2`, passed 194 of 194 with no rerun). CI takes about
   10 minutes: the `verify` job about 1.8 minutes, then four Playwright shards.
 - Every new challenge and module since 2026-10-19 awaits owner engineering review (section 3).
 - Known gaps: no password recovery or cross-tab session sync for local accounts; the 2D bracket

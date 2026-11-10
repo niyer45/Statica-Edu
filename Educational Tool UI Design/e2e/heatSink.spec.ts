@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, expectGuidedStep, expectParametricNote, openAbout, readState, runAnyTest, tabTo } from './helpers'
+import { audit, closeStepDialog, expectAllStepsComplete, expectGuidedStep, expectParametricNote, openAbout, readState, runAnyTest, tabTo } from './helpers'
 
 // Heat Sink I (task 48.3; HSK-14–HSK-16, MM-16, MM-22): chosen before entry from the library,
 // full prediction/test loop to an Accepted fin array, saved under its own key, isolated from
@@ -26,6 +26,8 @@ async function openHeatSink(page: Page, mode: 'Guided' | 'Parametric', keyboard:
     await drawer.getByRole('button', { name: 'Open challenge', exact: true }).click()
   }
   await expect(page.getByRole('button', { name: 'Run Test', exact: true })).toBeVisible()
+  // The step dialog opens on every Guided entry and on reload (task 78.4); read it, then close it.
+  if (mode === 'Guided') await closeStepDialog(page)
   // The dev snapshot follows the newly mounted store after the switch; wait for it.
   await expect.poll(async () => (await readState(page)).challengeId).toBe('heat-sink-1')
 }
@@ -89,17 +91,20 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await setFin(page, 'Fin count', '4')
       await runAnyTest(page)
       await expectGuidedStep(page, 'Thinner fins')
+      await closeStepDialog(page)
       await expect(page.getByRole('button', { name: 'Add a fin' })).toBeDisabled()
       await setFin(page, 'Fin thickness', '3')
       await runAnyTest(page)
       await expectGuidedStep(page, 'Fin height')
+      await closeStepDialog(page)
       await setFin(page, 'Fin height', '35')
       await runAnyTest(page)
       await expectGuidedStep(page, 'Meet every check')
+      await closeStepDialog(page)
       await setFin(page, 'Fin thickness', '1.5')
       await setFin(page, 'Fin count', '10')
       await runAnyTest(page)
-      await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('heading', { name: 'All experiments complete' })).toBeVisible()
+      await expectAllStepsComplete(page)
     } else {
       await setFin(page, 'Fin thickness', '1.5')
       await setFin(page, 'Fin count', '10')

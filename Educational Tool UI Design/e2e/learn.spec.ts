@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { audit } from './helpers'
+import { audit, closeStepDialog, stepDialog } from './helpers'
 
 // Task 67: the Learn pillar on desktop and Pixel 7. Predict-then-check steps, model-backed demos,
 // progress kept across reloads, accessible at 320 px, and Apply it opening Cantilever Beam I in
@@ -60,6 +60,8 @@ test('Learn: predict, check with the demo, keep progress and apply it in Guided 
   await page.getByRole('button', { name: 'Open Cantilever Beam I in Guided mode' }).click()
   await expect(page.getByRole('button', { name: 'Run Test', exact: true })).toBeVisible()
   await expect(page.getByRole('region', { name: 'Guided experiments' })).toBeVisible()
+  await expect(stepDialog(page)).toBeVisible() // entering a Guided challenge opens the step dialog (task 78.4)
+  await closeStepDialog(page)
 })
 
 // Task 71 (D-61): the Torsion module, with model-backed demo readouts, KaTeX equations, progress
@@ -99,5 +101,6 @@ test('Learn Torsion: predict, check with the shaft demo and apply it to Torsion 
   await page.getByRole('list', { name: 'Steps' }).getByRole('button', { name: 'Apply it' }).click()
   await page.getByRole('button', { name: 'Open Torsion Shaft I in Guided mode' }).click()
   await expect(page.getByRole('button', { name: 'Run Test', exact: true })).toBeVisible()
-  await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('heading', { name: 'Hollow it out', exact: true })).toBeVisible()
+  await expect(stepDialog(page).getByRole('heading', { name: 'Hollow it out', exact: true })).toBeVisible()
+  await closeStepDialog(page)
 })

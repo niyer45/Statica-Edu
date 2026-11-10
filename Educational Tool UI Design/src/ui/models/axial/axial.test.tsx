@@ -222,7 +222,7 @@ describe('Stress and Strain I workbench', () => {
 
   it('Guided locks the material in step one; Parametric is open design', () => {
     renderRod('guided')
-    expect(within(screen.getByRole('region', { name: 'Guided experiments' })).getByRole('heading', { name: 'Thicken the rod' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Thicken the rod' })).toBeTruthy()
     expect((screen.getByLabelText('Diameter') as HTMLInputElement).readOnly).toBe(false)
     expect((screen.getByRole('radio', { name: /^Titanium/ }) as HTMLInputElement).disabled).toBe(true)
     cleanup()

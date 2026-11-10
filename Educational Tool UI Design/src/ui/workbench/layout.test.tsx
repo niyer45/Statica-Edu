@@ -88,7 +88,8 @@ describe('Workbench layout', () => {
 
     // Panels respond to input while the viewport is still loading (the palette tiles are
     // non-interactive stubs until task 15.1, so the requirements panel's help button is used).
-    expect(document.querySelector('.modal')).toBeNull()
+    // (The Guided step dialog is open on entry; only other modals are counted here.)
+    expect(document.querySelector('.modal:not([data-dialog-kind="guided-step"])')).toBeNull()
     const panelButtons = within(challenge).getAllByRole('button').filter((b) => !b.hasAttribute('disabled'))
     expect(panelButtons.length).toBeGreaterThan(0)
     fireEvent.click(panelButtons[0] as HTMLElement)

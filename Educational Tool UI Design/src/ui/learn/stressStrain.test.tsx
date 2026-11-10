@@ -120,6 +120,6 @@ describe('Stress and strain module (task 72)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Open Stress and Strain I in Guided mode' }))
     expect(screen.getByTestId('workbench-host').hidden).toBe(false)
     expect(window.__EI_STATE__).toMatchObject({ challengeId: 'stress-strain-1', mode: 'guided' })
-    expect(within(screen.getByRole('region', { name: 'Guided experiments' })).getByRole('heading', { name: 'Thicken the rod' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Thicken the rod' })).toBeTruthy()
   })
 })

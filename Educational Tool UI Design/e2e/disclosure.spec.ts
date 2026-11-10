@@ -1,12 +1,12 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { dismissGuidedPopover } from './helpers'
+import { audit, closeStepDialog, readState, stepDialog } from './helpers'
 
 // Task 61 (owner feedback): opening a disclosure in the challenge panel may grow the workbench
 // row, but closing it must return the row to its original height. The 3D canvas used to keep the
 // taller pixel height and hold the row open.
-// Task 78: all ten challenges, in Guided (where the step popover is dismissed first, WD-11) and
-// the popover behaviour itself. Task 78.3: the steps are a stepper row; About sits at the bottom.
+// Task 78: all ten challenges, in Guided (where the step dialog is closed first, task 78.4) and
+// the dialog behaviour itself. Task 78.3: the steps are a stepper row; About sits at the bottom.
 
 const NAMES = catalog.map((entry) => entry.title)
 
@@ -27,9 +27,8 @@ for (const name of NAMES) {
   test(`${name}: closing a challenge-panel disclosure restores the workbench height`, async ({ page }) => {
     test.skip(!catalog.find((e) => e.title === name)?.available, `${name} is not active`)
     await enter(page, name, 'Guided')
-    // The auto-opened Guided step popover is in flow above the workbench and pushes it down;
-    // dismiss it explicitly (WD-11) so the measurements start from the settled layout.
-    await dismissGuidedPopover(page)
+    // The Guided step dialog opens on entry and blocks the page (WD-40); close it before measuring.
+    await closeStepDialog(page)
     const row = page.locator('.workbench')
     const height = async () => Math.round((await row.boundingBox())!.height)
     // Let the lazy 3D view (or its 2D fallback) settle before the baseline measurement.
@@ -46,35 +45,104 @@ for (const name of NAMES) {
   })
 }
 
-test('Guided: the step popover is visible on entry; after Close the current step remains and the challenge disclosures are clickable', async ({ page }) => {
+test('Guided: the step dialog is open and modal on entry; the page behind is blocked; "Got it" closes it and the step name reopens it', async ({ page }) => {
   await enter(page, 'Cantilever Beam I', 'Guided')
   const stepper = page.getByRole('navigation', { name: 'Guided steps' })
   const current = stepper.getByRole('button', { name: /, current step$/ })
-  const popover = page.locator('.guided-popover')
+  const dialog = stepDialog(page)
   await expect(current).toBeVisible()
-  await expect(popover).toBeVisible()
-  await expect(current).toHaveAttribute('aria-expanded', 'true')
-  await popover.getByRole('button', { name: 'Close', exact: true }).click()
-  await expect(popover).toBeHidden()
-  await expect(current).toBeVisible()
-  await expect(current).toHaveAttribute('aria-expanded', 'false')
-  // The challenge band disclosure can now be clicked and opens.
+  await expect(dialog).toBeVisible()
+  await expect(dialog).toHaveAccessibleName('Step 1 of 4: Grow the circle')
+  await expect(dialog).toHaveAttribute('aria-modal', 'true')
+  await expect(dialog.getByRole('heading', { name: 'Grow the circle' })).toBeVisible()
+  await expect(dialog.getByText('Editable now:')).toBeVisible()
+  await expect(dialog.locator('#guided-lock-line')).toContainText('Locked in this step: everything except diameter.')
+  await expect(dialog.getByText('Hint', { exact: true })).toBeVisible()
+  await expect(dialog.locator('details')).not.toHaveAttribute('open', '')
+  await expect(current).toHaveAttribute('aria-haspopup', 'dialog')
+  await expect(current).not.toHaveAttribute('aria-expanded', /.*/)
+  // Focus starts inside the dialog (its Close button, like every other dialog).
+  await expect(dialog.getByRole('button', { name: 'Close', exact: true })).toBeFocused()
+  // The dialog is centred and sits over the whole app: the page behind is not clickable.
+  const box = (await dialog.boundingBox())!
+  const view = page.viewportSize()!
+  expect(Math.abs(box.x + box.width / 2 - view.width / 2)).toBeLessThanOrEqual(2)
+  expect(box.y).toBeGreaterThanOrEqual(0)
+  const runTest = page.getByRole('button', { name: 'Run Test', exact: true })
+  await runTest.scrollIntoViewIfNeeded()
+  const target = (await runTest.boundingBox())!
+  const covered = await page.evaluate(([x, y]) => !!document.elementFromPoint(x!, y!)?.closest('.modal-backdrop'), [target.x + target.width / 2, target.y + target.height / 2])
+  expect(covered, 'the backdrop covers Run Test').toBe(true)
+  await expect(runTest.click({ timeout: 1500 })).rejects.toThrow()
+  await expect(dialog).toBeVisible()
+  expect((await readState(page)).history).toHaveLength(1)
+  // Focus stays trapped inside while Tab is pressed repeatedly.
+  for (let i = 0; i < 6; i++) await page.keyboard.press('Tab')
+  expect(await page.evaluate(() => document.activeElement?.closest('[role="dialog"]') !== null)).toBe(true)
+  // axe audit with the dialog open.
+  await audit(page)
+  // "Got it" closes it, focus returns to the step button, and the workbench is usable.
+  await dialog.getByRole('button', { name: 'Got it', exact: true }).click()
+  await expect(dialog).toBeHidden()
+  await expect(current).toBeFocused()
   const more = page.locator('.challenge-band details > summary').first()
   await more.click()
   await expect(more.locator('xpath=..')).toHaveAttribute('open', '')
-  // The current step reopens the popover; the lock line is inside it.
+  // The step name reopens it; Escape closes it again and focus returns to the step button.
   await current.click()
-  await expect(popover).toBeVisible()
-  await expect(popover.locator('#guided-lock-line')).toContainText('Locked in this step: everything except diameter.')
-  // No "Step N of M" chip any more.
+  await expect(dialog).toBeVisible()
+  await expect(dialog.locator('#guided-lock-line')).toContainText('Locked in this step: everything except diameter.')
+  await page.keyboard.press('Escape')
+  await expect(dialog).toBeHidden()
+  await expect(current).toBeFocused()
+  // No "Step N of M" chip in the page, and no failed-attempt line without an attempt.
   await expect(page.getByText(/Step \d+ of \d+/)).toHaveCount(0)
+  await expect(page.locator('.guided-feedback')).toHaveCount(0)
 })
 
-test('Parametric: there is no stepper row or popover', async ({ page }) => {
+test('Guided: nothing is pushed down; the workbench starts below the stepper exactly as far below the band as in Parametric', async ({ page }) => {
+  const top = async () => Math.round((await page.locator('.workbench').boundingBox())!.y + await page.evaluate(() => window.scrollY))
+  await enter(page, 'Cantilever Beam I', 'Guided')
+  await page.waitForTimeout(1000)
+  const whileOpen = await top()
+  await closeStepDialog(page)
+  expect(await top(), 'closing the dialog does not move the workbench').toBe(whileOpen)
+  const stepperBlock = await page.evaluate(() => {
+    const el = document.querySelector('.guided-instructions') as HTMLElement
+    return el.getBoundingClientRect().height + parseFloat(getComputedStyle(el).marginBottom)
+  })
+  await enter(page, 'Cantilever Beam I', 'Parametric')
+  await page.waitForTimeout(1000)
+  expect(Math.abs(whileOpen - await top() - stepperBlock), 'the only extra height in Guided is the stepper row').toBeLessThanOrEqual(2)
+})
+
+test('Guided: a failed attempt shows one feedback line under the stepper and does not reopen the dialog', async ({ page }) => {
+  await enter(page, 'Cantilever Beam I', 'Guided')
+  await closeStepDialog(page)
+  await expect(page.locator('.guided-feedback')).toHaveCount(0)
+  // Re-testing the unchanged Baseline does not meet "grow the circle".
+  await page.getByRole('button', { name: 'Run Test', exact: true }).click()
+  const prediction = page.getByRole('dialog').filter({ has: page.getByRole('button', { name: 'Run structural test' }) })
+  if (await prediction.isVisible()) {
+    await prediction.getByLabel('Decrease', { exact: true }).check()
+    await prediction.getByRole('button', { name: 'Run structural test' }).click()
+    await expect(prediction).toBeHidden()
+  }
+  const line = page.locator('.guided-feedback')
+  await expect(line).toHaveText(/^Iteration \d+ did not complete this step yet\. Change only diameter as asked, then Run Test\.$/)
+  await expect(stepDialog(page)).toHaveCount(0)
+  await expect(line.locator('xpath=preceding-sibling::*[1]')).toHaveAttribute('aria-label', 'Guided steps')
+  // The same line is inside the dialog when it is reopened.
+  await page.getByRole('navigation', { name: 'Guided steps' }).getByRole('button').click()
+  await expect(stepDialog(page).getByText(/did not complete this step yet/)).toBeVisible()
+})
+
+test('Parametric: there is no stepper row and no step dialog', async ({ page }) => {
   await enter(page, 'Cantilever Beam I', 'Parametric')
   await expect(page.getByRole('region', { name: 'Guided experiments' })).toHaveCount(0)
   await expect(page.getByRole('navigation', { name: 'Guided steps' })).toHaveCount(0)
-  await expect(page.locator('.guided-popover')).toHaveCount(0)
+  await expect(stepDialog(page)).toHaveCount(0)
+  await expect(page.getByRole('dialog')).toHaveCount(0)
   await expect(page.locator('.guided-stepper')).toHaveCount(0)
 })
 
@@ -129,13 +197,14 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       return [follows(document.querySelector('.results-panel')!, about), follows(about, document.querySelector('.page-footer')!)]
     })
     expect(order).toEqual([true, true])
+    await closeStepDialog(page) // a no-op in Parametric
     await about.locator('summary').click()
     await expect(about.locator('.ei-disclosure-body p').first()).toBeVisible()
   })
 }
 
-// Task 78.2 (WD-20–WD-23): the challenge band is the first workbench content, uncovered by the
-// Guided popover, and its disclosure works with the popover still open.
+// Task 78.2 (WD-20–WD-23): the challenge band is the first workbench content, and its disclosure
+// works once the Guided step dialog (open on entry, task 78.4) is closed.
 for (const mode of ['Guided', 'Parametric'] as const) {
   for (const name of NAMES) {
     test(`${name} (${mode}): the challenge band is first, shows the goal line and one visible sentence`, async ({ page }) => {
@@ -154,7 +223,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
         const bandEl = document.querySelector('.challenge-band')!
         const stepper = document.querySelector('.guided-stepper')
         const chain = [document.querySelector('h1')!, bandEl, ...(stepper === null ? [] : [stepper]), document.querySelector('.design-panel')!, document.querySelector('.results-panel')!, document.querySelector('.about-model')!, document.querySelector('.page-footer')!]
-        return [...chain.slice(0, -1).map((el, i) => follows(el, chain[i + 1]!)), document.querySelectorAll('.challenge-band').length === 1, (stepper !== null) === (document.querySelector('.guided-popover') !== null)]
+        return [...chain.slice(0, -1).map((el, i) => follows(el, chain[i + 1]!)), document.querySelectorAll('.challenge-band').length === 1, (stepper !== null) === (document.querySelector('[role="dialog"][data-dialog-kind="guided-step"]') !== null)]
       })
       expect(order.every(Boolean), JSON.stringify(order)).toBe(true)
       // Full width above 870 px: the band spans the workbench row and sits above it.
@@ -163,11 +232,8 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       expect(bandBox.width).toBeGreaterThanOrEqual(rowBox.width - 2)
       expect(bandBox.y + bandBox.height).toBeLessThanOrEqual(rowBox.y)
       if (mode === 'Guided') {
-        // The popover is open on entry and does not cover the band.
-        const popover = page.locator('.guided-popover')
-        await expect(popover).toBeVisible()
-        const p = (await popover.boundingBox())!
-        expect(p.y).toBeGreaterThanOrEqual(bandBox.y + bandBox.height - 1)
+        // The step dialog is open on entry; close it, then the band's disclosure is usable.
+        await closeStepDialog(page)
         const more = band.getByText('More about this challenge', { exact: true })
         if (await more.count() > 0) {
           await more.click()

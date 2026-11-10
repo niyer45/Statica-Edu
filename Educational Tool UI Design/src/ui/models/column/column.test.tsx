@@ -223,7 +223,7 @@ describe('Column Buckling I workbench', () => {
 
   it('Guided locks every control but the step one and never reveals reference numbers; Parametric is open', () => {
     renderColumn('guided')
-    expect(within(screen.getByRole('region', { name: 'Guided experiments' })).getByRole('heading', { name: 'Thicken the solid bar' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Thicken the solid bar' })).toBeTruthy()
     expect((screen.getByLabelText('Diameter') as HTMLInputElement).readOnly).toBe(false)
     expect(screen.getByRole('button', { name: /Hollow tube/ }).getAttribute('aria-disabled')).toBe('true')
     expect(columnUi.guided.steps.map((s) => `${s.instruction} ${s.hint}`).join(' ')).not.toMatch(/\d/)

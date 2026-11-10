@@ -43,10 +43,11 @@ describe('Guided structured experiments (task 58)', () => {
     const guide = screen.getByRole('region', { name: 'Guided experiments' })
     expect(within(guide).getByRole('button', { name: 'Grow the circle, current step' })).toBeTruthy()
     expect(steps()).toEqual(['Grow the circle, current step', 'Try another shape, locked', 'Tune one dimension, locked', 'Meet every check, locked'])
-    expect(within(guide).getByRole('heading', { name: 'Grow the circle' })).toBeTruthy()
-    expect(within(guide).getByText(/Increase only the diameter of the solid circle/)).toBeTruthy()
-    expect(within(guide).getByText('Diameter')).toBeTruthy()
-    expect(guide.querySelector('details')?.open).toBe(false)
+    const dialog = screen.getByRole('dialog', { name: 'Step 1 of 4: Grow the circle' })
+    expect(within(dialog).getByRole('heading', { name: 'Grow the circle' })).toBeTruthy()
+    expect(within(dialog).getByText(/Increase only the diameter of the solid circle/)).toBeTruthy()
+    expect(within(dialog).getByText('Diameter')).toBeTruthy()
+    expect(dialog.querySelector('details')?.open).toBe(false)
   })
 
   it('advances only when a tested result meets the step objective, reporting stored changes', () => {
@@ -58,7 +59,8 @@ describe('Guided structured experiments (task 58)', () => {
     // Retesting the unchanged Baseline does not meet "increase the diameter".
     test()
     expect(screen.getByRole('heading', { name: 'Grow the circle' })).toBeTruthy()
-    expect(screen.getByText(/Iteration 1 did not complete this step yet/)).toBeTruthy()
+    // The line under the stepper and the same text inside the open dialog.
+    expect(screen.getAllByText(/Iteration 1 did not complete this step yet/)).toHaveLength(2)
     // A smaller circle changes the diameter in the wrong direction.
     grow(0.029)
     test()
@@ -138,51 +140,163 @@ describe('Guided structured experiments (task 58)', () => {
   })
 })
 
-describe('Guided stepper, popover and lock line (tasks 78, 78.3)', () => {
-  it('shows the stepper with the current step as the toggle of a non-modal popover that opens by itself', () => {
+describe('Guided stepper, step dialog and lock line (tasks 78, 78.3, 78.4)', () => {
+  const stepButton = (name = 'Grow the circle, current step') => within(screen.getByRole('navigation', { name: 'Guided steps' })).getByRole('button', { name })
+  const dialog = () => screen.getByRole('dialog', { name: /^Step \d of 4: / })
+  const gotIt = () => screen.getByRole('button', { name: 'Got it' })
+
+  it('opens a modal step dialog on mount, named "Step N of M: <title>", with the current step content', () => {
     setup()
-    const guide = screen.getByRole('region', { name: 'Guided experiments' })
-    const current = within(guide).getByRole('button', { name: 'Grow the circle, current step' })
+    const current = stepButton()
     expect(current.closest('li')?.getAttribute('aria-current')).toBe('step')
-    expect(current.getAttribute('aria-expanded')).toBe('true')
-    // No "Step N of M" chip, and no experiments list in the popover (the stepper shows the steps).
+    expect(current.getAttribute('aria-haspopup')).toBe('dialog')
+    expect(current.hasAttribute('aria-expanded')).toBe(false)
+    expect(current.hasAttribute('aria-controls')).toBe(false)
     expect(screen.queryByText(/Step \d of \d/)).toBeNull()
-    expect(screen.queryByRole('list', { name: 'Experiment steps' })).toBeNull()
-    const popover = within(guide).getByRole('group', { name: 'Guided step instructions' })
-    expect(popover.getAttribute('id')).toBe(current.getAttribute('aria-controls'))
-    expect(popover.querySelector('ol')).toBeNull()
-    expect(within(popover).getByText(/Increase only the diameter of the solid circle/)).toBeTruthy()
-    expect(within(popover).getByRole('heading', { name: 'Grow the circle' })).toBeTruthy()
-    expect(document.activeElement).toBe(document.body)
-    expect(popover.querySelector('details')?.open).toBe(false)
-    // The lock line is inside the popover, after "Editable now".
-    const focus = popover.querySelector('.guided-focus')!
-    const line = popover.querySelector('#guided-lock-line')!
+    const d = screen.getByRole('dialog', { name: 'Step 1 of 4: Grow the circle' })
+    expect(d.getAttribute('aria-modal')).toBe('true')
+    expect(document.body.contains(d) && !screen.getByRole('region', { name: 'Guided experiments' }).contains(d)).toBe(true)
+    expect(within(d).getByRole('heading', { name: 'Grow the circle' })).toBeTruthy()
+    expect(within(d).getByText(/Increase only the diameter of the solid circle/)).toBeTruthy()
+    expect(d.querySelector('ol')).toBeNull()
+    expect(d.querySelector('details')?.open).toBe(false)
+    expect(within(d).getByText('Hint')).toBeTruthy()
+    // Initial focus is the dialog's first focusable, its Close button, like every other dialog.
+    expect(document.activeElement).toBe(within(d).getByRole('button', { name: 'Close' }))
+    // The lock line is inside the dialog, after "Editable now".
+    const focus = d.querySelector('.guided-focus')!
+    const line = d.querySelector('#guided-lock-line')!
     expect(line.textContent).toContain('Locked in this step: everything except diameter.')
     expect((focus.compareDocumentPosition(line) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0).toBe(true)
     // Completed and locked steps are not buttons; the row adds one tab stop.
     expect(within(screen.getByRole('navigation', { name: 'Guided steps' })).getAllByRole('button')).toEqual([current])
+    expect(document.querySelector('.guided-popover')).toBeNull()
   })
 
-  it('closing the popover hides the lock line with it and the current step reopens it', () => {
+  it('"Got it", Close and Escape each close it and return focus to the current step button', () => {
     setup()
-    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
-    const line = document.getElementById('guided-lock-line')!
-    expect(line.closest('.guided-popover')?.hasAttribute('hidden')).toBe(true)
-    fireEvent.click(screen.getByRole('button', { name: 'Grow the circle, current step' }))
-    expect(line.closest('.guided-popover')?.hasAttribute('hidden')).toBe(false)
+    for (const close of [() => fireEvent.click(gotIt()), () => fireEvent.click(within(dialog()).getByRole('button', { name: 'Close' })), () => fireEvent.keyDown(document.activeElement!, { key: 'Escape' })]) {
+      close()
+      expect(screen.queryByRole('dialog')).toBeNull()
+      expect(document.activeElement).toBe(stepButton())
+      fireEvent.click(stepButton())
+      expect(dialog()).toBeTruthy()
+    }
   })
 
-  it('reopens on a new step, leaves a closed popover closed on a retest of the same step', () => {
+  it('a backdrop click does not dismiss it', () => {
     setup()
-    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
-    expect(screen.getByRole('button', { name: 'Grow the circle, current step' }).getAttribute('aria-expanded')).toBe('false')
-    // A step change reopens it, still without focus.
+    fireEvent.click(document.querySelector('.modal-backdrop')!)
+    expect(dialog()).toBeTruthy()
+  })
+
+  it('traps focus while open: Tab and Shift+Tab cycle inside, and focus pulled outside returns inside', () => {
+    setup(fresh('guided'), undefined, challenge, true)
+    const d = dialog()
+    const close = within(d).getByRole('button', { name: 'Close' })
+    expect(document.activeElement).toBe(close)
+    fireEvent.keyDown(close, { key: 'Tab', shiftKey: true })
+    expect(document.activeElement).toBe(gotIt())
+    fireEvent.keyDown(gotIt(), { key: 'Tab' })
+    expect(document.activeElement).toBe(close)
+    // The background (a design control, Run Test) is not reachable: focus moving there is sent back.
+    screen.getByRole('button', { name: 'Run Test' }).focus()
+    expect(d.contains(document.activeElement)).toBe(true)
+    screen.getByRole('spinbutton', { name: /^Diameter/ }).focus()
+    expect(d.contains(document.activeElement)).toBe(true)
+  })
+
+  it('reopens from the current step, and opens by itself on a new step but not after a failed attempt', () => {
+    setup()
+    fireEvent.click(gotIt())
+    // A retest of the unchanged Baseline does not meet the step: the dialog stays closed.
+    test()
+    expect(screen.queryByRole('dialog')).toBeNull()
+    // A met step opens it again for the next step, without moving focus to it first from outside.
     grow()
     test()
-    const next = screen.getByRole('button', { name: 'Try another shape, current step' })
-    expect(next.getAttribute('aria-expanded')).toBe('true')
-    expect(document.activeElement).toBe(document.body)
+    expect(screen.getByRole('dialog', { name: 'Step 2 of 4: Try another shape' })).toBeTruthy()
+    fireEvent.click(gotIt())
+    expect(document.activeElement).toBe(stepButton('Try another shape, current step'))
+  })
+
+  it('shows one feedback line under the stepper only after an attempt that did not meet the step', () => {
+    setup()
+    const guide = screen.getByRole('region', { name: 'Guided experiments' })
+    expect(guide.querySelector('.guided-feedback')).toBeNull()
+    fireEvent.click(gotIt())
+    test()
+    const line = guide.querySelector('.guided-feedback')!
+    expect(line.textContent).toBe('Iteration 1 did not complete this step yet. Change only diameter as asked, then Run Test.')
+    expect(line.getAttribute('aria-live')).toBeNull()
+    expect(line.closest('[role]')).toBeNull()
+    expect(line.previousElementSibling).toBe(screen.getByRole('navigation', { name: 'Guided steps' }))
+    // Also inside the dialog when reopened.
+    fireEvent.click(stepButton())
+    expect(within(dialog()).getByText(line.textContent!)).toBeTruthy()
+    fireEvent.click(gotIt())
+    // Meeting the step clears the line.
+    grow()
+    test()
+    fireEvent.click(gotIt())
+    expect(guide.querySelector('.guided-feedback')).toBeNull()
+  })
+
+  it('shows the completion message once when every step is met and reopens from "All N steps complete"', () => {
+    setup(fresh('guided'), undefined, challenge, true)
+    fireEvent.click(gotIt())
+    grow()
+    test()
+    fireEvent.click(gotIt())
+    act(() => store.dispatch({ type: 'applySection', kind: 'iSection' }))
+    test()
+    fireEvent.click(gotIt())
+    act(() => store.dispatch({ type: 'setParam', param: 'heightM', valueM: 0.06, mode: 'strict' }))
+    test()
+    fireEvent.click(gotIt())
+    act(() => {
+      for (const [param, valueM] of [['heightM', 0.06], ['widthM', 0.04], ['flangeThicknessM', 0.004], ['webThicknessM', 0.003]] as const) store.dispatch({ type: 'setParam', param, valueM, mode: 'strict' })
+    })
+    test()
+    expect(screen.getByRole('dialog', { name: 'All 4 steps complete' })).toBeTruthy()
+    fireEvent.click(gotIt())
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'All 4 steps complete' }))
+    expect(screen.queryByRole('dialog')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'All 4 steps complete' }))
+    expect(screen.getByRole('heading', { name: 'All experiments complete' })).toBeTruthy()
+  })
+
+  it('never stacks on another dialog: it waits for the Prediction dialog and opens when that closes', () => {
+    setup(fresh('guided'), undefined, challenge, true)
+    fireEvent.click(gotIt())
+    fireEvent.click(screen.getByRole('button', { name: 'Run Test' }))
+    const prediction = screen.getByRole('dialog', { name: /./ })
+    expect(within(prediction).getByRole('button', { name: 'Run structural test' })).toBeTruthy()
+    // Meet the step while the prediction dialog is up: no second dialog appears.
+    grow()
+    expect(screen.getAllByRole('dialog')).toHaveLength(1)
+    fireEvent.click(within(prediction).getByLabelText('Decrease', { exact: true }))
+    fireEvent.click(within(prediction).getByRole('button', { name: 'Run structural test' }))
+    expect(screen.getAllByRole('dialog')).toHaveLength(1)
+    expect(screen.getByRole('dialog', { name: /^Step 2 of 4: / })).toBeTruthy()
+  })
+
+  it('does not open while another dialog is on screen at entry, then opens when it closes', async () => {
+    const other = document.createElement('div')
+    other.setAttribute('role', 'dialog')
+    other.setAttribute('aria-label', 'Other dialog')
+    document.body.append(other)
+    setup()
+    expect(screen.getAllByRole('dialog')).toHaveLength(1)
+    other.remove()
+    await act(async () => { await Promise.resolve() })
+    expect(screen.getByRole('dialog', { name: 'Step 1 of 4: Grow the circle' })).toBeTruthy()
+  })
+
+  it('Parametric has no stepper and no dialog', () => {
+    setup(fresh('parametric'), undefined, challenge, true)
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(screen.queryByRole('navigation', { name: 'Guided steps' })).toBeNull()
   })
 
   it('replaces the per-control sentences with one lock line and a lock mark per locked control', () => {

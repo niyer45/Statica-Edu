@@ -2,7 +2,7 @@ import { observations, type GuidedResult } from '../../evaluation/guided/plan'
 import Icon from '../icons/Icon'
 import { useModelStore } from '../state/store'
 import Disclosure from './Disclosure'
-import GuidedStepPopover, { type StepState } from './GuidedStepPopover'
+import GuidedStepDialog, { type StepState } from './GuidedStepDialog'
 import { useGuided } from './useGuided'
 
 // Mode experience (task 58; replaces the task 44 Inspect/Experiment/Compare/Explain prompts).
@@ -14,9 +14,10 @@ import { useGuided } from './useGuided'
 //   final step opens every parameter and is met by an Accepted test.
 // - Parametric = open design. Every parameter editable from the start, no steps: the goal and
 //   the checks stay in the challenge panel.
-// Task 78: the Guided block is a non-modal popover (GuidedStepPopover); the locked controls share
-// one line instead of one sentence each. Task 78.3: the steps are a stepper row (the current step
-// toggles the popover) and the lock line sits inside the popover under "Editable now".
+// Task 78: the locked controls share one line instead of one sentence each. Task 78.3: the steps are
+// a stepper row and the lock line sits under "Editable now". Task 78.4: the current step's
+// instruction is a modal dialog (GuidedStepDialog) that opens on entry and on each new step and is
+// reopened from the current step; a failed attempt shows one line under the row.
 
 function iterationName(history: ReadonlyArray<GuidedResult>, id: string | undefined): string {
   const r = history.find((x) => x.id === id)
@@ -40,17 +41,19 @@ function GuidedExperiments() {
     title: s.title,
     state: (allDone || i < progress.current ? 'complete' : i === progress.current ? 'current' : 'locked') as StepState,
   }))
+  const notMetText = notMet !== undefined ? `Iteration ${notMet.iteration} did not complete this step yet. Change only ${step!.focus.toLowerCase()} as asked, then Run Test.` : undefined
   const locksSomething = step !== undefined && step.unlocks !== 'all'
   return (
-    <GuidedStepPopover
+    <GuidedStepDialog
       steps={stepperSteps}
       completeLabel={allDone ? `All ${total} steps complete` : undefined}
-      label="Guided step instructions"
-      autoOpenKey={`${progress.current}:${notMet?.id ?? ''}`}
+      label={step !== undefined ? `Step ${progress.current + 1} of ${total}: ${step.title}` : `All ${total} steps complete`}
+      title={step !== undefined ? step.title : 'All experiments complete'}
+      autoOpenKey={allDone ? 'done' : String(progress.current)}
+      feedback={notMetText}
     >
       {step !== undefined ? (
         <>
-          <h2>{step.title}</h2>
           <p>{step.instruction}</p>
           <p className="guided-focus">
             Editable now: <strong>{step.focus}</strong>
@@ -67,15 +70,10 @@ function GuidedExperiments() {
         </>
       ) : (
         <>
-          <h2>All experiments complete</h2>
           <p>Every parameter is unlocked. Open Explain & submit to record your design and what your experiments showed.</p>
         </>
       )}
-      {notMet !== undefined && (
-        <p className="guided-result">
-          Iteration {notMet.iteration} did not complete this step yet. Change only {step!.focus.toLowerCase()} as asked, then Run Test.
-        </p>
-      )}
+      {notMetText !== undefined && <p className="guided-result">{notMetText}</p>}
       {notMet === undefined && last !== undefined && lastStep !== undefined && (
         <p className="guided-result">
           <Icon name="check" size={11} /> {lastStep.title} complete: {iterationName(history, last.resultId)}
@@ -83,7 +81,7 @@ function GuidedExperiments() {
           {seen.length > 0 ? `. ${seen.map((o) => `${o.label} ${o.change === 'unavailable' ? 'not available' : o.change === 'unchanged' ? 'did not change' : o.change}`).join('; ')}.` : '.'}
         </p>
       )}
-    </GuidedStepPopover>
+    </GuidedStepDialog>
   )
 }
 
