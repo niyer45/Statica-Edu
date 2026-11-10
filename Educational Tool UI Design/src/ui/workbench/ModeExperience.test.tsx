@@ -30,7 +30,7 @@ function setup(initial = fresh(), storage?: SessionStorage, ch: Challenge = chal
   </StoreProvider>)
 }
 const test = () => act(() => { store.dispatch({ type: 'setPrediction', direction: 'decrease', now }); store.runTest() })
-const steps = () => within(screen.getByRole('list', { name: 'Experiment steps' })).getAllByRole('listitem').map((li) => li.textContent)
+const steps = () => within(screen.getByRole('navigation', { name: 'Guided steps' })).getAllByRole('listitem').map((li) => { const c = li.cloneNode(true) as HTMLElement; c.querySelectorAll('[aria-hidden="true"]').forEach((n) => n.remove()); return c.textContent })
 afterEach(cleanup)
 
 // The Baseline is a solid Ø31 mm circle (task 59, D-47 amendment): the beam's first experiment
@@ -41,8 +41,8 @@ describe('Guided structured experiments (task 58)', () => {
   it('shows the ordered single-variable steps with the first one current', () => {
     setup()
     const guide = screen.getByRole('region', { name: 'Guided experiments' })
-    expect(within(guide).getByText(/Step 1 of 4/)).toBeTruthy()
-    expect(steps()).toEqual(['1. Grow the circle, current step', '2. Try another shape, locked', '3. Tune one dimension, locked', '4. Meet every check, locked'])
+    expect(within(guide).getByRole('button', { name: 'Grow the circle, current step' })).toBeTruthy()
+    expect(steps()).toEqual(['Grow the circle, current step', 'Try another shape, locked', 'Tune one dimension, locked', 'Meet every check, locked'])
     expect(within(guide).getByRole('heading', { name: 'Grow the circle' })).toBeTruthy()
     expect(within(guide).getByText(/Increase only the diameter of the solid circle/)).toBeTruthy()
     expect(within(guide).getByText('Diameter')).toBeTruthy()
@@ -66,9 +66,9 @@ describe('Guided structured experiments (task 58)', () => {
     grow(0.034)
     test()
     expect(screen.getByRole('heading', { name: 'Try another shape' })).toBeTruthy()
-    expect(screen.getByText(/Step 2 of 4/)).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Try another shape, current step' })).toBeTruthy()
     expect(screen.getByText(/Grow the circle complete: Iteration 3 compared with Iteration 2\. Tip deflection decreased; Mass increased; Bending stress decreased\./)).toBeTruthy()
-    expect(steps()[0]).toBe('1. Grow the circle, complete')
+    expect(steps()[0]).toBe('Grow the circle, completed')
   })
 
   it('locks every control the current step does not unlock; Parametric locks nothing', () => {
@@ -119,7 +119,8 @@ describe('Guided structured experiments (task 58)', () => {
     test()
     expect(store.state.history.at(-1)?.accepted).toBe(true)
     expect(screen.getByRole('heading', { name: 'All experiments complete' })).toBeTruthy()
-    expect(screen.getByText(/All 4 steps complete/)).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'All 4 steps complete' })).toBeTruthy()
+    expect(steps().every((t) => t!.endsWith(', completed'))).toBe(true)
   })
 
   it('keeps step progress after reload without a new persisted field', () => {
@@ -137,30 +138,50 @@ describe('Guided structured experiments (task 58)', () => {
   })
 })
 
-describe('Guided chip, popover and lock line (task 78)', () => {
-  it('shows a compact chip and the instruction in a non-modal popover that opens by itself', () => {
+describe('Guided stepper, popover and lock line (tasks 78, 78.3)', () => {
+  it('shows the stepper with the current step as the toggle of a non-modal popover that opens by itself', () => {
     setup()
     const guide = screen.getByRole('region', { name: 'Guided experiments' })
-    const chip = within(guide).getByRole('button', { name: 'Step 1 of 4: Grow the circle' })
-    expect(chip.getAttribute('aria-expanded')).toBe('true')
+    const current = within(guide).getByRole('button', { name: 'Grow the circle, current step' })
+    expect(current.closest('li')?.getAttribute('aria-current')).toBe('step')
+    expect(current.getAttribute('aria-expanded')).toBe('true')
+    // No "Step N of M" chip, and no experiments list in the popover (the stepper shows the steps).
+    expect(screen.queryByText(/Step \d of \d/)).toBeNull()
+    expect(screen.queryByRole('list', { name: 'Experiment steps' })).toBeNull()
     const popover = within(guide).getByRole('group', { name: 'Guided step instructions' })
-    expect(popover.getAttribute('id')).toBe(chip.getAttribute('aria-controls'))
+    expect(popover.getAttribute('id')).toBe(current.getAttribute('aria-controls'))
+    expect(popover.querySelector('ol')).toBeNull()
     expect(within(popover).getByText(/Increase only the diameter of the solid circle/)).toBeTruthy()
     expect(within(popover).getByRole('heading', { name: 'Grow the circle' })).toBeTruthy()
     expect(document.activeElement).toBe(document.body)
-    // The step instruction is no longer inline in the strip.
     expect(popover.querySelector('details')?.open).toBe(false)
+    // The lock line is inside the popover, after "Editable now".
+    const focus = popover.querySelector('.guided-focus')!
+    const line = popover.querySelector('#guided-lock-line')!
+    expect(line.textContent).toContain('Locked in this step: everything except diameter.')
+    expect((focus.compareDocumentPosition(line) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0).toBe(true)
+    // Completed and locked steps are not buttons; the row adds one tab stop.
+    expect(within(screen.getByRole('navigation', { name: 'Guided steps' })).getAllByRole('button')).toEqual([current])
+  })
+
+  it('closing the popover hides the lock line with it and the current step reopens it', () => {
+    setup()
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+    const line = document.getElementById('guided-lock-line')!
+    expect(line.closest('.guided-popover')?.hasAttribute('hidden')).toBe(true)
+    fireEvent.click(screen.getByRole('button', { name: 'Grow the circle, current step' }))
+    expect(line.closest('.guided-popover')?.hasAttribute('hidden')).toBe(false)
   })
 
   it('reopens on a new step, leaves a closed popover closed on a retest of the same step', () => {
     setup()
     fireEvent.click(screen.getByRole('button', { name: 'Close' }))
-    expect(screen.getByRole('button', { name: /^Step 1 of 4/ }).getAttribute('aria-expanded')).toBe('false')
+    expect(screen.getByRole('button', { name: 'Grow the circle, current step' }).getAttribute('aria-expanded')).toBe('false')
     // A step change reopens it, still without focus.
     grow()
     test()
-    const chip = screen.getByRole('button', { name: 'Step 2 of 4: Try another shape' })
-    expect(chip.getAttribute('aria-expanded')).toBe('true')
+    const next = screen.getByRole('button', { name: 'Try another shape, current step' })
+    expect(next.getAttribute('aria-expanded')).toBe('true')
     expect(document.activeElement).toBe(document.body)
   })
 

@@ -31,6 +31,36 @@ const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   advanced: 'Advanced',
 }
 
+/**
+ * The "Guided mode / About this model" row. Task 78.3 (WD-35): it sits at the bottom of the
+ * workbench content, after the results and before the limits footer, not at the top.
+ */
+export function AboutModel() {
+  const sessionMode = useSession().mode
+  const { copy } = useModelUi()
+  return (
+    <div className="workspace-context" aria-label="Design mode">
+      <span className="mode-badge">
+        <Icon name={sessionMode === 'guided' ? 'tune' : 'cube'} size={15} />
+        {MODE_LABELS[sessionMode]} mode
+      </span>
+      <Disclosure summary="About this model" className="about-model">
+        <p>{copy.tagline}</p>
+        <p>
+          {MODE_SENTENCES[sessionMode]}
+          {copy.contextNote !== undefined && ` ${copy.contextNote}`}
+        </p>
+        {sessionMode !== 'guided' && (
+          <p>
+            <strong>Parametric · Open design.</strong> Every parameter is editable from the start. Meet all the checks in the Checks panel.
+          </p>
+        )}
+        <p className="solver-label">{copy.solverLabel}</p>
+      </Disclosure>
+    </div>
+  )
+}
+
 export interface WorkbenchChromeProps {
   onExit: () => void
   onOpenHelp: () => void
@@ -40,10 +70,8 @@ export interface WorkbenchChromeProps {
 
 export default function WorkbenchChrome({ onExit, onOpenHelp, onShowDesigns, children }: WorkbenchChromeProps) {
   const ch = useChallenge()
-  const sessionMode = useSession().mode
-  const mode = MODE_LABELS[sessionMode]
+  const mode = MODE_LABELS[useSession().mode]
   const difficulty = DIFFICULTY_LABELS[ch.difficulty]
-  const { copy } = useModelUi()
   // Card metadata for the open challenge (number, discipline, time); defaults match the beam card.
   const entry = catalog.find((e) => e.available && e.challengeId === ch.id)
   const discipline = entry?.discipline ?? 'Mechanics'
@@ -148,25 +176,6 @@ export default function WorkbenchChrome({ onExit, onOpenHelp, onShowDesigns, chi
             </button>
           </section>
           <ChallengeBand />
-          <div className="workspace-context" aria-label="Design mode">
-            <span className="mode-badge">
-              <Icon name={sessionMode === 'guided' ? 'tune' : 'cube'} size={15} />
-              {mode} mode
-            </span>
-            <Disclosure summary="About this model" className="about-model">
-              <p>{copy.tagline}</p>
-              <p>
-                {MODE_SENTENCES[sessionMode]}
-                {copy.contextNote !== undefined && ` ${copy.contextNote}`}
-              </p>
-              {sessionMode !== 'guided' && (
-                <p>
-                  <strong>Parametric · Open design.</strong> Every parameter is editable from the start. Meet all the checks in the Checks panel.
-                </p>
-              )}
-              <p className="solver-label">{copy.solverLabel}</p>
-            </Disclosure>
-          </div>
           {children}
         </main>
       </div>

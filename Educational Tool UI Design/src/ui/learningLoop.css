@@ -166,31 +166,39 @@
 }
 
 /* Task 58 (replaces the task 44 prompts): Guided structured experiments outside challenge text and Canvas. */
-/* Task 78: the Guided block is a chip plus a non-modal popover. Above 870 px the popover hangs under
-   the chip over the challenge column (never over the 3D canvas, D-26); at 870 px and narrower it is in
-   flow under the chip, so it cannot cover the design view, the controls or the Run Test button. */
-.guided-instructions { position: relative; min-width: 0; margin-bottom: 14px; color: #46583b; font-size: 11px; line-height: 1.6; overflow-wrap: break-word; }
-.guided-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
-.guided-chip { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; border: 1px solid #345640; border-radius: 999px; padding: 6px 12px; background: #345640; color: #fff; font-size: 11px; font-weight: 600; text-align: left; transition: none; }
-.guided-chip::after { content: '\25BE'; margin-left: 2px; }
-.guided-chip[aria-expanded='true'] { background: #fff; color: #345640; }
-.guided-chip[aria-expanded='true']::after { content: '\25B4'; }
-.guided-chip:focus-visible, .guided-popover-close:focus-visible, .ei-disclosure > summary:focus-visible { outline: 2px solid #345640; outline-offset: 3px; }
-.guided-lock-line { display: flex; align-items: center; gap: 4px; margin: 0; flex: 1 1 220px; min-width: 0; }
-.guided-popover { position: absolute; top: calc(100% + 2px); right: 0; z-index: 15; box-sizing: border-box; width: 270px; max-height: 70vh; overflow-y: auto; border: 1px solid #a4b496; border-radius: 7px; padding: 12px; background: #fafbf7; box-shadow: 0 6px 24px #273f3326; }
+/* Task 78.3 (WD-30 to WD-36): the Guided steps are a horizontal stepper row between two thin rules, under
+   the challenge band. The current step is a button that toggles the non-modal popover, which renders in
+   flow directly under the row at every width, so it never covers the band, the design view or the 3D
+   canvas (D-26). At 870 px and narrower the steps stack one per line, so nothing overflows at 320 px. */
+.guided-instructions { min-width: 0; margin-bottom: 14px; color: #46583b; font-size: 11px; line-height: 1.6; overflow-wrap: break-word; }
+.guided-stepper { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 14px 4px; border-top: 1px solid #dde4d4; border-bottom: 1px solid #dde4d4; }
+.guided-stepper ol { display: flex; flex: 1 1 360px; align-items: center; min-width: 0; margin: 0; padding: 0; list-style: none; }
+.guided-step { display: flex; flex: 1 1 0; align-items: center; gap: 10px; min-width: 0; padding-right: 10px; }
+.guided-step:last-child { flex: 0 1 auto; padding-right: 0; }
+.guided-step:not(:last-child)::after { content: ''; flex: 1 1 16px; min-width: 12px; height: 1px; background: #cbd5c0; }
+.guided-step-body { display: inline-flex; align-items: center; gap: 8px; min-width: 0; margin: 0; border: 0; padding: 0; background: none; font: inherit; font-size: 13px; line-height: 1.35; text-align: left; color: #5f6e55; transition: none; }
+.guided-step-dot { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 24px; height: 24px; border: 1px solid #cbd5c0; border-radius: 50%; background: #eef2e8; color: #5f6e55; font-size: 11px; font-weight: 600; }
+.guided-step.complete .guided-step-dot { color: #3f5a33; }
+.guided-step.current .guided-step-dot { border-color: #345640; background: #345640; color: #fff; }
+.guided-step.current .guided-step-body { color: #2e4232; font-weight: 700; cursor: pointer; }
+.guided-step-label { min-width: 0; overflow-wrap: break-word; }
+.guided-complete { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; border: 1px solid #a4b496; border-radius: 999px; padding: 5px 12px; background: #fff; color: #345640; font-size: 11px; font-weight: 600; transition: none; }
+.guided-complete[aria-expanded='true'] { background: #eef2e8; }
+.guided-step-body:focus-visible, .guided-complete:focus-visible, .guided-popover-close:focus-visible, .ei-disclosure > summary:focus-visible { outline: 2px solid #345640; outline-offset: 3px; }
+.guided-lock-line { display: flex; align-items: center; gap: 4px; margin: 0; min-width: 0; }
+.guided-popover { box-sizing: border-box; max-width: 640px; margin-top: 10px; border: 1px solid #a4b496; border-radius: 7px; padding: 12px; background: #fafbf7; }
 .guided-popover[hidden] { display: none; }
 .guided-popover-close { float: right; margin: 0 0 4px 8px; border: 1px solid #8a977d; border-radius: 5px; padding: 3px 10px; font-size: 10px; color: #345640; background: #fff; }
-.guidance-steps { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; padding: 0; list-style: none; clear: both; }
-.guidance-steps li { display: inline-flex; align-items: center; gap: 4px; border: 1px solid #a4b496; border-radius: 5px; padding: 4px 9px; background: #fff; color: #345640; }
-.guidance-steps li.current { background: #345640; color: #fff; border-color: #345640; font-weight: 600; }
-.guidance-steps li.locked { border-style: dashed; color: #53614b; }
 .guided-popover h2 { font-size: 12px; margin: 0 0 4px; }
 .guided-popover p { margin: 4px 0; }
 .guided-focus { font-weight: 500; }
 .guided-result { border-top: 1px solid #dce3d4; padding-top: 6px; }
-@media (min-width: 1500px) { .guided-popover { width: 300px; } }
-@media (max-width: 1250px) { .guided-popover { width: 235px; } }
-@media (max-width: 870px) { .guided-popover { position: static; width: auto; max-height: none; margin-top: 8px; } }
+@media (max-width: 870px) {
+  .guided-stepper ol { flex: 1 1 100%; flex-direction: column; align-items: stretch; }
+  .guided-step, .guided-step:last-child { flex: none; padding: 4px 0; }
+  .guided-step:not(:last-child)::after { display: none; }
+  .guided-complete { margin-left: 0; }
+}
 /* Per-control lock mark (a small icon; the reason is text for assistive technology). */
 .guided-lock-mark { display: inline-flex; align-items: center; vertical-align: middle; color: #46583b; margin-left: 4px; }
 /* Shared disclosure (task 78): native <details>, one summary style. */

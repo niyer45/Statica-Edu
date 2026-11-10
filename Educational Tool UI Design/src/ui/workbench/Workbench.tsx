@@ -10,7 +10,7 @@ import { useModelUi } from '../models/registry'
 import { selectStatusBadge } from '../../state/selectors'
 import { useSession } from '../state/store'
 import PageFooter from './PageFooter'
-import WorkbenchChrome, { MODE_LABELS } from './WorkbenchChrome'
+import WorkbenchChrome, { AboutModel, MODE_LABELS } from './WorkbenchChrome'
 import ModeExperience from './ModeExperience'
 import ResetDraftControl from './ResetDraftControl'
 export { default as ViewportLoading, VIEWPORT_LOADING_TEXT } from '../viewport/ViewportLoading'
@@ -88,6 +88,7 @@ export default function Workbench({ onExit }: WorkbenchProps) {
         <section className="results-panel panel" aria-label="Results">
           <ui.Results />
         </section>
+        <AboutModel />
         <PageFooter onExplainSubmit={() => setModal('submit')} />
         <Toast message={notice} onDismiss={dismissNotice} />
       </WorkbenchChrome>

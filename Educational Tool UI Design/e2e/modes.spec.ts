@@ -65,6 +65,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     } else {
       await expect(guide).toHaveCount(0)
       await expect(page.getByRole('list', { name: 'Experiment steps' })).toHaveCount(0)
+      await expect(page.getByRole('navigation', { name: 'Guided steps' })).toHaveCount(0)
       await expect(page.locator('canvas')).toHaveCount(0)
       await expectParametricNote(page)
       await expect(page.getByText(/Locked in this step/)).toHaveCount(0)

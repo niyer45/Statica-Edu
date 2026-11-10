@@ -2,7 +2,7 @@ import { observations, type GuidedResult } from '../../evaluation/guided/plan'
 import Icon from '../icons/Icon'
 import { useModelStore } from '../state/store'
 import Disclosure from './Disclosure'
-import GuidedStepPopover from './GuidedStepPopover'
+import GuidedStepPopover, { type StepState } from './GuidedStepPopover'
 import { useGuided } from './useGuided'
 
 // Mode experience (task 58; replaces the task 44 Inspect/Experiment/Compare/Explain prompts).
@@ -14,10 +14,9 @@ import { useGuided } from './useGuided'
 //   final step opens every parameter and is met by an Accepted test.
 // - Parametric = open design. Every parameter editable from the start, no steps: the goal and
 //   the checks stay in the challenge panel.
-// Task 78: the Guided block is a chip plus a non-modal popover (GuidedStepPopover); the locked
-// controls share one line beside the chip instead of one sentence each.
-
-const STATE_TEXT = { complete: 'complete', current: 'current step', locked: 'locked' } as const
+// Task 78: the Guided block is a non-modal popover (GuidedStepPopover); the locked controls share
+// one line instead of one sentence each. Task 78.3: the steps are a stepper row (the current step
+// toggles the popover) and the lock line sits inside the popover under "Editable now".
 
 function iterationName(history: ReadonlyArray<GuidedResult>, id: string | undefined): string {
   const r = history.find((x) => x.id === id)
@@ -35,33 +34,20 @@ function GuidedExperiments() {
   const notMet = step !== undefined && history.length - 1 > lastIndex ? latest : undefined
   const seen = last === undefined ? [] : observations(plan, last, history)
   const lastStep = last === undefined ? undefined : plan.steps.find((s) => s.id === last.stepId)
-  const chipLabel = progress.complete || step === undefined ? `All ${total} steps complete` : `Step ${progress.current + 1} of ${total}: ${step.title}`
+  const allDone = progress.complete || step === undefined
+  const stepperSteps = plan.steps.map((s, i) => ({
+    id: s.id,
+    title: s.title,
+    state: (allDone || i < progress.current ? 'complete' : i === progress.current ? 'current' : 'locked') as StepState,
+  }))
   const locksSomething = step !== undefined && step.unlocks !== 'all'
   return (
     <GuidedStepPopover
-      chipLabel={chipLabel}
+      steps={stepperSteps}
+      completeLabel={allDone ? `All ${total} steps complete` : undefined}
       label="Guided step instructions"
       autoOpenKey={`${progress.current}:${notMet?.id ?? ''}`}
-      strip={
-        locksSomething ? (
-          <p id="guided-lock-line" className="guided-lock-line">
-            <Icon name="lock" size={10} /> Locked in this step: everything except {step.focus.toLowerCase()}. Others unlock in later steps.
-          </p>
-        ) : undefined
-      }
     >
-      <ol className="guidance-steps" aria-label="Experiment steps">
-        {plan.steps.map((s, i) => {
-          const state = i < progress.current ? 'complete' : i === progress.current ? 'current' : 'locked'
-          return (
-            <li key={s.id} className={state} aria-current={state === 'current' ? 'step' : undefined}>
-              {state === 'complete' ? <Icon name="check" size={11} /> : state === 'locked' ? <Icon name="lock" size={11} /> : null}
-              {i + 1}. {s.title}
-              <span className="sr-only">, {STATE_TEXT[state]}</span>
-            </li>
-          )
-        })}
-      </ol>
       {step !== undefined ? (
         <>
           <h2>{step.title}</h2>
@@ -70,6 +56,11 @@ function GuidedExperiments() {
             Editable now: <strong>{step.focus}</strong>
             {step.unlocks === 'all' ? '.' : '. Other parameters stay locked until a later step.'}
           </p>
+          {locksSomething && (
+            <p id="guided-lock-line" className="guided-lock-line">
+              <Icon name="lock" size={10} /> Locked in this step: everything except {step.focus.toLowerCase()}. Others unlock in later steps.
+            </p>
+          )}
           <Disclosure key={step.id} summary="Hint">
             <p>{step.hint}</p>
           </Disclosure>

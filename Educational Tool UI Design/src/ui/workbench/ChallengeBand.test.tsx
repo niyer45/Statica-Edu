@@ -57,7 +57,7 @@ describe('ChallengeBandView', () => {
 })
 
 describe('ChallengeBand in the Workbench', () => {
-  it.each(['guided', 'parametric'] as const)('renders once, before the About row and the Guided chip, in %s mode', (mode) => {
+  it.each(['guided', 'parametric'] as const)('renders once, first in the workbench, with the stepper after it and About at the bottom, in %s mode', (mode) => {
     const { container } = renderWorkbench(mode)
     const bands = container.querySelectorAll('.challenge-band')
     expect(bands).toHaveLength(1)
@@ -72,13 +72,15 @@ describe('ChallengeBand in the Workbench', () => {
     const panel = screen.getByRole('complementary', { name: 'Checks' })
     expect(within(panel).queryByText('More about this challenge')).toBeNull()
     expect(container.querySelectorAll('details.ei-disclosure > summary').length).toBeGreaterThan(0)
-    // DOM order: page title, then the band, then About this model, then the Guided chip.
+    // DOM order (WD-20, WD-30, WD-35): title, band, stepper (Guided only), workbench, results,
+    // About this model, footer.
     const follows = (a: Element, b: Element) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0
-    expect(follows(container.querySelector('h1')!, band)).toBe(true)
-    expect(follows(band, container.querySelector('.about-model')!)).toBe(true)
-    expect(follows(band, container.querySelector('.design-panel')!)).toBe(true)
-    const chip = container.querySelector('.guided-chip')
-    if (mode === 'guided') expect(follows(band, chip!)).toBe(true)
-    else expect(chip).toBeNull()
+    const stepper = container.querySelector('.guided-stepper')
+    const about = container.querySelector('.workspace-context')!
+    const ordered = [container.querySelector('h1')!, band, ...(mode === 'guided' ? [stepper!] : []), container.querySelector('.workbench')!, container.querySelector('.results-panel')!, about, container.querySelector('.page-footer')!]
+    for (let i = 0; i < ordered.length - 1; i++) expect(follows(ordered[i]!, ordered[i + 1]!), `item ${i}`).toBe(true)
+    if (mode === 'parametric') expect(stepper).toBeNull()
+    expect(container.querySelector('.guided-chip')).toBeNull()
+    expect(about.textContent).toContain(mode === 'guided' ? 'Guided mode' : 'Parametric mode')
   })
 })

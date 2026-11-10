@@ -58,11 +58,16 @@ export async function runAnyTest(page: Page, keyboard = false) {
 }
 
 /**
- * Asserts the current Guided experiment step by its title (task 78). The always-visible chip
- * "Step N of M: <title>" carries the title whether or not the step popover is open.
+ * Asserts the current Guided experiment step by its title (task 78.3). The stepper row is a `nav`
+ * named "Guided steps"; its current step is the one button, named "<title>, current step", inside
+ * the list item marked `aria-current="step"`. It is visible whether or not the popover is open.
  */
 export async function expectGuidedStep(page: Page, title: string) {
-  await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('button', { name: new RegExp(`^Step \\d+ of \\d+: ${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*[\\u25BE\\u25B4]?$`) })).toBeVisible()
+  // The label and the sr-only ", current step" are separate flex items, so the computed name has a space before the comma.
+  const escaped = title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const current = page.getByRole('navigation', { name: 'Guided steps' }).getByRole('button', { name: new RegExp(`^${escaped}\\s*, current step$`) })
+  await expect(current).toBeVisible()
+  await expect(current.locator('xpath=..')).toHaveAttribute('aria-current', 'step')
 }
 
 /**
@@ -76,7 +81,7 @@ export async function dismissGuidedPopover(page: Page) {
   await expect(popover).toBeHidden()
 }
 
-/** Opens the collapsed "About this model" disclosure in the workbench chrome (task 78). */
+/** Opens the collapsed "About this model" disclosure, which sits at the bottom of the workbench (task 78.3, WD-35). */
 export async function openAbout(page: Page) {
   const about = page.locator('.workspace-context details.ei-disclosure')
   if (!(await about.evaluate((el: HTMLDetailsElement) => el.open))) await about.locator('summary').click()
