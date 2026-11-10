@@ -26,7 +26,7 @@ everything older is in `HANDOFF_HISTORY.md`. CI run links follow the pattern
 - Deployment: a manual, CI-gated GitHub Pages workflow (`DEPLOY.md`). Site:
   https://niyer45.github.io/Statica-Edu/. The Home footer shows the build id. No deployment is
   recorded in these documents yet.
-- Tests (task 78 branch, local): 3241 unit tests and 123/123 Playwright E2E cases (desktop and Pixel 7). CI takes about
+- Tests (task 78 branch, local): 3241 unit tests and 124 Playwright E2E cases (desktop and Pixel 7; in the last full run one Pixel 7 case hit its timeout at a machine load average above 500 and passed on a solo rerun). CI takes about
   10 minutes: the `verify` job about 1.8 minutes, then four Playwright shards.
 - Every new challenge and module since 2026-10-19 awaits owner engineering review (section 3).
 - Known gaps: no password recovery or cross-tab session sync for local accounts; the 2D bracket
