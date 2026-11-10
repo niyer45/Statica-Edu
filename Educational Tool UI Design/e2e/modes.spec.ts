@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { audit, closeStepDialog, expectAllStepsComplete, expectGuidedStep, stepDialog, expectParametricNote, normalizeState, openWorkbench, readState, referenceDesign, runAnyTest, setDimension, tabTo } from './helpers'
+import { audit, closeStepDialog, STEP_DIALOG_OPEN_TIMEOUT, expectAllStepsComplete, expectGuidedStep, stepDialog, expectParametricNote, normalizeState, openWorkbench, readState, referenceDesign, runAnyTest, setDimension, tabTo } from './helpers'
 
 // Task 58: Guided = structured experiments (one variable per step, the rest locked, progress from
 // tested results); Parametric = open design (everything editable, no steps). Both are chosen in
@@ -35,7 +35,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       // Step 1 (the Baseline is a solid Ø31 mm circle): only the diameter is editable; the section
       // shape is locked with a visible reason.
       // The dialog is open on entry and holds the lock line; close it by keyboard.
-      await expect(stepDialog(page).locator('.guided-focus')).toHaveText('Editable now: Diameter. Other parameters stay locked until a later step.')
+      await expect(stepDialog(page).locator('.guided-focus')).toHaveText('Editable now: Diameter. Other parameters stay locked until a later step.', { timeout: STEP_DIALOG_OPEN_TIMEOUT })
       await closeStepDialog(page, true)
       await expectGuidedStep(page, 'Grow the circle')
       await expect(iSection).toHaveAttribute('aria-disabled', 'true')
@@ -48,7 +48,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await runAnyTest(page)
       // Step 2: the shape unlocks and the diameter locks.
       await expectGuidedStep(page, 'Try another shape')
-      await expect(stepDialog(page)).toContainText('Grow the circle complete: Iteration 1 compared with the Baseline. Tip deflection decreased; Mass increased; Bending stress decreased.')
+      await expect(stepDialog(page)).toContainText('Grow the circle complete: Iteration 1 compared with the Baseline. Tip deflection decreased; Mass increased; Bending stress decreased.', { timeout: STEP_DIALOG_OPEN_TIMEOUT })
       await closeStepDialog(page)
       await expect(page.locator('#dim-diameterM')).toHaveAttribute('readonly', '')
       await expect(iSection).not.toHaveAttribute('aria-disabled', 'true')

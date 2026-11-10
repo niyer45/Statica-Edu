@@ -79,6 +79,19 @@ export function stepDialog(page: Page) {
 }
 
 /**
+ * The dialog opens on a timer (0.8 s after entry, 1.5 s after a step change, task 78.5) and, on a loaded
+ * CI runner, only after the main thread has finished rendering the test result (seen to take 6-8 s
+ * per action). Waiting for it is waiting on an explicit signal (the dialog is visible), so the bound
+ * is generous: a dialog that never opens still fails, just later.
+ */
+export const STEP_DIALOG_OPEN_TIMEOUT = 30_000
+
+/** Waits for the Guided step dialog to open by itself (entry, reload or a step change). */
+export async function expectStepDialogOpen(page: Page) {
+  await expect(stepDialog(page)).toBeVisible({ timeout: STEP_DIALOG_OPEN_TIMEOUT })
+}
+
+/**
  * Waits for the Guided step dialog (it opens on entry, on reload and on every step change), asserts it
  * is visible, then closes it: with "Got it", or by keyboard (Escape) when `keyboard` is set, and asserts
  * that focus returns to the current step button of the stepper. A no-op in Parametric (no stepper, no
@@ -88,7 +101,7 @@ export async function closeStepDialog(page: Page, keyboard = false) {
   const nav = page.getByRole('navigation', { name: 'Guided steps' })
   if (await nav.count() === 0) return
   const dialog = stepDialog(page)
-  await expect(dialog).toBeVisible()
+  await expectStepDialogOpen(page)
   if (keyboard) await page.keyboard.press('Escape')
   else await dialog.getByRole('button', { name: 'Got it', exact: true }).click()
   await expect(dialog).toBeHidden()
@@ -97,7 +110,7 @@ export async function closeStepDialog(page: Page, keyboard = false) {
 
 /** With every step met the step dialog shows "All experiments complete"; asserts that, then closes it. */
 export async function expectAllStepsComplete(page: Page, keyboard = false) {
-  await expect(stepDialog(page).getByRole('heading', { name: 'All experiments complete' })).toBeVisible()
+  await expect(stepDialog(page).getByRole('heading', { name: 'All experiments complete' })).toBeVisible({ timeout: STEP_DIALOG_OPEN_TIMEOUT })
   await closeStepDialog(page, keyboard)
   await expect(page.getByRole('navigation', { name: 'Guided steps' }).getByRole('button', { name: /^All \d+ steps complete$/ })).toBeVisible()
 }

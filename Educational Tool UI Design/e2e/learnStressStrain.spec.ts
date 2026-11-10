@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { audit, closeStepDialog, readState, stepDialog } from './helpers'
+import { audit, closeStepDialog, readState, STEP_DIALOG_OPEN_TIMEOUT, stepDialog } from './helpers'
 
 // Task 72 (SSL-01–SSL-06): the Stress and strain Learn module on desktop and Pixel 7.
 // Predict-then-check steps, model-backed demos with beyond-yield states in text, KaTeX equations,
@@ -64,7 +64,7 @@ test('Learn: Stress and strain, predict and check, keep progress and apply it in
   await expect(page.getByRole('heading', { level: 2, name: 'Apply it' })).toBeFocused()
   await page.getByRole('button', { name: 'Open Stress and Strain I in Guided mode' }).click()
   await expect(page.getByRole('button', { name: 'Run Test', exact: true })).toBeVisible()
-  await expect(stepDialog(page).getByRole('heading', { name: 'Thicken the rod' })).toBeVisible()
+  await expect(stepDialog(page).getByRole('heading', { name: 'Thicken the rod' })).toBeVisible({ timeout: STEP_DIALOG_OPEN_TIMEOUT })
   await closeStepDialog(page)
   await expect.poll(async () => (await readState(page)).challengeId).toBe('stress-strain-1')
   expect((await readState(page)).mode).toBe('guided')

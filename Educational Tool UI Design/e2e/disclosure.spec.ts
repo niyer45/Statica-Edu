@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, closeStepDialog, readState, stepDialog } from './helpers'
+import { audit, closeStepDialog, expectStepDialogOpen, readState, stepDialog } from './helpers'
 
 // Task 61 (owner feedback): opening a disclosure in the challenge panel may grow the workbench
 // row, but closing it must return the row to its original height. The 3D canvas used to keep the
@@ -51,7 +51,7 @@ test('Guided: the step dialog is open and modal on entry; the page behind is blo
   const current = stepper.getByRole('button', { name: /, current step$/ })
   const dialog = stepDialog(page)
   await expect(current).toBeVisible()
-  await expect(dialog).toBeVisible()
+  await expectStepDialogOpen(page)
   await expect(dialog).toHaveAccessibleName('Step 1 of 4: Grow the circle')
   await expect(dialog).toHaveAttribute('aria-modal', 'true')
   await expect(dialog.getByRole('heading', { name: 'Grow the circle' })).toBeVisible()
@@ -102,19 +102,29 @@ test('Guided: the step dialog is open and modal on entry; the page behind is blo
 
 // Task 78.5 (WD-50, WD-51): the dialog opens after a short delay, so the workbench is seen first; the
 // step name opens it with no delay.
-test('Guided: the workbench shows first and the step dialog opens after a delay; the step name opens it at once', async ({ page }) => {
+test('Guided: the workbench shows first and the step dialog opens after it; the step name opens it again', async ({ page }) => {
+  // Order of events, recorded in the page by a MutationObserver (exact, unlike a poll from the test):
+  // the workbench's Run Test button appears, then the step dialog. No wall-clock bound is asserted.
+  await page.addInitScript(() => {
+    const seen: string[] = []
+    ;(window as unknown as { __appearance: string[] }).__appearance = seen
+    new MutationObserver(() => {
+      if (!seen.includes('workbench') && Array.from(document.querySelectorAll('button')).some((b) => b.textContent?.trim() === 'Run Test' && b.closest('[hidden]') === null)) seen.push('workbench')
+      if (!seen.includes('dialog') && document.querySelector('[data-dialog-kind="guided-step"]') !== null) seen.push('dialog')
+    }).observe(document, { childList: true, subtree: true })
+  })
   await enter(page, 'Cantilever Beam I', 'Guided')
   const dialog = stepDialog(page)
-  // The workbench is visible and nothing covers it yet.
   await expect(page.getByRole('button', { name: 'Zoom in', exact: true })).toBeVisible()
-  await expect(dialog).toHaveCount(0)
-  // Then it opens by itself (the default expect timeout covers the 800 ms delay).
-  await expect(dialog).toBeVisible()
+  // Then it opens by itself (a wait on the dialog, not on the clock).
+  await expectStepDialogOpen(page)
+  expect(await page.evaluate(() => (window as unknown as { __appearance: string[] }).__appearance), 'the workbench appears before the dialog').toEqual(['workbench', 'dialog'])
   await dialog.getByRole('button', { name: 'Got it', exact: true }).click()
   await expect(dialog).toBeHidden()
-  // The step name opens it without a delay.
+  // The step name opens it again. That no timer is involved is a unit-test property (GuidedStepDialog.test);
+  // a wall-clock bound here would fail on a slow runner.
   await page.getByRole('navigation', { name: 'Guided steps' }).getByRole('button').click()
-  await expect(dialog).toBeVisible({ timeout: 500 })
+  await expect(dialog).toBeVisible()
 })
 
 test('Guided: nothing is pushed down; the workbench starts below the stepper exactly as far below the band as in Parametric', async ({ page }) => {
@@ -255,8 +265,14 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       expect(order.pop(), 'stepper row only in Guided').toBe(mode === 'Guided')
       expect(order.every(Boolean), JSON.stringify(order)).toBe(true)
       // Full width above 870 px: the band spans the workbench row and sits above it.
-      const bandBox = (await band.boundingBox())!
-      const rowBox = (await page.locator('.workbench').boundingBox())!
+      // Both boxes are read in one synchronous evaluate, after the web fonts are in: two separate
+      // boundingBox calls straddled a font-swap reflow on CI (the band shrank by 42 px between them).
+      const { bandBox, rowBox } = await page.evaluate(async () => {
+        await document.fonts.ready
+        const b = document.querySelector('.challenge-band')!.getBoundingClientRect()
+        const r = document.querySelector('.workbench')!.getBoundingClientRect()
+        return { bandBox: { y: b.y, width: b.width, height: b.height }, rowBox: { y: r.y, width: r.width } }
+      })
       expect(bandBox.width).toBeGreaterThanOrEqual(rowBox.width - 2)
       expect(bandBox.y + bandBox.height).toBeLessThanOrEqual(rowBox.y)
       if (mode === 'Guided') {
