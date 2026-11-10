@@ -174,6 +174,18 @@ describe('Column Buckling I workbench', () => {
     expect(value('Diameter')).toBe('24.5')
   })
 
+  it('keeps the view text and the statement remainder collapsed until their disclosures are opened', () => {
+    renderColumn()
+    const details = screen.getByText(/Latest tested critical buckling load 3\.01 kN/).closest('details')!
+    expect(details.open).toBe(false)
+    fireEvent.click(within(details).getByText('Column details'))
+    expect(details.open).toBe(true)
+    const more = screen.getByText('More about this challenge').closest('details')!
+    expect(more.open).toBe(false)
+    fireEvent.click(within(more).getByText('More about this challenge'))
+    expect(more.open).toBe(true)
+  })
+
   it('lists the fixed length, load, pinned ends and material', () => {
     renderColumn()
     fireEvent.click(screen.getByText('Some things are fixed.'))

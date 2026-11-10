@@ -62,6 +62,14 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     await expect(requirements.getByText('✗ Fail', { exact: true })).toHaveCount(3)
     await expect(page.getByText('Idealized plate-fin heat sink model, not a thermal certification')).toBeVisible()
     await expect(page.getByRole('img', { name: /Front view across the heat sink: 3 fins/ })).toBeVisible()
+    // Task 78: the fin summary and the fin note are collapsed until opened.
+    const finText = page.getByText(/latest tested gap/)
+    await expect(finText).toBeHidden()
+    await page.getByText('Fin details', { exact: true }).click()
+    await expect(finText).toBeVisible()
+    await expect(page.getByText('Straight fins across the base, evenly spaced.')).toBeHidden()
+    await page.getByText('About the fins', { exact: true }).click()
+    await expect(page.getByText('Straight fins across the base, evenly spaced.')).toBeVisible()
     const height = page.getByLabel('Fin height', { exact: true })
     if (mode === 'Guided') {
       // Task 58: structured experiments; only the fin count is editable in the first step.

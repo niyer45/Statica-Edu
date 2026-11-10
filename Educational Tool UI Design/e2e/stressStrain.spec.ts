@@ -96,7 +96,14 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await expect(page.getByText('3D view is unavailable. Showing the 2D view of the rod instead.').first()).toBeVisible()
       await expect(page.locator('canvas')).toHaveCount(0)
     }
-    await expect(page.getByText(/Latest tested: elongation 1\.51 mm \(drawn ×100\), stress 150\.7 MPa/)).toBeVisible()
+    // Task 78: the view text, the rod note and the material note are collapsed until opened.
+    const viewText = page.getByText(/Latest tested: elongation 1\.51 mm \(drawn ×100\), stress 150\.7 MPa/)
+    await expect(viewText).toBeHidden()
+    await page.getByText('Rod details', { exact: true }).click()
+    await expect(viewText).toBeVisible()
+    await expect(page.getByText('Typical textbook values, not certified material data.')).toBeHidden()
+    await page.getByText('About these values', { exact: true }).click()
+    await expect(page.getByText('Typical textbook values, not certified material data.')).toBeVisible()
     await expect(page.getByText(/Idealized linear-elastic rod in axial tension/)).toBeVisible()
     const titanium = page.getByRole('radio', { name: /^Titanium alloy/ })
     if (mode === 'Guided') {

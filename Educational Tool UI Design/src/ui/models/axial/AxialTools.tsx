@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { allowableStress } from '../../../physics/axial/formulas'
 import { formatMm, mmToM, mToMm, parseMmInput, nToKn } from '../../../units/units'
 import Icon from '../../icons/Icon'
+import Disclosure from '../../workbench/Disclosure'
 import LockNote from '../../workbench/LockNote'
 import { useGuided } from '../../workbench/useGuided'
 import { formatAxial, useAxialStore } from './shared'
@@ -68,7 +69,9 @@ export default function AxialTools({ onAnnounce }: { onAnnounce: (message: strin
       <div className="section-heading">
         ROD DIAMETER <span>01</span>
       </div>
-      <p className="axial-note">A solid round rod. The load pulls straight along its axis.</p>
+      <Disclosure summary="About the rod">
+        <p className="axial-note">A solid round rod. The load pulls straight along its axis.</p>
+      </Disclosure>
       <div className="dimension-field">
         <label htmlFor={FIELD_ID}>Diameter</label>
         <div className="number-field">
@@ -127,12 +130,18 @@ export default function AxialTools({ onAnnounce }: { onAnnounce: (message: strin
           </label>
         ))}
         {materialLocked && <LockNote id="rod-material-locked" reason={guided.lockReason} />}
-        <p className="field-hint">Typical textbook values, not certified material data.</p>
+        <Disclosure summary="About these values">
+          <p className="field-hint">Typical textbook values, not certified material data.</p>
+        </Disclosure>
       </fieldset>
-      <details className="locked-features">
-        <summary>
-          <Icon name="lock" size={14} /> Some things are fixed.
-        </summary>
+      <Disclosure
+        className="locked-features"
+        summary={
+          <>
+            <Icon name="lock" size={14} /> Some things are fixed.
+          </>
+        }
+      >
         <dl>
           <dt>Length</dt>
           <dd>{ch.lengthM} m between the pins</dd>
@@ -143,7 +152,7 @@ export default function AxialTools({ onAnnounce }: { onAnnounce: (message: strin
           <dt>Support</dt>
           <dd>Pinned to a rigid roof beam; the load hangs from the lower pin</dd>
         </dl>
-      </details>
+      </Disclosure>
     </div>
   )
 }

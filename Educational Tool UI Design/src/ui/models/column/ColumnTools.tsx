@@ -5,6 +5,7 @@ import { COLUMN_PARAM_LABELS, COLUMN_SECTION_PARAMS, type ColumnSectionParam } f
 import { formatMm, mmToM, mToMm, nToKn, parseMmInput } from '../../../units/units'
 import Icon from '../../icons/Icon'
 import SectionIcon from '../../icons/SectionIcon'
+import Disclosure from '../../workbench/Disclosure'
 import LockNote from '../../workbench/LockNote'
 import { useGuided } from '../../workbench/useGuided'
 import { COLUMN_SECTION_ICONS, COLUMN_SECTION_NAMES, formatColumn, useColumnStore } from './shared'
@@ -138,10 +139,14 @@ export default function ColumnTools({ onAnnounce }: { onAnnounce: (message: stri
           </div>
         )
       })}
-      <details className="locked-features">
-        <summary>
-          <Icon name="lock" size={14} /> Some things are fixed.
-        </summary>
+      <Disclosure
+        className="locked-features"
+        summary={
+          <>
+            <Icon name="lock" size={14} /> Some things are fixed.
+          </>
+        }
+      >
         <dl>
           <dt>Length</dt>
           <dd>{formatColumn(ch.lengthM, 'm')} between the pins</dd>
@@ -152,7 +157,7 @@ export default function ColumnTools({ onAnnounce }: { onAnnounce: (message: stri
           <dt>Material</dt>
           <dd>{ch.material.name}</dd>
         </dl>
-      </details>
+      </Disclosure>
     </>
   )
 }

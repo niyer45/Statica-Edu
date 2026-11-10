@@ -90,6 +90,19 @@ describe('Heat Sink I workbench', () => {
     expect(screen.queryByText(/Fin color scale/)).toBeNull()
   })
 
+  it('keeps the fin notes, fin table and statement remainder collapsed until their disclosures are opened', () => {
+    renderHeatSink()
+    const details = screen.getByText(/latest tested gap/).closest('details')!
+    const fins = screen.getByText('Straight fins across the base, evenly spaced.').closest('details')!
+    const table = screen.getByRole('table', { name: 'Fin temperature profile' }).closest('details')!
+    const more = screen.getByText('More about this challenge').closest('details')!
+    for (const [d, label] of [[details, 'Fin details'], [fins, 'About the fins'], [table, 'Fin temperatures'], [more, 'More about this challenge']] as const) {
+      expect(d.open).toBe(false)
+      fireEvent.click(within(d).getByText(label))
+      expect(d.open).toBe(true)
+    }
+  })
+
   it('runs the learning loop to an Accepted reference fin array with a scored base temperature rise prediction', () => {
     renderHeatSink()
     testReference()

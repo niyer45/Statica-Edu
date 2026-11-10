@@ -97,6 +97,12 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await expect(page.locator('canvas')).toHaveCount(0)
     }
     await expect(page.getByText(/Idealized pinned–pinned Euler column/)).toBeVisible()
+    // Task 78: the view text (summary and display note) is collapsed until "Column details" opens.
+    const viewText = page.getByText(/Latest tested critical buckling load 3\.01 kN/)
+    await expect(viewText).toBeHidden()
+    await page.getByText('Column details', { exact: true }).click()
+    await expect(viewText).toBeVisible()
+    await expect(page.getByText(/Dashed line: the buckling mode shape/)).toBeVisible()
     const tile = page.getByRole('button', { name: /Hollow tube/ })
     if (mode === 'Guided') {
       await expectGuidedStep(page, 'Thicken the solid bar')

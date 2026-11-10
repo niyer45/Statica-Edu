@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { heatSinkPermissibleRange } from '../../../geometry/heatSink/edit'
 import { formatMm, mmToM, mToMm, parseMmInput } from '../../../units/units'
 import Icon from '../../icons/Icon'
+import Disclosure from '../../workbench/Disclosure'
 import LockNote from '../../workbench/LockNote'
 import { useGuided } from '../../workbench/useGuided'
 import { FIN_PARAM_LABELS, formatCelsius, formatLength, useHeatSinkStore } from './shared'
@@ -110,7 +111,9 @@ export default function HeatSinkTools({ onAnnounce }: { onAnnounce: (message: st
       <div className="section-heading">
         FIN ARRAY <span>01</span>
       </div>
-      <p className="tool-copy">Straight fins across the base, evenly spaced.</p>
+      <Disclosure summary="About the fins">
+        <p className="tool-copy">Straight fins across the base, evenly spaced.</p>
+      </Disclosure>
       <div className="dimension-field">
         <label htmlFor={count.id}>{FIN_PARAM_LABELS.finCount}</label>
         {count.input}

@@ -95,9 +95,17 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     } else {
       await expect(page.getByRole('img', { name: /^Section through the vessel/ })).toBeVisible()
       await expect(page.getByText('3D view is unavailable. Showing the 2D section of the vessel instead.').first()).toBeVisible()
+      // Task 78: the exaggeration caption is collapsed until "About this drawing" opens.
+      await expect(page.getByText(/wall thicknesses are drawn 6 times thicker/)).toBeHidden()
+      await page.getByText('About this drawing', { exact: true }).click()
       await expect(page.getByText(/wall thicknesses are drawn 6 times thicker/)).toBeVisible()
       await expect(page.locator('canvas')).toHaveCount(0)
     }
+    // The view text is collapsed until "Vessel details" opens (both modes).
+    const viewText = page.getByText(/Latest tested: hoop stress/)
+    await expect(viewText).toBeHidden()
+    await page.getByText('Vessel details', { exact: true }).click()
+    await expect(viewText).toBeVisible()
     await expect(page.getByText(/Idealized thin-walled vessel: membrane stresses/)).toBeVisible()
     const diameter = page.getByLabel('Inner diameter', { exact: true })
     if (mode === 'Guided') {

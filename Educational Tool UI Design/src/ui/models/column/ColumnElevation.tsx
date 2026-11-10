@@ -1,4 +1,5 @@
 import { columnInnerDiameterM, columnOuterDiameterM } from '../../../geometry/column/design'
+import Disclosure from '../../workbench/Disclosure'
 import { displayedRadii, DISPLAY_NOTE, MODE_AMPLITUDE_FRACTION, modeShapePoints } from './columnLayout'
 import { COLUMN_SECTION_NAMES, designLabel, formatColumn, formatLimit, useColumnStore } from './shared'
 
@@ -29,11 +30,13 @@ export function ColumnSummary() {
   const latest = state.history[state.history.length - 1]!
   const buckling = latest.evaluation.constraints.find((c) => c.id === 'buckling')!
   return (
-    <p id={COLUMN_SUMMARY_ID} className="viewport-label column-summary" aria-live="off">
-      {COLUMN_SECTION_NAMES[state.draft.section.kind]} {designLabel(state.draft)}, pinned at both ends, load pressing down on the top.
-      {' '}Latest tested critical buckling load {formatColumn(buckling.value, 'N')} (needs {formatLimit(buckling)})
-      {state.draftStatus === 'draft' && ' · draft changed since this test'}. {DISPLAY_NOTE}
-    </p>
+    <Disclosure summary="Column details">
+      <p id={COLUMN_SUMMARY_ID} className="viewport-label column-summary" aria-live="off">
+        {COLUMN_SECTION_NAMES[state.draft.section.kind]} {designLabel(state.draft)}, pinned at both ends, load pressing down on the top.
+        {' '}Latest tested critical buckling load {formatColumn(buckling.value, 'N')} (needs {formatLimit(buckling)})
+        {state.draftStatus === 'draft' && ' · draft changed since this test'}. {DISPLAY_NOTE}
+      </p>
+    </Disclosure>
   )
 }
 
