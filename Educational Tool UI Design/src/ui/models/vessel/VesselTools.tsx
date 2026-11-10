@@ -5,6 +5,7 @@ import { vesselPermissibleRange } from '../../../geometry/vessel/edit'
 import { VESSEL_PARAM_LABELS } from '../../../geometry/vessel/validate'
 import { formatMm, mmToM, mToMm, paToMpa, parseMmInput } from '../../../units/units'
 import Icon from '../../icons/Icon'
+import Disclosure from '../../workbench/Disclosure'
 import LockNote from '../../workbench/LockNote'
 import { useGuided } from '../../workbench/useGuided'
 import { useVesselStore } from './shared'
@@ -70,9 +71,11 @@ export default function VesselTools({ onAnnounce }: { onAnnounce: (message: stri
       <div className="section-heading">
         PRESSURE VESSEL <span>01</span>
       </div>
-      <p className="vessel-step-note">
-        A cylindrical shell closed by two hemispherical heads. The shell length is the straight part between the heads.
-      </p>
+      <Disclosure summary="About the vessel">
+        <p className="vessel-step-note">
+          A cylindrical shell closed by two hemispherical heads. The shell length is the straight part between the heads.
+        </p>
+      </Disclosure>
       <div className="section-heading dimensions-heading">DIMENSIONS</div>
       {VESSEL_PARAMS.map((param) => {
         const range = vesselPermissibleRange(param, ch.designLimits)!
@@ -115,10 +118,14 @@ export default function VesselTools({ onAnnounce }: { onAnnounce: (message: stri
           </div>
         )
       })}
-      <details className="locked-features">
-        <summary>
-          <Icon name="lock" size={14} /> Some things are fixed.
-        </summary>
+      <Disclosure
+        className="locked-features"
+        summary={
+          <>
+            <Icon name="lock" size={14} /> Some things are fixed.
+          </>
+        }
+      >
         <dl>
           <dt>Internal pressure</dt>
           <dd>{paToMpa(ch.pressurePa).toFixed(1)} MPa (gauge)</dd>
@@ -133,7 +140,7 @@ export default function VesselTools({ onAnnounce }: { onAnnounce: (message: stri
             {ch.designFactor} on yield: allowable stress {paToMpa(allowableStressPa(ch)).toFixed(0)} MPa
           </dd>
         </dl>
-      </details>
+      </Disclosure>
     </>
   )
 }

@@ -4,6 +4,7 @@ import type { ViewportProps } from '../../viewport/FallbackViewport'
 import ViewportBoundary from '../../viewport/ViewportBoundary'
 import ViewportLoading from '../../viewport/ViewportLoading'
 import { supportsWebGL2 } from '../../viewport/webgl'
+import Disclosure from '../../workbench/Disclosure'
 import AxialElevation from './AxialElevation'
 import { displayedStretch, formatAxial, materialName, useAxialStore } from './shared'
 import './axial.css'
@@ -28,13 +29,15 @@ export function AxialSummary() {
   const a = latest.analysis
   const { capped } = displayedStretch(a.elongationM, ch.lengthM, ch.visualization)
   return (
-    <p id={AXIAL_SUMMARY_ID} className="viewport-label axial-summary" aria-live="off">
-      {materialName(ch, draft.materialId)} rod, Ø{formatMm(draft.diameterM, 1)} mm and {ch.lengthM} m long, hanging from a roof beam with a{' '}
-      {nToKn(ch.forceN)} kN load. Latest tested: elongation {formatAxial(a.elongationM, 'm')}
-      {capped ? ' (drawn exaggerated, display capped)' : ` (drawn ×${ch.visualization.elongationExaggerationFactor})`}, stress {formatAxial(a.stressPa, 'Pa')}.
-      {' '}The rod&apos;s width is to scale; its length is drawn much shorter than scale.
-      {state.draftStatus === 'draft' && ' Draft changed since this test.'}
-    </p>
+    <Disclosure summary="Rod details">
+      <p id={AXIAL_SUMMARY_ID} className="viewport-label axial-summary" aria-live="off">
+        {materialName(ch, draft.materialId)} rod, Ø{formatMm(draft.diameterM, 1)} mm and {ch.lengthM} m long, hanging from a roof beam with a{' '}
+        {nToKn(ch.forceN)} kN load. Latest tested: elongation {formatAxial(a.elongationM, 'm')}
+        {capped ? ' (drawn exaggerated, display capped)' : ` (drawn ×${ch.visualization.elongationExaggerationFactor})`}, stress {formatAxial(a.stressPa, 'Pa')}.
+        {' '}The rod&apos;s width is to scale; its length is drawn much shorter than scale.
+        {state.draftStatus === 'draft' && ' Draft changed since this test.'}
+      </p>
+    </Disclosure>
   )
 }
 

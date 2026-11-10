@@ -9,7 +9,7 @@ the current state and next work live in `HANDOFF.md`.
 
 1. `HANDOFF.md`: the state right now, what waits on the owner, recent changes.
 2. `../PROGRAM.md` (repository root, written by the director): the plan and the agent hierarchy.
-3. `DECISIONS.md`: D-01–D-63 and the 14 applicability thresholds. Later decisions supersede earlier ones
+3. `DECISIONS.md`: D-01–D-65 and the 14 applicability thresholds. Later decisions supersede earlier ones
    where they say so (for example D-37 over D-36; D-26 over the original 3D overlay requirements).
 4. `OWNER_REVIEW_CHECKLIST.md`: open owner questions. Defaults stay live until the owner answers.
 5. `../.kiro/specs/`: `engineering-intuition-mvp/` (requirements 1–35; design D-01–D-25 and Properties
@@ -44,6 +44,7 @@ Product behaviour
   The reducer never reads the time itself.
 - Keep the compact challenge, history, compare and My designs presentation (D-28–D-33): no permanent
   explanatory paragraphs, no exclamation prefix on Not accepted, no dense results table.
+- Workbench text follows `.kiro/specs/workbench-declutter/` (D-65): the challenge band (goal line and first sentence) comes first, then (Guided only) the stepper row of the Guided steps, then the checks, controls, primary view, Run Test, results, warnings and the limits footer, all visible by default; "Guided mode / About this model" sits at the bottom, above the footer; put anything else in the shared `Disclosure`; Guided instructions live in the step dialog, opened from the stepper (it opens on entry and on each new step, and the current step reopens it).
 - Do not regenerate completed requirements or design or rewrite completed features; add scoped specs.
   Later tasks fill existing stub files in place; do not create parallel components.
 

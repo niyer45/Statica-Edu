@@ -1,9 +1,10 @@
 import { STATUS_LABELS } from '../../panels/resultPresentation'
 import Icon from '../../icons/Icon'
+import Disclosure from '../../workbench/Disclosure'
 import { formatFatigue, formatLimit, lifeText, useFatigueStore } from './shared'
 
 // Fatigue challenge panel (task 70; FAT-16, D-48 amendment). The Cantilever presentation: a
-// visible statement paragraph, the stored VALUE / LIMIT checks of the latest test with text
+// statement lead (the rest in a collapsed disclosure, task 78), the stored VALUE / LIMIT checks of the latest test with text
 // Pass/Fail (lower bounds say "min", upper bounds "max"), applicability reasons, a Test details
 // disclosure with the full table and the stored fatigue quantities, draft errors, the reference
 // link and Run Test.
@@ -30,10 +31,9 @@ export default function FatigueChallengePanel({ onOpenHelp }: { onOpenHelp: () =
     <>
       <div className="panel-title">
         <Icon name="book" size={16} />
-        <h2>The challenge</h2>
+        <h2>Checks</h2>
       </div>
       <div className="challenge-body">
-        <p>{ch.statement}</p>
         <div className="section-heading requirements-title">
           VALUE / LIMIT <Icon name="lock" size={11} />
         </div>
@@ -56,8 +56,7 @@ export default function FatigueChallengePanel({ onOpenHelp }: { onOpenHelp: () =
             ))}
           </ul>
         )}
-        <details className="result-details">
-          <summary>Test details</summary>
+        <Disclosure summary="Test details" className="result-details">
           <table aria-label="Latest tested results">
             <thead>
               <tr>
@@ -89,7 +88,7 @@ export default function FatigueChallengePanel({ onOpenHelp }: { onOpenHelp: () =
             </tbody>
           </table>
           <p>Status: {STATUS_LABELS[evaluation.status]}</p>
-        </details>
+        </Disclosure>
         {state.draftErrors.length > 0 && (
           <ul aria-label="Design errors">
             {state.draftErrors.map((e, i) => (

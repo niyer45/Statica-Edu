@@ -166,39 +166,62 @@
 }
 
 /* Task 58 (replaces the task 44 prompts): Guided structured experiments outside challenge text and Canvas. */
-.guided-instructions { min-width: 0; border: 1px solid #dce3d4; border-radius: 7px; padding: 12px; margin-bottom: 14px; background: #fafbf7; color: #46583b; font-size: 11px; line-height: 1.6; overflow-wrap: break-word; }
-.guided-mode-label { margin: 0 0 6px; }
-.guidance-steps { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; padding: 0; list-style: none; }
-.guidance-steps li { display: inline-flex; align-items: center; gap: 4px; border: 1px solid #a4b496; border-radius: 5px; padding: 4px 9px; background: #fff; color: #345640; }
-.guidance-steps li.current { background: #345640; color: #fff; border-color: #345640; font-weight: 600; }
-.guidance-steps li.locked { border-style: dashed; color: #53614b; }
-.guided-instructions h2 { font-size: 12px; margin: 0 0 4px; }
-.guided-instructions p { margin: 4px 0; }
-.guided-instructions details { margin-top: 6px; }
-.guided-instructions summary { cursor: pointer; font-weight: 600; }
-.guided-focus { font-weight: 500; }
-.guided-result { border-top: 1px solid #dce3d4; padding-top: 6px; }
-.guided-lock { display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+/* Task 78.3 (WD-30 to WD-36): the Guided steps are a horizontal stepper row between two thin rules, under
+   the challenge band. The current step is a button that opens the modal step dialog (task 78.4, WD-40 to
+   WD-47; the shared `.modal` styles), which is not in flow, so nothing is pushed down. At 870 px and narrower the steps stack one per line, so nothing overflows at 320 px. */
+.guided-instructions { min-width: 0; margin-bottom: 14px; color: #46583b; font-size: 11px; line-height: 1.6; overflow-wrap: break-word; }
+.guided-stepper { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 14px 4px; border-top: 1px solid #dde4d4; border-bottom: 1px solid #dde4d4; }
+.guided-stepper ol { display: flex; flex: 1 1 360px; align-items: center; min-width: 0; margin: 0; padding: 0; list-style: none; }
+.guided-step { display: flex; flex: 1 1 0; align-items: center; gap: 10px; min-width: 0; padding-right: 10px; }
+.guided-step:last-child { flex: 0 1 auto; padding-right: 0; }
+.guided-step:not(:last-child)::after { content: ''; flex: 1 1 16px; min-width: 12px; height: 1px; background: #cbd5c0; }
+.guided-step-body { display: inline-flex; align-items: center; gap: 8px; min-width: 0; margin: 0; border: 0; padding: 0; background: none; font: inherit; font-size: 13px; line-height: 1.35; text-align: left; color: #5f6e55; transition: none; }
+.guided-step-dot { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 24px; height: 24px; border: 1px solid #cbd5c0; border-radius: 50%; background: #eef2e8; color: #5f6e55; font-size: 11px; font-weight: 600; }
+.guided-step.complete .guided-step-dot { color: #3f5a33; }
+.guided-step.current .guided-step-dot { border-color: #345640; background: #345640; color: #fff; }
+.guided-step.current .guided-step-body { color: #2e4232; font-weight: 700; cursor: pointer; }
+.guided-step-label { min-width: 0; overflow-wrap: break-word; }
+.guided-complete { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; border: 1px solid #a4b496; border-radius: 999px; padding: 5px 12px; background: #fff; color: #345640; font-size: 11px; font-weight: 600; transition: none; }
+.guided-step-body:focus-visible, .guided-complete:focus-visible, .ei-disclosure > summary:focus-visible { outline: 2px solid #345640; outline-offset: 3px; }
+/* One short feedback line under the row after an attempt that did not meet the step (WD-43). */
+.guided-feedback { margin: 8px 4px 0; font-weight: 500; }
+/* Step dialog body (task 78.5, WD-48): one type size, one line height, one gap between blocks, one left edge. */
+.guided-body { display: flex; flex-direction: column; gap: 10px; min-width: 0; font-size: 12px; line-height: 1.6; color: #6b785f; }
+.guided-body p, .guided-body .ei-disclosure, .guided-body .ei-disclosure p { margin: 0; font-size: 12px; line-height: 1.6; }
+.guided-body .ei-disclosure > summary { padding: 0; }
+.guided-body .ei-disclosure-body { padding-top: 6px; }
+.guided-body .guided-focus { display: flex; align-items: flex-start; gap: 6px; font-weight: 500; }
+.guided-body .guided-focus > svg { margin-top: 0.3em; }
+.guided-body .guided-result { border-top: 1px solid #dce3d4; padding-top: 10px; }
+@media (max-width: 870px) {
+  .guided-stepper ol { flex: 1 1 100%; flex-direction: column; align-items: stretch; }
+  .guided-step, .guided-step:last-child { flex: none; padding: 4px 0; }
+  .guided-step:not(:last-child)::after { display: none; }
+  .guided-complete { margin-left: 0; }
+}
+/* Per-control lock mark (a small icon; the reason is text for assistive technology). */
+.guided-lock-mark { display: inline-flex; align-items: center; vertical-align: middle; color: #46583b; margin-left: 4px; }
+/* Shared disclosure (task 78): native <details>, one summary style. */
+.ei-disclosure { margin-top: 8px; min-width: 0; font-size: 11px; line-height: 1.6; overflow-wrap: anywhere; }
+.ei-disclosure > summary { display: flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 600; color: #345640; padding: 4px 0; list-style: none; }
+.ei-disclosure > summary::-webkit-details-marker { display: none; }
+.ei-disclosure > summary::after { content: '\25BE'; margin-left: auto; }
+.ei-disclosure[open] > summary::after { content: '\25B4'; }
+.ei-disclosure-body { padding-top: 4px; }
+.ei-disclosure-body > :first-child { margin-top: 0; }
+/* Task 78.5 (WD-49): the same 19px the page puts between the workbench row and the results panel. */
+.workspace-context { margin-top: 19px; }
+.about-model { margin-top: 0; flex: 1 1 260px; }
+.about-model p { margin: 4px 0; }
 .shape-tile.locked { cursor: not-allowed; opacity: .6; }
 .workspace-context .mode-badge { font-weight: 650; }
 
-.parametric-context { margin: 0 0 12px; color: #46583b; font-size: 11px; }
 
-/* Torsion Shaft I (task 47.3): display-only SVG shaft view and torsion field details. */
-.torsion-view { display: flex; flex-direction: column; flex: 1; justify-content: center; padding: 0 12px 12px; }
-.torsion-view svg { width: 100%; height: auto; min-height: 0; cursor: default; }
-.shaft-section, .shaft-body { fill: #a8b49a; stroke: #4f653e; stroke-width: 1; }
-.shaft-bore { fill: #f4f6ef; stroke: #4f653e; stroke-width: 1; }
-.shaft-wall { fill: #62685c; }
-.shaft-twist-line { stroke: #34543c; stroke-width: 2; stroke-dasharray: 5 3; }
-.torsion-summary { margin: 8px 0 0; letter-spacing: 0; text-transform: none; font-weight: 500; }
 .field-error { grid-column: 1 / -1; margin: 0; font-size: 10px; color: #8a4b1c; }
 .locked-features dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; margin: 8px 0 0; font-size: 10px; }
 .locked-features dt { color: #5c6a55; }
 .locked-features dd { margin: 0; }
 
-/* Vibration Isolation I (task 50.3): stiffness/material tools, static schematic and frequency-response chart. */
-.tools-body > .vibration-tools { grid-column: 1 / -1; min-width: 0; }
 .field-hint { grid-column: 1 / -1; margin: 0; font-size: 9px; color: #5c6a55; }
 .material-choice { border: 0; margin: 18px 0 0; padding: 0; min-width: 0; }
 .material-choice > legend { width: 100%; padding: 0; margin-bottom: 8px; }
@@ -206,149 +229,7 @@
 .material-option.selected { border-color: #4f653e; background: #f0f4e9; font-weight: 600; }
 .material-option input { margin: 0; accent-color: #4f653e; }
 .material-option small { margin-left: auto; font-size: 9px; color: #5c6a55; font-variant-numeric: tabular-nums; }
-.vibration-view { display: flex; flex-direction: column; flex: 1; padding: 0 12px 12px; min-width: 0; }
-.vibration-figures { display: grid; grid-template-columns: minmax(70px, 1fr) minmax(0, 3fr); gap: 8px; align-items: center; }
-.vibration-figures svg { width: 100%; height: auto; min-width: 0; }
-.vib-mass { fill: #a8b49a; stroke: #4f653e; stroke-width: 1; }
-.vib-spring { fill: none; stroke: #34543c; stroke-width: 2; stroke-linejoin: round; }
-.vib-damper { stroke: #34543c; stroke-width: 2; }
-.vib-damper-cylinder { fill: #f4f6ef; stroke: #34543c; stroke-width: 1.5; }
-.vib-base { fill: #62685c; }
-.vib-hatch-line { stroke: #62685c; stroke-width: 1.5; }
-.vib-band-hatch { stroke: #b9c6a8; stroke-width: 2; }
-.vib-band { stroke: #7f946a; stroke-width: 1; stroke-dasharray: 2 2; }
-.vib-grid { stroke: #e0e5d9; stroke-width: 1; }
-.vib-axis { stroke: #62685c; stroke-width: 1; }
-.vib-axis-text, .vib-chart-label { font-size: 9px; fill: #46583b; }
-.vib-chart-label { font-weight: 600; paint-order: stroke; stroke: #f4f6ef; stroke-width: 3px; stroke-linejoin: round; }
-.vib-limit { stroke-width: 1.5; }
-.vib-limit-band { stroke: #8a4b1c; stroke-dasharray: 6 3; }
-.vib-limit-peak { stroke: #8a4b1c; stroke-dasharray: 2 3; }
-.vib-fn { stroke: #345640; stroke-width: 1; stroke-dasharray: 1 3; }
-.vib-curve { fill: none; stroke: #34543c; stroke-width: 2; stroke-linejoin: round; }
-.vib-marker { stroke: #f4f6ef; stroke-width: 1.5; }
-.vib-marker-worst { fill: #8a4b1c; }
-.vib-marker-peak { fill: #34543c; }
-.vibration-summary { margin: 8px 0 0; letter-spacing: 0; text-transform: none; font-weight: 500; line-height: 1.6; }
-.vibration-table { overflow-x: auto; margin-top: 8px; }
-.vibration-table table { width: 100%; border-collapse: collapse; font-size: 9px; color: #46583b; font-variant-numeric: tabular-nums; }
-.vibration-table th, .vibration-table td { text-align: left; padding: 4px 6px; border-bottom: 1px solid #e0e5d9; vertical-align: top; }
-.vibration-table thead th { color: #5c6a55; font-weight: 600; }
-.vibration-table tbody th { font-weight: 500; }
-/* Heat Sink I (task 48.3): display-only SVG fin array, stored-profile shading and fin tools. */
-.tools-body > .heat-sink-tools { grid-column: 1 / -1; }
-.heat-sink-tools .tool-copy { white-space: normal; }
-.fin-stepper { grid-column: 1 / -1; display: flex; gap: 6px; }
-.fin-stepper button { flex: 1; border: 1px solid #e1e6d7; border-radius: 4px; padding: 5px 4px; font-size: 9px; color: #5c6a55; background: #fcfcf9; }
-.heat-sink-view { display: flex; flex-direction: column; flex: 1; justify-content: center; gap: 8px; padding: 0 12px 12px; min-width: 0; }
-.heat-sink-scene { width: 100%; height: auto; max-height: 340px; }
-.fin-untested, .heat-sink-base { fill: #a8b49a; stroke: #4f653e; stroke-width: 0.5; }
-.fin-tested { stroke: #4f653e; stroke-width: 0.5; }
-.heat-sink-source { fill: #62685c; }
-.heat-sink-summary { margin: 0; letter-spacing: 0; text-transform: none; font-weight: 500; }
-.heat-sink-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 9px; color: #5c6a55; }
-.heat-sink-legend svg { width: 80px; height: 8px; }
-.fin-profile-details { font-size: 9px; color: #5c6a55; }
-.fin-profile-details summary { cursor: pointer; font-weight: 600; }
-.fin-profile { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 9px; color: #46583b; }
-.fin-profile caption { text-align: left; color: #5c6a55; margin-bottom: 4px; }
-.fin-profile th, .fin-profile td { text-align: left; padding: 3px 6px 3px 0; border-bottom: 1px solid #e6eadf; }
-/* Mounting Bracket I (tasks 46.3, 54.1): lazy 3D scene or 2D side view, moment strip and section table. */
-.bracket-view { display: flex; flex-direction: column; flex: 1; justify-content: center; padding: 0 12px 12px; min-width: 0; }
-.bracket-view svg { width: 100%; height: auto; min-height: 0; cursor: default; }
-.bracket-body { fill: #a8b49a; stroke: #4f653e; stroke-width: 1; }
-.bracket-wall { fill: #62685c; }
-.bracket-section-line { stroke: #4f653e; stroke-width: 1; stroke-dasharray: 3 3; }
-.bracket-load { stroke: #8a4b1c; stroke-width: 2; }
-.bracket-load-head { fill: #8a4b1c; }
-.moment-axis { stroke: #5c6a55; stroke-width: 1; }
-.moment-strip { fill: #dfe5d6; stroke: #4f653e; stroke-width: 1.5; }
-.governing-marker { fill: #34543c; stroke: #1f3324; stroke-width: 1; }
-.section-marker { fill: #f4f6ef; stroke: #34543c; stroke-width: 1.5; }
-.bracket-summary { margin: 8px 0 0; letter-spacing: 0; text-transform: none; font-weight: 500; }
-.bracket-sections { margin-top: 6px; font-size: 11px; max-width: 100%; overflow-x: auto; }
-.bracket-sections summary { cursor: pointer; font-weight: 600; }
-.bracket-sections table { border-collapse: collapse; margin-top: 6px; }
-.bracket-sections th, .bracket-sections td { padding: 2px 8px 2px 0; text-align: left; white-space: nowrap; }
-.bracket-step-note { margin: 0 0 8px; font-size: 11px; color: #46583b; }
-.bracket-view .bracket-elevation { min-height: 0; max-height: 300px; touch-action: auto; user-select: auto; }
-.bracket-view .bracket-moment { max-height: 96px; margin-top: 4px; }
-.bracket-hatch-line { stroke: #8b9282; stroke-width: 1.5; }
-.bracket-wall-face { stroke: #3d4a3f; stroke-width: 1.5; }
-.bracket-plate { fill: #7d8a7e; stroke: #2f3a31; stroke-width: 1; }
-.bracket-bolt { fill: #3d4a3f; }
-.bracket-washer { fill: #6f7c70; stroke: #2f3a31; stroke-width: 0.6; }
-.bracket-body-side { fill: #c7cfbb; stroke: #4f653e; stroke-width: 0.6; stroke-linejoin: round; }
-.bracket-wall-side { fill: #b9c0b1; stroke: #3d4a3f; stroke-width: 1; }
-.bracket-body-side-smooth { stroke: #c7cfbb; }
-.bracket-body-back { fill: #c7cfbb; stroke: #4f653e; stroke-width: 1; }
-.bracket-cable { stroke: #3d4a3f; stroke-width: 1.5; }
-.bracket-weight { fill: #cf744b; stroke: #7a3f14; stroke-width: 1; }
-.bracket-fallback-notice { margin: 0 0 4px; letter-spacing: 0; text-transform: none; font-weight: 500; }
-/* Bracket 3D (task 54.1): canvas host and the control row below it (never over the model). */
-.bracket-scene { min-height: 300px; }
-.bracket-scene-controls { display: flex; align-items: center; gap: 2px; align-self: flex-end; margin-top: 6px; background: #fcfdf8; border: 1px solid #e1e6d7; border-radius: 5px; padding: 4px; }
-.bracket-scene-controls button { display: grid; place-items: center; width: 28px; height: 26px; color: #4f653e; }
-.bracket-scene-hint { font-size: 10px; color: #5c6a55; padding: 0 6px; }
 .field-note { grid-column: 1 / -1; margin: 0; font-size: 10px; color: #5c6a55; }
-/* Braced Frame I (task 49.3): main-bundle SVG frame view, bracing toggles and member sections.
-   Member stroke widths are SVG presentation attributes (by section), so these rules set no
-   stroke-width for present members. Patterns, not colours alone, carry tension/compression. */
-.frame-view { display: flex; flex-direction: column; flex: 1; padding: 0 12px 12px; min-width: 0; }
-.frame-view .frame-scene { width: 100%; height: auto; min-height: 0; max-height: 360px; cursor: default; touch-action: auto; user-select: auto; }
-.frame-support polygon { fill: #dfe4d8; stroke: #4f653e; stroke-width: 1; }
-.frame-support line { stroke: #4f653e; stroke-width: 1.5; }
-.frame-joint { fill: #fff; stroke: #26352b; stroke-width: 1.2; }
-.frame-member-tension, .frame-member-neutral, .frame-member-zero, .frame-member-compression { stroke: #34543c; stroke-linecap: round; }
-.frame-member-neutral { stroke: #7a8670; }
-.frame-member-zero { stroke-dasharray: 1 4; }
-.frame-member-compression-core { stroke: #f4f6ef; stroke-linecap: round; }
-.frame-member-absent { stroke: #9aa48f; stroke-width: 1; stroke-dasharray: 6 5; opacity: 0.8; }
-.frame-label { font-size: 9px; fill: #26352b; paint-order: stroke; stroke: #f4f6ef; stroke-width: 3px; font-variant-numeric: tabular-nums; }
-.frame-load line { stroke: #76552c; stroke-width: 1.6; }
-.frame-load polygon { fill: #76552c; }
-.frame-load-label { font-size: 8px; fill: #5c3f1d; }
-.frame-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; list-style: none; margin: 4px 0 0; padding: 0; font-size: 10px; color: #46583b; }
-.frame-legend li { display: flex; align-items: center; gap: 5px; }
-.frame-legend svg { width: 24px; height: 8px; }
-.frame-summary { margin: 8px 0 0; letter-spacing: 0; text-transform: none; font-weight: 500; line-height: 1.6; }
-.frame-mechanism { margin: 10px 0 0; padding: 10px; border: 1px solid #eee1c8; border-radius: 5px; background: #fcf7ed; color: #5c3f1d; font-size: 11px; font-weight: 600; }
-.frame-table-wrap { margin-top: 10px; overflow-x: auto; }
-.frame-table-wrap table { width: 100%; border-collapse: collapse; font-size: 10px; color: #26352b; font-variant-numeric: tabular-nums; }
-.frame-table-wrap caption { text-align: left; font-size: 10px; font-weight: 600; color: #46583b; padding-bottom: 4px; }
-.frame-table-wrap th, .frame-table-wrap td { padding: 4px 3px; text-align: left; vertical-align: top; border-bottom: 1px solid #dfe4d8; }
-.frame-reactions { font-size: 10px; color: #46583b; line-height: 1.6; margin: 8px 0 0; }
-.frame-tools .dimensions-heading { margin: 18px 0 10px; }
-.frame-toggles { display: grid; gap: 10px; margin: 10px 0 0; }
-.frame-storey-title { margin: 0 0 4px; font-size: 10px; font-weight: 600; color: #46583b; }
-.frame-toggle { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; margin-bottom: 5px; padding: 7px 8px; border: 1px solid #c9d2bf; border-radius: 5px; background: #fff; color: #46583b; font-size: 10px; text-align: left; transition: none; }
-.frame-toggle.on { border-color: #345640; background: #f0f4e9; }
-.frame-toggle small { font-size: 9px; font-weight: 600; color: #58664a; }
-.frame-sections { display: grid; gap: 8px; }
-.frame-section-field { display: grid; gap: 3px; }
-.frame-section-field label { font-size: 10px; color: #46583b; }
-.frame-section-field small { display: inline; color: #58664a; }
-.frame-section-field select { width: 100%; min-width: 0; padding: 4px 5px; font: inherit; font-size: 10px; border: 1px solid #8a977d; border-radius: 4px; background: #fff; color: #26352b; }
-.frame-load-list { margin: 0; padding-left: 14px; }
-.challenge-body .frame-governing { font-size: 10px; line-height: 1.6; color: #46583b; margin: 10px 0 0; }
-.frame-metrics { flex-wrap: wrap; row-gap: 12px; }
-.frame-glyph rect, .frame-glyph line { fill: none; stroke: currentColor; stroke-width: 1.4; }
-/* Braced Frame I 3D view (task 54.3): a definite-height Canvas host, the shared scene
-   controls below it (never over the model), a fallback notice, and pattern-key glyphs for the 3D tube patterns. */
-.frame-view .frame-scene-3d { position: relative; flex: none; width: 100%; height: 360px; cursor: grab; touch-action: none; user-select: none; }
-.frame-view .frame-scene-3d:active { cursor: grabbing; }
-.frame-view .frame-scene-controls { position: static; align-self: flex-end; margin: 6px 0 2px; }
-.frame-fallback-notice { margin: 0 0 4px; font-size: 10px; color: #345640; }
-.frame-glyph-core { stroke: #eef1e6; }
-.frame-glyph-bands { stroke: #22301f; stroke-dasharray: 3 3; }
-.frame-glyph-beads { stroke: #4f653e; stroke-linecap: round; stroke-dasharray: 0 5; }
-.frame-glyph-plain { fill: none; stroke: #7d8a72; stroke-width: 1; stroke-dasharray: 2 1.5; }
-@media (max-width: 620px) {
-  .frame-view .frame-scene-3d { height: 280px; }
-  .tools-body > .frame-tools { grid-column: 1 / -1; }
-  .frame-tools .dimensions-heading { margin: 16px 0 10px; }
-  .frame-metrics .metric { flex: 1 1 40%; }
-}
 /* Reset to baseline (task 60): one shared row under the Design tools title for every model. */
 .reset-baseline { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding: 10px 15px; border-bottom: 1px solid var(--line); }
 .reset-baseline .reset-baseline-button { color: #345640; border-color: #8a977d; font-size: 10px; padding: 6px 10px; }
@@ -361,65 +242,16 @@
 /* Submit dialog (task 61): the two ways out once a submission is recorded. */
 .submit-exit { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
 .submit-exit > button { flex: 1 1 160px; justify-content: center; }
-/* Pressure Vessel I (task 69): view, 2D section, 3D controls and history glyph. */
-.vessel-view { display: flex; flex-direction: column; flex: 1; justify-content: center; padding: 0 12px 12px; min-width: 0; }
-.vessel-view svg { width: 100%; height: auto; min-height: 0; cursor: default; }
-.vessel-view .vessel-elevation { min-height: 0; max-height: 280px; touch-action: auto; user-select: auto; }
-.vessel-wall { fill: #8a979b; stroke: #3c4a4f; stroke-width: 0.8; stroke-linejoin: round; }
-.vessel-cavity { fill: #e3ecee; stroke: none; }
-.vessel-axis { stroke: #5b6a6f; stroke-width: 0.8; stroke-dasharray: 6 3 1 3; }
-.vessel-pressure path { fill: none; stroke: #b9703f; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
-.vessel-summary, .vessel-caption, .vessel-fallback-notice { margin: 8px 0 0; letter-spacing: 0; text-transform: none; font-weight: 500; }
-.vessel-fallback-notice { margin: 0 0 4px; }
-.vessel-step-note { margin: 0 0 8px; font-size: 11px; color: #46583b; }
-.vessel-sections { margin-top: 6px; font-size: 11px; max-width: 100%; overflow-x: auto; }
-.vessel-sections summary { cursor: pointer; font-weight: 600; }
-.vessel-sections table { border-collapse: collapse; margin-top: 6px; }
-.vessel-sections th, .vessel-sections td { padding: 2px 8px 2px 0; text-align: left; white-space: nowrap; }
-.vessel-scene { min-height: 300px; }
-.vessel-scene-controls { display: flex; align-items: center; gap: 2px; align-self: flex-end; margin-top: 6px; background: #fcfdf8; border: 1px solid #e1e6d7; border-radius: 5px; padding: 4px; }
-.vessel-scene-controls button { display: grid; place-items: center; width: 28px; height: 26px; color: #4f653e; }
-.vessel-scene-hint { font-size: 10px; color: #5c6a55; padding: 0 6px; }
-/* Fatigue Analysis I (task 70): card theme, 2D side view, S-N diagram and finish choice. The
-   fillet marker, load arrows and S-N lines differ by shape and dash, never colour alone. */
 .theme-fatigue { --art-background: #eef0ea; --art-color: #8f9a7c; }
-.fatigue-elevation { max-height: 280px; }
-.fatigue-body { fill: #b8c0bb; stroke: #3d4a3f; stroke-width: 1; stroke-linejoin: round; }
-.fatigue-hub { fill: #dfe5d7; fill-opacity: 0.75; stroke: #5c6a55; stroke-width: 0.8; }
-.fatigue-axis { stroke: #5c6a55; stroke-width: 0.8; stroke-dasharray: 8 3 2 3; }
-.fatigue-fillet-marker { fill: none; stroke: #7a3f14; stroke-width: 1.5; }
-.fatigue-load-min { stroke: #3d4a3f; stroke-width: 1.2; }
-.fatigue-load-min-head { fill: #fcfdf8; stroke: #3d4a3f; stroke-width: 1; }
-.fatigue-view .fatigue-sn { width: 100%; height: auto; max-height: 190px; margin-top: 6px; }
-.fatigue-sn-line { fill: none; stroke: #3d4a3f; stroke-width: 2; }
-.fatigue-sn-target { stroke: #5c6a55; stroke-width: 1.2; stroke-dasharray: 1.5 3; }
-.fatigue-sn-stress { stroke: #8a4b1c; stroke-width: 1.4; stroke-dasharray: 6 3; }
-.fatigue-sn-point { fill: #8a4b1c; stroke: #5a2d0c; stroke-width: 1; }
-.fatigue-sn-point-open { fill: #fcfdf8; stroke: #8a4b1c; stroke-width: 1.6; }
-.fatigue-sn-tick { font-size: 9px; fill: #46583b; }
-.fatigue-finish { border: 0; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; }
-.fatigue-finish legend { padding: 0; margin-bottom: 4px; width: 100%; }
-.fatigue-finish-option { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #2f3a31; min-height: 24px; }
-/* Column Buckling I (task 68): main-bundle 2D column view, 3D canvas host and its control row
-   (below the canvas, never over the model). Shapes and the text summary carry the meaning. */
-.column-view { display: flex; flex-direction: column; flex: 1; justify-content: center; padding: 0 12px 12px; min-width: 0; }
-.column-view .column-elevation { width: 100%; height: auto; min-height: 0; max-height: 320px; cursor: default; touch-action: auto; user-select: auto; }
-.column-body { fill: #a8b49a; stroke: #4f653e; stroke-width: 1; }
-.column-section { fill: #a8b49a; stroke: #4f653e; stroke-width: 1; }
-.column-bore { fill: #f4f6ef; stroke: #4f653e; stroke-width: 1; }
-.column-pin { fill: #f4f6ef; stroke: #2f3a31; stroke-width: 1.5; }
-.column-support { fill: #dfe4d8; stroke: #4f653e; stroke-width: 1; }
-.column-ground { stroke: #3d4a3f; stroke-width: 1.5; }
-.column-hatch-line { stroke: #8b9282; stroke-width: 1.2; }
-.column-load { stroke: #8a4b1c; stroke-width: 2; }
-.column-load-head { fill: #8a4b1c; }
-.column-mode { fill: none; stroke: #8a4b1c; stroke-width: 1.5; stroke-dasharray: 5 3; }
-.column-summary { margin: 8px 0 0; letter-spacing: 0; text-transform: none; font-weight: 500; }
-.column-fallback-notice { margin: 0 0 4px; letter-spacing: 0; text-transform: none; font-weight: 500; }
-.column-scene { min-height: 320px; }
-.column-scene-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; align-self: flex-end; margin-top: 6px; background: #fcfdf8; border: 1px solid #e1e6d7; border-radius: 5px; padding: 4px; }
-.column-scene-controls button:not(.toggle-row) { display: grid; place-items: center; width: 28px; height: 26px; color: #4f653e; }
-.column-scene-controls .toggle-row { padding: 0 6px; height: 26px; font-size: 10px; color: #4f653e; }
-.column-scene-hint { font-size: 10px; color: #5c6a55; padding: 0 6px; }
 /* Library card and drawer art tint for the column, alongside the template's .theme-* rules. */
 .theme-column { --art-background: #ecf0f2; --art-color: #7f939b; }
+
+/* Task 78.2: the challenge band, first workbench content under the title (WD-20–WD-24). Full width,
+   no heavier chrome than the "About this model" row. The goal line uses the heading type style. */
+.challenge-band { margin: 0 0 14px; padding: 12px 16px; border: 1px solid #e0e5d9; border-radius: 7px; background: #fcfdf9; min-width: 0; overflow-wrap: break-word; }
+.challenge-band h2 { margin: 0 0 4px; font-size: 8px; letter-spacing: 1.2px; text-transform: uppercase; font-weight: 600; color: #56644a; }
+.challenge-band .challenge-goal { margin: 0 0 6px; font-family: Manrope, sans-serif; font-weight: 650; font-size: 16px; letter-spacing: -.3px; line-height: 1.4; color: #2e4232; }
+.challenge-band p { margin: 0 0 4px; font-size: 12px; line-height: 1.7; color: #46583b; }
+.challenge-band .challenge-goal + p { margin-top: 0; }
+.challenge-band .ei-disclosure { margin-top: 2px; }
+.challenge-band .ei-disclosure p { font-size: 11px; }

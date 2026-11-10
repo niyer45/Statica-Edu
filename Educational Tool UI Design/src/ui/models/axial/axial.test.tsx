@@ -117,6 +117,18 @@ describe('Stress and Strain I workbench', () => {
     expect(screen.getByText(/Draft changed since this test\./)).toBeTruthy()
   })
 
+  it('keeps the view text, notes and statement remainder collapsed until their disclosures are opened', () => {
+    renderRod()
+    const view = screen.getByText(/Latest tested: elongation 1\.51 mm/).closest('details')!
+    const note = screen.getByText('Typical textbook values, not certified material data.').closest('details')!
+    const more = screen.getByText('More about this challenge').closest('details')!
+    for (const [d, label] of [[view, 'Rod details'], [note, 'About these values'], [more, 'More about this challenge']] as const) {
+      expect(d.open).toBe(false)
+      fireEvent.click(within(d).getByText(label))
+      expect(d.open).toBe(true)
+    }
+  })
+
   it('lists each material with its typical E, yield, density and allowable stress from the physics layer', () => {
     renderRod()
     const steel = screen.getByRole('radio', { name: /^Structural steel/ }).closest('label')!
@@ -208,9 +220,9 @@ describe('Stress and Strain I workbench', () => {
     expect(within(dialog).getByText(/not a real-world approval/)).toBeTruthy()
   })
 
-  it('Guided locks the material in step one; Parametric is open design', () => {
+  it('Guided locks the material in step one; Parametric is open design', async () => {
     renderRod('guided')
-    expect(within(screen.getByRole('region', { name: 'Guided experiments' })).getByRole('heading', { name: 'Thicken the rod' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Thicken the rod' }, { timeout: 3000 })).toBeTruthy()
     expect((screen.getByLabelText('Diameter') as HTMLInputElement).readOnly).toBe(false)
     expect((screen.getByRole('radio', { name: /^Titanium/ }) as HTMLInputElement).disabled).toBe(true)
     cleanup()

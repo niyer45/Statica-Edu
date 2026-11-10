@@ -1,4 +1,5 @@
 import { formatMm, radToDeg } from '../../../units/units'
+import Disclosure from '../../workbench/Disclosure'
 import { displayedTwist, formatTorsion, SHAFT_SECTION_NAMES, useTorsionStore } from './shared'
 
 // Torsion design view (task 47.3; TSH-14, OC-12). A main-bundle SVG with no Three.js dependency,
@@ -29,10 +30,12 @@ function useShaftDisplay() {
 export function TorsionSummary() {
   const { ch, section, outer, inner, tested, shown, capped } = useShaftDisplay()
   return (
+    <Disclosure summary="Shaft summary">
     <p id={TORSION_SUMMARY_ID} className="viewport-label torsion-summary" aria-live="off">
       {SHAFT_SECTION_NAMES[section.kind]} · outer {formatMm(outer, 1)} mm{inner > 0 ? ` · inner ${formatMm(inner, 1)} mm` : ''} · latest tested twist {formatTorsion(tested, 'rad')}
       {capped ? ' (display capped)' : ` (shown ×${ch.visualization.twistExaggerationFactor}, ${radToDeg(shown).toFixed(1)}° drawn)`}
     </p>
+    </Disclosure>
   )
 }
 

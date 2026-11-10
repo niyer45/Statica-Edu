@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { FRAME_MEMBER_IDS } from '../../../geometry/bracedFrame/template'
 import type { ViewportProps } from '../../viewport/FallbackViewport'
+import Disclosure from '../../workbench/Disclosure'
 import ViewportBoundary from '../../viewport/ViewportBoundary'
 import ViewportLoading from '../../viewport/ViewportLoading'
 import BracedFrameFallback from './BracedFrameFallback'
@@ -50,8 +51,7 @@ function BracedFrameDetails() {
           {MECHANISM_TEXT}: no member forces, drift or reactions to show.
         </p>
       ) : (
-        <details className="frame-more">
-          <summary>Member forces and reactions</summary>
+        <Disclosure summary="Member forces and reactions" className="frame-more">
           <div className="frame-table-wrap">
             <table aria-label="Latest tested member forces">
               <caption>Member forces ({label}, tension positive)</caption>
@@ -94,7 +94,7 @@ function BracedFrameDetails() {
               {formatFrame(Math.abs(tested.floorDriftM), 'm')}.
             </p>
           </div>
-        </details>
+        </Disclosure>
       )}
     </>
   )

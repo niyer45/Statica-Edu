@@ -4,6 +4,8 @@ import { catalog } from '../../challenge/catalog'
 import Icon from '../icons/Icon'
 import { useModelUi } from '../models/registry'
 import { useChallenge, useSession } from '../state/store'
+import Disclosure from './Disclosure'
+import ChallengeBand from './ChallengeBand'
 
 // Template Workbench chrome (task 13.3): `aside.sidebar`, `header.topbar`, `.page-heading`,
 // and `.workspace-context`, with the template class names so index.css / platform*.css apply.
@@ -16,7 +18,7 @@ export const MODE_LABELS: Record<InteractionMode, string> = {
   freeform: 'Freeform',
 }
 
-/** One sentence per mode (task 58), shared by the challenge drawer and the workspace context. */
+/** One sentence per mode (task 58), shared by the challenge drawer, the library and the "About this model" Disclosure (task 78). */
 export const MODE_SENTENCES: Record<InteractionMode, string> = {
   guided: 'Structured experiments: change one variable per step while the rest stay locked, then design freely once every step is met.',
   parametric: 'Open design: every parameter is editable from the start, with just the goal and the checks.',
@@ -29,6 +31,36 @@ const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   advanced: 'Advanced',
 }
 
+/**
+ * The "Guided mode / About this model" row. Task 78.3 (WD-35): it sits at the bottom of the
+ * workbench content, after the results and before the limits footer, not at the top.
+ */
+export function AboutModel() {
+  const sessionMode = useSession().mode
+  const { copy } = useModelUi()
+  return (
+    <div className="workspace-context" aria-label="Design mode">
+      <span className="mode-badge">
+        <Icon name={sessionMode === 'guided' ? 'tune' : 'cube'} size={15} />
+        {MODE_LABELS[sessionMode]} mode
+      </span>
+      <Disclosure summary="About this model" className="about-model">
+        <p>{copy.tagline}</p>
+        <p>
+          {MODE_SENTENCES[sessionMode]}
+          {copy.contextNote !== undefined && ` ${copy.contextNote}`}
+        </p>
+        {sessionMode !== 'guided' && (
+          <p>
+            <strong>Parametric · Open design.</strong> Every parameter is editable from the start. Meet all the checks in the Checks panel.
+          </p>
+        )}
+        <p className="solver-label">{copy.solverLabel}</p>
+      </Disclosure>
+    </div>
+  )
+}
+
 export interface WorkbenchChromeProps {
   onExit: () => void
   onOpenHelp: () => void
@@ -38,10 +70,8 @@ export interface WorkbenchChromeProps {
 
 export default function WorkbenchChrome({ onExit, onOpenHelp, onShowDesigns, children }: WorkbenchChromeProps) {
   const ch = useChallenge()
-  const sessionMode = useSession().mode
-  const mode = MODE_LABELS[sessionMode]
+  const mode = MODE_LABELS[useSession().mode]
   const difficulty = DIFFICULTY_LABELS[ch.difficulty]
-  const { copy } = useModelUi()
   // Card metadata for the open challenge (number, discipline, time); defaults match the beam card.
   const entry = catalog.find((e) => e.available && e.challengeId === ch.id)
   const discipline = entry?.discipline ?? 'Mechanics'
@@ -139,24 +169,13 @@ export default function WorkbenchChrome({ onExit, onOpenHelp, onShowDesigns, chi
                 </span>
               </div>
               <h1>{ch.title}</h1>
-              <p>{copy.tagline}</p>
             </div>
             <button type="button" className="secondary exit" onClick={onExit}>
               <Icon name="back" size={15} />
               All challenges
             </button>
           </section>
-          <div className="workspace-context" aria-label="Design mode">
-            <span className="mode-badge">
-              <Icon name={sessionMode === 'guided' ? 'tune' : 'cube'} size={15} />
-              {mode} mode
-            </span>
-            <span>
-              {MODE_SENTENCES[sessionMode]}
-              {copy.contextNote !== undefined && ` ${copy.contextNote}`}
-            </span>
-            <span className="solver-label">{copy.solverLabel}</span>
-          </div>
+          <ChallengeBand />
           {children}
         </main>
       </div>

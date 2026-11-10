@@ -1,3 +1,4 @@
+import './bracket.css'
 import type { BracketEfficiency } from '../../../evaluation/bracket/types'
 import type { ModelUi } from '../types'
 import BracketChallengePanel from './BracketChallengePanel'

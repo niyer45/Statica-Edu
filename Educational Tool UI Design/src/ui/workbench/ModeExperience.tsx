@@ -1,6 +1,8 @@
 import { observations, type GuidedResult } from '../../evaluation/guided/plan'
 import Icon from '../icons/Icon'
 import { useModelStore } from '../state/store'
+import Disclosure from './Disclosure'
+import GuidedStepDialog, { type StepState } from './GuidedStepDialog'
 import { useGuided } from './useGuided'
 
 // Mode experience (task 58; replaces the task 44 Inspect/Experiment/Compare/Explain prompts).
@@ -12,8 +14,10 @@ import { useGuided } from './useGuided'
 //   final step opens every parameter and is met by an Accepted test.
 // - Parametric = open design. Every parameter editable from the start, no steps: the goal and
 //   the checks stay in the challenge panel.
-
-const STATE_TEXT = { complete: 'complete', current: 'current step', locked: 'locked' } as const
+// Task 78: the locked controls share one line instead of one sentence each. Task 78.3: the steps are
+// a stepper row and the lock line sits under "Editable now". Task 78.4: the current step's
+// instruction is a modal dialog (GuidedStepDialog) that opens on entry and on each new step and is
+// reopened from the current step; a failed attempt shows one line under the row.
 
 function iterationName(history: ReadonlyArray<GuidedResult>, id: string | undefined): string {
   const r = history.find((x) => x.id === id)
@@ -31,65 +35,57 @@ function GuidedExperiments() {
   const notMet = step !== undefined && history.length - 1 > lastIndex ? latest : undefined
   const seen = last === undefined ? [] : observations(plan, last, history)
   const lastStep = last === undefined ? undefined : plan.steps.find((s) => s.id === last.stepId)
+  const allDone = progress.complete || step === undefined
+  const stepperSteps = plan.steps.map((s, i) => ({
+    id: s.id,
+    title: s.title,
+    state: (allDone || i < progress.current ? 'complete' : i === progress.current ? 'current' : 'locked') as StepState,
+  }))
+  const notMetText = notMet !== undefined ? `Iteration ${notMet.iteration} did not complete this step yet. Change only ${step!.focus.toLowerCase()} as asked, then Run Test.` : undefined
+  const locksSomething = step !== undefined && step.unlocks !== 'all'
   return (
-    <section className="guided-instructions" aria-label="Guided experiments">
-      <p className="guided-mode-label">
-        <strong>Guided experiments</strong> · {progress.complete ? `All ${total} steps complete` : `Step ${progress.current + 1} of ${total}`}
-      </p>
-      <ol className="guidance-steps" aria-label="Experiment steps">
-        {plan.steps.map((s, i) => {
-          const state = i < progress.current ? 'complete' : i === progress.current ? 'current' : 'locked'
-          return (
-            <li key={s.id} className={state} aria-current={state === 'current' ? 'step' : undefined}>
-              {state === 'complete' ? <Icon name="check" size={11} /> : state === 'locked' ? <Icon name="lock" size={11} /> : null}
-              {i + 1}. {s.title}
-              <span className="sr-only">, {STATE_TEXT[state]}</span>
-            </li>
-          )
-        })}
-      </ol>
-      {step !== undefined ? (
-        <>
-          <h2>{step.title}</h2>
-          <p>{step.instruction}</p>
-          <p className="guided-focus">
-            Editable now: <strong>{step.focus}</strong>
-            {step.unlocks === 'all' ? '.' : '. Other parameters stay locked until a later step.'}
-          </p>
-          <details key={step.id}>
-            <summary>Hint</summary>
-            <p>{step.hint}</p>
-          </details>
-        </>
-      ) : (
-        <>
-          <h2>All experiments complete</h2>
+    <GuidedStepDialog
+      steps={stepperSteps}
+      completeLabel={allDone ? `All ${total} steps complete` : undefined}
+      label={step !== undefined ? `Step ${progress.current + 1} of ${total}: ${step.title}` : `All ${total} steps complete`}
+      title={step !== undefined ? step.title : 'All experiments complete'}
+      autoOpenKey={allDone ? 'done' : String(progress.current)}
+      feedback={notMetText}
+    >
+      <div className="guided-body">
+        {step !== undefined ? (
+          <>
+            <p>{step.instruction}</p>
+            <p className="guided-focus">
+              {locksSomething && <Icon name="lock" size={11} />}
+              <span>
+                Editable now: <strong>{step.focus}</strong>
+                {step.unlocks === 'all' ? '.' : '. Other parameters stay locked until a later step.'}
+              </span>
+            </p>
+            <Disclosure key={step.id} summary="Hint">
+              <p>{step.hint}</p>
+            </Disclosure>
+          </>
+        ) : (
           <p>Every parameter is unlocked. Open Explain & submit to record your design and what your experiments showed.</p>
-        </>
-      )}
-      {notMet !== undefined && (
-        <p className="guided-result">
-          Iteration {notMet.iteration} did not complete this step yet. Change only {step!.focus.toLowerCase()} as asked, then Run Test.
-        </p>
-      )}
-      {notMet === undefined && last !== undefined && lastStep !== undefined && (
-        <p className="guided-result">
-          <Icon name="check" size={11} /> {lastStep.title} complete: {iterationName(history, last.resultId)}
-          {last.comparedWithId !== undefined && <> compared with {iterationName(history, last.comparedWithId)}</>}
-          {seen.length > 0 ? `. ${seen.map((o) => `${o.label} ${o.change === 'unavailable' ? 'not available' : o.change === 'unchanged' ? 'did not change' : o.change}`).join('; ')}.` : '.'}
-        </p>
-      )}
-    </section>
+        )}
+        {notMetText !== undefined && <p className="guided-result">{notMetText}</p>}
+        {notMet === undefined && last !== undefined && lastStep !== undefined && (
+          <p className="guided-result">
+            <Icon name="check" size={11} /> {lastStep.title} complete: {iterationName(history, last.resultId)}
+            {last.comparedWithId !== undefined && <> compared with {iterationName(history, last.comparedWithId)}</>}
+            {seen.length > 0 ? `. ${seen.map((o) => `${o.label} ${o.change === 'unavailable' ? 'not available' : o.change === 'unchanged' ? 'did not change' : o.change}`).join('; ')}.` : '.'}
+          </p>
+        )}
+      </div>
+    </GuidedStepDialog>
   )
 }
 
+// Parametric shows no panel here: its one explanatory sentence lives in the workbench chrome's
+// "About this model" Disclosure (task 78, WD-03).
 export default function ModeExperience() {
   const { active } = useGuided()
-  return active ? (
-    <GuidedExperiments />
-  ) : (
-    <p className="parametric-context">
-      <strong>Parametric · Open design.</strong> Every parameter is editable from the start. Meet all the checks in The challenge panel.
-    </p>
-  )
+  return active ? <GuidedExperiments /> : null
 }

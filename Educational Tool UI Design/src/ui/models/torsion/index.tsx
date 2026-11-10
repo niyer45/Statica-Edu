@@ -1,3 +1,4 @@
+import './torsion.css'
 import { lazy, Suspense } from 'react'
 import type { TorsionEfficiency } from '../../../evaluation/torsion/types'
 import ViewportBoundary from '../../viewport/ViewportBoundary'

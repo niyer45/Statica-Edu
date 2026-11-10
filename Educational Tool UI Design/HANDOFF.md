@@ -1,6 +1,6 @@
 # Statica Edu handoff
 
-Last updated: 2026-10-20 (commit 618e2ee, CI run 39368119809 passed).
+Last updated: 2026-11-10 (task 78 declutter on branch `task-78-declutter`, PR to `main` pending CI; last green `main` run is 39368119809).
 
 This file is the current state. Rules are in `AGENTS.md`, the plan is in `../PROGRAM.md`, and
 everything older is in `HANDOFF_HISTORY.md`. CI run links follow the pattern
@@ -26,7 +26,7 @@ everything older is in `HANDOFF_HISTORY.md`. CI run links follow the pattern
 - Deployment: a manual, CI-gated GitHub Pages workflow (`DEPLOY.md`). Site:
   https://niyer45.github.io/Statica-Edu/. The Home footer shows the build id. No deployment is
   recorded in these documents yet.
-- Tests: 3216 unit tests and 110/110 Playwright E2E cases (desktop and Pixel 7). CI takes about
+- Tests (task 78 branch, local): 3265 unit tests and 196 Playwright E2E cases (desktop and Pixel 7; the task 78.5 full run, `--workers=2`, passed 196 of 196 with no rerun in 16.9 min, against 14.8 min before the open delay). CI takes about
   10 minutes: the `verify` job about 1.8 minutes, then four Playwright shards.
 - Every new challenge and module since 2026-10-19 awaits owner engineering review (section 3).
 - Known gaps: no password recovery or cross-tab session sync for local accounts; the 2D bracket
@@ -67,6 +67,13 @@ open questions:
   Euler range (D-58). Confirm.
 - Pressure Vessel I adds an overall-length limit (1000 mm) so that volume is a real check (D-59).
   Confirm.
+- Task 78 (D-65): review the decluttered screens on every challenge. Task 78.3: the Guided steps are a stepper row
+  under the challenge band and "Guided mode / About this model" is at the bottom of the page. Task 78.4: the
+  step instruction is a modal dialog ("Got it" closes it; the current step in the stepper reopens it); confirm the
+  dialog opening on every entry and reload and on each new step is the wanted frequency, and that the 800 ms / 1500 ms
+  delays (task 78.5) feel right. Heat Sink I's "coefficient is given, not computed" note and Vibration Isolation I's
+  "steady-state" sentence are now one click away rather than always visible (the specs require them to be stated,
+  not always visible): confirm. A screen-reader check of the descriptions inside collapsed sections has not been done.
 - Older open items: the backend choice for cross-device sync (38.1), and the manual checks that keep
   44.3, 30 and gate 51 open.
 
@@ -81,6 +88,7 @@ catalog gate), 35.2 (Milestone 5 checkpoint), then 74 onward.
 
 | Task | Date | Commit | CI run | Decision |
 | --- | --- | --- | --- | --- |
+| 78 Workbench declutter (owner, pilot feedback; 78.2 amendment: the challenge comes first, see below): Guided steps move to a non-modal popover under an always-visible "Step N of M" chip; statements show two lead sentences with the rest under "More about this challenge" (superseded by 78.2: see below); lock notes become one line plus lock marks; tagline, solver and mode sentence sit in "About this model"; secondary charts, captions and duplicate tables are collapsed in the shared `Disclosure`, for all ten challenges. No wording, JSON, physics or save-format change. `e2e/disclosure.spec.ts` now covers all ten challenges in Guided with explicit popover dismissal (`dismissGuidedPopover`) plus chip/popover and Parametric assertions; `.guided-chip` has `transition: none` because axe sampled its colour mid-transition. Visible workbench words (excluding headings, labels, buttons, requirement rows, results and footer; same script on `main` and on this branch, 1280×800, Guided popover dismissed): 164 vs 240 (beam), 125 vs 203 (torsion), 118 vs 231 (column), 105 vs 234 (stress and strain), 136 vs 258 (bracket), 142 vs 254 (heat sink), 139 vs 273 (vessel), 244 vs 367 (frame), 152 vs 263 (vibration), 131 vs 299 (fatigue). Task 78.2 (owner, 2026-11-09: "'The Challenge' should also be somewhat simplified and put at the top… I need to see the challenge first, and then process after"): a full-width challenge band is now the first workbench content on all ten challenges, directly under the title: the card goal line as the headline, the first sentence of the statement visible, the remainder word for word under "More about this challenge"; the right-hand panel is renamed "Checks" and no longer repeats the statement (WD-20–WD-24, D-65 amendment). Task 78.3 (owner, 2026-11-09, with a reference image): the Guided steps (the challenge's own experiment titles) become a horizontal stepper row between the band and the workbench, replacing the "Step N of M" chip (the current step is the button that opens the popover; the popover now holds the current step only, with the lock line under "Editable now"); "Guided mode / About this model" moves to the bottom, above the footer, in both modes; Parametric has no stepper (WD-30–WD-36, D-65 amendment 2). Task 78.4 (owner, 2026-11-10: "The 'Grow the circle' popup should be a popup that takes over the screen and must be read and then closed. It can then be reopened by clicking on the 'Grow the circle' text."): the step instruction is now a modal dialog on the shared `Dialog` (name "Step N of M: <title>", "Got it" and Close, Escape; focus returns to the current step button; opens on every Guided entry and on each new step, queued behind any other dialog, not after a failed attempt); a failed attempt shows one line under the stepper; the current step button has `aria-haspopup="dialog"`; the in-flow popover and its CSS are removed (WD-40–WD-47, D-65 amendment 3); E2E helper `dismissGuidedPopover` became `closeStepDialog`. Task 78.5 (owner, 2026-11-10: "formatting looks a little messed up. Also, give some delay before showing the popup"; "give some more gap between the two boxes"): the dialog body is one text block (one size, line height and gap, one left edge), the lock line is merged into "Editable now: <focus>. Other parameters stay locked until a later step." with an inline lock icon, the dialog opens 800 ms after entry and 1500 ms after a new step (the step name opens it at once), and the "Guided mode / About this model" row has a 19 px gap above it (WD-48–WD-51). CI run 42875713442 on ba8f189 failed on shards 2 and 4: `modes.spec` waited 5 s for the step dialog after a step change while a loaded runner's main thread was busy for 6–8 s per action, and `disclosure.spec` read the band and the workbench in two `boundingBox` calls that straddled a font-swap reflow; task 78.6 waits for the dialog with a 30 s explicit-signal timeout (`expectStepDialogOpen`), reads both boxes in one evaluate after `document.fonts.ready`, and replaces the wall-clock "opens at once" and "not visible yet" assertions with an in-page order-of-events record (`learningLoop` also failed once on its first attempt in that shard, the known runner timeout) | 2026-11-09 | this branch | pending | D-65 |
 | 77 learningLoop keyboard/mouse E2E split; keyboard path no longer pre-scrolls; 77.2: mouse test compares against a committed normalized fixture (`e2e/fixtures/learningLoop/`) instead of rebuilding the keyboard flow, and the keyboard reflection is entered with `fill()` instead of `pressSequentially` | 2026-10-20 | this branch | pending | — |
 | Card art: Fatigue Analysis I spindle, Stress and Strain I hanger rod (owner) | 2026-10-20 | 618e2ee | 39368119809 passed | — |
 | 73 Difficulty order, numbers 001–010; CI split into `verify` + 4 shards; cleanup | 2026-10-19 | 5c9e2ba | 39363320472 passed (9.9 min) | D-63 |
@@ -122,6 +130,8 @@ catalog gate), 35.2 (Milestone 5 checkpoint), then 74 onward.
 - Playwright reuses any server already on 4173/4174. Use `PW_DEV_PORT`/`PW_PREVIEW_PORT` per
   worktree and check `lsof -iTCP:4173 -iTCP:4174` first.
 - Rebuilding `dist` while a preview tab is open breaks its lazy 3D chunk until the tab reloads.
+- The Guided step dialog opens 0.8–1.5 s after entry or a step change (and later on a loaded runner): E2E must wait for it
+  (`expectStepDialogOpen`, 30 s) and close it (`closeStepDialog`) before interacting, and must not assert wall-clock bounds on it.
 - Software WebGL under load can take more than 5 s to show a canvas; canvas assertions wait up to
   20 s.
 - A failed Playwright run leaves a trace viewer in `playwright-report/`, which makes lint report

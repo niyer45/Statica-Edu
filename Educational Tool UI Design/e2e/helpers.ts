@@ -18,12 +18,12 @@ export async function tabTo(page: Page, target: Locator) {
   throw new Error(`Control not reachable by Tab: ${await target.getAttribute('aria-label') ?? await target.textContent()}`)
 }
 /**
- * Opens Cantilever Beam I. With `mode`, the mode is chosen in the challenge drawer before entry
+ * Opens Cantilever Beam I (closing the Guided step dialog, see `closeStepDialog`). With `mode`, the mode is chosen in the challenge drawer before entry
  * (D-37); a fresh navigation defaults to Parametric, the open-design mode the generic learning-loop
  * specs need (Guided locks parameters by step, task 58). Without `mode` (a reload), the featured
  * Open/Continue button reopens the saved session in its own mode.
  */
-export async function openWorkbench(page: Page, navigate = true, keyboard = false, mode: 'Guided' | 'Parametric' | undefined = navigate ? 'Parametric' : undefined) {
+export async function openWorkbench(page: Page, navigate = true, keyboard = false, mode: 'Guided' | 'Parametric' | undefined = navigate ? 'Parametric' : undefined, closeDialog = true) {
   if (navigate) await page.goto('/#challenges')
   const press = async (target: Locator) => {
     if (keyboard) { await tabTo(page, target); await page.keyboard.press('Enter') }
@@ -39,6 +39,9 @@ export async function openWorkbench(page: Page, navigate = true, keyboard = fals
   }
   await expect(page.getByRole('button', { name: 'Run Test', exact: true })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Zoom in', exact: true })).toBeVisible()
+  // A Guided challenge opens its step dialog on every entry and reload (task 78.4): assert it, then close it.
+  // A no-op in Parametric. Pass `closeDialog = false` to assert the dialog yourself.
+  if (closeDialog) await closeStepDialog(page, keyboard)
 }
 
 /** Clicks Run Test and answers the prediction checkpoint if this iteration requires one. */
@@ -57,9 +60,72 @@ export async function runAnyTest(page: Page, keyboard = false) {
   await expect.poll(async () => (await readState(page)).history.length).toBe(before + 1)
 }
 
-/** Asserts the current Guided experiment step by its heading (task 58). */
+/**
+ * Asserts the current Guided experiment step by its title (task 78.3). The stepper row is a `nav`
+ * named "Guided steps"; its current step is the one button, named "<title>, current step", inside
+ * the list item marked `aria-current="step"`. It is visible whether or not the step dialog is open.
+ */
 export async function expectGuidedStep(page: Page, title: string) {
-  await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('heading', { name: title, exact: true })).toBeVisible()
+  // The label and the sr-only ", current step" are separate flex items, so the computed name has a space before the comma.
+  const escaped = title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const current = page.getByRole('navigation', { name: 'Guided steps' }).getByRole('button', { name: new RegExp(`^${escaped}\\s*, current step$`) })
+  await expect(current).toBeVisible()
+  await expect(current.locator('xpath=..')).toHaveAttribute('aria-current', 'step')
+}
+
+/** The Guided step dialog (task 78.4): "Step N of M: <title>", or "All N steps complete" at the end. */
+export function stepDialog(page: Page) {
+  return page.getByRole('dialog', { name: /^(Step \d+ of \d+: .+|All \d+ steps complete)$/ })
+}
+
+/**
+ * The dialog opens on a timer (0.8 s after entry, 1.5 s after a step change, task 78.5) and, on a loaded
+ * CI runner, only after the main thread has finished rendering the test result (seen to take 6-8 s
+ * per action). Waiting for it is waiting on an explicit signal (the dialog is visible), so the bound
+ * is generous: a dialog that never opens still fails, just later.
+ */
+export const STEP_DIALOG_OPEN_TIMEOUT = 30_000
+
+/** Waits for the Guided step dialog to open by itself (entry, reload or a step change). */
+export async function expectStepDialogOpen(page: Page) {
+  await expect(stepDialog(page)).toBeVisible({ timeout: STEP_DIALOG_OPEN_TIMEOUT })
+}
+
+/**
+ * Waits for the Guided step dialog (it opens on entry, on reload and on every step change), asserts it
+ * is visible, then closes it: with "Got it", or by keyboard (Escape) when `keyboard` is set, and asserts
+ * that focus returns to the current step button of the stepper. A no-op in Parametric (no stepper, no
+ * dialog). Replaces `dismissGuidedPopover` (task 78.4).
+ */
+export async function closeStepDialog(page: Page, keyboard = false) {
+  const nav = page.getByRole('navigation', { name: 'Guided steps' })
+  if (await nav.count() === 0) return
+  const dialog = stepDialog(page)
+  await expectStepDialogOpen(page)
+  if (keyboard) await page.keyboard.press('Escape')
+  else await dialog.getByRole('button', { name: 'Got it', exact: true }).click()
+  await expect(dialog).toBeHidden()
+  await expect(nav.getByRole('button')).toBeFocused()
+}
+
+/** With every step met the step dialog shows "All experiments complete"; asserts that, then closes it. */
+export async function expectAllStepsComplete(page: Page, keyboard = false) {
+  await expect(stepDialog(page).getByRole('heading', { name: 'All experiments complete' })).toBeVisible({ timeout: STEP_DIALOG_OPEN_TIMEOUT })
+  await closeStepDialog(page, keyboard)
+  await expect(page.getByRole('navigation', { name: 'Guided steps' }).getByRole('button', { name: /^All \d+ steps complete$/ })).toBeVisible()
+}
+
+/** Opens the collapsed "About this model" disclosure, which sits at the bottom of the workbench (task 78.3, WD-35). */
+export async function openAbout(page: Page) {
+  const about = page.locator('.workspace-context details.ei-disclosure')
+  if (!(await about.evaluate((el: HTMLDetailsElement) => el.open))) await about.locator('summary').click()
+  return about
+}
+
+/** Parametric's one explanatory sentence lives in "About this model" (task 78, WD-03). */
+export async function expectParametricNote(page: Page) {
+  const about = await openAbout(page)
+  await expect(about.getByText(/Every parameter is editable from the start/)).toBeVisible()
 }
 
 /** Fills a labelled numeric field and commits it with Enter. */

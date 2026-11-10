@@ -2,8 +2,21 @@ import { useEffect, useId, useRef, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import Icon from '../icons/Icon'
 
+export interface DialogProps {
+  title: string
+  icon?: string
+  onClose: () => void
+  children: ReactNode
+  /** Accessible name when it must differ from the visible heading (task 78.4: "Step N of M: <title>"). */
+  ariaLabel?: string
+  /** A backdrop click closes by default; false makes the dialog close only through its own controls. */
+  dismissOnBackdrop?: boolean
+  /** Marks the dialog (`data-dialog-kind`) so a queued dialog can tell its own from others. */
+  kind?: string
+}
+
 /** Shared template-styled modal with a focus trap and opener restoration (task 22.1). */
-export default function Dialog({ title, icon = 'book', onClose, children }: { title: string; icon?: string; onClose: () => void; children: ReactNode }) {
+export default function Dialog({ title, icon = 'book', onClose, children, ariaLabel, dismissOnBackdrop = true, kind }: DialogProps) {
   const titleId = useId()
   const dialog = useRef<HTMLElement>(null)
   const close = useRef(onClose)
@@ -31,8 +44,8 @@ export default function Dialog({ title, icon = 'book', onClose, children }: { ti
       target?.focus()
     }
   }, [])
-  return createPortal(<div className="modal-backdrop" onClick={() => close.current()}>
-    <section ref={dialog} className="modal" role="dialog" aria-modal="true" aria-labelledby={titleId} tabIndex={-1} onClick={(e) => e.stopPropagation()}>
+  return createPortal(<div className="modal-backdrop" onClick={dismissOnBackdrop ? () => close.current() : undefined}>
+    <section ref={dialog} className="modal" role="dialog" aria-modal="true" aria-label={ariaLabel} aria-labelledby={ariaLabel === undefined ? titleId : undefined} data-dialog-kind={kind} tabIndex={-1} onClick={(e) => e.stopPropagation()}>
       <button type="button" className="modal-close" onClick={onClose} aria-label="Close">×</button>
       <div className="modal-icon"><Icon name={icon} size={23} /></div>
       <h2 id={titleId}>{title}</h2>

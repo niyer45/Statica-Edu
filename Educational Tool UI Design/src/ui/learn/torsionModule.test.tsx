@@ -105,7 +105,7 @@ describe('Torsion learn module (task 71)', () => {
     expect(readout('Shear stress at the surface')).toBe(mpa(shaftResponse(baseShaft()).maxShearStressPa))
   })
 
-  it('Apply it opens Torsion Shaft I in Guided mode', () => {
+  it('Apply it opens Torsion Shaft I in Guided mode', async () => {
     renderHost(memory().storage)
     fireEvent.click(screen.getByRole('button', { name: 'Start Torsion' }))
     fireEvent.click(within(steps()).getByRole('button', { name: 'Apply it' }))
@@ -113,6 +113,6 @@ describe('Torsion learn module (task 71)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Open Torsion Shaft I in Guided mode' }))
     expect(window.__EI_STATE__!.challengeId).toBe('torsion-shaft-1')
     expect(window.__EI_STATE__!.mode).toBe('guided')
-    expect(within(screen.getByRole('region', { name: 'Guided experiments' })).getByRole('heading', { name: 'Hollow it out' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Hollow it out' }, { timeout: 3000 })).toBeTruthy()
   })
 })

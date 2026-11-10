@@ -174,6 +174,18 @@ describe('Column Buckling I workbench', () => {
     expect(value('Diameter')).toBe('24.5')
   })
 
+  it('keeps the view text and the statement remainder collapsed until their disclosures are opened', () => {
+    renderColumn()
+    const details = screen.getByText(/Latest tested critical buckling load 3\.01 kN/).closest('details')!
+    expect(details.open).toBe(false)
+    fireEvent.click(within(details).getByText('Column details'))
+    expect(details.open).toBe(true)
+    const more = screen.getByText('More about this challenge').closest('details')!
+    expect(more.open).toBe(false)
+    fireEvent.click(within(more).getByText('More about this challenge'))
+    expect(more.open).toBe(true)
+  })
+
   it('lists the fixed length, load, pinned ends and material', () => {
     renderColumn()
     fireEvent.click(screen.getByText('Some things are fixed.'))
@@ -209,9 +221,9 @@ describe('Column Buckling I workbench', () => {
     expect(within(dialog).getByText(/not a real-world approval/)).toBeTruthy()
   })
 
-  it('Guided locks every control but the step one and never reveals reference numbers; Parametric is open', () => {
+  it('Guided locks every control but the step one and never reveals reference numbers; Parametric is open', async () => {
     renderColumn('guided')
-    expect(within(screen.getByRole('region', { name: 'Guided experiments' })).getByRole('heading', { name: 'Thicken the solid bar' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Thicken the solid bar' }, { timeout: 3000 })).toBeTruthy()
     expect((screen.getByLabelText('Diameter') as HTMLInputElement).readOnly).toBe(false)
     expect(screen.getByRole('button', { name: /Hollow tube/ }).getAttribute('aria-disabled')).toBe('true')
     expect(columnUi.guided.steps.map((s) => `${s.instruction} ${s.hint}`).join(' ')).not.toMatch(/\d/)

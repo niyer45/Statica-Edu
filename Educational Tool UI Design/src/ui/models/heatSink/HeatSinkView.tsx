@@ -1,6 +1,7 @@
 import { useId } from 'react'
 import { finGap } from '../../../geometry/heatSink/design'
 import type { FinProfileSample } from '../../../physics/heatSink/types'
+import Disclosure from '../../workbench/Disclosure'
 import { describeFins, formatCelsius, formatGap, formatPercent, positionLabel, useHeatSinkStore } from './shared'
 
 // Heat sink design view (task 48.3; HSK-14, MM-22). A main-bundle SVG with no Three.js
@@ -96,10 +97,12 @@ export default function HeatSinkView() {
         <rect x={LEFT} y={baseTop} width={W} height={baseH} className="heat-sink-base" />
         <rect x={LEFT + W * 0.1} y={baseTop + baseH} width={W * 0.8} height={4} className="heat-sink-source" />
       </svg>
-      <p className="viewport-label heat-sink-summary" aria-live="off">
-        {describeFins(draft)} · latest tested gap {formatGap(latest.analysis.finGapM)}
-        {tested ? '' : ' · shading appears after you test this design'}
-      </p>
+      <Disclosure summary="Fin details">
+        <p className="viewport-label heat-sink-summary" aria-live="off">
+          {describeFins(draft)} · latest tested gap {formatGap(latest.analysis.finGapM)}
+          {tested ? '' : ' · shading appears after you test this design'}
+        </p>
+      </Disclosure>
       {tested && (
         <div className="heat-sink-legend">
           <span>Fin color scale: {formatCelsius(coolK)} (air)</span>
@@ -115,10 +118,9 @@ export default function HeatSinkView() {
           <span>{formatCelsius(hotK)} limit or hotter</span>
         </div>
       )}
-      <details className="fin-profile-details">
-        <summary>Fin temperatures</summary>
+      <Disclosure summary="Fin temperatures" className="fin-profile-details">
         <ProfileTable profile={latest.analysis.finProfile} caption={`${latest.iteration === 0 ? 'Baseline' : `Iteration ${latest.iteration}`}, latest tested design`} />
-      </details>
+      </Disclosure>
     </div>
   )
 }

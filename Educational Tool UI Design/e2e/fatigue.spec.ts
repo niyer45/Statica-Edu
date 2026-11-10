@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers'
+import { audit, closeStepDialog, expectAllStepsComplete, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers'
 
 // Fatigue Analysis I (task 70, D-60): the stepped stub-axle spindle, chosen before entry from the
 // library, the full prediction/test loop from a Baseline that fails fatigue, yield and mass to the
@@ -27,6 +27,8 @@ async function openFatigue(page: Page, mode: 'Guided' | 'Parametric', keyboard: 
     await drawer.getByRole('button', { name: /^(Open|Continue) challenge$/ }).click()
   }
   await expect(page.getByRole('button', { name: 'Run Test', exact: true })).toBeVisible()
+  // The step dialog opens on every Guided entry and on reload (task 78.4); read it, then close it.
+  if (mode === 'Guided') await closeStepDialog(page, keyboard)
   await expect.poll(async () => (await readState(page)).challengeId).toBe('fatigue-analysis-1')
 }
 
@@ -95,7 +97,19 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await expect(page.getByText('3D view is unavailable. Showing the 2D side view of the spindle instead.').first()).toBeVisible()
       await expect(page.locator('canvas')).toHaveCount(0)
     }
-    await expect(page.getByRole('img', { name: /^S-N diagram of the latest tested design/ })).toBeVisible()
+    // Task 78: the S-N diagram and the statement remainder are collapsed until opened.
+    const snDiagram = page.getByRole('img', { name: /^S-N diagram of the latest tested design/ })
+    await expect(snDiagram).toBeHidden()
+    await page.getByText('S-N diagram', { exact: true }).click()
+    await expect(snDiagram).toBeVisible()
+    const challenge = page.getByRole('complementary', { name: 'Checks', exact: true })
+    const band = page.getByRole('region', { name: 'The challenge', exact: true })
+    await expect(band.getByText(/A steel stub-axle spindle is held by its collar/)).toBeVisible()
+    await expect(challenge.getByText(/A steel stub-axle spindle is held by its collar/)).toHaveCount(0)
+    const fixedNote = band.getByText(/The load, its position, the lengths and the material are fixed/)
+    await expect(fixedNote).toBeHidden()
+    await band.getByText('More about this challenge', { exact: true }).click()
+    await expect(fixedNote).toBeVisible()
     await expect(page.getByText(/Stress-life screening of a stepped spindle/)).toBeVisible()
     const collar = page.getByLabel('Collar diameter', { exact: true })
     if (mode === 'Guided') {
@@ -113,15 +127,18 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await setDimension(page, 'Fillet radius', '2', keyboard)
       await runAnyTest(page, keyboard)
       await expectGuidedStep(page, 'Improve the surface')
+      await closeStepDialog(page, keyboard)
       await chooseMachined(page, keyboard)
       await runAnyTest(page, keyboard)
       await expectGuidedStep(page, 'Thicken the neck')
+      await closeStepDialog(page, keyboard)
       await setDimension(page, 'Neck diameter', '24.5', keyboard)
       await runAnyTest(page, keyboard)
       await expectGuidedStep(page, 'Meet every check')
+      await closeStepDialog(page, keyboard)
       await setDimension(page, 'Collar diameter', '34', keyboard)
       await runAnyTest(page, keyboard)
-      await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('heading', { name: 'All experiments complete' })).toBeVisible()
+      await expectAllStepsComplete(page, keyboard)
     } else {
       await setDimension(page, 'Collar diameter', '34', keyboard)
       await setDimension(page, 'Neck diameter', '24.5', keyboard)

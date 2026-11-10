@@ -122,7 +122,7 @@ describe('model UI registry', () => {
     expect(beamUi.copy.prediction.question('the Baseline')).toBe('Compared with the Baseline, how will your new section change tip deflection?')
   })
 
-  it('renders a non-beam workbench entirely through its slots and wording', () => {
+  it('renders a non-beam workbench entirely through its slots and wording', async () => {
     renderTorsion()
     expect(screen.getByText('Torsion tools for Torsion Shaft I')).toBeTruthy()
     expect(screen.getByText('Torsion view')).toBeTruthy()
@@ -131,7 +131,7 @@ describe('model UI registry', () => {
     expect(screen.getByText('Idealized circular-shaft torsion, not a certification')).toBeTruthy()
     expect(screen.getByText('Limit twist within stress, mass and packaging limits.')).toBeTruthy()
     expect(screen.getByText('Saint-Venant · Circular shaft torsion')).toBeTruthy()
-    expect(screen.getByText('Find the limit the solid shaft misses.')).toBeTruthy()
+    expect(await screen.findByText('Find the limit the solid shaft misses.', undefined, { timeout: 3000 })).toBeTruthy()
     // No beam wording leaks into the non-beam workbench.
     expect(screen.queryByText(/beam/i)).toBeNull()
     expect(screen.queryByText(/deflection/i)).toBeNull()
@@ -149,7 +149,9 @@ describe('model UI registry', () => {
 
   it('shows open design and no guided experiments in Parametric mode', () => {
     renderTorsion('parametric')
-    expect(screen.getByText(/Every parameter is editable from the start/)).toBeTruthy()
+    const sentence = screen.getByText(/Every parameter is editable from the start/)
+    // The sentence lives in the collapsed "About this model" disclosure (task 78).
+    expect(sentence.closest('details')?.querySelector('summary')?.textContent).toBe('About this model')
     expect(screen.queryByText('Find the limit the solid shaft misses.')).toBeNull()
   })
 

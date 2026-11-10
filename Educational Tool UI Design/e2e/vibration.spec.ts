@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers'
+import { audit, closeStepDialog, expectAllStepsComplete, expectGuidedStep, expectParametricNote, readState, runAnyTest, tabTo } from './helpers'
 
 // Vibration Isolation I (task 50.3; VIB-14–VIB-16, MM-16, MM-22): chosen before entry from the
 // library, full prediction/test loop to an Accepted reference-class mount, saved under its own
@@ -26,6 +26,8 @@ async function openVibration(page: Page, mode: 'Guided' | 'Parametric', keyboard
     await drawer.getByRole('button', { name: 'Open challenge', exact: true }).click()
   }
   await expect(page.getByRole('button', { name: 'Run Test', exact: true })).toBeVisible()
+  // The step dialog opens on every Guided entry and on reload (task 78.4); read it, then close it.
+  if (mode === 'Guided') await closeStepDialog(page, keyboard)
   // The dev snapshot follows the newly mounted store after the switch; wait for it.
   await expect.poll(async () => (await readState(page)).challengeId).toBe('vibration-isolation-1')
 }
@@ -78,12 +80,24 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     expect(initial.mode).toBe(mode.toLowerCase())
     // Task 56 follow-up: the challenge panel matches Cantilever Beam I: the visible statement
     // followed by the value/limit checks.
-    const challenge = page.getByRole('complementary', { name: 'The challenge', exact: true })
-    await expect(challenge.getByText(/it does not simulate motion over time/)).toBeVisible()
+    const challenge = page.getByRole('complementary', { name: 'Checks', exact: true })
+    // Task 78.2: the challenge band is first; its first sentence is visible and the steady-state sentence is collapsed until opened.
+    const band = page.getByRole('region', { name: 'The challenge', exact: true })
+    await expect(band.getByText(/A rigid component sits on mounts so stiff/)).toBeVisible()
+    await expect(challenge.getByText(/A rigid component sits on mounts so stiff/)).toHaveCount(0)
+    const steady = band.getByText(/it does not simulate motion over time/)
+    await expect(steady).toBeHidden()
+    await band.getByText('More about this challenge', { exact: true }).click()
+    await expect(steady).toBeVisible()
     const requirements = challenge.getByRole('list', { name: 'Design requirements' })
     await expect(requirements.getByText('10.1', { exact: true })).toHaveCount(2)
     await expect(page.getByText('Idealized steady-state vibration isolation, not an engineering certification')).toBeVisible()
     await expect(page.getByRole('img', { name: /Steady-state frequency response/ })).toBeVisible()
+    // The chart reading note is collapsed by default and visible once opened (task 78).
+    const reading = page.getByText(/Natural frequency 30\.20 Hz, inside the operating band/)
+    await expect(reading).toBeHidden()
+    await page.getByText('Reading the chart', { exact: true }).click()
+    await expect(reading).toBeVisible()
     // The full response table is collapsed by default (task 56).
     await expect(page.getByRole('table', { name: 'Frequency response values' })).toBeHidden()
     await page.getByText('All response values', { exact: true }).click()
@@ -95,7 +109,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await expect(neoprene).toBeDisabled()
     } else {
       await expect(page.getByRole('region', { name: 'Guided experiments' })).toHaveCount(0)
-      await expect(page.getByText(/Every parameter is editable from the start/)).toBeVisible()
+      await expectParametricNote(page)
       await expect(neoprene).toBeEnabled()
     }
     await audit(page)
@@ -106,10 +120,12 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await stiffness.press('Enter')
       await runAnyTest(page)
       await expectGuidedStep(page, 'Change the damping')
+      await closeStepDialog(page, keyboard)
       await expect(stiffness).toHaveAttribute('readonly', '')
       await neoprene.check()
       await runAnyTest(page)
       await expectGuidedStep(page, 'Meet every check')
+      await closeStepDialog(page, keyboard)
     }
     await setReferenceMount(page, keyboard)
     const run = page.getByRole('button', { name: 'Run Test', exact: true })
@@ -138,7 +154,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     const tested = await readState(page)
     expect(tested.history).toHaveLength(tests)
     expect(tested.history[tests - 1].evaluation.status).toBe('accepted')
-    if (mode === 'Guided') await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('heading', { name: 'All experiments complete' })).toBeVisible()
+    if (mode === 'Guided') await expectAllStepsComplete(page, keyboard)
     await expect(requirements.getByText('0.0929', { exact: true })).toBeVisible()
     await audit(page)
     await noHorizontalOverflow(page)

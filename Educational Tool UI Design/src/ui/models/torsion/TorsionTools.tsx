@@ -3,6 +3,7 @@ import { torsionPermissibleRange, TORSION_SECTION_PARAMS } from '../../../geomet
 import { formatMm, mmToM, mToMm, parseMmInput } from '../../../units/units'
 import Icon from '../../icons/Icon'
 import SectionIcon from '../../icons/SectionIcon'
+import Disclosure from '../../workbench/Disclosure'
 import LockNote from '../../workbench/LockNote'
 import { useGuided } from '../../workbench/useGuided'
 import { formatTorsion, SHAFT_PARAM_LABELS, SHAFT_SECTION_NAMES, useTorsionStore } from './shared'
@@ -136,10 +137,14 @@ export default function TorsionTools({ onAnnounce }: { onAnnounce: (message: str
           </div>
         )
       })}
-      <details className="locked-features">
-        <summary>
-          <Icon name="lock" size={14} /> Some things are fixed.
-        </summary>
+      <Disclosure
+        className="locked-features"
+        summary={
+          <>
+            <Icon name="lock" size={14} /> Some things are fixed.
+          </>
+        }
+      >
         <dl>
           <dt>Length</dt>
           <dd>{formatTorsion(ch.lengthM, 'm')}</dd>
@@ -150,7 +155,7 @@ export default function TorsionTools({ onAnnounce }: { onAnnounce: (message: str
           <dt>Support</dt>
           <dd>Opposite end fixed against rotation</dd>
         </dl>
-      </details>
+      </Disclosure>
     </>
   )
 }

@@ -39,12 +39,32 @@ describe('Workbench', () => {
     // Explain & submit disabled until a non-baseline test exists (Req 35.6).
     expect(screen.getByRole('button', { name: /Explain & submit/ }).hasAttribute('disabled')).toBe(true)
     // Guided experiment step states conveyed by text (task 58).
-    expect(screen.getByRole('list', { name: 'Experiment steps' }).textContent).toContain('1. Grow the circle, current step')
+    expect(screen.getByRole('navigation', { name: 'Guided steps' }).textContent).toContain('Grow the circle, current step')
     expect(document.querySelector('[aria-live="polite"]')).not.toBeNull()
 
     // The lazy viewport resolves into the same region.
     expect(await screen.findByRole('button', { name: 'Zoom in' }, { timeout: 5000 })).toBeTruthy()
     expect(screen.queryByText(VIEWPORT_LOADING_TEXT)).toBeNull()
+  })
+})
+
+describe('About this model disclosure (task 78, WD-03)', () => {
+  it('folds the tagline, mode sentence and solver label into one collapsed disclosure; the footer notice stays visible', () => {
+    const { container } = renderWorkbench()
+    const about = container.querySelector('.workspace-context details.ei-disclosure')!
+    expect(about.querySelector('summary')?.textContent).toBe('About this model')
+    expect((about as HTMLDetailsElement).open).toBe(false)
+    expect(about.textContent).toContain('Structured experiments')
+    expect(about.querySelector('.solver-label')?.textContent).not.toBe('')
+    // Task 78.3: the row sits at the bottom, after the results and before the limits footer.
+    const row = container.querySelector('.workspace-context')!
+    const follows = (a: Element, b: Element) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0
+    expect(follows(container.querySelector('.results-panel')!, row)).toBe(true)
+    expect(follows(row, container.querySelector('.page-footer')!)).toBe(true)
+    // The tagline is no longer a permanent paragraph in the page heading.
+    expect(container.querySelector('.page-heading p')).toBeNull()
+    // The model-limits notice is outside every disclosure (Req 29.7).
+    expect(screen.getByText(MODEL_LIMITS_NOTICE).closest('details')).toBeNull()
   })
 })
 

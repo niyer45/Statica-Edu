@@ -1,0 +1,8 @@
+/* Torsion Shaft I (task 47.3): display-only SVG shaft view and torsion field details. */
+.torsion-view { display: flex; flex-direction: column; flex: 1; justify-content: center; padding: 0 12px 12px; }
+.torsion-view svg { width: 100%; height: auto; min-height: 0; cursor: default; }
+.shaft-section, .shaft-body { fill: #a8b49a; stroke: #4f653e; stroke-width: 1; }
+.shaft-bore { fill: #f4f6ef; stroke: #4f653e; stroke-width: 1; }
+.shaft-wall { fill: #62685c; }
+.shaft-twist-line { stroke: #34543c; stroke-width: 2; stroke-dasharray: 5 3; }
+.torsion-summary { margin: 8px 0 0; letter-spacing: 0; text-transform: none; font-weight: 500; }

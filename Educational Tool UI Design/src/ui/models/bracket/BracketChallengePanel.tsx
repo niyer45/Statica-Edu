@@ -1,4 +1,5 @@
 import { STATUS_LABELS } from '../../panels/resultPresentation'
+import Disclosure from '../../workbench/Disclosure'
 import Icon from '../../icons/Icon'
 import { formatBracket, useBracketStore } from './shared'
 
@@ -8,7 +9,7 @@ import { formatBracket, useBracketStore } from './shared'
 // quantities (owner feedback: no extra lines under the checks), draft errors and Run Test.
 
 export default function BracketChallengePanel({ onOpenHelp }: { onOpenHelp: () => void }) {
-  const { state, challenge: ch, runTest } = useBracketStore()
+  const { state, runTest } = useBracketStore()
   const latest = state.history[state.history.length - 1]!
   const { analysis: a, evaluation } = latest
   const outside = evaluation.status === 'modelNotApplicable'
@@ -28,10 +29,9 @@ export default function BracketChallengePanel({ onOpenHelp }: { onOpenHelp: () =
     <>
       <div className="panel-title">
         <Icon name="book" size={16} />
-        <h2>The challenge</h2>
+        <h2>Checks</h2>
       </div>
       <div className="challenge-body">
-        <p>{ch.statement}</p>
         <div className="section-heading requirements-title">
           VALUE / LIMIT <Icon name="lock" size={11} />
         </div>
@@ -54,8 +54,7 @@ export default function BracketChallengePanel({ onOpenHelp }: { onOpenHelp: () =
             ))}
           </ul>
         )}
-        <details className="result-details">
-          <summary>Test details</summary>
+        <Disclosure summary="Test details" className="result-details">
           {a.warnings.length > 0 && (
             <ul aria-label="Model warnings">
               {a.warnings.map((w) => (
@@ -94,7 +93,7 @@ export default function BracketChallengePanel({ onOpenHelp }: { onOpenHelp: () =
             </tbody>
           </table>
           <p>Status: {STATUS_LABELS[evaluation.status]}</p>
-        </details>
+        </Disclosure>
         {state.draftErrors.length > 0 && (
           <ul aria-label="Design errors">
             {state.draftErrors.map((e, i) => (

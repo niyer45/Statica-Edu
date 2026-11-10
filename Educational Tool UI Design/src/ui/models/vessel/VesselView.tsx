@@ -3,6 +3,7 @@ import type { ViewportProps } from '../../viewport/FallbackViewport'
 import ViewportBoundary from '../../viewport/ViewportBoundary'
 import ViewportLoading from '../../viewport/ViewportLoading'
 import { supportsWebGL2 } from '../../viewport/webgl'
+import Disclosure from '../../workbench/Disclosure'
 import VesselDetails from './VesselDetails'
 import VesselElevation, { WALL_EXAGGERATION } from './VesselElevation'
 
@@ -30,7 +31,9 @@ function VesselFallback({ onUnavailable }: ViewportProps) {
     <>
       <p className="viewport-label vessel-fallback-notice">{VESSEL_FALLBACK_NOTICE}</p>
       <VesselElevation />
-      <p className="viewport-label vessel-caption">{ELEVATION_CAPTION}</p>
+      <Disclosure summary="About this drawing">
+        <p className="viewport-label vessel-caption">{ELEVATION_CAPTION}</p>
+      </Disclosure>
     </>
   )
 }

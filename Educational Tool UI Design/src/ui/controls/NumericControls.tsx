@@ -6,6 +6,7 @@ import type { GeometryError, Orientation } from '../../geometry/sections'
 import { formatMm, mmToM, mToMm, parseMmInput } from '../../units/units'
 import Icon from '../icons/Icon'
 import { useChallenge, useDispatch, useSession } from '../state/store'
+import Disclosure from '../workbench/Disclosure'
 import LockNote from '../workbench/LockNote'
 import { useGuided } from '../workbench/useGuided'
 
@@ -237,8 +238,7 @@ function LockedFields() {
   }
   const fields = (Object.keys(LOCKED_LABELS) as LockedField[]).filter((f) => challenge.lockedFields.includes(f))
   return (
-    <details className="locked-features">
-      <summary><Icon name="lock" size={13} />Some things are fixed.</summary>
+    <Disclosure className="locked-features" summary={<><Icon name="lock" size={13} />Some things are fixed.</>}>
       <div className="min-w-0">
         {fields.map((f) => {
           const id = `locked-${f}`
@@ -264,6 +264,6 @@ function LockedFields() {
           )
         })}
       </div>
-    </details>
+    </Disclosure>
   )
 }

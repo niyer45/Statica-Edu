@@ -92,11 +92,28 @@ describe('Fatigue Analysis I workbench', () => {
     expect(within(requirements).getAllByText('✗ Fail')).toHaveLength(3)
     expect(within(requirements).getAllByText('✓ Pass')).toHaveLength(1)
     expect(screen.getByText(FATIGUE_LIMITS_NOTICE)).toBeTruthy()
-    expect(screen.getByText(/fatigue safety factor 0\.62 \(fail\), Kf 2\.001, predicted life 6\.99 × 10³ cycles/)).toBeTruthy()
+    // Task 78 (D-65): task 78.2: the first sentence is a visible paragraph in the challenge band; the remainder is
+    // word for word in the collapsed "More about this challenge" (visible after opening).
+    const panel = screen.getByRole('complementary', { name: 'Checks' })
+    const band = screen.getByRole('region', { name: 'The challenge' })
+    const lead = within(band).getByText(/A steel stub-axle spindle is held by its collar/)
+    expect(lead.tagName).toBe('P')
+    expect(lead.closest('details')).toBeNull()
+    expect(panel.textContent).not.toContain(lead.textContent!)
+    expect(lead.textContent).toBe(ch.statement.slice(0, lead.textContent!.length))
+    const more = within(band).getByText('More about this challenge').closest('details')!
+    expect(more.open).toBe(false)
+    expect(within(more).getByText(/The load, its position, the lengths and the material are fixed\./).textContent).toBe(ch.statement.slice(lead.textContent!.length).trim())
+    fireEvent.click(within(more).getByText('More about this challenge'))
+    expect(more.open).toBe(true)
+    // The test summary, the S-N diagram and its values are collapsed by default.
+    const summary = screen.getByText(/fatigue safety factor 0\.62 \(fail\), Kf 2\.001, predicted life 6\.99 × 10³ cycles/)
+    expect(summary.closest('details')!.open).toBe(false)
     // jsdom has no WebGL2: the 2D side view shows with a notice, plus the S-N diagram.
     expect(screen.getByRole('img', { name: ELEVATION_LABEL })).toBeTruthy()
     expect(screen.getAllByText(FATIGUE_FALLBACK_NOTICE).length).toBeGreaterThan(0)
     const sn = screen.getByRole('img', { name: SN_LABEL })
+    expect(sn.closest('details')!.open).toBe(false)
     expect(sn.querySelectorAll('polyline.fatigue-sn-line')).toHaveLength(1)
     expect(sn.querySelectorAll('circle.fatigue-sn-point')).toHaveLength(1)
     const table = screen.getByRole('table', { name: 'S-N values of the latest tested design' })
@@ -198,7 +215,7 @@ describe('Fatigue Analysis I workbench', () => {
     expect(within(dialog).getByText(/not a fatigue certification/)).toBeTruthy()
   })
 
-  it('Guided locks everything but the step parameter; Parametric is open design (task 58)', () => {
+  it('Guided locks everything but the step parameter; Parametric is open design (task 58)', async () => {
     renderFatigue('guided')
     const unlocked = fatigueUi.guided.steps[0]!.unlocks as readonly string[]
     for (const [param, label] of Object.entries(FATIGUE_PARAM_LABELS)) {
@@ -206,8 +223,7 @@ describe('Fatigue Analysis I workbench', () => {
       expect((screen.getByLabelText(label) as HTMLInputElement).readOnly).toBe(!unlocked.includes(param))
     }
     expect((screen.getByRole('radio', { name: 'Ground' }) as HTMLInputElement).disabled).toBe(true)
-    const guidance = screen.getByRole('region', { name: 'Guided experiments' })
-    expect(within(guidance).getByRole('heading', { name: 'Round the fillet' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Round the fillet' }, { timeout: 3000 })).toBeTruthy()
     expect(fatigueUi.guided.steps.map((s) => `${s.instruction} ${s.hint}`).join(' ')).not.toMatch(/\d/)
     cleanup()
     renderFatigue('parametric')

@@ -96,6 +96,17 @@ These tasks need the owner and real students. Agents prepare materials and recor
   - [ ] 76.2 Implement and verify: export/import round-trip, read-only viewer, E2E on desktop and Pixel 7, axe gates; owner review before release.
 
 - [x] 77. Split the learningLoop keyboard/mouse E2E test and drop its keyboard pre-scroll (director, 2026-10-20, after CI run 39371364350 shard 2 timed out on a slow runner; no assertion weakened) — see HANDOFF; 77.2: (b) compares against a committed normalized fixture (`e2e/fixtures/learningLoop/`) instead of rebuilding the keyboard state
+- [x] 78. Declutter the challenge workbench: Guided step popover, collapsed sections, two-sentence statements (owner, 2026-11-09: "way too cluttered… too many words"; D-65) — see HANDOFF
+  - [x] 78.0 Foundation: spec `.kiro/specs/workbench-declutter/`, shared `Disclosure`, `ChallengeStatement`, Guided step popover, lock line and marks
+  - [x] 78.A Per-model slice A: Cantilever Beam I, Torsion Shaft I, Mounting Bracket I
+  - [x] 78.B Per-model slice B: Column Buckling I, Stress and Strain I, Heat Sink I, Pressure Vessel I
+  - [x] 78.C Per-model slice C: Braced Frame I, Vibration Isolation I, Fatigue Analysis I
+  - [x] 78.I Integration: merge of the slices, `e2e/disclosure.spec.ts` over all ten challenges with explicit popover dismissal (`dismissGuidedPopover`), popover/chip and Parametric assertions, before/after word counts, docs, full gate
+  - [x] 78.2 The challenge comes first (owner, 2026-11-09; D-65 amendment; WD-20–WD-24): full-width `ChallengeBand` above the "About this model" row and the Guided chip on all ten challenges, with the card goal line and the first sentence visible and the rest under "More about this challenge"; the right-hand panel is now "Checks"
+  - [x] 78.3 Guided steps as a stepper row under the challenge band (replaces the "Step N of M" chip; the popover holds the current step and the lock line), and "Guided mode / About this model" moves to the bottom above the footer (owner, 2026-11-09, with a reference image; D-65 amendment 2; WD-30–WD-36)
+  - [x] 78.4 The Guided step instruction is a modal dialog opened on entry and on each new step, reopened from the current step in the stepper; one feedback line under the row after a failed attempt (owner, 2026-11-10; D-65 amendment 3; WD-40–WD-47; supersedes the non-modal popover)
+  - [x] 78.5 Step dialog polish (owner, 2026-11-10; WD-48–WD-51): one consistent text block, the lock line merged into the "Editable now" line, the dialog opens 800 ms after entry and 1500 ms after a new step (clicking the step name is immediate), and a 19 px gap above the "Guided mode / About this model" row (owner: "give some more gap between the two boxes"; also at least 12 px below it); unit tests on fake timers, a delay E2E and an About-row gap assertion (at least 12 px above and below) in `e2e/disclosure.spec.ts`
+  - [x] 78.6 E2E robustness after CI run 42875713442 (shards 2 and 4 failed on ba8f189): the step dialog is awaited with an explicit 30 s signal (`expectStepDialogOpen`, `STEP_DIALOG_OPEN_TIMEOUT` in `e2e/helpers.ts`) wherever it follows entry or a step change; the band-above-workbench check reads both boxes in one evaluate after `document.fonts.ready`; the delay test records the order workbench then dialog in the page instead of asserting a 500 ms bound or a pre-delay absence
 
 ### (d) Milestone 6: scoped platform extensions
 

@@ -1,18 +1,20 @@
 import { BRACED_FRAME_CONSTRAINT_LABELS } from '../../../evaluation/bracedFrame/constraints'
 import { STATUS_LABELS } from '../../panels/resultPresentation'
 import Icon from '../../icons/Icon'
+import Disclosure from '../../workbench/Disclosure'
 import { boolText, CHECK_LABELS, constraintRows, formatFrame, MODE_PHRASES, memberName, NOT_APPLICABLE, unstableText, useFrameStore } from './shared'
 
 // Braced frame challenge panel (task 49.3; task 56 follow-up: same structure and styling as
-// Cantilever Beam I's RequirementsPanel; BFR-06, BFR-07, MM-10, MM-11). The visible challenge
-// statement (with the pin-jointed idealization sentence, BFR-01), the stored value/limit list of
+// Cantilever Beam I's RequirementsPanel; BFR-06, BFR-07, MM-10, MM-11). The challenge
+// statement lead (two sentences; the rest, with the pin-jointed idealization sentence of BFR-01, in a
+// collapsed disclosure, task 78), the stored value/limit list of
 // the latest test with Pass/Fail marks, one governing-member (or unstable-storey) line,
 // applicability reasons/warnings, a table-only Test details disclosure (D-30), draft errors, the
 // reference link and Run Test. For a mechanism, roof drift and utilization are not defined: they
 // are shown as "Not applicable", never as numbers or as failed.
 
 export default function BracedFrameChallengePanel({ onOpenHelp }: { onOpenHelp: () => void }) {
-  const { state, challenge: ch, runTest } = useFrameStore()
+  const { state, runTest } = useFrameStore()
   const latest = state.history[state.history.length - 1]!
   const { analysis, evaluation } = latest
   const outside = evaluation.status === 'modelNotApplicable'
@@ -21,11 +23,10 @@ export default function BracedFrameChallengePanel({ onOpenHelp }: { onOpenHelp: 
     <>
       <div className="panel-title">
         <Icon name="book" size={16} />
-        <h2>The challenge</h2>
+        <h2>Checks</h2>
         <span className="challenge-number">01 / 01</span>
       </div>
       <div className="challenge-body">
-        <p>{ch.statement}</p>
         <div className="section-heading requirements-title">
           VALUE / LIMIT <Icon name="lock" size={11} />
         </div>
@@ -82,8 +83,7 @@ export default function BracedFrameChallengePanel({ onOpenHelp }: { onOpenHelp: 
             <li key={w.code}>{w.message}</li>
           ))}
         </ul>
-        <details className="result-details">
-          <summary>Test details</summary>
+        <Disclosure summary="Test details" className="result-details">
           <table aria-label="Latest tested results">
             <thead>
               <tr>
@@ -115,7 +115,7 @@ export default function BracedFrameChallengePanel({ onOpenHelp }: { onOpenHelp: 
             </tbody>
           </table>
           <p>Status: {STATUS_LABELS[evaluation.status]}</p>
-        </details>
+        </Disclosure>
         {state.draftErrors.length > 0 && (
           <ul aria-label="Design errors">
             {state.draftErrors.map((e, i) => (

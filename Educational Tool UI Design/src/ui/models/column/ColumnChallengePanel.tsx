@@ -3,7 +3,7 @@ import Icon from '../../icons/Icon'
 import { formatColumn, formatLimit, useColumnStore } from './shared'
 
 // Column challenge panel (task 68; CBK-07, CBK-08, CBK-11, CBK-12, D-48 amendment). The Cantilever
-// layout: the statement as a visible paragraph, the stored VALUE / LIMIT list of the latest test
+// layout: the statement lead visible with the rest collapsed (task 78), the stored VALUE / LIMIT list of the latest test
 // with text Pass/Fail (the critical load is a minimum, shown as "≥ limit"), applicability reasons
 // and cautions, a Test details disclosure (D-30) with the constraint table and the stored column
 // quantities, draft errors, the reference link and Run Test.
@@ -26,10 +26,9 @@ export default function ColumnChallengePanel({ onOpenHelp }: { onOpenHelp: () =>
     <>
       <div className="panel-title">
         <Icon name="book" size={16} />
-        <h2>The challenge</h2>
+        <h2>Checks</h2>
       </div>
       <div className="challenge-body">
-        <p>{ch.statement}</p>
         <div className="section-heading requirements-title">
           VALUE / LIMIT <Icon name="lock" size={11} />
         </div>

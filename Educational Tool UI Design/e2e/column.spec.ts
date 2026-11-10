@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers'
+import { audit, closeStepDialog, expectAllStepsComplete, expectGuidedStep, expectParametricNote, readState, runAnyTest, tabTo } from './helpers'
 
 // Column Buckling I (task 68, D-58; CBK-18–CBK-20, MM-16, MM-22): the owner-requested introductory
 // challenge, chosen before entry from the library; the full prediction/test loop from a solid bar
@@ -26,6 +26,8 @@ async function openColumn(page: Page, mode: 'Guided' | 'Parametric', keyboard: b
     await drawer.getByRole('button', { name: /^(Open|Continue) challenge$/ }).click()
   }
   await expect(page.getByRole('button', { name: 'Run Test', exact: true })).toBeVisible()
+  // The step dialog opens on every Guided entry and on reload (task 78.4); read it, then close it.
+  if (mode === 'Guided') await closeStepDialog(page, keyboard)
   await expect.poll(async () => (await readState(page)).challengeId).toBe('column-buckling-1')
 }
 
@@ -97,13 +99,19 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await expect(page.locator('canvas')).toHaveCount(0)
     }
     await expect(page.getByText(/Idealized pinned–pinned Euler column/)).toBeVisible()
+    // Task 78: the view text (summary and display note) is collapsed until "Column details" opens.
+    const viewText = page.getByText(/Latest tested critical buckling load 3\.01 kN/)
+    await expect(viewText).toBeHidden()
+    await page.getByText('Column details', { exact: true }).click()
+    await expect(viewText).toBeVisible()
+    await expect(page.getByText(/Dashed line: the buckling mode shape/)).toBeVisible()
     const tile = page.getByRole('button', { name: /Hollow tube/ })
     if (mode === 'Guided') {
       await expectGuidedStep(page, 'Thicken the solid bar')
       await expect(tile).toHaveAttribute('aria-disabled', 'true')
     } else {
       await expect(page.getByRole('region', { name: 'Guided experiments' })).toHaveCount(0)
-      await expect(page.getByText(/Every parameter is editable from the start/)).toBeVisible()
+      await expectParametricNote(page)
     }
     await audit(page)
 
@@ -112,19 +120,23 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await setDimension(page, 'Diameter', '30', keyboard)
       await runAnyTest(page, keyboard)
       await expectGuidedStep(page, 'Hollow it out')
+      await closeStepDialog(page, keyboard)
       await chooseTube(page, keyboard)
       await runAnyTest(page, keyboard)
       await expectGuidedStep(page, 'Change only the wall')
+      await closeStepDialog(page, keyboard)
       await expect(page.getByLabel('Outer diameter', { exact: true })).toHaveAttribute('readonly', '')
       await setDimension(page, 'Wall thickness', '2', keyboard)
       await runAnyTest(page, keyboard)
       await expectGuidedStep(page, 'Widen the tube')
+      await closeStepDialog(page, keyboard)
       await setDimension(page, 'Outer diameter', '55', keyboard)
       await runAnyTest(page, keyboard)
       await expectGuidedStep(page, 'Meet every check')
+      await closeStepDialog(page, keyboard)
       await setDimension(page, 'Outer diameter', '60', keyboard)
       await runAnyTest(page, keyboard)
-      await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('heading', { name: 'All experiments complete' })).toBeVisible()
+      await expectAllStepsComplete(page, keyboard)
     } else {
       await chooseTube(page, keyboard)
       await setDimension(page, 'Outer diameter', '60', keyboard)

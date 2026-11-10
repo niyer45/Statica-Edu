@@ -108,7 +108,7 @@ describe('Mounting Bracket I workbench', () => {
     expect(within(requirements).getAllByText('✗ Fail')).toHaveLength(4)
     expect(screen.getAllByText(/Bend stress 231\.0 MPa at the inside of the bend \(curved-beam factor 1\.73\) · 333 N per bolt/).length).toBeGreaterThan(0)
     // Owner feedback (task 61): no extra lines under the checks; the cautions sit in Test details.
-    const panel = screen.getByRole('complementary', { name: 'The challenge' })
+    const panel = screen.getByRole('complementary', { name: 'Checks' })
     expect(within(panel).queryByText(/^Bend stress .* per bolt$/)).toBeNull()
     const warnings = within(panel).getByRole('list', { name: 'Model warnings', hidden: true })
     expect(warnings.closest('details')?.querySelector('summary')?.textContent).toBe('Test details')
@@ -120,6 +120,11 @@ describe('Mounting Bracket I workbench', () => {
     // jsdom has no WebGL2: the 2D side view (wall, L-bracket, bolts, hanging load) shows with a notice.
     expect(screen.getByRole('img', { name: ELEVATION_LABEL })).toBeTruthy()
     expect(screen.getAllByText(BRACKET_FALLBACK_NOTICE).length).toBeGreaterThan(0)
+    // Task 78: the moment-path paragraph, graph and section table sit in one collapsed Disclosure.
+    const momentPath = screen.getByText('Moment path').closest('details')!
+    expect(momentPath.open).toBe(false)
+    fireEvent.click(screen.getByText('Moment path'))
+    expect(momentPath.open).toBe(true)
     expect(screen.getByText(/An L-bracket: its vertical flange is bolted flat to the wall/)).toBeTruthy()
     const view = screen.getByRole('img', { name: STRIP_LABEL })
     // The bend is a distinct shape (filled triangle) and the bolt row an open circle, not only a color.
@@ -240,10 +245,9 @@ describe('Mounting Bracket I workbench', () => {
     for (const label of Object.values(BRACKET_PARAM_LABELS)) expect((screen.getByLabelText(label) as HTMLInputElement).readOnly).toBe(false)
   })
 
-  it('Guided steps never reveal the reference dimensions', () => {
+  it('Guided steps never reveal the reference dimensions', async () => {
     renderBracket('guided')
-    const guidance = screen.getByRole('region', { name: 'Guided experiments' })
-    expect(within(guidance).getByRole('heading', { name: bracketUi.guided.steps[0]!.title })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: bracketUi.guided.steps[0]!.title }, { timeout: 3000 })).toBeTruthy()
     const text = bracketUi.guided.steps.map((s) => `${s.instruction} ${s.hint}`).join(' ')
     expect(text).not.toMatch(/\d/)
   })

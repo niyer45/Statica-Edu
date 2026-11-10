@@ -52,7 +52,7 @@ function exposedText(node: Node): string {
 
 /** Visible label plus the visually hidden state text of each Guided experiment step. */
 function stepTexts() {
-  return within(screen.getByRole('list', { name: 'Experiment steps' }))
+  return within(screen.getByRole('navigation', { name: 'Guided steps' }))
     .getAllByRole('listitem')
     .map(exposedText)
 }
@@ -88,7 +88,8 @@ describe('Workbench layout', () => {
 
     // Panels respond to input while the viewport is still loading (the palette tiles are
     // non-interactive stubs until task 15.1, so the requirements panel's help button is used).
-    expect(document.querySelector('.modal')).toBeNull()
+    // (The Guided step dialog is open on entry; only other modals are counted here.)
+    expect(document.querySelector('.modal:not([data-dialog-kind="guided-step"])')).toBeNull()
     const panelButtons = within(challenge).getAllByRole('button').filter((b) => !b.hasAttribute('disabled'))
     expect(panelButtons.length).toBeGreaterThan(0)
     fireEvent.click(panelButtons[0] as HTMLElement)
@@ -138,10 +139,10 @@ describe('Workbench layout', () => {
     // Baseline only: the first experiment is current, the rest locked.
     const { unmount } = renderWorkbench(session)
     expect(stepTexts()).toEqual([
-      '1. Grow the circle, current step',
-      '2. Try another shape, locked',
-      '3. Tune one dimension, locked',
-      '4. Meet every check, locked',
+      'Grow the circle, current step',
+      'Try another shape, locked',
+      'Tune one dimension, locked',
+      'Meet every check, locked',
     ])
     expect(screen.getByRole('listitem', { current: 'step' }).textContent).toContain('Grow the circle')
     unmount()
@@ -154,10 +155,10 @@ describe('Workbench layout', () => {
     }
     renderWorkbench(tested)
     expect(stepTexts()).toEqual([
-      '1. Grow the circle, complete',
-      '2. Try another shape, current step',
-      '3. Tune one dimension, locked',
-      '4. Meet every check, locked',
+      'Grow the circle, completed',
+      'Try another shape, current step',
+      'Tune one dimension, locked',
+      'Meet every check, locked',
     ])
     expect(screen.getByRole('listitem', { current: 'step' }).textContent).toContain('Try another shape')
   })

@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { catalog } from '../src/challenge/catalog'
-import { audit, openWorkbench, readState, runAnyTest, setDimension, tabTo } from './helpers'
+import { audit, closeStepDialog, expectGuidedStep, openWorkbench, readState, runAnyTest, setDimension, tabTo } from './helpers'
 
 // Task 60 (owner amendment): Reset to baseline starts a challenge over. For each of the six
 // workbenches the learner edits the design, records a test, edits again, then resets through the
@@ -150,11 +150,13 @@ test('Guided: reset returns experiments to step 1 and clears the submission', as
   test.setTimeout(120_000)
   await openWorkbench(page, true, false, 'Guided')
   const guide = page.getByRole('region', { name: 'Guided experiments' })
-  await expect(guide).toContainText(/Step 1 of \d+/)
+  await expectGuidedStep(page, 'Grow the circle')
   // Step 1 grows the Ø31 mm circle baseline (D-47 amendment).
   await setDimension(page, 'diameterM', '34')
   await runAnyTest(page)
-  await expect(guide).not.toContainText(/Step 1 of \d+/)
+  await expectGuidedStep(page, 'Try another shape')
+  await closeStepDialog(page)
+  await expect(guide.getByRole('button', { name: /^Grow the circle\s*, current step$/ })).toHaveCount(0)
   await page.getByRole('button', { name: 'Explain & submit' }).click()
   await page.getByRole('dialog', { name: 'Explain & submit', exact: true }).getByRole('textbox').fill('A reflection that reset clears.')
   await page.getByRole('button', { name: 'Submit design & reflection' }).click()
@@ -165,11 +167,12 @@ test('Guided: reset returns experiments to step 1 and clears the submission', as
   await page.getByRole('dialog', { name: 'Reset this challenge?' }).getByRole('button', { name: 'Reset challenge', exact: true }).click()
   await expect.poll(async () => (await state(page)).history.length).toBe(1)
   expectFresh(await state(page), 'guided')
-  await expect(guide).toContainText(/Step 1 of \d+/)
+  await expectGuidedStep(page, 'Grow the circle')
+  await closeStepDialog(page) // the step changed back to step 1, so the dialog opens again
   await page.reload()
   await openWorkbench(page, false)
   expectFresh(await state(page), 'guided')
-  await expect(page.getByRole('region', { name: 'Guided experiments' })).toContainText(/Step 1 of \d+/)
+  await expectGuidedStep(page, 'Grow the circle')
 })
 
 test('Reset to baseline works by keyboard, can be cancelled and fits 320 px', async ({ page }, info) => {

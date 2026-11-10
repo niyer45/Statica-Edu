@@ -1,4 +1,5 @@
 import type { BracketAnalysis } from '../../../physics/bracket/types'
+import Disclosure from '../../workbench/Disclosure'
 import { formatBracket, useBracketStore } from './shared'
 
 // Bracket result details shown under the 3D or 2D view (task 55 L-bracket; MM-22).
@@ -37,7 +38,7 @@ export default function BracketDetails() {
   const width = Math.max(460, Math.ceil(loadX + X0))
   const result = (ok: boolean) => (ok ? '✓ Pass' : '✗ Fail')
   return (
-    <>
+    <Disclosure summary="Moment path" className="bracket-moment-path">
       <p id={SUMMARY_ID} className="viewport-label bracket-summary" aria-live="off">
         An L-bracket: its vertical flange is bolted flat to the wall and its horizontal arm carries a load hanging near the tip.
         {' '}Latest tested: {bendSummary(a)} · the triangle in the moment path marks the bend
@@ -50,8 +51,7 @@ export default function BracketDetails() {
         <polygon className="governing-marker" points={`${bendX - 6},${peakY + 5} ${bendX + 6},${peakY + 5} ${bendX},${peakY - 6}`} />
         <circle className="section-marker" cx={boltX} cy={BASE} r={4.5} />
       </svg>
-      <details className="bracket-sections">
-        <summary>Checked sections</summary>
+      <div className="bracket-section-table">
         <table aria-label="Checked sections of the latest tested design">
           <thead>
             <tr>
@@ -79,7 +79,7 @@ export default function BracketDetails() {
             </tr>
           </tbody>
         </table>
-      </details>
-    </>
+      </div>
+    </Disclosure>
   )
 }

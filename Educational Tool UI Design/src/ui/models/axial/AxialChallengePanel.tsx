@@ -28,10 +28,9 @@ export default function AxialChallengePanel({ onOpenHelp }: { onOpenHelp: () => 
     <>
       <div className="panel-title">
         <Icon name="book" size={16} />
-        <h2>The challenge</h2>
+        <h2>Checks</h2>
       </div>
       <div className="challenge-body">
-        <p>{ch.statement}</p>
         <div className="section-heading requirements-title">
           VALUE / LIMIT <Icon name="lock" size={11} />
         </div>

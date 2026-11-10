@@ -1,6 +1,7 @@
 import { useId, useMemo } from 'react'
 import { transmissibilityCurve } from '../../../physics/vibration/response'
 import { formatHz, formatPercent, mToMm } from '../../../units/units'
+import Disclosure from '../../workbench/Disclosure'
 import { formatVibration, materialName, useVibrationStore } from './shared'
 import './vibration.css'
 
@@ -155,13 +156,14 @@ export default function VibrationView() {
           </text>
         </svg>
       </div>
-      <p className="vibration-position">
-        Natural frequency {formatVibration(a.naturalFrequencyHz, 'Hz')}, {fnPosition} ({formatHz(band.minHz)}–{formatHz(band.maxHz)} Hz). Transmissibility 1 passes vibration
-        straight through; below 1 isolates it.
-      </p>
-      {sagPx < sagMm * SAG_PX_PER_MM && <p className="vibration-note">Drawn sag is capped; the stored sag is {formatVibration(a.staticDeflectionM, 'm')}.</p>}
-      <details className="vibration-more">
-        <summary>All response values</summary>
+      <Disclosure summary="Reading the chart" className="vibration-reading">
+        <p className="vibration-position">
+          Natural frequency {formatVibration(a.naturalFrequencyHz, 'Hz')}, {fnPosition} ({formatHz(band.minHz)}–{formatHz(band.maxHz)} Hz). Transmissibility 1 passes vibration
+          straight through; below 1 isolates it.
+        </p>
+        {sagPx < sagMm * SAG_PX_PER_MM && <p className="vibration-note">Drawn sag is capped; the stored sag is {formatVibration(a.staticDeflectionM, 'm')}.</p>}
+      </Disclosure>
+      <Disclosure summary="All response values" className="vibration-more">
         <p className="vibration-summary">
           Latest test: {materialName(ch, latest.designSnapshot.materialId)} mount · {formatVibration(a.stiffnessNPerM, 'N/m')} · natural frequency{' '}
           {formatVibration(a.naturalFrequencyHz, 'Hz')}, {fnPosition} · sag {formatVibration(a.staticDeflectionM, 'm')}. Steady-state response at each frequency,
@@ -235,7 +237,7 @@ export default function VibrationView() {
             </tbody>
           </table>
         </div>
-      </details>
+      </Disclosure>
     </div>
   )
 }

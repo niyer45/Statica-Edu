@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { audit, expectGuidedStep, readState, runAnyTest, tabTo } from './helpers'
+import { audit, closeStepDialog, expectAllStepsComplete, expectGuidedStep, expectParametricNote, readState, runAnyTest, tabTo } from './helpers'
 
 // Torsion Shaft I (task 47.3; TSH-14–TSH-16, MM-16, MM-22): chosen before entry from the
 // library, full prediction/test loop to an Accepted hollow shaft, saved under its own key,
@@ -23,6 +23,8 @@ async function openTorsion(page: Page, mode: 'Guided' | 'Parametric', keyboard: 
     await drawer.getByRole('button', { name: 'Open challenge', exact: true }).click()
   }
   await expect(page.getByRole('button', { name: 'Run Test', exact: true })).toBeVisible()
+  // The step dialog opens on every Guided entry and on reload (task 78.4); read it, then close it.
+  if (mode === 'Guided') await closeStepDialog(page)
   // The dev snapshot follows the newly mounted store after the switch; wait for it.
   await expect.poll(async () => (await readState(page)).challengeId).toBe('torsion-shaft-1')
 }
@@ -73,6 +75,15 @@ for (const mode of ['Guided', 'Parametric'] as const) {
     await expect(requirements.getByText('2.73°', { exact: true })).toBeVisible()
     await expect(requirements.getByText('4.588 kg', { exact: true })).toBeVisible()
     await expect(page.getByText('Idealized circular-shaft torsion, not a structural certification')).toBeVisible()
+    // Task 78: the statement remainder and the shaft summary are collapsed until their Disclosures open.
+    const fixedSentence = page.getByText('The length, end support, material, and applied torque are fixed.')
+    await expect(fixedSentence).toBeHidden()
+    await page.getByText('More about this challenge', { exact: true }).click()
+    await expect(fixedSentence).toBeVisible()
+    const shaftSummary = page.getByText(/latest tested twist 2\.73°/)
+    await expect(shaftSummary).toBeHidden()
+    await page.getByText('Shaft summary', { exact: true }).click()
+    await expect(shaftSummary).toBeVisible()
     const hollow = page.getByRole('button', { name: 'Hollow tube', exact: true })
     if (mode === 'Guided') {
       // Task 58: structured experiments; since task 71 (D-61) step 1 unlocks only the shaft type.
@@ -81,7 +92,7 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await expect(page.getByLabel('Diameter', { exact: true })).toHaveAttribute('readonly', '')
     } else {
       await expect(page.getByRole('region', { name: 'Guided experiments' })).toHaveCount(0)
-      await expect(page.getByText(/Every parameter is editable from the start/)).toBeVisible()
+      await expectParametricNote(page)
       await expect(hollow).not.toHaveAttribute('aria-disabled', 'true')
     }
     await audit(page)
@@ -90,17 +101,19 @@ for (const mode of ['Guided', 'Parametric'] as const) {
       await hollow.click()
       await runAnyTest(page)
       await expectGuidedStep(page, 'Move the material outward')
+      await closeStepDialog(page)
       await setShaft(page, 'Outer diameter', '45')
       await setShaft(page, 'Inner diameter', '37')
       await runAnyTest(page)
       await expectGuidedStep(page, 'Meet every check')
+      await closeStepDialog(page)
     }
     await hollow.click()
     await setShaft(page, 'Outer diameter', '50')
     await setShaft(page, 'Inner diameter', '44')
     if (mode === 'Guided') {
       await runAnyTest(page)
-      await expect(page.getByRole('region', { name: 'Guided experiments' }).getByRole('heading', { name: 'All experiments complete' })).toBeVisible()
+      await expectAllStepsComplete(page)
     } else {
       await page.getByRole('button', { name: 'Run Test', exact: true }).click()
       const prediction = page.getByRole('dialog', { name: 'Predict twist' })

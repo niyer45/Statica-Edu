@@ -109,6 +109,22 @@ describe('Pressure Vessel I workbench', () => {
     expect(screen.queryByText(/bracket|torsion|twist|deflection|cantilever/i)).toBeNull()
   })
 
+  it('keeps the caption, view text, vessel note and statement remainder collapsed until their disclosures are opened', () => {
+    renderVessel()
+    const pairs = [
+      [screen.getByText(ELEVATION_CAPTION), 'About this drawing'],
+      [screen.getByText(/Latest tested: hoop stress/), 'Vessel details'],
+      [screen.getByText(/The shell length is the straight part between the heads/), 'About the vessel'],
+      [screen.getByText('More about this challenge'), 'More about this challenge'],
+    ] as const
+    for (const [el, label] of pairs) {
+      const d = el.closest('details')!
+      expect(d.open).toBe(false)
+      fireEvent.click(within(d).getByText(label))
+      expect(d.open).toBe(true)
+    }
+  })
+
   it('draws the draft section: two walls, the air space and the axis, with no text on the drawing', () => {
     renderVessel()
     const svg = screen.getByRole('img', { name: ELEVATION_LABEL })
@@ -159,7 +175,7 @@ describe('Pressure Vessel I workbench', () => {
     renderVessel()
     setMm('Shell thickness', '2')
     runTest(/Decrease/)
-    const panel = screen.getByRole('complementary', { name: 'The challenge' })
+    const panel = screen.getByRole('complementary', { name: 'Checks' })
     const warnings = within(panel).getByRole('list', { name: 'Model warnings', hidden: true })
     expect(warnings.closest('details')?.querySelector('summary')?.textContent).toBe('Test details')
     expect(within(warnings).getByText(/Largest membrane stress divided by yield stress is 0\.96/, undefined)).toBeTruthy()
@@ -219,14 +235,13 @@ describe('Pressure Vessel I workbench', () => {
     expect(within(dialog).getByText(/not a real-world approval or a pressure-vessel code/)).toBeTruthy()
   })
 
-  it('Guided locks every dimension but the step one; Parametric is open design (D-49)', () => {
+  it('Guided locks every dimension but the step one; Parametric is open design (D-49)', async () => {
     renderVessel('guided')
     const unlocked = vesselUi.guided.steps[0]!.unlocks as readonly string[]
     for (const [param, label] of Object.entries(VESSEL_PARAM_LABELS)) {
       expect((screen.getByLabelText(label) as HTMLInputElement).readOnly).toBe(!unlocked.includes(param))
     }
-    const guidance = screen.getByRole('region', { name: 'Guided experiments' })
-    expect(within(guidance).getByRole('heading', { name: 'Thicken the shell' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Thicken the shell' }, { timeout: 3000 })).toBeTruthy()
     cleanup()
     renderVessel('parametric')
     expect(screen.queryByRole('region', { name: 'Guided experiments' })).toBeNull()
